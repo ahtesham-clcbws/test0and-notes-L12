@@ -3,7 +3,6 @@
 /public/storage
 /storage/logs
 /storage/debugbar
-/storage/framework
 .env
 .env.backup
 .env.live
