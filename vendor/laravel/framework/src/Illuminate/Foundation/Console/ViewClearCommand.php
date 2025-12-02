@@ -54,9 +54,9 @@ class ViewClearCommand extends Command
     {
         $path = $this->laravel['config']['view.compiled'];
 
-        if (! $path) {
-            throw new RuntimeException('View path not found.');
-        }
+        // if (!$path) {
+        //     throw new RuntimeException('View path not found.');
+        // }
 
         $this->laravel['view.engine.resolver']
             ->resolve('blade')
