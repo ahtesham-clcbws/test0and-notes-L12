@@ -30,7 +30,6 @@
 
         @stack('scripts')
         @stack('styles')
-        @livewireStyles
 
     </head>
 
