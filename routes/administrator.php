@@ -15,6 +15,8 @@ use App\Http\Controllers\StudymaterialController;
 
 use App\Http\Controllers\Admin\PlanController;
 use App\Http\Controllers\AuthController;
+use App\Livewire\Admin\Pages\PagesList;
+
 //Raj@KNP78  careerwithoutbarrier@gmail.com
 Route::post('gettestpackage', [ExamsController::class, 'gettestpackage'])->name('gettestpackage');
 
@@ -127,6 +129,9 @@ Route::name('administrator.')->group(function () {
                 Route::any('pdf-list', [SettingsController::class, 'pdfList'])->name('dashboard_add_pdf_content');
                 Route::post('pdf-submit', [SettingsController::class, 'pdfSubmit'])->name('pdf_submit');
                 Route::post('pdf-delete', [SettingsController::class, 'pdfDelete'])->name('pdf_delete');
+                // livewire
+                Route::any('pages', PagesList::class)->name('website_pages');
+                Route::any('pages/{page}/update', PagesList::class)->name('website_pages.update');
             });
         });
     });

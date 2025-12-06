@@ -452,6 +452,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ route('administrator.website_pages') }}">
+                                Website Pages
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('administrator.manage_home') }}">
                                 Manage Home
                             </a>
