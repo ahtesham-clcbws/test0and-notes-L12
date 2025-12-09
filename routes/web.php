@@ -11,6 +11,8 @@ use App\Http\Controllers\Frontend\CourseController;
 use Illuminate\Support\Facades\Artisan;
 
 use App\Http\Controllers\TestController;
+use App\Livewire\Frontend\Pages;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -22,11 +24,11 @@ use App\Http\Controllers\TestController;
 |
 */
 
-Route::get('/clear', function () {
-    $exitCode = Artisan::call('cache:clear');
-    $exitCode = Artisan::call('config:cache');
-    return 'DONE'; //Return anything
-});
+// Route::get('/clear', function () {
+//     $exitCode = Artisan::call('cache:clear');
+//     $exitCode = Artisan::call('config:cache');
+//     return 'DONE'; //Return anything
+// });
 Route::get('/', [HomeController::class, 'index'])->name('home_page');
 Route::get('page', [HomeController::class, 'page'])->name('page');
 Route::post('/', [InternalRequestsController::class, 'index']);
@@ -66,10 +68,15 @@ Route::get('/clear-cache', function () {
 
 Route::redirect('admin', 'administrator', 301);
 
-Route::view('resetpassword', 'Dashboard/Admin/reset_password');
-Route::view('resetpassword_student', 'Dashboard/Student/reset_password');
-Route::view('resetpassword_franchise', 'Dashboard/Franchise/reset_password');
-Route::view('resetpassword_creater', 'Dashboard/Franchise/Management/Creater/reset_password');
-Route::view('resetpassword_publisher', 'Dashboard/Franchise/Management/Publisher/reset_password');
+// Route::view('resetpassword', 'Dashboard/Admin/reset_password');
+// Route::view('resetpassword_student', 'Dashboard/Student/reset_password');
+// Route::view('resetpassword_franchise', 'Dashboard/Franchise/reset_password');
+// Route::view('resetpassword_creater', 'Dashboard/Franchise/Management/Creater/reset_password');
+// Route::view('resetpassword_publisher', 'Dashboard/Franchise/Management/Publisher/reset_password');
 
 Route::post('resetpassword', [AuthController::class, 'resetPwd']);
+
+
+Route::any('{slug}', Pages::class)->name('policy-page');
+// Route::any('privacy-policy', Pages::class);
+// Route::any('terms-and-conditions', Pages::class);

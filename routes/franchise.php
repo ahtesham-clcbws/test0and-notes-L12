@@ -21,6 +21,7 @@ use App\Http\Controllers\Frontend\Franchise\Management\Manager\ExamsController a
 
 use App\Http\Controllers\Frontend\Franchise\Management\Publisher\DashboardController as PublisherDashboardController;
 use App\Http\Controllers\Frontend\Franchise\Management\Publisher\ExamsController as PublisherExamsController;
+use App\Http\Middleware\IsFranchise;
 
 Route::any('/contributor/login', [AuthController::class, 'franchiseManagementLogin'])->middleware(['managementguest'])->name('management_login');
 Route::name('franchise.')->group(function () {
@@ -219,7 +220,7 @@ Route::name('franchise.')->group(function () {
 
 
 
-        Route::middleware(['is_franchise'])->group(function () {
+        Route::middleware(IsFranchise::class)->group(function () {
             Route::any('/', [DashboardController::class, 'index'])->name('dashboard');
             Route::any('users', [UserController::class, 'index'])->name('users');
             Route::any('users/{type}', [UserController::class, 'index'])->name('users_type');

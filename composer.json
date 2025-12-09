@@ -12,7 +12,7 @@
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.8",
-        "livewire/livewire": "^3.7",
+        "livewire/livewire": "^3.4",
         "maatwebsite/excel": "^3.1",
         "phpoffice/phpspreadsheet": "^1.15",
         "razorpay/razorpay": "^2.9",
@@ -35,7 +35,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helper/GlobalHelper.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

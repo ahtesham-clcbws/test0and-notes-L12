@@ -10,10 +10,9 @@ use App\Http\Controllers\Controller;
 
 use App\Models\Gn_PackagePlan;
 
-use App\Models\Educationtype;
 use App\Models\Pdf;
 
-use App\Models\{TestModal, Studymaterial, BooksModel, User};
+use App\Models\{Studymaterial, User};
 use App\Notifications\ContactFormAdminNotify;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,12 +25,6 @@ class HomeController extends Controller
 
     public function index()
     {
-
-        $gn_EduTypes      = Educationtype::get();
-
-        $gn_EduTest      = TestModal::get();
-
-
 
         $current_date = date('Y-m-d');
 
@@ -150,17 +143,14 @@ class HomeController extends Controller
         $result['subtitle8_content'] = $data->banner_content;
 
         $pdf = Pdf::where('type', 'student')->orderBy('id', 'DESC')->first();
-        $education_types = DB::table('education_type')->get();
-        $classes_groups_exams = DB::table('classes_groups_exams')->get();
-        return view('Frontend/home', compact('classes_groups_exams', 'education_types', 'gn_EduTypes', 'gn_EduTest', 'Gn_PackagePlanGyanology', 'Gn_PackagePlanGyanology2', 'StudymaterialGovComp', 'StudymaterialGovComp2', 'StudymaterialGovComp3', 'StudymaterialGovComp4', 'StudymaterialGovComp5', 'Gn_PackagePackagelist', 'Gn_PackagePlanInstitute', 'result', 'pdf'));
+        return view('Frontend/home', compact('Gn_PackagePlanGyanology', 'Gn_PackagePlanGyanology2', 'StudymaterialGovComp', 'StudymaterialGovComp2', 'StudymaterialGovComp3', 'StudymaterialGovComp4', 'StudymaterialGovComp5', 'Gn_PackagePackagelist', 'Gn_PackagePlanInstitute', 'result', 'pdf'));
     }
 
     public function page()
     {
         $pdf = Pdf::where('type', 'student')->orderBy('id', 'DESC')->first();
         $education_types = DB::table('education_type')->get();
-        $classes_groups_exams = DB::table('classes_groups_exams')->get();
-        return view('Frontend/page', compact('education_types', 'classes_groups_exams', 'pdf'));
+        return view('Frontend/page', compact('education_types', 'pdf'));
     }
 
     public function onlineTest()

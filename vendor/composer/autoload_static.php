@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInita0106b658eab8ed72e4c2df774205f90
+class ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8
 {
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
@@ -40,6 +40,7 @@ class ComposerStaticInita0106b658eab8ed72e4c2df774205f90
         'f57d353b41eb2e234b26064d63d8c5dd' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Filesystem/functions.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '7f7ac2ddea9cc3fb4b2cc201d63dbc10' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Log/functions.php',
+        '91892b814db86b8442ad76273bb7aec5' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Reflection/helpers.php',
         '493c6aea52f6009bab023b26c21a386a' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/functions.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
         '40275907c8566c390185147049ef6e5d' => __DIR__ . '/..' . '/livewire/livewire/src/helpers.php',
@@ -50,6 +51,7 @@ class ComposerStaticInita0106b658eab8ed72e4c2df774205f90
         '13906c19e3d8fcd1341b24ed4d51cf72' => __DIR__ . '/..' . '/razorpay/razorpay/Deprecated.php',
         '320163ac6b93aebe3dc25b60a0533d56' => __DIR__ . '/..' . '/spatie/laravel-ignition/src/helpers.php',
         '0b47d6d4a00ca9112ba3953b49e7c9a4' => __DIR__ . '/..' . '/yajra/laravel-datatables-oracle/src/helper.php',
+        'c5120a1e8a9e8555c82401e6c804c195' => __DIR__ . '/../..' . '/app/Helper/GlobalHelper.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -545,6 +547,7 @@ class ComposerStaticInita0106b658eab8ed72e4c2df774205f90
             0 => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Macroable',
             1 => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Collections',
             2 => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Conditionable',
+            3 => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Reflection',
         ),
         'Illuminate\\' =>
         array (
@@ -732,6 +735,9 @@ class ComposerStaticInita0106b658eab8ed72e4c2df774205f90
         'App\\Http\\Requests\\UpdateStudymaterialRequest' => __DIR__ . '/../..' . '/app/Http/Requests/UpdateStudymaterialRequest.php',
         'App\\Imports\\QuestionBankImport' => __DIR__ . '/../..' . '/app/Imports/QuestionBankImport.php',
         'App\\Imports\\QuestionImport' => __DIR__ . '/../..' . '/app/Imports/QuestionImport.php',
+        'App\\Livewire\\Admin\\Pages\\PagesList' => __DIR__ . '/../..' . '/app/Livewire/Admin/Pages/PagesList.php',
+        'App\\Livewire\\Admin\\Pages\\PagesView' => __DIR__ . '/../..' . '/app/Livewire/Admin/Pages/PagesView.php',
+        'App\\Livewire\\Frontend\\Pages' => __DIR__ . '/../..' . '/app/Livewire/Frontend/Pages.php',
         'App\\Mail\\InstituteApproveEmail' => __DIR__ . '/../..' . '/app/Mail/InstituteApproveEmail.php',
         'App\\Mail\\InstituteRejectedEmail' => __DIR__ . '/../..' . '/app/Mail/InstituteRejectedEmail.php',
         'App\\Mail\\NotifyAdminInstituteSignup' => __DIR__ . '/../..' . '/app/Mail/NotifyAdminInstituteSignup.php',
@@ -2897,6 +2903,7 @@ class ComposerStaticInita0106b658eab8ed72e4c2df774205f90
         'Illuminate\\Foundation\\Console\\PolicyMakeCommand' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/PolicyMakeCommand.php',
         'Illuminate\\Foundation\\Console\\ProviderMakeCommand' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/ProviderMakeCommand.php',
         'Illuminate\\Foundation\\Console\\QueuedCommand' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/QueuedCommand.php',
+        'Illuminate\\Foundation\\Console\\ReloadCommand' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/ReloadCommand.php',
         'Illuminate\\Foundation\\Console\\RequestMakeCommand' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/RequestMakeCommand.php',
         'Illuminate\\Foundation\\Console\\ResourceMakeCommand' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/ResourceMakeCommand.php',
         'Illuminate\\Foundation\\Console\\RouteCacheCommand' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/RouteCacheCommand.php',
@@ -3022,6 +3029,8 @@ class ComposerStaticInita0106b658eab8ed72e4c2df774205f90
         'Illuminate\\Http\\Client\\HttpClientException' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Client/HttpClientException.php',
         'Illuminate\\Http\\Client\\PendingRequest' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Client/PendingRequest.php',
         'Illuminate\\Http\\Client\\Pool' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Client/Pool.php',
+        'Illuminate\\Http\\Client\\Promises\\FluentPromise' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Client/Promises/FluentPromise.php',
+        'Illuminate\\Http\\Client\\Promises\\LazyPromise' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Client/Promises/LazyPromise.php',
         'Illuminate\\Http\\Client\\Request' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Client/Request.php',
         'Illuminate\\Http\\Client\\RequestException' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Client/RequestException.php',
         'Illuminate\\Http\\Client\\Response' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Client/Response.php',
@@ -3431,7 +3440,7 @@ class ComposerStaticInita0106b658eab8ed72e4c2df774205f90
         'Illuminate\\Support\\Optional' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Optional.php',
         'Illuminate\\Support\\Pluralizer' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Pluralizer.php',
         'Illuminate\\Support\\ProcessUtils' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/ProcessUtils.php',
-        'Illuminate\\Support\\Reflector' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Reflector.php',
+        'Illuminate\\Support\\Reflector' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Reflection/Reflector.php',
         'Illuminate\\Support\\ServiceProvider' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/ServiceProvider.php',
         'Illuminate\\Support\\Sleep' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Sleep.php',
         'Illuminate\\Support\\Str' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Str.php',
@@ -3458,7 +3467,7 @@ class ComposerStaticInita0106b658eab8ed72e4c2df774205f90
         'Illuminate\\Support\\Traits\\InteractsWithData' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Traits/InteractsWithData.php',
         'Illuminate\\Support\\Traits\\Localizable' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Traits/Localizable.php',
         'Illuminate\\Support\\Traits\\Macroable' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php',
-        'Illuminate\\Support\\Traits\\ReflectsClosures' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Traits/ReflectsClosures.php',
+        'Illuminate\\Support\\Traits\\ReflectsClosures' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Reflection/Traits/ReflectsClosures.php',
         'Illuminate\\Support\\Traits\\Tappable' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Traits/Tappable.php',
         'Illuminate\\Support\\Traits\\TransformsToResourceCollection' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Collections/Traits/TransformsToResourceCollection.php',
         'Illuminate\\Support\\Uri' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/Uri.php',
@@ -4099,6 +4108,9 @@ class ComposerStaticInita0106b658eab8ed72e4c2df774205f90
         'League\\Uri\\Exceptions\\OffsetOutOfBounds' => __DIR__ . '/..' . '/league/uri-interfaces/Exceptions/OffsetOutOfBounds.php',
         'League\\Uri\\Exceptions\\SyntaxError' => __DIR__ . '/..' . '/league/uri-interfaces/Exceptions/SyntaxError.php',
         'League\\Uri\\FeatureDetection' => __DIR__ . '/..' . '/league/uri-interfaces/FeatureDetection.php',
+        'League\\Uri\\HostFormat' => __DIR__ . '/..' . '/league/uri-interfaces/HostFormat.php',
+        'League\\Uri\\HostRecord' => __DIR__ . '/..' . '/league/uri-interfaces/HostRecord.php',
+        'League\\Uri\\HostType' => __DIR__ . '/..' . '/league/uri-interfaces/HostType.php',
         'League\\Uri\\Http' => __DIR__ . '/..' . '/league/uri/Http.php',
         'League\\Uri\\HttpFactory' => __DIR__ . '/..' . '/league/uri/HttpFactory.php',
         'League\\Uri\\IPv4\\BCMathCalculator' => __DIR__ . '/..' . '/league/uri-interfaces/IPv4/BCMathCalculator.php',
@@ -7138,7 +7150,9 @@ class ComposerStaticInita0106b658eab8ed72e4c2df774205f90
         'Resend\\Laravel\\Events\\EmailComplained' => __DIR__ . '/..' . '/resend/resend-laravel/src/Events/EmailComplained.php',
         'Resend\\Laravel\\Events\\EmailDelivered' => __DIR__ . '/..' . '/resend/resend-laravel/src/Events/EmailDelivered.php',
         'Resend\\Laravel\\Events\\EmailDeliveryDelayed' => __DIR__ . '/..' . '/resend/resend-laravel/src/Events/EmailDeliveryDelayed.php',
+        'Resend\\Laravel\\Events\\EmailFailed' => __DIR__ . '/..' . '/resend/resend-laravel/src/Events/EmailFailed.php',
         'Resend\\Laravel\\Events\\EmailOpened' => __DIR__ . '/..' . '/resend/resend-laravel/src/Events/EmailOpened.php',
+        'Resend\\Laravel\\Events\\EmailReceived' => __DIR__ . '/..' . '/resend/resend-laravel/src/Events/EmailReceived.php',
         'Resend\\Laravel\\Events\\EmailSent' => __DIR__ . '/..' . '/resend/resend-laravel/src/Events/EmailSent.php',
         'Resend\\Laravel\\Exceptions\\ApiKeyIsMissing' => __DIR__ . '/..' . '/resend/resend-laravel/src/Exceptions/ApiKeyIsMissing.php',
         'Resend\\Laravel\\Facades\\Resend' => __DIR__ . '/..' . '/resend/resend-laravel/src/Facades/Resend.php',
@@ -8831,10 +8845,10 @@ class ComposerStaticInita0106b658eab8ed72e4c2df774205f90
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInita0106b658eab8ed72e4c2df774205f90::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInita0106b658eab8ed72e4c2df774205f90::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInita0106b658eab8ed72e4c2df774205f90::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInita0106b658eab8ed72e4c2df774205f90::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -2,6 +2,18 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\IsAdminGuest;
+use App\Http\Middleware\IsFranchise;
+use App\Http\Middleware\IsFranchiseGuest;
+use App\Http\Middleware\IsManagement;
+use App\Http\Middleware\IsManagementGuest;
+use App\Http\Middleware\IsStudent;
+use App\Http\Middleware\IsStudentGuest;
+use App\Http\Middleware\Management\IsCreater;
+use App\Http\Middleware\Management\IsManager;
+use App\Http\Middleware\Management\IsMulti;
+use App\Http\Middleware\Management\IsPublisher;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -67,17 +79,17 @@ class Kernel extends HttpKernel
         'signed'            => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle'          => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified'          => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'is_admin'          => \App\Http\Middleware\IsAdmin::class,
-        'is_franchise'      => \App\Http\Middleware\IsFranchise::class,
-        'is_student'        => \App\Http\Middleware\IsStudent::class,
-        'is_management'     => \App\Http\Middleware\IsManagement::class,
-        'is_creater'        => \App\Http\Middleware\Management\IsCreater::class,
-        'is_publisher'      => \App\Http\Middleware\Management\IsPublisher::class,
-        'is_manager'        => \App\Http\Middleware\Management\IsManager::class,
-        'is_multi'          => \App\Http\Middleware\Management\IsMulti::class,
-        'adminguest'        => \App\Http\Middleware\IsAdminGuest::class,
-        'franchiseguest'    => \App\Http\Middleware\IsFranchiseGuest::class,
-        'studentguest'      => \App\Http\Middleware\IsStudentGuest::class,
-        'managementguest'   => \App\Http\Middleware\IsManagementGuest::class,
+        'is_admin'          => IsAdmin::class,
+        'is_franchise'      => IsFranchise::class,
+        'is_student'        => IsStudent::class,
+        'is_management'     => IsManagement::class,
+        'is_creater'        => IsCreater::class,
+        'is_publisher'      => IsPublisher::class,
+        'is_manager'        => IsManager::class,
+        'is_multi'          => IsMulti::class,
+        'adminguest'        => IsAdminGuest::class,
+        'franchiseguest'    => IsFranchiseGuest::class,
+        'studentguest'      => IsStudentGuest::class,
+        'managementguest'   => IsManagementGuest::class,
     ];
 }
