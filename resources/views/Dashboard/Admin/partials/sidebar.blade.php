@@ -457,6 +457,16 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ route('administrator.manage.faq') }}">
+                                Manage FAQ's
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('administrator.manage.important_links') }}">
+                                Important Links
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('administrator.manage_home') }}">
                                 Manage Home
                             </a>

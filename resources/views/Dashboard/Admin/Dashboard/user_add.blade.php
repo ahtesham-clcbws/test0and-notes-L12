@@ -527,7 +527,7 @@
                                 <div class="input-group flex-nowrap">
                                     <span class="input-group-text" id="addon-wrapping"><i
                                             class="bi bi-phone-fill"></i></span>
-                                    <input type="number" min="2222222222" max="9999999999" class="form-control"
+                                    <input type="tel" min="2222222222" max="9999999999" class="form-control"
                                         placeholder="Mobile number" name="mobile" id="contributor_mobile" required>
                                 </div>
                             </div>
@@ -640,54 +640,6 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $('.select2').select2();
-
-        // async function checkCredentials(type, value) {
-        //     var formData = new FormData();
-        //     formData.append(type, value);
-        //     formData.append('form_name', 'credentials_check');
-
-        //     var returnResponse = true;
-
-        //     await $.ajax({
-        //         url: '/',
-        //         type: 'post',
-        //         data: formData,
-        //         contentType: false,
-        //         processData: false,
-        //     }).done(function(response, textStatus) {
-        //         console.log(response);
-        //         returnResponse = response == 'true' ? true : false;
-        //         console.log(textStatus);
-        //     })
-        //     return returnResponse;
-        // }
-
-        // function checkValidation() {
-        //     var contributor_username = $('#contributor_username');
-        //     var contributor_mobile = $('#contributor_mobile');
-        //     var contributor_email = $('#contributor_email');
-        //     if (contributor_username.val() !== '') {
-        //         var response = checkCredentials('username', contributor_username.val());
-        //         if (response) {
-        //             alert('username already available');
-        //         return false;
-        //         }
-        //     }
-        //     if (contributor_mobile.val() !== '') {
-        //         var response = checkCredentials('mobile', contributor_mobile.val());
-        //         if (response) {
-        //             alert('mobile already available');
-        //         return false;
-        //         }
-        //     }
-        //     if (contributor_email.val() !== '') {
-        //         var response = checkCredentials('email', contributor_email.val());
-        //         if (response) {
-        //             alert('email already available');
-        //         return false;
-        //         }
-        //     }
-        // }
     </script>
 
     <script>

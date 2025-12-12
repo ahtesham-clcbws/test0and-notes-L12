@@ -16,10 +16,11 @@ use App\Http\Controllers\StudymaterialController;
 use App\Http\Controllers\Admin\PlanController;
 use App\Http\Controllers\AuthController;
 use App\Livewire\Admin\Pages\PagesList;
+use App\Livewire\Admin\ManageFaq;
+use App\Livewire\Admin\ManageImportantLinks;
 
 //Raj@KNP78  careerwithoutbarrier@gmail.com
 Route::post('gettestpackage', [ExamsController::class, 'gettestpackage'])->name('gettestpackage');
-
 
 Route::name('administrator.')->group(function () {
     Route::prefix('administrator')->group(function () {
@@ -132,6 +133,9 @@ Route::name('administrator.')->group(function () {
                 // livewire
                 Route::any('pages', PagesList::class)->name('website_pages');
                 Route::any('pages/{page}/update', PagesList::class)->name('website_pages.update');
+
+                Route::any('faq', ManageFaq::class)->name('manage.faq');
+                Route::any('important-links', ManageImportantLinks::class)->name('manage.important_links');
             });
         });
     });

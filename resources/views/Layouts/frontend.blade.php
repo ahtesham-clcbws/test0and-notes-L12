@@ -289,11 +289,11 @@
                             <h5 class="text-uppercase text-white" style="font-family:Sansita">Our Terms & Policies
                             </h5>
                             <ul class="list-unstyled">
-                                <li><a class="text-white" href="#">About Us</a></li>
+                                <li><a class="text-white" href="{{ route('about_us') }}">About Us</a></li>
                                 <li><a class="text-white" href="#">Free for You</a></li>
                                 <li><a class="text-white" href="#">Courses & Exams</a></li>
-                                <li><a class="text-white" href="#">Teach Online with Us</a></li>
-                                <li><a class="text-white" href="#">Become Our Education Partner</a></li>
+                                <li><a class="text-white" href="{{ route('bussines_enquiry') }}">Teach Online with Us</a></li>
+                                <li><a class="text-white" href="{{ route('bussines_enquiry') }}">Become Our Education Partner</a></li>
                             </ul>
                         </div>
                         <div class="col-md-3">
@@ -332,7 +332,6 @@
                     </div>
                 </div>
             </footer>
-
             <!-- ============================ Footer End ================================== -->
 
             <!-- Log In Modal -->

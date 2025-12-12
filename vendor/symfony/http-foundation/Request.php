@@ -349,7 +349,7 @@ class Request
         $server['REQUEST_METHOD'] = strtoupper($method);
 
         if (($i = strcspn($uri, ':/?#')) && ':' === ($uri[$i] ?? null) && (strspn($uri, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-.') !== $i || strcspn($uri, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'))) {
-            throw new BadRequestException('Invalid URI: Scheme is malformed.');
+            // throw new BadRequestException('Invalid URI: Scheme is malformed.');
         }
         if (false === $components = parse_url(\strlen($uri) !== strcspn($uri, '?#') ? $uri : $uri.'#')) {
             throw new BadRequestException('Invalid URI.');

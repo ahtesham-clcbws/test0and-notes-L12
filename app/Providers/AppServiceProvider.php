@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\{ClassGoupExamModel};
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Paginator::useBootstrapFive();
         $classes = ClassGoupExamModel::where(['education_type_id' => 52])->get();
         $getGovt = ClassGoupExamModel::where(['education_type_id' => 53])->get();
         $getCompotition = ClassGoupExamModel::where(['education_type_id' => 51])->get();

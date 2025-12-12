@@ -13,7 +13,6 @@
         <link href="{{ asset('logos/logo-white-square.png') }}" rel="apple-touch-icon">
         <title>{{ env('APP_NAME') }}</title>
 
-        <link href="https://getbootstrap.com/docs/5.1/examples/dashboard/" rel="canonical">
         <!-- Bootstrap core CSS -->
         <link href="{{ asset('css/bootstrap.min.css') }} " rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css" rel="stylesheet">

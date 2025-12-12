@@ -38,7 +38,7 @@ Route::any('contributor', [FormsController::class, 'instituteUser'])->name('cont
 Route::any('institute-signup', [FormsController::class, 'instituteSignup'])->name('institute_signup');
 Route::any('reset-password/{studentid}/{resetid}', [FormsController::class, 'studentPasswordReset'])->name('student_recover_password');
 Route::get('start-test', [HomeController::class, 'startTest'])->name('start_test');
-Route::get('about', [HomeController::class, 'aboutUs'])->name('about_us');
+Route::get('about-us', [HomeController::class, 'aboutUs'])->name('about_us');
 Route::any('contact', [HomeController::class, 'contactUs'])->name('contact_us');
 Route::get('plans', [HomeController::class, 'subscribePlan'])->name('plans');
 
