@@ -11,6 +11,7 @@ use App\Http\Controllers\Frontend\CourseController;
 use Illuminate\Support\Facades\Artisan;
 
 use App\Http\Controllers\TestController;
+use App\Livewire\Frontend\Faq;
 use App\Livewire\Frontend\Pages;
 
 /*
@@ -41,6 +42,8 @@ Route::get('start-test', [HomeController::class, 'startTest'])->name('start_test
 Route::get('about-us', [HomeController::class, 'aboutUs'])->name('about_us');
 Route::any('contact', [HomeController::class, 'contactUs'])->name('contact_us');
 Route::get('plans', [HomeController::class, 'subscribePlan'])->name('plans');
+
+Route::get('faq', Faq::class)->name('faqs');
 
 //----------------------Test--------------------//
 Route::get('test', [TestController::class, 'onlineTest'])->name('online_test');

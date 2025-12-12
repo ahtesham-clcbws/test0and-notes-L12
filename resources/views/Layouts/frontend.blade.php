@@ -299,7 +299,7 @@
                         <div class="col-md-3">
                             <h5 class="text-uppercase text-white" style="font-family:Sansita">FAQ’s & Policies</h5>
                             <ul class="list-unstyled">
-                                <li><a class="text-white" href="#">FAQ’s</a></li>
+                                <li><a class="text-white" href="{{ route('faqs') }}">FAQ’s</a></li>
                                 <li><a class="text-white" href="#">Important Links</a></li>
                                 <li><a class="text-white"
                                         href="{{ route('policy-page', ['policy-and-terms']) }}">User Policy &
