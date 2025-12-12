@@ -7,21 +7,16 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Layout('Layouts.admin')]
 class ManageFaq extends Component
 {
+    // use WithPagination;
     #[Url('limit')]
     public $limit = 5;
     #[Url('search')]
     public $search = '';
-
-    // public function updated($property)
-    // {
-    //     if (!$this->formState) {
-    //         $this->reset();
-    //     }
-    // }
 
     public function render()
     {
@@ -62,6 +57,7 @@ class ManageFaq extends Component
                     ->update([
                         'question' => $this->question,
                         'answer' => $this->answer,
+                        'status' => true
                     ]);
             } else {
                 FrequentlyAskedQuestion::create([
