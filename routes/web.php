@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Artisan;
 
 use App\Http\Controllers\TestController;
 use App\Livewire\Frontend\Faq;
+use App\Livewire\Frontend\ImportantLinksWebsitePage;
 use App\Livewire\Frontend\Pages;
 
 /*
@@ -44,6 +45,7 @@ Route::any('contact', [HomeController::class, 'contactUs'])->name('contact_us');
 Route::get('plans', [HomeController::class, 'subscribePlan'])->name('plans');
 
 Route::get('faq', Faq::class)->name('faqs');
+Route::get('important-links', ImportantLinksWebsitePage::class)->name('important_links');
 
 //----------------------Test--------------------//
 Route::get('test', [TestController::class, 'onlineTest'])->name('online_test');
