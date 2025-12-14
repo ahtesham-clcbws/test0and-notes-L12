@@ -347,7 +347,7 @@ class UserController extends Controller
             }
             if ($file = request()->file('user_image')) {
                 $name = $file->hashName();
-                $details->photo_url = request()->file('user_image')->storeAs('admin/' . $id, $name);
+                $details->photo_url = request()->file('user_image')->storeAs('admin/' . $id, $name, 'public');
             }
             if (request()->input('address') && $inputs['address'] !== $details['address']) {
                 $details->address = $inputs['address'];
@@ -491,7 +491,7 @@ class UserController extends Controller
                     $userDetailsDb->user_id =  $userDb->id;
                     if ($file = request()->file('user_logo')) {
                         $name = $file->hashName();
-                        $userDetailsDb->photo_url = request()->file('user_logo')->storeAs('student_uploads/' . $userDb->id, $name);
+                        $userDetailsDb->photo_url = request()->file('user_logo')->storeAs('student_uploads/' . $userDb->id, $name, 'public');
                     }
                     $userDetailsDb->save();
                     User::generateCounts();

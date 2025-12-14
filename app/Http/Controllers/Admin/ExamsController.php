@@ -322,7 +322,7 @@ class ExamsController extends Controller
                 $testMd->sections                   = $inputs['no_of_sections'];
                 $testMd->total_questions            = $inputs['total_questions'];
                 if(isset($req->test_image)){
-                    $testMd->test_image = (isset($req->test_image)) ? $req->file('test_image')->storeAs('test_image', preg_replace('/\s+/', '', $req->file('test_image')->getClientOriginalName())) : null;
+                    $testMd->test_image = (isset($req->test_image)) ? $req->file('test_image')->storeAs('test_image', preg_replace('/\s+/', '', $req->file('test_image')->getClientOriginalName()), 'public') : null;
                 }
                 $testMd->education_type_id          = $inputs['education_type_id'];
                 $testMd->education_type_child_id    = $inputs['class_group_exam_id'];
@@ -2145,7 +2145,7 @@ class ExamsController extends Controller
     if ($req->post('id') > 0) {
     // Update existing record
     if (isset($req->cat_image)) {
-        $imageUrl = $req->file('cat_image')->storeAs('cat_image', preg_replace('/\s+/', '', $req->file('cat_image')->getClientOriginalName()));
+        $imageUrl = $req->file('cat_image')->storeAs('cat_image', preg_replace('/\s+/', '', $req->file('cat_image')->getClientOriginalName()), 'public');
         DB::table('test_cat')->where('id', $req->post('id'))->update([
             'cat_name' => $req->post('cat_name'),
             'cat_image' => $imageUrl
@@ -2158,7 +2158,7 @@ class ExamsController extends Controller
     } else {
         // Insert new record
         if (isset($req->cat_image)) {
-            $imageUrl = $req->file('cat_image')->storeAs('cat_image', preg_replace('/\s+/', '', $req->file('cat_image')->getClientOriginalName()));
+            $imageUrl = $req->file('cat_image')->storeAs('cat_image', preg_replace('/\s+/', '', $req->file('cat_image')->getClientOriginalName()), 'public');
             DB::table('test_cat')->insert([
                 'cat_name' => $req->post('cat_name'),
                 'cat_image' => $imageUrl

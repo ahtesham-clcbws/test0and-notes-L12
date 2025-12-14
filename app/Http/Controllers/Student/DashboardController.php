@@ -159,7 +159,7 @@ class DashboardController extends Controller
 
             $file = $req->file('photo_url');
             $name = $file->hashName();
-            $image_name = $req->file('photo_url')->storeAs('student_uploads/' . $user->id, $name);
+            $image_name = $req->file('photo_url')->storeAs('student_uploads/' . $user->id, $name, 'public');
             DB::table('user_details')
                 ->where('user_id', Auth::user()->id)
                 ->update(['photo_url' => $image_name]);

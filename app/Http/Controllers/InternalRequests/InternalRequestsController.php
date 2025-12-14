@@ -453,7 +453,7 @@ class InternalRequestsController extends Controller
                     }
                     if ($file = $request->file('user_logo')) {
                         $name = $file->hashName();
-                        $userDetailsDb->photo_url = $request->file('user_logo')->storeAs('student_uploads/' . $userDb->id, $name);
+                        $userDetailsDb->photo_url = $request->file('user_logo')->storeAs('student_uploads/' . $userDb->id, $name, 'public');
                     }
 
                     $userDetailsDb->days = '7';
@@ -1352,7 +1352,7 @@ class InternalRequestsController extends Controller
                         $userDetailsDb->user_id =  $userDb->id;
                         if ($file = request()->file('user_logo')) {
                             $name = $file->hashName();
-                            $userDetailsDb->photo_url = request()->file('user_logo')->storeAs('student_uploads/' . $userDb->id, $name);
+                            $userDetailsDb->photo_url = request()->file('user_logo')->storeAs('student_uploads/' . $userDb->id, $name, 'public');
                         }
                         $userDetailsDb->save();
                         return response()->json(['status' => true, 'message' => 'User Created Successfully!']);

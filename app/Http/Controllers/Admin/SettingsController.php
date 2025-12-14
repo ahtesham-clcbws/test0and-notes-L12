@@ -366,7 +366,6 @@ class SettingsController extends Controller
         if ($request->hasFile('pdf_file')) {
             // $file = $request->file('pdf_file');
             // $fileName = $title.rand(111,999). '-' . $file->getClientOriginalName();
-            // $path = $file->storeAs('settingPdf', $fileName, 'public');
             $file = $request->file('pdf_file');
 
         $fileName = $title . rand(111, 999) . '-' . $file->getClientOriginalName();

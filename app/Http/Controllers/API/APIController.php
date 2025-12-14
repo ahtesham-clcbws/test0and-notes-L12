@@ -435,7 +435,7 @@ class APIController extends Controller
 
                     $file=$request->file('photo_url');
                     $name = $file->hashName();
-                    $image_name = $request->file('photo_url')->storeAs('student_uploads/' . $userDb->id, $name);
+                    $image_name = $request->file('photo_url')->storeAs('student_uploads/' . $userDb->id, $name, 'public');
                      $userDetailsDb->photo_url =  $name;
                 }
             $userDetailsDb->education_type =  $request->input('education_type');
@@ -446,7 +446,7 @@ class APIController extends Controller
             }
             if ($file = $request->file('user_logo')) {
                 $name = $file->hashName();
-                $userDetailsDb->photo_url = $request->file('user_logo')->storeAs('student_uploads/' . $userDb->id, $name);
+                $userDetailsDb->photo_url = $request->file('user_logo')->storeAs('student_uploads/' . $userDb->id, $name, 'public');
             }
 
             $userDetailsDb->days = '7';
