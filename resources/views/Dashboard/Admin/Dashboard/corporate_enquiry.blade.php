@@ -26,7 +26,7 @@
                                 <td>{{ $key + 1 }}</td>
                                 <td>
                                     <img id="profile_img"
-                                        src="{{ $enquiry['photoUrl'] ? '/storage/public/' . $enquiry['photoUrl'] : asset('noimg.png') }}"
+                                        src="{{ $enquiry['photoUrl'] ? '/storage/' . $enquiry['photoUrl'] : asset('noimg.png') }}"
                                         style="width:50px;height:50px;border:1px solid #c2c2c2;border-radius:50%;">
                                 </td>
                                 <td>{{ $enquiry['name'] }}</td>

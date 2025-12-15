@@ -25,7 +25,7 @@
                                             <td class="information-txt">{{ $data['name'] }}</td>
                                             <td rowspan="2" class="userImageCell">
                                                 <img id="profile_img"
-                                                    src="{{ $data['details']['photo_url'] ? '/storage/public/'.$data['details']['photo_url'] : asset('noimg.png') }}"
+                                                    src="{{ $data['details']['photo_url'] ? '/storage/'.$data['details']['photo_url'] : asset('noimg.png') }}"
                                                     style="width:80px;height:80px;border:1px solid #c2c2c2;  ">
                                             </td>
                                         </tr>

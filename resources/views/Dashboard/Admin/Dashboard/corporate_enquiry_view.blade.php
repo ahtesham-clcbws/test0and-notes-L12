@@ -26,20 +26,20 @@
                                             <td rowspan="2" class="userImageCell">
                                                 {{-- @if ($data['status'] == 'converted' || $data['status'] == 'activated' || $data['status'] == 'expired' || $data['status'] == 'banned')
                                                 <img id="profile_img"
-                                                    src="{{ $data['details']['image'] ? '/storage/public/'.$data['details']['image'] : asset('noimg.png') }}"
+                                                    src="{{ $data['details']['image'] ? '/storage/'.$data['details']['image'] : asset('noimg.png') }}"
                                                     style="width:80px;height:80px;border:1px solid #c2c2c2;  ">
                                                 @else
                                                 <img id="profile_img"
-                                                    src="{{ $data['photoUrl'] ? '/storage/public/'.$data['photoUrl'] : asset('noimg.png') }}"
+                                                    src="{{ $data['photoUrl'] ? '/storage/'.$data['photoUrl'] : asset('noimg.png') }}"
                                                     style="width:80px;height:80px;border:1px solid #c2c2c2;  ">
                                                 @endif --}}
                                                 @if ($data['status'] == 'converted' || $data['status'] == 'activated' || $data['status'] == 'expired' || $data['status'] == 'banned')
                                                 <img id="profile_img"
-                                                    src="{{ $data['photoUrl'] ? '/storage/public/'.$data['photoUrl'] : asset('noimg.png') }}"
+                                                    src="{{ $data['photoUrl'] ? '/storage/'.$data['photoUrl'] : asset('noimg.png') }}"
                                                     style="width:80px;height:80px;border:1px solid #c2c2c2;  ">                                                
                                                 @else
                                                 <img id="profile_img"
-                                                    src="{{ $data['photoUrl'] ? '/storage/public/'.$data['photoUrl'] : asset('noimg.png') }}"
+                                                    src="{{ $data['photoUrl'] ? '/storage/'.$data['photoUrl'] : asset('noimg.png') }}"
                                                     style="width:80px;height:80px;border:1px solid #c2c2c2;  ">
                                                 @endif
                                             </td>
