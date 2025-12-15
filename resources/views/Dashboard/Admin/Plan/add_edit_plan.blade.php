@@ -63,7 +63,7 @@
 					@if(isset($data['package']))
 					<div class="col-md-1 mt-3">
 						<div class="form-group">
-						<img id="package_img" src="{{ isset($data['package']) && $data['package'][0]['package_image'] ? '/storage/app/' . $data['package'][0]['package_image'] : asset('noimg.png') }}"
+						<img id="package_img" src="{{ isset($data['package']) && $data['package'][0]['package_image'] ? '/storage/' . $data['package'][0]['package_image'] : asset('noimg.png') }}"
                                 style="width:80px;height:80px;border:1px solid #c2c2c2;  ">
 						</div>
 					</div>

@@ -55,7 +55,7 @@
                     </div>
                     @if(isset($data['test']))
 					<div class="col-4">
-						<img id="package_img" src="{{ isset($data['test']) && $data['test']['test_image'] ? '/storage/app/' . $data['test']['test_image'] : asset('noimg.png') }}"
+						<img id="package_img" src="{{ isset($data['test']) && $data['test']['test_image'] ? '/storage/' . $data['test']['test_image'] : asset('noimg.png') }}"
                                 style="width:80px;height:80px;border:1px solid #c2c2c2; object-fit:cover; ">
 					</div>
 					@endif

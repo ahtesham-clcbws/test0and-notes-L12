@@ -23,7 +23,7 @@
                                     <input name="user_image" class="form-control" accept="image/jpeg,image/jpg" type="file"
                                             onchange="avatarPreview(event)">
                                     <img class="w-100 mb-2" id="user_profile_image"
-                                        src="{{ $user['details']['photo_url'] ? '/storage/app/public/' . $user['details']['photo_url'] : asset('noimg.png') }}">
+                                        src="{{ $user['details']['photo_url'] ? '/storage/public/' . $user['details']['photo_url'] : asset('noimg.png') }}">
                                 </div>
                             </div>
                                 <!-- <button class="btn btn-success w-100 mt-2" type="submit" id="imageSaveButton">
@@ -36,7 +36,7 @@
                                         <input name="logo" class="form-control" accept="image/jpeg,image/jpg" type="file"
                                         onchange="logoPreview(event)">
                                         <img class="w-100 mb-2" id="user_logo_image"
-                                        src="{{ $user['details']['logo'] ? '/storage/app/public/' . $user['details']['logo'] : asset('noimg.png') }}">
+                                        src="{{ $user['details']['logo'] ? '/storage/public/' . $user['details']['logo'] : asset('noimg.png') }}">
                                     </div>    
                                     <!-- <button class="btn btn-success w-100 mt-2" type="submit" id="imageSaveButton2">
                                         Save Logo

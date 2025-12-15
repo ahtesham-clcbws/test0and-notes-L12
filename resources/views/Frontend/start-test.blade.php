@@ -396,7 +396,7 @@
                                     @if ($i == 0)
                                         <div class="row">
                                             <div class="col-3">
-                                                <img src="{{ '/storage/app/' . auth()->user()->user_details->photo_url }}"
+                                                <img src="{{ '/storage/' . auth()->user()->user_details->photo_url }}"
                                                     class="student_image" alt="">
                                             </div>
                                             <div class="col-9 text-center d-flex flex-column justify-content-center"

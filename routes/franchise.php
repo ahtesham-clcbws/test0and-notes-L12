@@ -25,14 +25,12 @@ use App\Http\Middleware\IsFranchise;
 
 Route::any('/contributor/login', [AuthController::class, 'franchiseManagementLogin'])->middleware(['managementguest'])->name('management_login');
 Route::name('franchise.')->group(function () {
-    Route::any('institute-login', [AuthController::class, 'franchiselogin'])->middleware(['franchiseguest'])->name('login');
-    Route::prefix('institute')->group(function () {
+    Route::any('corporate-login', [AuthController::class, 'franchiselogin'])->middleware(['franchiseguest'])->name('login');
+    Route::prefix('corporate')->group(function () {
 
         // Route::any('/forget-password', [AuthController::class, 'forgetPassword'])->middleware(['franchiseguest'])->name('forget_password');
         Route::any('/password-reset/{email}/{code}', [AuthController::class, 'franchisePasswordReset'])->middleware(['franchiseguest'])->name('password_reset');
         // Route::any('/', [DashboardController::class, 'index'])->name('dashboard');
-
-
 
         Route::name('management.')->group(function () {
             Route::prefix('management')->group(function () {
@@ -218,8 +216,6 @@ Route::name('franchise.')->group(function () {
             });
         });
 
-
-
         Route::middleware(IsFranchise::class)->group(function () {
             Route::any('/', [DashboardController::class, 'index'])->name('dashboard');
             Route::any('users', [UserController::class, 'index'])->name('users');
@@ -251,5 +247,6 @@ Route::name('franchise.')->group(function () {
                 });
             });
         });
+
     });
 });

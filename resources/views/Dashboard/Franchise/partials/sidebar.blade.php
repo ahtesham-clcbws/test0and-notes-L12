@@ -2,7 +2,7 @@
     <div class="position-sticky">
         <div class="user-details text-center py-3">
             <img class="rounded-circle"
-            src="{{ auth()->user()->institute['logo'] ? '/storage/app/public/'. auth()->user()->institute['logo'] : asset('super/images/default-avatar.jpg') }}">
+            src="{{ auth()->user()->institute['logo'] ? '/storage/public/'. auth()->user()->institute['logo'] : asset('super/images/default-avatar.jpg') }}">
             <h5>
                 {{auth()->user()->institute['institute_name']}}<br>
                 <small>{{auth()->user()->institute->branch_code}}</small>

@@ -2,7 +2,7 @@
     <div class="position-sticky">
         <div class="user-details text-center py-3">
             <img class="rounded-circle" 
-            src="{{ auth()->user()->user_details && auth()->user()->user_details['photo_url'] ? '/storage/app/'.auth()->user()->user_details['photo_url'] : asset('super/images/default-avatar.jpg') }}">
+            src="{{ auth()->user()->user_details && auth()->user()->user_details['photo_url'] ? '/storage/'.auth()->user()->user_details['photo_url'] : asset('super/images/default-avatar.jpg') }}">
             <h5>
                 {{auth()->user()->name}}<br>
                 {{-- <small><small>Director</small></small> --}}

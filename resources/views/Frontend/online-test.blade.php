@@ -126,7 +126,7 @@
                 
                     <div class="property_video sm">
                         <div class="thumb">
-                            <img class="pro_img img-fluid w100" src="{{ '/storage/app/'.$data['user_data']->photo_url }}" alt="7.jpg">
+                            <img class="pro_img img-fluid w100" src="{{ '/storage/'.$data['user_data']->photo_url }}" alt="7.jpg">
                             <!-- <div class="overlay_icon">
                                 <div class="bb-video-box">
                                     <div class="bb-video-box-inner">

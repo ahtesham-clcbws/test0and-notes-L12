@@ -226,7 +226,7 @@
                         @foreach ($tests_category_data as $item)
                             <div class="col-xl-3 col-sm-6 mb-5">
                                 <div class="bg-white rounded shadow-sm py-4 px-4"><img
-                                        src="{{ '/storage/app/' . $item->cat_image }}" alt="" width="100"
+                                        src="{{ '/storage/' . $item->cat_image }}" alt="" width="100"
                                         class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
                                     <h5 class="mb-0">{{ $item->cat_name }}</h5>
 

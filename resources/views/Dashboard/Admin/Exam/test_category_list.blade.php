@@ -24,7 +24,7 @@
                             <tr>
                                 <td>{{$key + 1}}</td>
                                 <td>{{$list->cat_name}}</td>
-                                <td><img style="width:80px;height:80px;border:1px solid #c2c2c2;  " src="{{ isset($list) && $list->cat_image ? '/storage/app/' . $list->cat_image : asset('noimg.png') }}"></td>
+                                <td><img style="width:80px;height:80px;border:1px solid #c2c2c2;  " src="{{ isset($list) && $list->cat_image ? '/storage/' . $list->cat_image : asset('noimg.png') }}"></td>
                                 <td>
                                    <a class="btn btn-primary" href="{{ route('administrator.edit_category',[$list->id]) }}">
                                        Edit

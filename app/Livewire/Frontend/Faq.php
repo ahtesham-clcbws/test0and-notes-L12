@@ -11,7 +11,7 @@ class Faq extends Component
 {
     public function render()
     {
-        $faqs = FrequentlyAskedQuestion::where('status', true)->inRandomOrder()->get();
+        $faqs = FrequentlyAskedQuestion::where('status', true)->orderBy('id')->get();
         return view('livewire.frontend.faq', ['faqs'=>$faqs]);
     }
 }

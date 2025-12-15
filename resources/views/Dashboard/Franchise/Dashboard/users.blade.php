@@ -29,7 +29,7 @@
                                 <td>
                                     <img id="profile_img"
                                     @if(isset(($user->user_details['photo_url']))) 
-                                        src=" {{ $user->user_details['photo_url'] ? '/storage/app/' . $user->user_details['photo_url'] : asset('noimg.png') }}" @else    src=" {{  asset('noimg.png') }}"@endif
+                                        src=" {{ $user->user_details['photo_url'] ? '/storage/' . $user->user_details['photo_url'] : asset('noimg.png') }}" @else    src=" {{  asset('noimg.png') }}"@endif
                                         style="width:50px;height:50px;border:1px solid #c2c2c2;border-radius:50%;">
                                 </td>
                                 <td>{{ $user['name'] }}</td>

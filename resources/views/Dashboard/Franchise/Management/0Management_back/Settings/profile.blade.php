@@ -20,7 +20,7 @@
                             <div class="col-md-6 col-12">
                                 <h4>User Image</h4>
                                 <img class="w-100 mb-2" id="user_profile_image"
-                                    src="{{ $user['details']['photo_url'] ? '/storage/app/public/' . $user['details']['photo_url'] : asset('noimg.png') }}">
+                                    src="{{ $user['details']['photo_url'] ? '/storage/public/' . $user['details']['photo_url'] : asset('noimg.png') }}">
                                 <input name="user_image" class="form-control mt-3" accept="image/jpeg,image/jpg" type="file"
                                     onchange="avatarPreview(event)">
                                 <button class="btn btn-success w-100 mt-2" type="submit" id="imageSaveButton">
@@ -30,7 +30,7 @@
                             <div class="col-md-6 col-12">
                                 <h4>Institute Logo</h4>
                                 <img class="w-100 mb-2" id="user_logo_image"
-                                    src="{{ $user['details']['logo'] ? '/storage/app/public/' . $user['details']['logo'] : asset('noimg.png') }}">
+                                    src="{{ $user['details']['logo'] ? '/storage/public/' . $user['details']['logo'] : asset('noimg.png') }}">
                                 <input name="logo" class="form-control mt-3" accept="image/jpeg,image/jpg" type="file"
                                     onchange="logoPreview(event)">
                                 <button class="btn btn-success w-100 mt-2" type="submit" id="imageSaveButton2">

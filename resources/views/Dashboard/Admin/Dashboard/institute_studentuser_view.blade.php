@@ -37,7 +37,7 @@
                                                  <td>{{$key + 1}}</td>
                                                 <td>
                                                     <img id="profile_img"
-                                                    src="{{ isset($list) && $list->photo_url ? '/storage/app/' . $list->photo_url : asset('noimg.png') }}"
+                                                    src="{{ isset($list) && $list->photo_url ? '/storage/' . $list->photo_url : asset('noimg.png') }}"
                                                     style="width:80px;height:80px;border:1px solid #c2c2c2;  ">
                                                    </td>
                                                 <td>{{$list->name}}</td>

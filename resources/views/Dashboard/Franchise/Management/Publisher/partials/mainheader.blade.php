@@ -252,12 +252,12 @@
         </li>
         <li class="nav-item user-menu dropdown profile-dropdown">
             <img class="nav-link rounded-circle dropdown-toggle" data-bs-toggle="dropdown" id="userMenu"
-                src="{{ auth()->user()->user_details['photo_url'] ? '/storage/app/public/' . auth()->user()->user_details['photo_url'] : asset('super/images/default-avatar.jpg') }}">
+                src="{{ auth()->user()->user_details['photo_url'] ? '/storage/public/' . auth()->user()->user_details['photo_url'] : asset('super/images/default-avatar.jpg') }}">
             <div class="dropdown-content panel-collapse profile-noti dropdown-menu dropdown-menu-end"
                 aria-labelledby="userMenu">
                 <div class="profile-box">
                     <img
-                        src="{{ auth()->user()->user_details['photo_url'] ? '/storage/app/public/' . auth()->user()->user_details['photo_url'] : asset('super/images/default-avatar.jpg') }}">
+                        src="{{ auth()->user()->user_details['photo_url'] ? '/storage/public/' . auth()->user()->user_details['photo_url'] : asset('super/images/default-avatar.jpg') }}">
                     <h6>{{ auth()->user()->name }}</h6>
                     {{-- <p>Admin Manager</p> --}}
                 </div>

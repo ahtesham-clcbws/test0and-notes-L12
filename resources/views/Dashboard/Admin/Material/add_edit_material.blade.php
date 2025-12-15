@@ -75,7 +75,7 @@
                         <label for="Select File" class="control-label">Study Material Image</label>
                         @if (isset($UserDetails) && isset($UserDetails->study_material_image) && $UserDetails->study_material_image != 'NA')
                         <?php $study_material_image = explode('/', $UserDetails->study_material_image); ?>
-                        <a href="{{ '/storage/app/study_material_image/' . $study_material_image[1] }}"
+                        <a href="{{ '/storage/study_material_image/' . $study_material_image[1] }}"
                             class="download" data='{{ $UserDetails->study_material_image }}' style="float:right;"
                             title="Download File"><i class="bi bi-download text-danger me-2"
                                 aria-hidden="true"></i></a>

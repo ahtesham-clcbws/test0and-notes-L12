@@ -41,7 +41,7 @@
                     <div class="col-4">
                         <small><b>Test Category Image</b></small>
                         <input type="file" id="cat_image" name="cat_image" value="{{$cat_image}}" placeholder="Enter test category image..." class="form-control form-control-sm">
-                        <img style="width:80px;height:80px;border:1px solid #c2c2c2;  " src="{{ isset($cat_image) && $cat_image ? '/storage/app/' . $cat_image : asset('noimg.png') }}">
+                        <img style="width:80px;height:80px;border:1px solid #c2c2c2;  " src="{{ isset($cat_image) && $cat_image ? '/storage/' . $cat_image : asset('noimg.png') }}">
                     </div>
                 </div><br>
                     <button type="submit" class="btn btn-primary">Submit</button>

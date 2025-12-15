@@ -25,7 +25,7 @@
                                 <td>{{ $key + 1 }}</td>
                                 <td>
                                     <img id="profile_img"
-                                        src="{{ $user->user_details['photo_url'] ? '/storage/app/' . $user->user_details['photo_url'] : asset('noimg.png') }}"
+                                        src="{{ $user->user_details['photo_url'] ? '/storage/' . $user->user_details['photo_url'] : asset('noimg.png') }}"
                                         style="width:50px;height:50px;border:1px solid #c2c2c2;  ">
                                 </td>
                                 <td>{{ $user['name'] }}</td>

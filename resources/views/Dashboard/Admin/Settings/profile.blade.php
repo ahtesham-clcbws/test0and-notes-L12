@@ -23,7 +23,7 @@
                             <input name="user_image" class="form-control" accept="image/jpeg,image/jpg" type="file"
                                 onchange="avatarPreview(event)">
                             <img class="w-100 mb-2" id="user_profile_image"
-                                src="{{ isset($user['details']) && $user['details']['photo_url'] ? '/storage/app/' . $user['details']['photo_url'] : asset('noimg.png') }}">
+                                src="{{ isset($user['details']) && $user['details']['photo_url'] ? '/storage/' . $user['details']['photo_url'] : asset('noimg.png') }}">
                         </div>
                         </div>
                         <div class="col-md-4">
