@@ -25,11 +25,9 @@
                 <ul class="list-unstyled">
                     <li><a class="text-white" href="{{ route('about_us') }}">About Us</a></li>
                     <li><a class="text-white" href="#">Free for You</a></li>
-                    <li><a class="text-white" href="#">Courses & Exams</a></li>
-                    <li><a class="text-white" href="{{ route('bussines_enquiry') }}">Teach Online with
-                            Us</a></li>
-                    <li><a class="text-white" href="{{ route('bussines_enquiry') }}">Become Our Education
-                            Partner</a></li>
+                    <li><a class="text-white" href="#">Compitition</a></li>
+                    <li><a class="text-white" href="#">Academics</a></li>
+                    <li><a class="text-white" href="#">Govt Jobs</a></li>
                 </ul>
             </div>
             <div class="col-md-3">
@@ -51,12 +49,14 @@
             <div class="col-md-3">
                 <h5 class="text-uppercase text-white" style="font-family:Sansita">Important Links</h5>
                 <ul class="list-unstyled">
-                    <li><a class="text-white" href="{{ route('bussines_enquiry') }}">Corporate
-                            Enquiry</a></li>
-                    <li><a class="text-white" href="{{ route('franchise.login') }}">Institute Login</a>
+                    <li><a class="text-white" href="{{ route('bussines_enquiry') }}">Become Our Education
+                            Partner</a></li>
+                    <li><a class="text-white" href="{{ route('franchise.login') }}">Corporate Login</a>
                     </li>
-                    <li><a class="text-white" href="#">Student Sign up</a></li>
-                    <li><a class="text-white" href="#">Student Login</a></li>
+                    {{-- <li><a class="text-white" href="#">Student Sign up</a></li>
+                    <li><a class="text-white" href="#">Student Login</a></li> --}}
+                    <li><a class="text-white" href="#">Contributor Sign up</a></li>
+                    <li><a class="text-white" href="#">Contributor Login</a></li>
                     <li><a class="text-white" href="{{ route('contact_us') }}">Contact Us For Any
                             Query</a></li>
                 </ul>

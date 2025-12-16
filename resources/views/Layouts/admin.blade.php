@@ -83,24 +83,21 @@
         <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.11.3/datatables.min.js"></script>
 
         <script>
-            var class_group = @php isset($class) ? $class : 0 @endphp;
-            var board = @php isset($board) ? $board : 0 @endphp;
-            var other_exam = @php isset($other_exam) ? $other_exam : 0 @endphp;
-            var subject = @php isset($subject) ? $subject : 0 @endphp;
-            var subject_part = @php isset($subject_part) ? $subject_part : 0 @endphp;
-            var video = @php isset($video) ? $video : 0 @endphp;
-            var notes = @php isset($notes) ? $notes : 0 @endphp;
-            var gk = @php isset($gk) ? $gk : 0 @endphp;
-            var test = @php isset($test) ? $test : 0 @endphp;
-            var package = @php isset($package) ? $package : 0 @endphp;
-            // console.log("class:", class_group);
-            // console.log("board:", board);
-            // console.log("other_exam:", other_exam);
-            // console.log("subject:", subject);
-            // console.log("subject_part:", subject_part);
-            // console.log("notes:", notes);
-            // console.log("test:", test);
-            // console.log("test:", package);
+            let class_group = {{ isset($class) ? $class : 0 }};
+            let board = {{ isset($board) ? $board : 0 }};
+            let other_exam = {{ isset($other_exam) ? $other_exam : 0 }};
+            let subject = {{ isset($subject) ? $subject : 0 }};
+            let subject_part = {{ isset($subject_part) ? $subject_part : 0 }};
+            let video = {{ isset($video) ? $video : 0 }};
+            let notes = {{ isset($notes) ? $notes : 0 }};
+            let gk = {{ isset($gk) ? $gk : 0 }};
+            // let test =  {{ isset($test) ? json_encode($test) : 0 }};
+            let package = {{ isset($package) ? $package : 0 }};
+
+            let test = 0;
+            @if (isset($test) && intval($test) > 0)
+                test = {{ $test }};
+            @endif
         </script>
 
 
@@ -399,8 +396,9 @@
                             alert('No classes / Groups or Exams in this Type, please select another, or add some.');
                         }
                         $('#class_group_exam_id').html(options);
-                        if (class_group != 0)
+                        if (class_group != 0) {
                             $('#class_group_exam_id').trigger('change');
+                        }
                     } else {
                         alert(data.message);
                     }
@@ -441,7 +439,8 @@
                             $('#exam_agency_board_university_id').val('');
                             $('#exam_agency_board_university_id').attr('disabled', 'disabled');
                             alert(
-                                'Exam Agency/ Board/ University in this Class/ Group/ Exam Name, please select another, or add some.');
+                                'Exam Agency/ Board/ University in this Class/ Group/ Exam Name, please select another, or add some.'
+                            );
                         }
                         $('#exam_agency_board_university_id').html(options);
                         if (board != 0)
