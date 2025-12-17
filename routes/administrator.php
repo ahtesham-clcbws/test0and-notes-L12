@@ -15,6 +15,9 @@ use App\Http\Controllers\StudymaterialController;
 
 use App\Http\Controllers\Admin\PlanController;
 use App\Http\Controllers\AuthController;
+use App\Livewire\Admin\Contact\ContactList;
+use App\Livewire\Admin\Contact\ContactListReply;
+use App\Livewire\Admin\Contact\ContactRepliesList;
 use App\Livewire\Admin\Pages\PagesList;
 use App\Livewire\Admin\ManageFaq;
 use App\Livewire\Admin\ManageImportantLinks;
@@ -136,6 +139,11 @@ Route::name('administrator.')->group(function () {
 
                 Route::any('faq', ManageFaq::class)->name('manage.faq');
                 Route::any('important-links', ManageImportantLinks::class)->name('manage.important_links');
+
+
+                Route::get('/contact_enquiry', ContactList::class)->name('manage.contactEnquiry');
+                Route::get('/contact_enquiry/{id}', ContactListReply::class)->name('manage.contactEnquiryReply');
+                Route::get('/contact-replies/{id}', ContactRepliesList::class)->name('manage.contactRelpiesList');
             });
         });
     });

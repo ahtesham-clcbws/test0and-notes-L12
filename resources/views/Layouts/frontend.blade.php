@@ -154,8 +154,8 @@
 
         @php
             $education_types = education_types();
-            $gn_EduTypes      = gn_EduTypes();
-            $gn_EduTest      = gn_EduTest();
+            $gn_EduTypes = gn_EduTypes();
+            $gn_EduTest = gn_EduTest();
             $classes_groups_exams = classes_groups_exams();
         @endphp
     </head>
@@ -235,8 +235,7 @@
                                         <li>
                                             <a class="alio_green" data-bs-toggle="modal" data-bs-target="#login"
                                                 href="#">
-                                                <i class="fas fa-sign-in-alt me-1"></i><span
-                                                    class="dn-lg">Login</span>
+                                                <i class="fas fa-sign-in-alt me-1"></i><span class="dn-lg">Login</span>
                                             </a>
                                         </li>
                                         <li class="add-listing theme-bg">
@@ -273,8 +272,7 @@
                 <div class="modal-dialog modal-lg modal-dialog-centered login-pop-form" role="document">
                     <div class="modal-content overli" id="loginmodal">
                         <div class="modal-header">
-                            <h5 class="modal-title theme-cl pointerCursor" id="loginModalTitle"
-                                onclick="toggleLogin()">
+                            <h5 class="modal-title theme-cl pointerCursor" id="loginModalTitle" onclick="toggleLogin()">
                                 Don't have account? SignUp
                             </h5>
                             <button class="btn-close" data-bs-dismiss="modal" type="button" aria-label="Close">
@@ -589,7 +587,7 @@
         <script src="{{ URL::asset('frontend/sweetalert2/sweetalert2.js') }}"></script>
 
         <script src="{{ asset('frontend/js/jquery.validate.min.js') }}"></script>
-        <!-- <script src="{{ asset('frontend/js/sweetalert.min.js') }}"></script> -->
+        <script src="{{ asset('frontend/js/sweetalert.min.js') }}"></script>
         <script src="{{ asset('skillup/js/custom.js') }}"></script>
         <script>
             var registration = $('#registration');
@@ -736,9 +734,34 @@
                     console.log(data);
                 })
             }
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "bottom-center",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+
+            function success(messasge) {
+                return Toast.fire({
+                    icon: "success",
+                    title: messasge
+                });
+            }
+            function error(messasge) {
+                return Toast.fire({
+                    icon: "error",
+                    title: messasge
+                });
+            }
         </script>
 
         @yield('js')
+        @stack('scripts')
 
         <div class="text-center" id="fullpage_loader">
             <div>

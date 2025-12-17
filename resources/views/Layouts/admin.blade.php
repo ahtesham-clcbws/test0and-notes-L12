@@ -27,7 +27,6 @@
         <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.2.0/dist/select2-bootstrap-5-theme.min.css"
             rel="stylesheet" />
 
-        @stack('scripts')
         @stack('styles')
 
     </head>
@@ -82,6 +81,7 @@
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.11.3/datatables.min.js"></script>
 
+        <script src="{{ asset('frontend/js/sweetalert.min.js') }}"></script>
         <script>
             let class_group = {{ isset($class) ? $class : 0 }};
             let board = {{ isset($board) ? $board : 0 }};
@@ -581,8 +581,35 @@
                     console.log(data);
                 })
             }
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "bottom-center",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+
+            function success(messasge) {
+                return Toast.fire({
+                    icon: "success",
+                    title: messasge
+                });
+            }
+            function error(messasge) {
+                return Toast.fire({
+                    icon: "error",
+                    title: messasge
+                });
+            }
         </script>
         @yield('javascript')
+        
+        @stack('scripts')
     </body>
 
 </html>

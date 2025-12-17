@@ -24,22 +24,22 @@
                 <div class="collapse" id="home-collapse">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('administrator.corporate_enquiry_type', 'new') }}">
+                            <a class="nav-link" href="{{ route('administrator.corporate_enquiry_type', ['new']) }}">
                                 New Enquiries
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('administrator.corporate_enquiry_type', 'signup') }}">
+                            <a class="nav-link" href="{{ route('administrator.corporate_enquiry_type', ['signup']) }}">
                                 New Sign Up
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('administrator.corporate_enquiry_type', 'approved') }}">
+                            <a class="nav-link" href="{{ route('administrator.corporate_enquiry_type', ['approved']) }}">
                                 Approved Enquiries
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('administrator.corporate_enquiry_type', 'rejected') }}">
+                            <a class="nav-link" href="{{ route('administrator.corporate_enquiry_type', ['rejected']) }}">
                                 Rejected Enquiries
                             </a>
                         </li>
@@ -55,27 +55,27 @@
                 <div class="collapse" id="franchise-collapse">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('administrator.franchise_type', 'compitition') }}">
+                            <a class="nav-link" href="{{ route('administrator.franchise_type', ['compitition']) }}">
                                 Competition Franchise
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('administrator.franchise_type', 'academics') }}">
+                            <a class="nav-link" href="{{ route('administrator.franchise_type', ['academics']) }}">
                                 Academics Franchise
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('administrator.franchise_type', 'school') }}">
+                            <a class="nav-link" href="{{ route('administrator.franchise_type', ['school']) }}">
                                 School Franchise
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('administrator.franchise_type', 'other') }}">
+                            <a class="nav-link" href="{{ route('administrator.franchise_type', ['other']) }}">
                                 Others Franchise
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('administrator.franchise_type', 'multi') }}">
+                            <a class="nav-link" href="{{ route('administrator.franchise_type', ['multi']) }}">
                                 Multi Franchise
                             </a>
                         </li>
@@ -467,6 +467,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ route('administrator.manage.contactEnquiry') }}">
+                                Contact Submissions
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('administrator.manage_home') }}">
                                 Manage Home
                             </a>
@@ -481,6 +486,7 @@
                                 Pdf Content List
                             </a>
                         </li>
+                        
                     </ul>
                 </div>
             </li>
