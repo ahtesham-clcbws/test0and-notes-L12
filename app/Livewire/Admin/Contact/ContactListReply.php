@@ -6,6 +6,7 @@ use App\Models\NewModels\ContactQuery;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
+use App\Notifications\ContactQueryReplyMail;
 
 #[Layout('Layouts.admin')]
 class ContactListReply extends Component
@@ -32,7 +33,7 @@ class ContactListReply extends Component
                 $this->contact->replies()->create([
                     'message' => $this->message
                 ]);
-                // $this->contact->notify(new ContactInfoReplyMail($this->contact, $this->message));
+                $this->contact->notify(new ContactQueryReplyMail($this->contact, $this->message));
                 $this->contact->update(['status' => true]);
                 $this->js('success("Reply message sent successfully.")');
                 return redirect()->route('administrator.manage.contactRelpiesList', $this->contact->id);

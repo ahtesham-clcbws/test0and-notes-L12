@@ -17,6 +17,7 @@
         "phpoffice/phpspreadsheet": "^1.15",
         "razorpay/razorpay": "^2.9",
         "resend/resend-laravel": "^1.0",
+        "resend/resend-php": "^1.1",
         "yajra/laravel-datatables-oracle": "^v12.6"
     },
     "require-dev": {

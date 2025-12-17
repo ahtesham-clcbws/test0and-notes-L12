@@ -35,7 +35,7 @@ class ContactUsForm extends Form
     {
         $this->validate();
         try {
-            return ContactQuery::create([
+            $contactQuery = ContactQuery::create([
                 'name' => $this->name,
                 'phone' => $this->phone,
                 'email' => $this->email,
@@ -43,6 +43,8 @@ class ContactUsForm extends Form
                 'subject' => $this->subject,
                 'query' => $this->query,
             ]);
+
+            return $contactQuery;
         } catch (\Throwable $th) {
             throw $th;
         }
