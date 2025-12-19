@@ -21,7 +21,7 @@ class ContactUsPage extends Component
         $this->form->validate();
         try {
             $this->form->saveContact();
-            // $this->form->reset();
+            $this->form->reset();
             $this->js("success('Successfully send contact')");
         } catch (\Throwable $th) {
             $this->js("error('Failed to send contact')");
