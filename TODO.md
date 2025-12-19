@@ -37,3 +37,12 @@ u482032683 = ~
 /home/u482032683/domains/testandnotes.com/public_html
 
 cp -r -a . /path/to/destination/directory
+
+# Discard all tracked changes (including composer.lock, vendor/* etc.)
+git reset --hard HEAD
+
+# Remove untracked files/dirs (this will delete those extra vendor/psy files)
+git clean -fd
+
+# Now pull safely
+git pull

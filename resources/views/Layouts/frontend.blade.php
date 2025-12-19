@@ -184,8 +184,7 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="crs_yuo12 btn-danger w-auto text-white" data-bs-toggle="modal"
-                                                data-bs-target="#login" href="#">
+                                            <a class="crs_yuo12 btn-danger w-auto text-white" href="{{ route('login') }}">
                                                 <span class="embos_45"><i class="ti ti-user"></i></span>
                                             </a>
                                         </li>
@@ -233,6 +232,16 @@
                                 @else
                                     <ul class="nav-menu nav-menu-social align-to-right">
                                         <li>
+                                            <a class="alio_green" href="{{ route('login') }}">
+                                                <i class="fas fa-sign-in-alt me-1"></i><span class="dn-lg">Login</span>
+                                            </a>
+                                        </li>
+                                        <li class="add-listing theme-bg">
+                                            <a class="alio_green register" href="{{ route('register') }}">
+                                                <i class="fas fa-users me-1"></i><span class="dn-lg">Register</span>
+                                            </a>
+                                        </li>
+                                        {{-- <li>
                                             <a class="alio_green" data-bs-toggle="modal" data-bs-target="#login"
                                                 href="#">
                                                 <i class="fas fa-sign-in-alt me-1"></i><span class="dn-lg">Login</span>
@@ -243,7 +252,7 @@
                                                 data-bs-target="#login" href="#">
                                                 <i class="fas fa-users me-1"></i><span class="dn-lg">Register</span>
                                             </a>
-                                        </li>
+                                        </li> --}}
                                     </ul>
                                 @endif
                             </div>

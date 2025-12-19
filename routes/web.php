@@ -11,6 +11,9 @@ use App\Http\Controllers\Frontend\CourseController;
 use Illuminate\Support\Facades\Artisan;
 
 use App\Http\Controllers\TestController;
+use App\Livewire\Frontend\Auth\ForgotPassword;
+use App\Livewire\Frontend\Auth\Login;
+use App\Livewire\Frontend\Auth\Register;
 use App\Livewire\Frontend\ContactUsPage;
 use App\Livewire\Frontend\Faq;
 use App\Livewire\Frontend\ImportantLinksWebsitePage;
@@ -42,8 +45,12 @@ Route::any('institute-signup', [FormsController::class, 'instituteSignup'])->nam
 Route::any('reset-password/{studentid}/{resetid}', [FormsController::class, 'studentPasswordReset'])->name('student_recover_password');
 Route::get('start-test', [HomeController::class, 'startTest'])->name('start_test');
 Route::get('about-us', [HomeController::class, 'aboutUs'])->name('about_us');
-Route::any('contact', ContactUsPage::class)->name('contact_us');
+Route::any('contact-us', ContactUsPage::class)->name('contact_us');
 Route::get('plans', [HomeController::class, 'subscribePlan'])->name('plans');
+
+Route::any('login', Login::class)->name('login');
+Route::any('registration', Register::class)->name('register');
+Route::any('forgot-password', ForgotPassword::class)->name('forgot_password');
 
 Route::get('faq', Faq::class)->name('faqs');
 Route::get('important-links', ImportantLinksWebsitePage::class)->name('important_links');
