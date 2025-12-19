@@ -40,7 +40,6 @@ class Register extends Component
 
     public function render()
     {
-        $this->testFormInput();
         return view('livewire.frontend.auth.register');
     }
 
