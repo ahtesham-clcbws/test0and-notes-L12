@@ -23,3 +23,12 @@ function classes_groups_exams()
 {
     return DB::table('classes_groups_exams')->get();
 }
+
+function getOtp(){
+    $otp = mt_rand(100000, 999999);
+    return $otp;
+}
+function getMobileOtp($mobileNumber){
+    $otp = getOtp();
+    return $otp;
+}
