@@ -41,6 +41,7 @@
                                         @enderror
                                     </div>
                                 </div>
+ 
                                 <div class="col-md-6 col-12">
                                     <div class="form-group mb-3">
                                         <div class="input-group">
@@ -55,6 +56,7 @@
                                         @enderror
                                     </div>
                                 </div>
+ 
                                 <div class="col-md-6 col-12">
                                     <div class="form-group mb-3">
                                         <div class="input-group">
@@ -75,7 +77,7 @@
                                         @enderror
                                     </div>
                                 </div>
-    
+
                                 <div class="col-md-6 col-12">
                                     <div class="form-group mb-3">
                                         <div class="input-group">
@@ -88,7 +90,7 @@
                                             <button class="btn theme-bg append text-white" type="button"
                                                 style="min-width: 70px;" wire:click="verifyOtp">
                                                 <span wire:target="verifyOtp" wire:loading>Verifying OTP...</span>
-                                                <span wire:target="verifyOtp" wire:loading.remove>Verify</span>
+                                                <span wire:target="verifyOtp" wire:loading.remove>{{ $otpVerificationStatus && $isOtpSend ? 'Verified' : 'Verify' }}</span>
                                             </button>
                                         </div>
                                         @error('form.mobile_otp')
@@ -96,6 +98,7 @@
                                         @enderror
                                     </div>
                                 </div>
+
                                 <div class="col-md-6 col-12">
                                     <div class="form-group mb-3">
                                         <div class="input-group">
@@ -104,7 +107,8 @@
                                             </span>
                                             <input class="form-control" type="password" wire:model="form.password"
                                                 placeholder="Password" minlength="8">
-                                            <button class="btn theme-bg togglePassword" type="button" style="width: 70px;">
+                                            <button class="btn theme-bg togglePassword" type="button"
+                                                style="width: 70px;">
                                                 <i class="fas fa-eye text-white"></i>
                                             </button>
                                         </div>
@@ -113,15 +117,18 @@
                                         @enderror
                                     </div>
                                 </div>
+
                                 <div class="col-md-6 col-12">
                                     <div class="form-group mb-3">
                                         <div class="input-group">
                                             <span class="input-group-text">
                                                 <i class="ti-unlock"></i>
                                             </span>
-                                            <input class="form-control" type="password" wire:model="form.confirm_password"
-                                                placeholder="Confirm Password" minlength="8">
-                                            <button class="btn theme-bg togglePassword" type="button" style="width: 70px;">
+                                            <input class="form-control" type="password"
+                                                wire:model="form.confirm_password" placeholder="Confirm Password"
+                                                minlength="8">
+                                            <button class="btn theme-bg togglePassword" type="button"
+                                                style="width: 70px;">
                                                 <i class="fas fa-eye text-white"></i>
                                             </button>
                                         </div>
@@ -130,26 +137,28 @@
                                         @enderror
                                     </div>
                                 </div>
+
                                 <div class="col-12">
                                     <div class="form-group mb-3">
                                         <div class="input-group">
                                             <span class="input-group-text">
                                                 <i class="ti-ink-pen"></i>
                                             </span>
-                                            <input class="form-control" type="text" wire:model="form.institute_code"
+                                            <input class="form-control" type="text"
+                                                wire:model="form.institute_code"
                                                 placeholder="Your institute code (If any)"
                                                 {{ $institute_name ? ' readonly ' : '' }}>
                                             <button class="btn theme-bg append text-white" type="button"
                                                 style="min-width: 70px;" wire:click="verifyInstitute"
                                                 {{ $institute_name ? ' disabled ' : '' }}>
                                                 <span wire:target="verifyInstitute" wire:loading>Verifying...</span>
-                                                <span wire:target="verifyInstitute" wire:loading.remove>Verify</span>
+                                                <span wire:target="verifyInstitute" wire:loading.remove>{{ $institute_name ? 'Verified' : 'Verify' }}</span>
                                             </button>
                                         </div>
                                         @if ($institute_name)
                                             <div class="mt-2">
-                                                <input class="form-control" type="text" value="{{ $institute_name }}"
-                                                    readonly disabled>
+                                                <input class="form-control" type="text"
+                                                    value="{{ $institute_name }}" readonly disabled>
                                             </div>
                                         @endif
                                         @error('form.institute_code')
@@ -157,6 +166,7 @@
                                         @enderror
                                     </div>
                                 </div>
+
                                 <div class="col-6">
                                     <div class="form-group mb-3">
                                         <div class="input-group">
@@ -175,26 +185,27 @@
                                         @enderror
                                     </div>
                                 </div>
-                                @if ($form->education_type_id)
-                                    <div class="col-6">
-                                        <div class="form-group mb-3">
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="fa fa-users" aria-hidden="true"></i>
-                                                </span>
-                                                <select class="form-control" wire:model="form.class_group_exam_id">
-                                                    <option value="" selected>Class/Group/Exam Name</option>
-                                                    @foreach (App\Models\ClassGoupExamModel::where('education_type_id', $form->education_type_id)->get() as $c)
-                                                        <option value="{{ $c->id }}">{{ $c->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            @error('form.class_group_exam_id')
-                                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                            @enderror
+
+                                <div class="col-6">
+                                    <div class="form-group mb-3">
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fa fa-users" aria-hidden="true"></i>
+                                            </span>
+                                            <select class="form-control" wire:model="form.class_group_exam_id"
+                                                {{ !$form->education_type_id ? ' disabled ' : '' }}>
+                                                <option value="" selected>Class/Group/Exam Name</option>
+                                                @foreach (App\Models\ClassGoupExamModel::where('education_type_id', $form->education_type_id)->get() as $c)
+                                                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
+                                        @error('form.class_group_exam_id')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
                                     </div>
-                                @endif
+                                </div>
+
                                 <div class="col-12">
                                     <div class="form-group mb-3">
                                         <label>You can attach jpeg / png file (max size: 200 kb)</label>
@@ -205,40 +216,40 @@
                                         @enderror
                                     </div>
                                 </div>
-                                <div class="form-group col-6 mb-2">
-                                    <input class="checkbox-custom" id="terms_check_box" type="checkbox"
-                                        wire:model="form.required_check_registration">
-                                    @if (isset($pdf))
-                                        <label class="checkbox-custom-label" for="terms_check_box">I agree
-                                            to The
-                                            gyanology's <a class="theme-cl" href="{{ url('public/' . $pdf->url) }}"
-                                                target="_blank">Terms
-                                                of
-                                                Services</a></label>
-                                    @else
-                                        <label class="checkbox-custom-label" for="terms_check_box">I agree
-                                            to The
-                                            gyanology's <a class="theme-cl" href="#">Terms of
-                                                Services</a></label>
-                                    @endif
-                                    @error('form.required_check_registration')
-                                        <br />
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-6 mb-2 text-end">
-                                    <small>
-                                        <a class="theme-cl pointerCursor fw-bold" href="{{ route('login') }}">
-                                            Already have account? Login
-                                        </a>
-                                    </small>
+
+                                <div class="col-12 d-md-flex justify-content-between">
+                                    <div class="form-group mb-2">
+                                        <input class="checkbox-custom" id="terms_check_box" type="checkbox"
+                                            wire:model="form.required_check_registration">
+                                        @if (isset($pdf))
+                                            <label class="checkbox-custom-label" for="terms_check_box">I agree
+                                                to The
+                                                gyanology's <a class="theme-cl"
+                                                    href="{{ url('public/' . $pdf->url) }}" target="_blank">Terms
+                                                    of
+                                                    Services</a></label>
+                                        @else
+                                            <label class="checkbox-custom-label" for="terms_check_box">I agree
+                                                to The
+                                                gyanology's <a class="theme-cl" href="#">Terms of
+                                                    Services</a></label>
+                                        @endif
+                                        @error('form.required_check_registration')
+                                            <br />
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="mb-2 text-end">
+                                        <small>
+                                            <a class="theme-cl pointerCursor fw-bold" href="{{ route('login') }}">
+                                                Already have account? Login
+                                            </a>
+                                        </small>
+                                    </div>
                                 </div>
                             </div>
                         </fieldset>
-                        <div class="row">
-                            <div class="col">
-                            </div>
-                        </div>
+                        
                         <div class="row">
                             <div class="col">
                                 <button class="btn btn-sm full-width theme-bg text-white" type="submit">

@@ -582,30 +582,30 @@
                 })
             }
 
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "bottom-center",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
+            // const Toast = Swal.mixin({
+            //     toast: true,
+            //     position: "bottom-center",
+            //     showConfirmButton: false,
+            //     timer: 3000,
+            //     timerProgressBar: true,
+            //     didOpen: (toast) => {
+            //         toast.onmouseenter = Swal.stopTimer;
+            //         toast.onmouseleave = Swal.resumeTimer;
+            //     }
+            // });
 
-            function success(messasge) {
-                return Toast.fire({
-                    icon: "success",
-                    title: messasge
-                });
-            }
-            function error(messasge) {
-                return Toast.fire({
-                    icon: "error",
-                    title: messasge
-                });
-            }
+            // function success(messasge) {
+            //     return Toast.fire({
+            //         icon: "success",
+            //         title: messasge
+            //     });
+            // }
+            // function error(messasge) {
+            //     return Toast.fire({
+            //         icon: "error",
+            //         title: messasge
+            //     });
+            // }
         </script>
         @yield('javascript')
         

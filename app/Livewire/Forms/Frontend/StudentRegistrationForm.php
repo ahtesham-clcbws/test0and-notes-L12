@@ -43,7 +43,7 @@ class StudentRegistrationForm extends Form
             'password' => 'required|min:8',
             'confirm_password' => 'required|min:8|same:password',
             'institute_code' => [
-                'required',
+                'nullable',
                 \Illuminate\Validation\Rule::exists('corporate_enquiries', 'branch_code')->where(function ($query) {
                     return $query->where('status', 'activated');
                 }),
@@ -74,7 +74,7 @@ class StudentRegistrationForm extends Form
             'confirm_password.required' => 'Confirm Password is required.',
             'confirm_password.min' => 'Confirm Password must be at least 8 characters.',
             'confirm_password.same' => 'Password and Confirm Password must match.',
-            'institute_code.required' => 'Institute Code is required.',
+            // 'institute_code.required' => 'Institute Code is required.',
             'institute_code.exists' => 'Invalid Institute Code or Institute is not active.',
             'education_type_id.required' => 'Please select an Education Type.',
             'class_group_exam_id.required' => 'Please select a Class/Group/Exam.',

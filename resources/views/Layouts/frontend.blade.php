@@ -148,6 +148,9 @@
             .font-family-geometric-black-bt {
                 font-family: geometric_black_bt;
             }
+            .swal2-container {
+                z-index: 99999 !important;
+            }
         </style>
 
         @yield('css')
@@ -593,10 +596,10 @@
         <script src="{{ asset('skillup/js/daterangepicker.js') }}"></script>
         <script src="{{ asset('skillup/js/summernote.min.js') }}"></script>
         <script src="{{ asset('skillup/js/metisMenu.min.js') }}"></script>
-        <script src="{{ URL::asset('frontend/sweetalert2/sweetalert2.js') }}"></script>
+        <script src="{{ asset('frontend/sweetalert2/sweetalert2.js') }}"></script>
 
         <script src="{{ asset('frontend/js/jquery.validate.min.js') }}"></script>
-        <script src="{{ asset('frontend/js/sweetalert.min.js') }}"></script>
+        {{-- <script src="{{ asset('frontend/js/sweetalert.min.js') }}"></script> --}}
         <script src="{{ asset('skillup/js/custom.js') }}"></script>
         <script>
             var registration = $('#registration');
@@ -743,30 +746,30 @@
                     console.log(data);
                 })
             }
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "bottom-center",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
+            // const Toast = Swal.mixin({
+            //     toast: true,
+            //     position: "bottom-center",
+            //     showConfirmButton: false,
+            //     timer: 3000,
+            //     timerProgressBar: true,
+            //     didOpen: (toast) => {
+            //         toast.onmouseenter = Swal.stopTimer;
+            //         toast.onmouseleave = Swal.resumeTimer;
+            //     }
+            // });
 
-            function success(messasge) {
-                return Toast.fire({
-                    icon: "success",
-                    title: messasge
-                });
-            }
-            function error(messasge) {
-                return Toast.fire({
-                    icon: "error",
-                    title: messasge
-                });
-            }
+            // function success(messasge) {
+            //     return Toast.fire({
+            //         icon: "success",
+            //         title: messasge
+            //     });
+            // }
+            // function error(messasge) {
+            //     return Toast.fire({
+            //         icon: "error",
+            //         title: messasge
+            //     });
+            // }
         </script>
 
         @yield('js')

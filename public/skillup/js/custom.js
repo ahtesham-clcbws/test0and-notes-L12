@@ -526,7 +526,7 @@ function uniqueEmailCheck(event, type) {
 function mobileNumberCheck(event, type) {
 	var mobileInput = $(event);
 	var formData = new FormData();
-	if (mobileInput.val().toString().length > 9) {
+	if (mobileInput.val().toString().length == 10) {
 		formData.append('form_name', 'unique_mobile_check');
 		formData.append('mobile', mobileInput.val());
 		formData.append('type', type);
@@ -543,14 +543,16 @@ function mobileNumberCheck(event, type) {
 				businessMobileCheck = false;
 				studentMobileValid = false;
 				corporateMobileValid = false;
-				if (type == 'corporate') {
-					showAlert(
-						'Mobile number Already exist. Please contact support from contact page along with your BRANCH code and all the information which you use to query before.',
-						'In Use', 'error');
-				} else {
-					showAlert('Mobile number Already exist.', 'In Use', 'error');
-				}
 				$(event).css('border-color', 'crimson')
+				if (type == 'corporate') {
+					return alert('Mobile number Already exist. Please contact support from contact page along with your BRANCH code and all the information which you use to query before.');
+					// showAlert(
+					// 	'Mobile number Already exist. Please contact support from contact page along with your BRANCH code and all the information which you use to query before.',
+					// 	'In Use', 'error');
+				} else {
+					return alert('Mobile number Already exist.');
+					// showAlert('Mobile number Already exist.', 'In Use', 'error');
+				}
 			} else {
 				businessMobileCheck = true;
 				studentMobileValid = true;
@@ -699,6 +701,7 @@ function verifyOtp(type) {
 		console.log(data);
 	})
 }
+
 function showAlert(text, title = 'Success', icon = 'success', button = 'Ok') {
 	return swal({
 		title,
@@ -1028,4 +1031,4 @@ $("#user_logo").change(function () {
 			}
 		}
 	}
-});
+})

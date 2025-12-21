@@ -21,10 +21,10 @@ class Register extends Component
     public function testFormInput()
     {
         $this->form->full_name = 'Ahtesham';
-        $this->form->email = 'ahtesham@weblies.com';
-        $this->form->mobile_number = '9810763315';
+        $this->form->email = 'ahtesham8@weblies.com';
+        $this->form->mobile_number = '9810763320';
 
-        $this->form->password = '2398872';
+        $this->form->password = '23988725';
         $this->form->confirm_password = '23988725';
         $this->form->institute_code = 'ACC16160356';
         // $this->form->education_type_id = '1';
@@ -40,6 +40,7 @@ class Register extends Component
 
     public function render()
     {
+        // $this->testFormInput();
         return view('livewire.frontend.auth.register');
     }
 

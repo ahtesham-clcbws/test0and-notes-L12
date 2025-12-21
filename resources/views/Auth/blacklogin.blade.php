@@ -3,7 +3,7 @@
 @section('form')
     <div class="card" style="background-color:#b2b3b280 !important;">
         <div class="card-header">
-            <h3>Admin Login</h3>
+            <h3>Corporate Login</h3>
             <div class="d-flex justify-content-end social_icon">
                 <img src="{{asset('logos/logo-white-square.png')}}">
             </div>

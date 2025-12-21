@@ -15,7 +15,7 @@
 
             <div class="col-xl-7 col-lg-8 col-md-12 col-sm-12">
                 <div class="crs_log_wrap">
-                    <form class="crs_log__caption" id="corporate" enctype="multipart/form-data">
+                    <form class="crs_log__caption" id="corporate" enctype="multipart/form-data" style="z-index: 1;">
                         <div class="rcs_log_124">
                             <div class="row py-3">
                                 <div class="col">
