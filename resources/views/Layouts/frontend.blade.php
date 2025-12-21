@@ -754,7 +754,7 @@
                     console.log(data);
                 })
             }
-            const Toast = Swal.mixin({
+            const Toast2 = Swal.mixin({
                 toast: true,
                 position: "bottom-center",
                 showConfirmButton: false,
@@ -767,13 +767,13 @@
             });
 
             function success(messasge) {
-                return Toast.fire({
+                return Toast2.fire({
                     icon: "success",
                     title: messasge
                 });
             }
             function error(messasge) {
-                return Toast.fire({
+                return Toast2.fire({
                     icon: "error",
                     title: messasge
                 });
