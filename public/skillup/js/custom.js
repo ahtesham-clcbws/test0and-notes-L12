@@ -7,6 +7,27 @@ $.ajaxSetup({
 		'X-CSRF-Token': csrfToken
 	}
 });
+
+// SweetAlert2 Toast Mixin
+const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+    }
+});
+window.Toast = Toast;
+
+function showToast(title, icon = 'success') {
+    Toast.fire({
+        icon: icon,
+        title: title
+    });
+}
 // $(document).ajaxStart(function () {
 // 	startLoader();
 // });
@@ -703,12 +724,15 @@ function verifyOtp(type) {
 }
 
 function showAlert(text, title = 'Success', icon = 'success', button = 'Ok') {
-	return swal({
-		title,
-		text,
-		icon,
-		button
-	});
+    return Swal.fire({
+        title: title,
+        text: text,
+        icon: icon,
+        confirmButtonText: button,
+        // z-index fix handled in CSS
+    }).then((result) => {
+        return result.isConfirmed;
+    });
 }
 
 

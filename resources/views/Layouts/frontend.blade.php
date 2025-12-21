@@ -15,7 +15,7 @@
         <link type="image/x-icon" href="{{ asset('logos/logo-white-square.png') }}" rel="icon">
         <link type="image/x-icon" href="{{ asset('logos/logo-white-square.png') }}" rel="shortcut-icon">
         <link href="{{ asset('logos/logo-white-square.png') }}" rel="apple-touch-icon">
-        <link href="{{ URL::asset('frontend/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Sansita:wght@400;700&display=swap" rel="stylesheet">
 
@@ -148,8 +148,15 @@
             .font-family-geometric-black-bt {
                 font-family: geometric_black_bt;
             }
+
             .swal2-container {
-                z-index: 99999 !important;
+                z-index: 20000 !important;
+            }
+            body.swal2-toast-shown .swal2-container {
+                pointer-events: none;
+            }
+            body.swal2-toast-shown .swal2-popup {
+                pointer-events: auto;
             }
         </style>
 
@@ -596,7 +603,8 @@
         <script src="{{ asset('skillup/js/daterangepicker.js') }}"></script>
         <script src="{{ asset('skillup/js/summernote.min.js') }}"></script>
         <script src="{{ asset('skillup/js/metisMenu.min.js') }}"></script>
-        <script src="{{ asset('frontend/sweetalert2/sweetalert2.js') }}"></script>
+        {{-- <script src="{{ asset('frontend/sweetalert2/sweetalert2.js') }}"></script> --}}
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <script src="{{ asset('frontend/js/jquery.validate.min.js') }}"></script>
         {{-- <script src="{{ asset('frontend/js/sweetalert.min.js') }}"></script> --}}
@@ -746,30 +754,30 @@
                     console.log(data);
                 })
             }
-            // const Toast = Swal.mixin({
-            //     toast: true,
-            //     position: "bottom-center",
-            //     showConfirmButton: false,
-            //     timer: 3000,
-            //     timerProgressBar: true,
-            //     didOpen: (toast) => {
-            //         toast.onmouseenter = Swal.stopTimer;
-            //         toast.onmouseleave = Swal.resumeTimer;
-            //     }
-            // });
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "bottom-center",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
 
-            // function success(messasge) {
-            //     return Toast.fire({
-            //         icon: "success",
-            //         title: messasge
-            //     });
-            // }
-            // function error(messasge) {
-            //     return Toast.fire({
-            //         icon: "error",
-            //         title: messasge
-            //     });
-            // }
+            function success(messasge) {
+                return Toast.fire({
+                    icon: "success",
+                    title: messasge
+                });
+            }
+            function error(messasge) {
+                return Toast.fire({
+                    icon: "error",
+                    title: messasge
+                });
+            }
         </script>
 
         @yield('js')
