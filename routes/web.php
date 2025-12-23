@@ -40,7 +40,6 @@ Route::get('page', [HomeController::class, 'page'])->name('page');
 Route::post('/', [InternalRequestsController::class, 'index']);
 Route::get('demoemail', [InternalRequestsController::class, 'demoemail']);
 Route::any('corporate-enquiry', [FormsController::class, 'businessEnquiry'])->name('bussines_enquiry');
-Route::any('contributor', [FormsController::class, 'instituteUser'])->name('contributor');
 Route::any('institute-signup', [FormsController::class, 'instituteSignup'])->name('institute_signup');
 Route::any('reset-password/{studentid}/{resetid}', [FormsController::class, 'studentPasswordReset'])->name('student_recover_password');
 Route::get('start-test', [HomeController::class, 'startTest'])->name('start_test');

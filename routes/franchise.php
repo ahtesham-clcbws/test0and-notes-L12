@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\Frontend\FormsController;
 use App\Http\Controllers\Frontend\Franchise\DashboardController;
 use App\Http\Controllers\Frontend\Franchise\ExamsController;
 use App\Http\Controllers\Frontend\Franchise\UserController;
@@ -22,8 +22,12 @@ use App\Http\Controllers\Frontend\Franchise\Management\Manager\ExamsController a
 use App\Http\Controllers\Frontend\Franchise\Management\Publisher\DashboardController as PublisherDashboardController;
 use App\Http\Controllers\Frontend\Franchise\Management\Publisher\ExamsController as PublisherExamsController;
 use App\Http\Middleware\IsFranchise;
+use App\Livewire\Frontend\Auth\ContributorSignUp;
 
-Route::any('/contributor/login', [AuthController::class, 'franchiseManagementLogin'])->middleware(['managementguest'])->name('management_login');
+// Route::any('contributor-signup', [FormsController::class, 'instituteUser'])->name('contributor');
+Route::any('contributor-signup', ContributorSignUp::class)->name('contributor');
+Route::any('/contributor-login', [AuthController::class, 'franchiseManagementLogin'])->middleware(['managementguest'])->name('management_login');
+
 Route::name('franchise.')->group(function () {
     Route::any('corporate-login', [AuthController::class, 'franchiselogin'])->middleware(['franchiseguest'])->name('login');
     Route::prefix('corporate')->group(function () {

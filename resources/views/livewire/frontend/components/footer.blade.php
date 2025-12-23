@@ -53,10 +53,8 @@
                             Partner</a></li>
                     <li><a class="text-white" href="{{ route('franchise.login') }}">Corporate Login</a>
                     </li>
-                    {{-- <li><a class="text-white" href="#">Student Sign up</a></li>
-                    <li><a class="text-white" href="#">Student Login</a></li> --}}
-                    <li><a class="text-white" href="#">Contributor Sign up</a></li>
-                    <li><a class="text-white" href="#">Contributor Login</a></li>
+                    <li><a class="text-white" href="{{ route('contributor') }}">Contributor Sign up</a></li>
+                    <li><a class="text-white" href="{{ route('management_login') }}">Contributor Login</a></li>
                     <li><a class="text-white" href="{{ route('contact_us') }}">Contact Us For Any
                             Query</a></li>
                 </ul>

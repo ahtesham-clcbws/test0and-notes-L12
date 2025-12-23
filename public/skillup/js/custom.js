@@ -492,8 +492,6 @@ $('.custom-file-input').on('change', function () {
 	$(this).closest('div').find('.custom-file-label').html(fileName)
 	console.log(fileEvent[0].files[0]['name']);
 })
-var loginModal = document.getElementById('login');
-var loginBsModal = new bootstrap.Modal(loginModal)
 
 // variables declaration
 var studentEmailValid = false;
@@ -736,53 +734,6 @@ function showAlert(text, title = 'Success', icon = 'success', button = 'Ok') {
 }
 
 
-// REGISTRATION ONLY
-// var loginModal = 
-// bootstrap.Modal.getInstance(registrationModal).hide();
-registrationModal.addEventListener('show.bs.modal', function (event) {
-	resetRegisterFormInputs();
-});
-registrationModal.addEventListener('hide.bs.modal', function (event) {
-	resetRegisterFormInputs();
-});
-registrationModal.addEventListener('shown.bs.modal', function (event) {
-	resetRegisterFormInputs();
-});
-registrationModal.addEventListener('hidden.bs.modal', function (event) {
-	resetRegisterFormInputs();
-});
-
-function resetRegisterFormInputs() {
-	$('#registration')[0].reset();
-
-	$('#fname_new').css('border-color', '#e6ebf5');
-	$('#fname_new').css('background-color', '#ffffff');
-
-	$('#email_new').css('border-color', '#e6ebf5');
-	$('#email_new').css('background-color', '#ffffff');
-
-	$('#mobile_register').removeAttr('readonly');
-	$('#mobile_register').css('border-color', '#e6ebf5');
-	$('#mobile_register').css('background-color', '#ffffff');
-
-	$('#mobile_otp_register').removeAttr('readonly');
-	$('#mobile_otp_register').css('border-color', '#e6ebf5');
-	$('#mobile_otp_register').css('background-color', '#ffffff');
-
-	$('#password').css('border-color', '#e6ebf5');
-	$('#password').css('background-color', '#ffffff');
-
-	$('#confirm_password_new').css('border-color', '#e6ebf5');
-	$('#confirm_password_new').css('background-color', '#ffffff');
-
-	$('#branch_code_new').css('border-color', '#e6ebf5');
-	$('#branch_code_new').css('background-color', '#ffffff');
-	
-	$('#verifystatus_institute').val(0);
-	$('#branch_code_new').removeAttr('readonlny');
-	$('#institute_name').val('');
-	$('#institute_name').hide();
-}
 $('#userid_new').on('input', function () {
 	var user_name_str = $(this).val();
 	var string = user_name_str.replace(/[^a-z0-9]/gi, '');
@@ -911,90 +862,7 @@ function registerStateSelected(event) {
 		console.log(data);
 	});
 }
-$('#registration').submit(function (event) {
-	event.preventDefault();
-	var formData = new FormData($(this)[0]);
-	formData.append('form_name', 'registration_form');
-	console.log(Array.from(formData));
-	// return;
-	if ($("#branch_code_new").val() != '' && $("#is_valid_branch").val() == 0) {
-		showAlert('Please validate branch name before continue.', 'Error', 'warning');
-		return;
-	}
-	if (!studentPasswordValid || !studentEmailValid || !studentMobileValid) {
-		var thisMessage = 'Please check your form again before submitting, there is errors in your form. or contact support.';
-		if (!studentPasswordValid) {
-			thisMessage = 'Passwords not macthed, or invalid password type.';
-		}
-		if (!studentEmailValid) {
-			thisMessage = 'Unable to verify your email.';
-		}
-		if (!studentMobileValid) {
-			thisMessage = 'Mobile number is invalid, or otp is not verified.';
-		}
-		showAlert(thisMessage, 'Error', 'warning');
-		return;
-	}
-	$.ajax({
-		url: '/',
-		data: formData,
-		processData: false,
-		type: 'post',
-		contentType: false
-	}).done(function (data) {
-		console.log(data);
-		console.log(JSON.parse(data));
-		// return;
-		if (data == 'true') {
-			var message = 'You are successfully registered, please login to continue.';
-			if ($("#branch_code_new").val() != '' && $("#is_valid_branch").val() == 0) {
-				message = 'Registeration succesfully goes to institute, please contact for activation.'
-			}
-			showAlert(message, "Registered");
-		} else {
-			showAlert('Server issue, please try again later.', 'Error', 'error');
-		}
-		bootstrap.Modal.getInstance(registrationModal).hide();
-	}).fail(function (data) {
-		showAlert('Server error, please try again later.', 'Error', 'error');
-		console.log(data)
-	});
-});
 
-// LOGIN ONLY
-$('#userlogin').submit(function (event) {
-	event.preventDefault();
-	var planclickValue = $("input[name='planclick']").val();
-	var formData = new FormData($(this)[0]);
-	formData.append('form_name', 'login_form');
-	console.log(Array.from(formData));
-	$.ajax({
-		url: '/',
-		data: formData,
-		processData: false,
-		type: 'post',
-		contentType: false
-	}).done(function (data) {
-		console.log(data);
-		
-		if (data == 'true') {
-		    if(planclickValue != 0)
-		    {
-		        window.location = planclickValue;
-		    }
-		    else
-		    {
-		        window.location = '/student';
-		    }
-		    
-		} else {
-			showAlert('Server issue, please try again later.', 'Error', 'error');
-		}
-	}).fail(function (data) {
-		showAlert('Server fail, please try again later.', 'Error', 'error');
-		console.log(data)
-	});
-})
 $("#user_logo").change(function () {
 
 	var photo = $("#user_logo").val();

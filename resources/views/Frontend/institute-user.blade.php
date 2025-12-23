@@ -2,183 +2,177 @@
 
 @section('css')
     <style>
-        /* #corporate .form-control,
-                            #corporate .form-select {
-                                height: inherit;
-                            } */
         #corporate .input-group .btn {
             min-width: 85px;
         }
-
     </style>
 @endsection
 @section('main')
-
     <section>
         <div class="container">
             <div class="row justify-content-center">
 
                 <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8">
-                    <div class="crs_log_wrap" style="margin-top:-50px;border: 1px solid #03b97c;width:60%;">
+                    <div class="crs_log_wrap" style="margin-top:-50px;border: 1px solid #03b97c;">
                         <form class="crs_log__caption" id="institute_user" enctype="multipart/form-data">
                             <div class="rcs_log_124">
                                 <div class="row py-3">
                                     <div class="col">
                                         <h4 class="theme-cl" style="border-bottom: 3px solid #03b97c;">
-                                                    <i class="ti-user"></i>
-                                           Contributor Sign up Form</h4>
+                                            <i class="ti-user"></i>
+                                            Contributor Sign up Form
+                                        </h4>
                                     </div>
                                 </div>
-                                <!-- <div class="col-md-12">
-                                        <div class="form-group smalls">
-                                            <label>Institute *</label>
-                                            <select class="form-select" id="inputGroupSelect02" name="institute_code" required>
-                                                @foreach ($data['franchiseCodes'] as $franchiseCode)
-                                                <option selected value="{{ $franchiseCode['branch_code'] }}">
-                                                    {{ $franchiseCode['institute_name'] }}
-                                                </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                </div> -->
 
-                    <div class="row">
-                                <div class="col-md-6">
+
+                                <div class="row">
+                                    <div class="col-md-6">
                                         <div class="form-group smalls">
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ti-user"></i>
                                                 </span>
-                                            <input type="text" name="name" class="form-control" placeholder="Contributor name"
-                                            required>
+                                                <input class="form-control" name="name" type="text"
+                                                    placeholder="Contributor name" required>
+                                            </div>
                                         </div>
-                                        </div>
-                                </div>
+                                    </div>
 
-                                <div class="col-md-6">
+                                    <div class="col-md-6">
                                         <div class="form-group smalls">
-                                        <div class="input-group">
+                                            <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ti-email"></i>
                                                 </span>
-                                                <input type="email" name="email" id="email_new" oninput="uniqueEmailCheck(this)" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" class="form-control" placeholder="E-mail" required="" style="border-color: rgb(230, 235, 245); background-color: rgb(255, 255, 255);">
-                                        </div>
-                                        </div>
-                                </div>
-                        </div>  
-                        
-                        <div class="row" style="margin-top:10px;">
-                                <div class="col-md-6">
-                                        <div class="form-group smalls flex-nowrap">
-                                            <div class="box-input">
-                                            <div class="input-group flex-nowrap">
-                                            <span class="input-group-text" id="addon-wrapping"><i class="ti-mobile"></i></span>
-                                            <input type="number" min="10" class="form-control"
-                                                placeholder="Mobile number" name="mobile_number" id="mobile_register" oninput="mobileNumberCheck(this, 'register')" required>
-                                                <button class="btn theme-bg-dark text-white append"
-                                                            onclick="sendOtp('register')" type="button" style="padding:0;">
-                                                            Get Otp
-                                                        </button>
-                                </div>
-                                </div>
-                                </div>
-                                </div>
-                                <div class="col-md-6">
-                                <input id="verifystatus_register" name="verifystatus_register"
-                                        class="d-none" value="0">
-                                        <div class="form-group smalls flex-nowrap">
-                                            <div class="box-input">
-                                            <div class="input-group flex-nowrap">
-                                            <span class="input-group-text">
-                                            <i class="ti-key"></i>
-                                                            </span>
-                                                            <input type="number" name="mobile_otp" id="mobile_otp_register"
-                                                                minlength="6" maxlength="6" required class="form-control"
-                                                                placeholder="Input OTP">
-                                                            <button class="btn theme-bg-dark text-white append"
-                                                                onclick="verifyOtp('register')" type="button" style="padding:0;">
-                                                                Verify
-                                                            </button>
+                                                <input class="form-control" id="email_new" name="email" type="email"
+                                                    style="border-color: rgb(230, 235, 245); background-color: rgb(255, 255, 255);"
+                                                    oninput="uniqueEmailCheck(this)"
+                                                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" placeholder="E-mail"
+                                                    required="">
                                             </div>
                                         </div>
+                                    </div>
                                 </div>
-                        </div>
-                        </div>
 
-                        <div class="row" style="margin-top:10px;">
-                                <div class="col-md-6">
+                                <div class="row" style="margin-top:10px;">
+                                    <div class="col-md-6">
                                         <div class="form-group smalls flex-nowrap">
-                                        <div class="input-group flex-nowrap">
+                                            <div class="box-input">
+                                                <div class="input-group flex-nowrap">
+                                                    <span class="input-group-text" id="addon-wrapping"><i
+                                                            class="ti-mobile"></i></span>
+                                                    <input class="form-control" id="mobile_register" name="mobile_number"
+                                                        type="number" min="10" placeholder="Mobile number"
+                                                        oninput="mobileNumberCheck(this, 'register')" required>
+                                                    <button class="btn theme-bg-dark append text-white" type="button"
+                                                        style="padding:0; width: 90px;" onclick="sendOtp('register')">
+                                                        Get Otp
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input class="d-none" id="verifystatus_register" name="verifystatus_register"
+                                            value="0">
+                                        <div class="form-group smalls flex-nowrap">
+                                            <div class="box-input">
+                                                <div class="input-group flex-nowrap">
+                                                    <span class="input-group-text">
+                                                        <i class="ti-key"></i>
+                                                    </span>
+                                                    <input class="form-control" id="mobile_otp_register" name="mobile_otp"
+                                                        type="number" minlength="6" maxlength="6" required
+                                                        placeholder="Input OTP">
+                                                    <button class="btn theme-bg-dark append text-white" type="button"
+                                                        style="padding:0;width: 90px;" onclick="verifyOtp('register')">
+                                                        Verify
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top:10px;">
+                                    <div class="col-md-6">
+                                        <div class="form-group smalls flex-nowrap">
+                                            <div class="input-group flex-nowrap">
                                                 <span class="input-group-text">
                                                     <i class="ti-unlock"></i>
                                                 </span>
-                                            <input type="password" class="form-control" placeholder="Password" id="password" name="password" value=""
-                                        required>
-                                        <button class="btn btn-dark togglePassword" type="button">
+                                                <input class="form-control" id="password" name="password" type="password"
+                                                    value="" placeholder="Password" required>
+                                                <button class="btn btn-dark togglePassword" type="button" style="width: 42px;">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
+                                            </div>
                                         </div>
-                                        </div>
-                                </div>
-                                <div class="col-md-6">
+                                    </div>
+                                    <div class="col-md-6">
                                         <div class="form-group smalls">
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ti-unlock"></i>
                                                 </span>
-                                                <input type="password" name="confirm_password" id="confirm_password_new" class="form-control" placeholder="Confirm Password" required="" minlength="5" oninput="inputConfirmPassword(this)" style="border-color: rgb(230, 235, 245); background-color: rgb(255, 255, 255);">
-                                                <button class="btn btn-dark togglePassword" type="button">
+                                                <input class="form-control" id="confirm_password_new"
+                                                    name="confirm_password" type="password"
+                                                    style="border-color: rgb(230, 235, 245); background-color: rgb(255, 255, 255);"
+                                                    placeholder="Confirm Password" required="" minlength="5"
+                                                    oninput="inputConfirmPassword(this)">
+                                                <button class="btn btn-dark togglePassword" type="button" style="width: 42px;">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
                                             </div>
-                                            
+
                                         </div>
                                     </div>
-                        </div>
+                                </div>
 
-                        <div class="row" style="margin-top:10px;">
+                                <div class="row" style="margin-top:10px;">
                                     <div class="col-12">
                                         <div class="form-group smalls">
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ti-ink-pen"></i>
                                                 </span>
-                                                <input type="text" id="branch_code_new" name="institute_code" class="form-control" placeholder="Branch Code" style="border-color: rgb(230, 235, 245); background-color: rgb(255, 255, 255);">
-                                                <button class="btn theme-bg-dark text-white append" onclick="verifyInstitute()" type="button">
+                                                <input class="form-control" id="branch_code_new" name="institute_code"
+                                                    type="text"
+                                                    style="border-color: rgb(230, 235, 245); background-color: rgb(255, 255, 255);"
+                                                    placeholder="Branch Code">
+                                                <button class="btn theme-bg-dark append text-white" type="button"
+                                                    style="width: 90px;" onclick="verifyInstitute()">
                                                     Verify
                                                 </button>
-                                                
-                                            </div>
-                                            <input type="text" id="institute_name" class="form-control" style="display: none;" readonly="" disabled="">
-                                            <input id="verifystatus_institute" class="d-none" value="0">
-                                        </div>
-                                    </div>
-                        </div>
 
-                        <div class="col-12" style="margin-top:10px;">
-                                        <div class="form-group smalls">
-                                            <label>You can attach jpeg / png files (max size: 200 kb)</label>
-                                            <input type="file" class="form-control" name="user_logo" id="user_logo">
+                                            </div>
+                                            <input class="form-control" id="institute_name" type="text"
+                                                style="display: none;" readonly="" disabled="">
+                                            <input class="d-none" id="verifystatus_institute" value="0">
                                         </div>
                                     </div>
-                                
-                                <!-- <div class="col-md-12">
-                                        <div class="form-group smalls">
-                                            <label>Username *</label>
-                                            <input type="text" class="form-control" placeholder="Username" name="username"
-                                        id="contributor_username" required>
-                                        </div>
-                                </div> -->
+                                </div>
+
+                                <div class="col-12" style="margin-top:10px;">
+                                    <div class="form-group smalls">
+                                        <label>You can attach jpeg / png files (max size: 200 kb)</label>
+                                        <input class="form-control" id="user_logo" name="user_logo" type="file">
+                                    </div>
+                                </div>
+
                                 <div class="form-group col-12 mb-2" style="margin-top:10px;">
-                                        <input class="checkbox-custom" id="required_check_registration" type="checkbox" required="">
-                                        <label for="required_check_registration" class="checkbox-custom-label">I agree
-                                            to The
-                                            gyanology's <a href="#" class="theme-cl">Terms of
-                                                Services</a></label>
-                                    </div>
-                                
+                                    <input class="checkbox-custom" id="required_check_registration" type="checkbox"
+                                        required="">
+                                    <label class="checkbox-custom-label" for="required_check_registration">I agree
+                                        to The
+                                        gyanology's <a class="theme-cl" href="#">Terms of
+                                            Services</a></label>
+                                </div>
+
                                 <div class="col-md-12">
-                                    <button class="btn btn-sm full-width theme-bg text-white" type="submit" style="margin-top:10px;margin-bottom:10px;">Register</button>
+                                    <button class="btn btn-sm full-width theme-bg text-white" type="submit"
+                                        style="margin-top:10px;margin-bottom:10px;">Register</button>
                                 </div>
                             </div>
                         </form>
@@ -188,16 +182,6 @@
             </div>
         </div>
     </section>
-    {{-- <div class="simple-input">
-        <select id="cates" class="form-control">
-            <option value="">&nbsp;</option>
-            <option value="1">Parent</option>
-            <option value="2">Banking</option>
-            <option value="3">Medical</option>
-            <option value="4">Insurence</option>
-            <option value="5">Finance & Accounting</option>
-        </select>
-    </div> --}}
 @endsection
 
 @section('js')
@@ -265,11 +249,12 @@
             }
         });
         // variables declaration
-var studentEmailValid = false;
-var studentMobileValid = false;
-var studentPasswordValid = false;
+        var studentEmailValid = false;
+        var studentMobileValid = false;
+        var studentPasswordValid = false;
         var corporateEmailValid = false;
         var corporateMobileValid = false;
+        
         $('#institute_type').select2({
             maximumSelectionLength: 3
         });
@@ -330,7 +315,8 @@ var studentPasswordValid = false;
                 return;
             }
             if (!studentPasswordValid || !studentEmailValid || !studentMobileValid) {
-                var thisMessage = 'Please check your form again before submitting, there is errors in your form. or contact support.';
+                var thisMessage =
+                    'Please check your form again before submitting, there is errors in your form. or contact support.';
                 if (!studentPasswordValid) {
                     thisMessage = 'Passwords not macthed, or invalid password type.';
                 }
@@ -371,27 +357,28 @@ var studentPasswordValid = false;
         });
 
         function inputConfirmPassword(event) {
-	validatePassword(event)
-	if (checkPasswordmatch()) {
-		$('#password').css('border-color', '#198754');
-		$(event).css('border-color', '#198754');
-		studentPasswordValid = true;
-	} else {
-		$('#password').css('border-color', 'crimson');
-		$(event).css('border-color', 'crimson');
-		studentPasswordValid = false;
-	}
-}
-function checkPasswordmatch() {
-	if ($('#password').val() == $('#confirm_password_new').val()) {
-		studentPasswordValid = true;
-		return true;
-	}
-	studentPasswordValid = false;
-	return false;
-}
+            validatePassword(event)
+            if (checkPasswordmatch()) {
+                $('#password').css('border-color', '#198754');
+                $(event).css('border-color', '#198754');
+                studentPasswordValid = true;
+            } else {
+                $('#password').css('border-color', 'crimson');
+                $(event).css('border-color', 'crimson');
+                studentPasswordValid = false;
+            }
+        }
 
-function verifyInstitute() {
+        function checkPasswordmatch() {
+            if ($('#password').val() == $('#confirm_password_new').val()) {
+                studentPasswordValid = true;
+                return true;
+            }
+            studentPasswordValid = false;
+            return false;
+        }
+
+        function verifyInstitute() {
             var branch_code_new = $('#branch_code_new').val();
             var formData = new FormData();
             formData.append('form_name', 'branch_code_confirm');
@@ -411,7 +398,7 @@ function verifyInstitute() {
                     $('#institute_name').hide();
                     showAlert('Branch Code Not Exist!.', 'Not Found', 'error');
 
-                } else { 
+                } else {
                     $('#verifystatus_institute').val(1);
                     $('#branch_code_new').attr('readonlny', 'readonlny');
                     $('#institute_name').val(JSON.parse(data));
@@ -423,39 +410,39 @@ function verifyInstitute() {
         }
 
         function uniqueEmailCheck(event, type) {
-	var emailInput = $(event);
-	if (validateEmail(emailInput.val())) {
-		var formData = new FormData();
-		formData.append('form_name', 'unique_email_check');
-		formData.append('email', emailInput.val());
-		formData.append('type', type);
-		console.log(Array.from(formData));
-		$.ajax({
-			url: '/',
-			data: formData,
-			processData: false,
-			type: 'post',
-			contentType: false
-		}).done(function (data) {
-			console.log(data)
-			if (data == true) {
-				businessEmailCheck = false;
-				studentEmailValid = false;
-				showAlert('Email Already in use.', 'In Use', 'error');
-				$(event).css('border-color', 'crimson')
-			} else {
-				businessEmailCheck = true;
-				studentEmailValid = true;
-				$(event).css('border-color', '#198754')
-			}
-		}).fail(function (data) {
-			console.log(data)
-		});
-	} else {
-		businessEmailCheck = false;
-		studentEmailValid = false;
-		$(event).css('border-color', 'crimson')
-	}
-}
+            var emailInput = $(event);
+            if (validateEmail(emailInput.val())) {
+                var formData = new FormData();
+                formData.append('form_name', 'unique_email_check');
+                formData.append('email', emailInput.val());
+                formData.append('type', type);
+                console.log(Array.from(formData));
+                $.ajax({
+                    url: '/',
+                    data: formData,
+                    processData: false,
+                    type: 'post',
+                    contentType: false
+                }).done(function(data) {
+                    console.log(data)
+                    if (data == true) {
+                        businessEmailCheck = false;
+                        studentEmailValid = false;
+                        showAlert('Email Already in use.', 'In Use', 'error');
+                        $(event).css('border-color', 'crimson')
+                    } else {
+                        businessEmailCheck = true;
+                        studentEmailValid = true;
+                        $(event).css('border-color', '#198754')
+                    }
+                }).fail(function(data) {
+                    console.log(data)
+                });
+            } else {
+                businessEmailCheck = false;
+                studentEmailValid = false;
+                $(event).css('border-color', 'crimson')
+            }
+        }
     </script>
 @endsection
