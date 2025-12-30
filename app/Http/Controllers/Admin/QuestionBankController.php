@@ -75,11 +75,11 @@ class QuestionBankController extends Controller
                     $editButton = '<a href="' . route('administrator.dashboard_question_update', [$testData['id']]) . '" title="Edit Test"><i class="bi bi-pencil-square text-success me-2"></i></a>';
                 }
 
-                $questionsData[$key]['creator_name'] = $testData->creator->name;
+                $questionsData[$key]['creator_name'] = optional($testData->creator)->name ?? '';
 
                 $questionsData[$key]['checker_name'] = '';
                 if ($testData['checked_by_id']) {
-                    $questionsData[$key]['checker_name'] = $testData->checkedBy->name;
+                    $questionsData[$key]['checker_name'] = optional($testData->checkedBy)->name ?? '';
                 }
 
                 $questionsData[$key]['type'] = 'Text';
@@ -96,32 +96,32 @@ class QuestionBankController extends Controller
 
                 $questionsData[$key]['education'] = '';
                 if ($testData['education_type_id']) {
-                    $questionsData[$key]['education'] = $testData->educationType->name;
+                    $questionsData[$key]['education'] = optional($testData->educationType)->name ?? '';
                 }
 
                 $questionsData[$key]['class'] = '';
                 if ($testData['class_group_exam_id']) {
-                    $questionsData[$key]['class'] = $testData->classGroup->name;
+                    $questionsData[$key]['class'] = optional($testData->classGroup)->name ?? '';
                 }
 
                 $questionsData[$key]['board'] = '';
                 if ($testData['board_agency_state_id']) {
-                    $questionsData[$key]['board'] = $testData->boardAgency->name;
+                    $questionsData[$key]['board'] = optional($testData->boardAgency)->name ?? '';
                 }
 
                 $questionsData[$key]['subject'] = '';
                 if ($testData['subject']) {
-                    $questionsData[$key]['subject'] = $testData->inSubject->name;
+                    $questionsData[$key]['subject'] = optional($testData->inSubject)->name ?? '';
                 }
 
                 $questionsData[$key]['subject_part'] = '';
                 if ($testData['subject_part']) {
-                    $questionsData[$key]['subject_part'] = $testData->inSubjectPart->name;
+                    $questionsData[$key]['subject_part'] = optional($testData->inSubjectPart)->name ?? '';
                 }
 
                 $questionsData[$key]['lesson_chapter'] = '';
                 if ($testData['subject_lesson_chapter']) {
-                    $questionsData[$key]['lesson_chapter'] = $testData->inSubjectLesson->name;
+                    $questionsData[$key]['lesson_chapter'] = optional($testData->inSubjectLesson)->name ?? '';
                 }
 
                 $questionsData[$key]['created'] = date('d-M-y g:s A', strtotime($testData->created_at));
@@ -182,7 +182,6 @@ class QuestionBankController extends Controller
 
     public function import()
     {
-        // dd("test");
         Excel::import(new QuestionBankImport, request()->file('question'));
         return back();
     }

@@ -72,16 +72,22 @@ class AjaxController extends Controller
                     'institute_code' => $enquiryData->branch_code
                 ];
                 if ($requestedData['type'] == 'approved') {
-                    $mailToSend = new InstituteApproveEmail($details);
-                    Mail::to($enquiryData['email'])->send($mailToSend);
-                    $emailSend = Mail::failures();
-                    $emailType = 'Approval';
+                    try {
+                        $mailToSend = new InstituteApproveEmail($details);
+                        Mail::to($enquiryData['email'])->send($mailToSend);
+                        $emailType = 'Approval';
+                    } catch (\Exception $e) {
+                        $emailSend = [$e->getMessage()];
+                    }
                 }
                 if ($requestedData['type'] == 'reject') {
-                    $mailToSend = new InstituteRejectedEmail($details);
-                    Mail::to($enquiryData['email'])->send($mailToSend);
-                    $emailSend = Mail::failures();
-                    $emailType = 'Rejection';
+                    try {
+                        $mailToSend = new InstituteRejectedEmail($details);
+                        Mail::to($enquiryData['email'])->send($mailToSend);
+                        $emailType = 'Rejection';
+                    } catch (\Exception $e) {
+                        $emailSend = [$e->getMessage()];
+                    }
                 }
 
                 $response['emailSend'] = $emailSend;

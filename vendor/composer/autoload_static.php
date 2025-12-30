@@ -165,7 +165,6 @@ class ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8
             'Laravel\\Sanctum\\' => 16,
             'Laravel\\Sail\\' => 13,
             'Laravel\\Prompts\\' => 16,
-            'Laravel\\Breeze\\' => 15,
         ),
         'I' =>
         array (
@@ -538,10 +537,6 @@ class ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8
         array (
             0 => __DIR__ . '/..' . '/laravel/prompts/src',
         ),
-        'Laravel\\Breeze\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/laravel/breeze/src',
-        ),
         'Illuminate\\Support\\' =>
         array (
             0 => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Macroable',
@@ -669,8 +664,6 @@ class ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8
     );
 
     public static $classMap = array (
-        'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
-        'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Http\\Controllers\\API\\APIController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/APIController.php',
         'App\\Http\\Controllers\\API\\BaseController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/BaseController.php',
         'App\\Http\\Controllers\\API\\InternalRequestsController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/InternalRequestsController.php',
@@ -683,7 +676,7 @@ class ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8
         'App\\Http\\Controllers\\Admin\\PlanController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/PlanController.php',
         'App\\Http\\Controllers\\Admin\\QuestionBankController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/QuestionBankController.php',
         'App\\Http\\Controllers\\Admin\\SettingsController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/SettingsController.php',
-        'App\\Http\\Controllers\\Admin\\UsersContoller' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/UsersContoller.php',
+        'App\\Http\\Controllers\\Admin\\UsersController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/UsersController.php',
         'App\\Http\\Controllers\\AuthController' => __DIR__ . '/../..' . '/app/Http/Controllers/AuthController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\Frontend\\ClassController' => __DIR__ . '/../..' . '/app/Http/Controllers/Frontend/ClassController.php',
@@ -708,7 +701,6 @@ class ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8
         'App\\Http\\Controllers\\Student\\StudentPlanController' => __DIR__ . '/../..' . '/app/Http/Controllers/Student/StudentPlanController.php',
         'App\\Http\\Controllers\\StudymaterialController' => __DIR__ . '/../..' . '/app/Http/Controllers/StudymaterialController.php',
         'App\\Http\\Controllers\\TestController' => __DIR__ . '/../..' . '/app/Http/Controllers/TestController.php',
-        'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
         'App\\Http\\Middleware\\Authenticate' => __DIR__ . '/../..' . '/app/Http/Middleware/Authenticate.php',
         'App\\Http\\Middleware\\Cors' => __DIR__ . '/../..' . '/app/Http/Middleware/Cors.php',
         'App\\Http\\Middleware\\EncryptCookies' => __DIR__ . '/../..' . '/app/Http/Middleware/EncryptCookies.php',
@@ -744,7 +736,12 @@ class ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8
         'App\\Livewire\\Admin\\Pages\\PagesList' => __DIR__ . '/../..' . '/app/Livewire/Admin/Pages/PagesList.php',
         'App\\Livewire\\Admin\\Pages\\PagesView' => __DIR__ . '/../..' . '/app/Livewire/Admin/Pages/PagesView.php',
         'App\\Livewire\\Forms\\Frontend\\ContactUsForm' => __DIR__ . '/../..' . '/app/Livewire/Forms/Frontend/ContactUsForm.php',
+        'App\\Livewire\\Forms\\Frontend\\StudentRegistrationForm' => __DIR__ . '/../..' . '/app/Livewire/Forms/Frontend/StudentRegistrationForm.php',
         'App\\Livewire\\Forms\\ImportantLinkForm' => __DIR__ . '/../..' . '/app/Livewire/Forms/ImportantLinkForm.php',
+        'App\\Livewire\\Frontend\\Auth\\ContributorSignUp' => __DIR__ . '/../..' . '/app/Livewire/Frontend/Auth/ContributorSignUp.php',
+        'App\\Livewire\\Frontend\\Auth\\ForgotPassword' => __DIR__ . '/../..' . '/app/Livewire/Frontend/Auth/ForgotPassword.php',
+        'App\\Livewire\\Frontend\\Auth\\Login' => __DIR__ . '/../..' . '/app/Livewire/Frontend/Auth/Login.php',
+        'App\\Livewire\\Frontend\\Auth\\Register' => __DIR__ . '/../..' . '/app/Livewire/Frontend/Auth/Register.php',
         'App\\Livewire\\Frontend\\Components\\Footer' => __DIR__ . '/../..' . '/app/Livewire/Frontend/Components/Footer.php',
         'App\\Livewire\\Frontend\\ContactUsPage' => __DIR__ . '/../..' . '/app/Livewire/Frontend/ContactUsPage.php',
         'App\\Livewire\\Frontend\\Faq' => __DIR__ . '/../..' . '/app/Livewire/Frontend/Faq.php',
@@ -820,11 +817,9 @@ class ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8
         'App\\Observers\\ContactQueryObserver' => __DIR__ . '/../..' . '/app/Observers/ContactQueryObserver.php',
         'App\\Policies\\StudymaterialPolicy' => __DIR__ . '/../..' . '/app/Policies/StudymaterialPolicy.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
-        'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
         'App\\Providers\\BroadcastServiceProvider' => __DIR__ . '/../..' . '/app/Providers/BroadcastServiceProvider.php',
-        'App\\Providers\\EventServiceProvider' => __DIR__ . '/../..' . '/app/Providers/EventServiceProvider.php',
         'App\\Providers\\GlobalFunctionsServiceProvider' => __DIR__ . '/../..' . '/app/Providers/GlobalFunctionsServiceProvider.php',
-        'App\\Providers\\RouteServiceProvider' => __DIR__ . '/../..' . '/app/Providers/RouteServiceProvider.php',
+        'App\\Services\\ExamService' => __DIR__ . '/../..' . '/app/Services/ExamService.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Barryvdh\\Debugbar\\Console\\ClearCommand' => __DIR__ . '/..' . '/barryvdh/laravel-debugbar/src/Console/ClearCommand.php',
         'Barryvdh\\Debugbar\\Controllers\\AssetController' => __DIR__ . '/..' . '/barryvdh/laravel-debugbar/src/Controllers/AssetController.php',
@@ -3622,12 +3617,6 @@ class ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8
         'Illuminate\\View\\ViewFinderInterface' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewFinderInterface.php',
         'Illuminate\\View\\ViewName' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewName.php',
         'Illuminate\\View\\ViewServiceProvider' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewServiceProvider.php',
-        'Laravel\\Breeze\\BreezeServiceProvider' => __DIR__ . '/..' . '/laravel/breeze/src/BreezeServiceProvider.php',
-        'Laravel\\Breeze\\Console\\InstallCommand' => __DIR__ . '/..' . '/laravel/breeze/src/Console/InstallCommand.php',
-        'Laravel\\Breeze\\Console\\InstallsApiStack' => __DIR__ . '/..' . '/laravel/breeze/src/Console/InstallsApiStack.php',
-        'Laravel\\Breeze\\Console\\InstallsBladeStack' => __DIR__ . '/..' . '/laravel/breeze/src/Console/InstallsBladeStack.php',
-        'Laravel\\Breeze\\Console\\InstallsInertiaStacks' => __DIR__ . '/..' . '/laravel/breeze/src/Console/InstallsInertiaStacks.php',
-        'Laravel\\Breeze\\Console\\InstallsLivewireStack' => __DIR__ . '/..' . '/laravel/breeze/src/Console/InstallsLivewireStack.php',
         'Laravel\\Prompts\\Clear' => __DIR__ . '/..' . '/laravel/prompts/src/Clear.php',
         'Laravel\\Prompts\\Concerns\\Colors' => __DIR__ . '/..' . '/laravel/prompts/src/Concerns/Colors.php',
         'Laravel\\Prompts\\Concerns\\Cursor' => __DIR__ . '/..' . '/laravel/prompts/src/Concerns/Cursor.php',

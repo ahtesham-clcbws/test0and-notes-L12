@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExamsController;
 use App\Http\Controllers\Admin\FranchiseController;
 use App\Http\Controllers\Admin\QuestionBankController;
-use App\Http\Controllers\Admin\UsersContoller;
+use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\StudymaterialController;
 
@@ -55,10 +55,10 @@ Route::name('administrator.')->group(function () {
             });
 
             Route::prefix('users')->group(function () {
-                Route::any('add', [UsersContoller::class, 'add'])->name('add_user');
-                Route::any('type/{type}/{franchise:?}', [UsersContoller::class, 'index'])->name('admin_users_list');
-                Route::any('view/{id}', [UsersContoller::class, 'show'])->name('user_show');
-                Route::any('delete/{id}', [UsersContoller::class, 'delete'])->name('user_delete');
+                Route::any('add', [UsersController::class, 'add'])->name('add_user');
+                Route::any('type/{type}/{franchise:?}', [UsersController::class, 'index'])->name('admin_users_list');
+                Route::any('view/{id}', [UsersController::class, 'show'])->name('user_show');
+                Route::any('delete/{id}', [UsersController::class, 'delete'])->name('user_delete');
             });
             Route::prefix('plan')->group(function () {
                 Route::any('', [PlanController::class, 'index'])->name('plan');
@@ -121,7 +121,7 @@ Route::name('administrator.')->group(function () {
                 Route::any('update/{id}', [QuestionBankController::class, 'add_update'])->name('dashboard_question_update');
             });
             Route::prefix('profile')->group(function () {
-                Route::any('', [UsersContoller::class, 'myPofile'])->name('admin_panel_profile');
+                Route::any('', [UsersController::class, 'myPofile'])->name('admin_panel_profile');
             });
             Route::prefix('settings')->group(function () {
                 Route::any('dashboard', [SettingsController::class, 'dashboardSettings'])->name('dashboard_settings');

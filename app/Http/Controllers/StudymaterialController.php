@@ -47,16 +47,9 @@ class StudymaterialController extends Controller
             $published = isset($request->published) ? $request->published : '';
             $study_material_cat = isset($request->study_material_cat) ? $request->study_material_cat : '';
 
-            // $model = Studymaterial::query()->select("study_material.id as id", "title", "sub_title", "is_featured", "institute_id", "publish_status", "publish_date", "document_type", "created_by", "file", "video_link", "category", "study_material.id as DT_RowIndex", "users.name as name", "classes_groups_exams.name as class_group")
-            //     ->leftJoin("users", "users.id", "study_material.created_by")
-            //     ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
-            //     ->leftJoin("franchise_details", "franchise_details.id", "study_material.institute_id");
-
-            $model = Studymaterial::query()->select("study_material.id", "title", "sub_title", "is_featured", "institute_id", "publish_status", "publish_date", "document_type", "created_by", "file", "video_link", "category", "users.name as name", "classes_groups_exams.name as class_group")
-                ->leftJoin("users", "users.id", "study_material.created_by")
-                ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
-                ->leftJoin("franchise_details", "franchise_details.id", "study_material.institute_id");
-
+            $model = Studymaterial::query()
+                ->select("study_material.id", "title", "sub_title", "is_featured", "institute_id", "publish_status", "publish_date", "document_type", "created_by", "file", "video_link", "category", "users.name as name", "classes_groups_exams.name as class_group")
+                ->withRelations();
 
             if ($is_franchies == 1) {
                 $model = $model->where("franchise_details.id", Auth::user()->institute->id);
@@ -67,33 +60,15 @@ class StudymaterialController extends Controller
             }
 
             if (!empty($published)) {
-                $model =  $model->where('publish_status', $published);
-                $count = $model->count();
-            }
-            if (!empty($study_material_cat)) {
-                if ($study_material_cat == 1) {
-                    $model =  $model->where('category', 'Study Notes & E-Books');
-                }
-                if ($study_material_cat == 2) {
-                    $model =  $model->where('category', 'Live & Video Classes');
-                }
-                if ($study_material_cat == 3) {
-                    $model =  $model->where('category', 'Static GK & Current Affairs');
-                }
-                if ($study_material_cat == 4) {
-                    $model =  $model->where('category', 'Comprehensive Study Material');
-                }
-                if ($study_material_cat == 5) {
-                    $model =  $model->where('category', 'Short Notes & One Liner');
-                }
-                if ($study_material_cat == 6) {
-                    $model =  $model->where('category', 'Premium Study Notes');
-                }
-                $count = $model->count();
+                $model = $model->where('publish_status', $published);
             }
 
-            $model = $model->where("study_material.status", 1);
-            $model = $model->orderBy('study_material.id', 'desc');
+            if (!empty($study_material_cat)) {
+                $model = $model->byCategory($study_material_cat);
+            }
+
+            $model = $model->where("study_material.status", 1)
+                ->orderBy('study_material.id', 'desc');
             $model->get();
 
             return Datatables::eloquent(new EloquentDataTable($model))

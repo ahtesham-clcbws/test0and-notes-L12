@@ -10,6 +10,8 @@
     <link rel="apple-touch-icon" href="{{ asset('logos/logo-white-square.png') }}">
     <link rel="stylesheet" href="{{ URL::asset('frontend/sweetalert2/sweetalert2.min.css') }}">
 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <title>{{ env('APP_NAME') }}</title>
     <style>
         #dark_theme {

@@ -13,6 +13,8 @@
     <link rel="shortcut-icon" href="{{ asset('logos/logo-white-square.png') }}" type="image/x-icon">
     <link rel="apple-touch-icon" href="{{ asset('logos/logo-white-square.png') }}">
 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <!-- Bootstrap core CSS -->
     {{-- <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet"> --}}
     <!--Bootsrap 4 CDN-->

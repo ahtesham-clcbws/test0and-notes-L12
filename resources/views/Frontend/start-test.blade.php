@@ -135,12 +135,6 @@
             cursor: pointer;
         }
 
-        /* .modal-container>p{
-                            text-align:center;
-                        }
-                        .modal-container>img{
-                        align-content:center;
-                        } */
         .modal-container {
             float: none;
             width: 30%;
@@ -192,90 +186,49 @@
     </style>
 @endsection
 @section('main')
-    <!-- ============================ Page Title Start================================== -->
     <div class="ed_detail_head" style="padding: 10px;">
         <div class="container">
             <div class="row align-items-center" style="flex-wrap: nowrap;display: flex;flex-direction: row;">
                 <div class="col-lg-8 col-md-7">
                     <div class="ed_detail_wrap">
-                        <!-- <div class="crs_cates cl_1"><span>Design</span></div><div class="crs_cates cl_3"><span>Design</span></div> -->
                         <div class="ed_header_caption">
                             <h2 class="ed_title">{{ $data['test_start']->title }}</h2>
-                            <!-- <ul>
-                                                <li><i class="ti-calendar"></i>10 - 20 weeks</li>
-                                                <li><i class="ti-control-forward"></i>102 Lectures</li>
-                                                <li><i class="ti-user"></i>502 Student Enrolled</li>
-                                            </ul> -->
                         </div>
-                        <!-- <div class="ed_header_short">
-                                            <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore. veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-                                        </div> -->
-
-                        <!-- <div class="ed_rate_info">
-                                                <div class="star_info">
-                                                    <i class="fas fa-star filled"></i>
-                                                    <i class="fas fa-star filled"></i>
-                                                    <i class="fas fa-star filled"></i>
-                                                    <i class="fas fa-star filled"></i>
-                                                    <i class="fas fa-star"></i>
-                                                </div>
-                                                <div class="review_counter">
-                                                    <strong class="high">4.7</strong> 3572 Reviews
-                                                </div>
-                                            </div> -->
 
                     </div>
                 </div>
                 <div class="counter col-lg-4 position-relative">
                     <div class="d-flex justify-content-between">
-                    <h3 style="color: red"><b>Time Left - <span id="timer">00:00:00</span></b></h3>
-                    <h3 clas="" style="position: absolute; right: 0">Total Qs - {{$data['test_start']['total_questions']}}</h3>
+                        <h3 style="color: red"><b>Time Left - <span id="timer">00:00:00</span></b></h3>
+                        <h3 style="position: absolute; right: 0" clas="">Total Qs -
+                            {{ $data['test_start']['total_questions'] }}</h3>
+                    </div>
                 </div>
-                </div>
-                <!-- <div class="counter">
-                                    <h2><b>Time Left - <span id="timer" style="color: red">00:00:00</span></b></h2><br>
-                                    <p id="demo"></p>
-                                </div> -->
-                <!-- <div class="counter" id="clockdiv">
-                                    <div>
-                                        <span class="days"></span>
-                                    </div>
-                                    <div>
-                                        <span class="hours"></span>
-                                    </div>
-                                    <div>
-                                        <span class="minutes"></span>
-                                    </div>
-                                    <div>
-                                        <span class="seconds"></span>
-                                    </div>
-                                </div> -->
             </div>
         </div>
     </div>
-    <!-- ============================ Page Title End ================================== -->
-    <!-- ============================ Course Detail ================================== -->
 
     <section class="pt-0">
         <div class="container">
             <div class="col-lg-6 col-md-12 col-sm-12">
                 <div class="custom-tab customize-tab tabs_creative">
-                    <ul class="nav nav-tabs pb-2 b-0" id="myTab" role="tablist">
+                    <ul class="nav nav-tabs b-0 pb-2" id="myTab" role="tablist">
                         @foreach ($data['test_start']->getSection as $i => $section)
                             @if ($i == 0)
                                 <li class="nav-item">
-                                    <a class="nav-link active test-tab-{{ $i }}" data-id="{{ $i }}"
-                                        id="{{ $section->sectionSubject->name }}_{{ $i }}-tab" data-toggle="tab"
+                                    <a class="nav-link active test-tab-{{ $i }}"
+                                        id="{{ $section->sectionSubject->name }}_{{ $i }}-tab"
+                                        data-id="{{ $i }}" data-toggle="tab"
                                         href="#{{ $section->sectionSubject->name }}_{{ $i }}" role="tab"
                                         aria-controls="{{ $section->sectionSubject->name }}_{{ $i }}"
                                         aria-selected="true">{{ $section->sectionSubject->name }}</a>
                                 </li>
                             @else
                                 <li class="nav-item">
-                                    <a class="nav-link test-tab-{{ $i }}" data-id="{{ $i }}"
+                                    <a class="nav-link test-tab-{{ $i }}"
                                         id="{{ $section->sectionSubject->name }}_{{ $i }}-tab"
-                                        data-toggle="tab" href="#{{ $section->sectionSubject->name }}_{{ $i }}"
-                                        role="tab"
+                                        data-id="{{ $i }}" data-toggle="tab"
+                                        href="#{{ $section->sectionSubject->name }}_{{ $i }}" role="tab"
                                         aria-controls="{{ $section->sectionSubject->name }}_{{ $i }}"
                                         aria-selected="false">{{ $section->sectionSubject->name }}</a>
                                 </li>
@@ -284,125 +237,69 @@
                     </ul>
                 </div>
             </div>
-            <form action="{{ url('end-test/' . $data['test_start']->id) }}" method="post" id="test_submit_form">
+            <form id="test_submit_form" action="{{ url('end-test/' . $data['test_start']->id) }}" method="post">
                 @csrf
                 <div class="row">
                     <div class="col-lg-8 col-md-12 order-lg-first">
                         <!-- Overview -->
-                        <input type="hidden" name="show_result" value="0" id="show_result">
+                        <input id="show_result" name="show_result" type="hidden" value="0">
                         <?php $questions_count = 0; ?>
                         @foreach ($data['test_start']->getSection as $i => $section)
                             @foreach ($section->getQuestions()->wherePivot('deleted_at', '=', null)->get() as $j => $questions)
-                                <div class="px-1 py-0 edu_wraper test-questions test-questions_{{ $j += 1 }}"
-                                    key="{{ $questions->id }}" data-id="{{ $i }}"
-                                    id="question_{{ $questions->id }}">
+                                <div class="edu_wraper test-questions test-questions_{{ $j += 1 }} px-1 py-0"
+                                    id="question_{{ $questions->id }}" data-id="{{ $i }}"
+                                    key="{{ $questions->id }}">
                                     <h3 class="edu_title" style="color: red;">Question Number {{ $questions_count += 1 }}
                                     </h3>
                                     <div class="d-flex">
                                         <p style="flex:none;"> Qs {{ $questions_count }} - &nbsp;</p>
                                         {!! $questions->question !!}
                                     </div>
-                                    {{-- <hr>
-                                    <h3 class="edu_title">Options</h3> --}}
                                     <ul class="no-ul-list img-ls-src">
                                         @for ($k = 1; $k <= $questions->mcq_options; $k++)
                                             <li>
-                                                <input
+                                                <input class="checkbox-custom"
                                                     id="answer_{{ $i }}_{{ $j }}_{{ $k }}"
-                                                    class="checkbox-custom" name="question[{{ $questions->id }}]"
-                                                    value="ans_{{ $k }}" type="radio">
-                                                <label
-                                                    for="answer_{{ $i }}_{{ $j }}_{{ $k }}"
-                                                    class="checkbox-custom-label">{!! $questions['ans_' . $k] !!}</label>
+                                                    name="question[{{ $questions->id }}]" type="radio"
+                                                    value="ans_{{ $k }}">
+                                                <label class="checkbox-custom-label"
+                                                    for="answer_{{ $i }}_{{ $j }}_{{ $k }}">{!! $questions['ans_' . $k] !!}</label>
                                             </li>
                                         @endfor
                                     </ul>
-                                    <input type="hidden" name="clear_questions[{{ $questions->id }}]" value="0">
-                                    <input type="hidden" key="{{ $questions->id }}"
-                                        name="mark_for_review_questions[{{ $questions->id }}]" value="0">
-                                    <input type="hidden" key="{{ $questions->id }}"
-                                        name="attemted_questions[{{ $questions->id }}]" value="0">
+                                    <input name="clear_questions[{{ $questions->id }}]" type="hidden" value="0">
+                                    <input name="mark_for_review_questions[{{ $questions->id }}]" type="hidden"
+                                        value="0" key="{{ $questions->id }}">
+                                    <input name="attemted_questions[{{ $questions->id }}]" type="hidden" value="0"
+                                        key="{{ $questions->id }}">
                                 </div>
                             @endforeach
                         @endforeach
-
-                        <!-- <div class="edu_wraper">
-                                            <h3 class="edu_title">Question Number</h3>
-                                            <p>Question</p>
-                                            <h6>Requirements</h6>
-                                            <ul class="no-ul-list">
-                                                <li>
-                                                    <input id="a-p1" class="checkbox-custom" name="a-p" type="radio">
-                                                    <label for="a-p1" class="checkbox-custom-label">Option 1</label>
-                                                </li>
-
-                                                <li>
-                                                    <input id="a-p2" class="checkbox-custom" name="a-p" type="radio">
-                                                    <label for="a-p2" class="checkbox-custom-label">Option 2</label>
-                                                </li>
-                                                <li>
-                                                    <input id="a-p3" class="checkbox-custom" name="a-p" type="radio">
-                                                    <label for="a-p3" class="checkbox-custom-label">Option 3</label>
-                                                </li>
-                                                <li>
-                                                    <input id="a-p4" class="checkbox-custom" name="a-p" type="radio">
-                                                    <label for="a-p4" class="checkbox-custom-label">Option 4</label>
-                                                </li>
-                                            </ul>
-                                        </div> -->
-                        <button type="button" class="btn btn-outline-theme" id="mark-for-review"
-                            onclick="starShow(0)">Mark for Review <i class="ti-hand-open"></i></button>
-                        <button type="button" class="btn btn-outline-theme" id="clear-response">Clear Response <i
+                        <button class="btn btn-outline-theme" id="mark-for-review" type="button" onclick="starShow(0)">Mark
+                            for Review <i class="ti-hand-open"></i></button>
+                        <button class="btn btn-outline-theme" id="clear-response" type="button">Clear Response <i
                                 class="ti-brush-alt"></i></button>
-                        <button type="button" class="btn btn-outline-theme" id="submit-answer">Save & Next<i
+                        <button class="btn btn-outline-theme" id="submit-answer" type="button">Save & Next<i
                                 class="ti-angle-right"></i></button>
-
-
-                        <!-- <div class="edu_wraper">
-                                            <h3 class="edu_title">Question Number 1</h3>
-                                            <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.</p>		 -->
-                        <!-- <h6>Requirements</h6> -->
-                        <!-- <ul class="no-ul-list">
-                                                <li>
-                                                    <input id="a-p" class="checkbox-custom" name="a-p" type="radio">
-                                                    <label for="a-p" class="checkbox-custom-label">Option 1</label>
-                                                </li>
-                                                <li>
-                                                    <input id="a-p" class="checkbox-custom" name="a-p" type="radio">
-                                                    <label for="a-p" class="checkbox-custom-label">Option 2</label>
-                                                </li>
-                                                <li>
-                                                    <input id="a-p" class="checkbox-custom" name="a-p" type="radio">
-                                                    <label for="a-p" class="checkbox-custom-label">Option 3</label>
-                                                </li>
-                                                <li>
-                                                    <input id="a-p" class="checkbox-custom" name="a-p" type="radio">
-                                                    <label for="a-p" class="checkbox-custom-label">Option 4</label>
-                                                </li>
-                                            </ul>
-                                        </div> -->
-                        <!-- <button type="submit" class="btn btn-outline-theme">Clear Response</button>
-                                        <button type="submit" class="btn btn-outline-theme">Save & Next</button>
-                                        <button type="submit" class="btn btn-outline-theme"  onclick="starShow(0)">Mark for Review</button> -->
-
                     </div>
 
                     <!-- Sidebar -->
                     <div class="col-lg-4 col-md-12 order-lg-last p-0">
-                        <div class="ed_view_box style_2  border border-2 border-success rounded-0">
+                        <div class="ed_view_box style_2 border-success rounded-0 border border-2">
                             <?php $questions_count = 0; ?>
                             <div class="tab-content" id="myTabContent">
                                 @foreach ($data['test_start']->getSection as $i => $section)
                                     @if ($i == 0)
                                         <div class="row">
                                             <div class="col-3">
-                                                <img src="{{ '/storage/' . auth()->user()->user_details->photo_url }}"
-                                                    class="student_image" alt="">
+                                                <img class="student_image"
+                                                    src="{{ '/storage/' . auth()->user()->user_details->photo_url }}"
+                                                    alt="">
                                             </div>
-                                            <div class="col-9 text-center d-flex flex-column justify-content-center"
+                                            <div class="col-9 d-flex flex-column justify-content-center text-center"
                                                 style="padding-left: 0;">
                                                 <h3
-                                                    class="studen_name border border-top-0 border-end-0 border-start-0 border-light border-2">
+                                                    class="studen_name border-top-0 border-end-0 border-start-0 border-light border border-2">
                                                     {{ auth()->user()->name }}</h3>
                                                 <h3 class="test_name" id="test_name">{{ $section->sectionSubject->name }}
                                                 </h3>
@@ -410,12 +307,11 @@
                                         </div>
                                     @endif
 
-                                    <div class="tab-pane pb-3 gray fade {{ $i == 0 ? 'show active ' : '' }} test-tab-content-{{ $i }}"
-                                        data-id="{{ $i }}"
-                                        id="{{ $section->sectionSubject->name }}_{{ $i }}" role="tabpanel"
+                                    <div class="tab-pane gray fade {{ $i == 0 ? 'show active ' : '' }} test-tab-content-{{ $i }} pb-3"
+                                        id="{{ $section->sectionSubject->name }}_{{ $i }}"
+                                        data-id="{{ $i }}" role="tabpanel"
                                         aria-labelledby="{{ $section->sectionSubject->name }}_{{ $i }}-tab">
                                         <div class="eld mb-3">
-                                            {{-- <h5 class="font-medium">{{ $section->sectionSubject->name }}</h5> --}}
                                             <ul class="question-grid">
                                                 @foreach ($section->getQuestions()->wherePivot('deleted_at', '=', null)->get() as $key => $questions)
                                                     <li class="col" id="question_li_{{ $questions->id }}"
@@ -431,78 +327,23 @@
                                 @endforeach
                             </div>
                             <div class="ed_view_features px-2">
-                                <!-- @foreach ($data['test_start']->getSection as $key => $section)
-    <div class="eld mb-3">
-                                                        <h5 class="font-medium">{{ $section->sectionSubject->name }}</h5>
-                                                        <ul class="number-que-list">
-                                                            @foreach ($section->getQuestions()->wherePivot('deleted_at', '=', null)->get() as $key => $questions)
-    <li class="question-list" id="question_li_{{ $questions->id }}" key="{{ $questions->id }}"><span class="numberlist">{{ $key += 1 }}</span></li>
-    @endforeach
-                                                        </ul>
-                                                    </div>
-    @endforeach -->
 
-                                <!-- <div class="eld mb-3">
-                                                    <h5 class="font-medium">Section: Domain</h5>
-                                                </div>
-                                                <div class="eld mb-3">
-                                                    <h5 class="font-medium">Section: Domain</h5>
-                                                </div> -->
 
-                                <!-- <ul class="number-que-list">
-                                                <li class="active"><span class="numberlist">1</span></li>
-                                                <li><span class="numberlist">2</span></li>
-                                                <li><span class="numberlist">3</span></li>
-                                                <li><span class="numberlist">4</span></li>
-                                                <li><span class="numberlist">5</span></li>
-                                                <li><span class="numberlist">6</span></li>
-                                                <li><span class="numberlist">7</span></li>
-                                                <li><span class="numberlist">8</span></li>
-                                                <li><span class="numberlist">9</span></li>
-                                                <li><span class="numberlist">10</span></li>
-                                            </ul>
-                                            <ul class="number-que-list">
-                                                <li><span class="numberlist">11</span></li>
-                                                <li><span class="numberlist">12</span></li>
-                                                <li><span class="numberlist">13</span></li>
-                                                <li><span class="numberlist">14</span></li>
-                                                <li><span class="numberlist">15</span></li>
-                                                <li><span class="numberlist">16</span></li>
-                                                <li><span class="numberlist">17</span></li>
-                                                <li><span class="numberlist">18</span></li>
-                                                <li><span class="numberlist">19</span></li>
-                                                <li><span class="numberlist">20</span></li>
-                                            </ul>
-                                            <ul class="number-que-list">
-                                                <li><span class="numberlist">21</span></li>
-                                                <li><span class="numberlist">22</span></li>
-                                                <li><span class="numberlist">23</span></li>
-                                                <li><span class="numberlist">24</span></li>
-                                                <li><span class="numberlist">25</span></li>
-                                                <li><span class="numberlist">26</span></li>
-                                                <li><span class="numberlist">27</span></li>
-                                                <li><span class="numberlist">28</span></li>
-                                                <li><span class="numberlist">29</span></li>
-                                                <li><span class="numberlist">30</span></li>
-                                            </ul> -->
                                 <div class="d-flex justify-content-between pt-3">
-                                    <div><a href="{{ route('question_paper', [$data['test_start']->id]) }}"
-                                            class="underline d-flex align-items-center">Question Paper<i
-                                                class="ti-angle-right"></i></a></div>
+                                    <div><a class="d-flex align-items-center underline"
+                                            href="{{ route('question_paper', [$data['test_start']->id]) }}">Question
+                                            Paper<i class="ti-angle-right"></i></a></div>
                                     <div></div>
                                 </div>
                                 <div class="ed_view_link">
-                                    <button type="button" id="myBtnl" class="btn theme-bg enroll-btn"
+                                    <button class="btn theme-bg enroll-btn" id="myBtnl" type="button"
                                         onclick="alert('Test submitted succesfully....')">Review & Submit<i
                                             class="ti-angle-right"></i></button>
-                                    <!-- <a href="#" class="btn theme-bg enroll-btn">Submit Test<i class="ti-angle-right"></i></a> -->
                                 </div>
-
-                                <!-- <button type="button" class="btn btn-outline-theme" >Save & Next</button> -->
 
                             </div>
 
-                            <div id="loc-Modal" class="modal-loc">
+                            <div class="modal-loc" id="loc-Modal">
                                 <div class="modalloc-content">
                                     <span class="close-modal">&times</span>
 
@@ -551,11 +392,10 @@
                                             </div>
                                             <div class="ed_view_features">
                                                 <div class="ed_view_link">
-                                                    <!-- <a href="{{ route('question_paper', [$data['test_start']->id]) }}" class="btn theme-light enroll-btn">Question Paper<i class="ti-angle-right"></i></a> -->
-                                                    <button type="button" class="btn theme-bg enroll-btn"
-                                                        id="submit_test">Submit Test<i
-                                                            class="ti-angle-right"></i></button>
-                                                    <!-- <a href="#" class="btn theme-bg enroll-btn">Submit Test<i class="ti-angle-right"></i></a> -->
+                                                    <!-- <a class="btn theme-light enroll-btn" href="{{ route('question_paper', [$data['test_start']->id]) }}">Question Paper<i class="ti-angle-right"></i></a> -->
+                                                    <button class="btn theme-bg enroll-btn" id="submit_test"
+                                                        type="button">Submit Test<i class="ti-angle-right"></i></button>
+                                                    <!-- <a class="btn theme-bg enroll-btn" href="#">Submit Test<i class="ti-angle-right"></i></a> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -564,10 +404,10 @@
                             </div>
                         </div>
                     </div>
+                </div>
             </form>
         </div>
     </section>
-    <!-- ============================ Course Detail ================================== -->
 @endsection
 
 @section('js')
@@ -666,73 +506,6 @@
             realtime);
     </script>
 
-    <script type="text/javascript">
-        //     var timeoutHandle;
-        //     function countdown(minutes) {
-        //     var seconds = 60;
-
-        //     var num = minutes;
-        //     var hours = (num / 60);
-        //     var rhours = Math.floor(hours);
-        //     var minutes1 = (hours - rhours) * 60;
-        //     var mins = Math.round(minutes1);
-        //     var current_hour    = rhours-1;
-
-        //     function tick() {
-        //         var counter = document.getElementById("timer");
-        //         if (current_hour > 0) {
-        //             var current_minutes = mins-1;
-        //         }
-        //         else{
-        //             var current_minutes = 60-1;
-        //             current_hour = 0;
-        //         }
-        //         seconds--;
-        //         counter.innerHTML =
-        //         current_hour.toString() + ":" + current_minutes.toString() + ":" + (seconds < 10 ? "00" : "") + String(seconds);
-        //         if( seconds > 0 ) {
-        //             timeoutHandle=setTimeout(tick, 1000);
-        //         } else {
-        //             if(mins > 1){
-        //                // countdown(mins-1);   never reach “00″ issue solved:Contributed by Victor Streithorst
-        //                setTimeout(function () { countdown(mins - 1); }, 1000);
-        //             }else{
-        //                 if (current_hour > 0) {
-        //                     setTimeout(function () { countdown(rhours * 60); }, 1000);
-        //                 }
-        //             }
-        //         }
-        //     }
-        //         tick();
-        //     }
-        //     countdown('<?php echo $data['test_start']->time_to_complete; ?>');
-    </script>
-
-    <script type="text/javascript">
-        //     var timeoutHandle;
-        //     function countdown(minutes) {
-        //     var seconds = 60;
-        //     var mins = minutes
-        //     function tick() {
-        //         var counter = document.getElementById("timer");
-        //         var current_minutes = mins-1
-        //         seconds--;
-        //         counter.innerHTML =
-        //         "00" + ":" + current_minutes.toString() + ":" + (seconds < 10 ? "00" : "") + String(seconds);
-        //         if( seconds > 0 ) {
-        //             timeoutHandle=setTimeout(tick, 1000);
-        //         } else {
-        //             if(mins > 1){
-        //                // countdown(mins-1);   never reach “00″ issue solved:Contributed by Victor Streithorst
-        //                setTimeout(function () { countdown(mins - 1); }, 1000);
-        //             }
-        //         }
-        //     }
-        //         tick();
-        //     }
-        //     countdown('<?php echo $data['test_start']->time_to_complete; ?>');
-    </script>
-
     <script>
         function starShow(i) {
             var star = document.querySelectorAll(".number-que-list li span")[i];
@@ -800,19 +573,11 @@
             });
 
             $(".nav-link").click(function() {
-                // $(".test-tab-"+section_id).removeClass('active');
-                // $(".test-tab-content-"+section_id).removeClass('show');
-                // $(".test-tab-content-"+section_id).removeClass('active');
                 $(".test-questions").hide();
                 var section_id = $(this).attr('data-id');
                 $('.test-questions[data-id=' + section_id + ']')[0].style.display = 'block';
                 console.log(this.innerHTML);
                 $("#test_name").html(this.innerHTML);
-                // $('.test-questions').attr('data-id',section_id).show();
-
-                // $(".test-tab-"+section_id).addClass('active');
-                // $(".test-tab-content-"+section_id).addClass('show');
-                // $(".test-tab-content-"+section_id).addClass('active');
 
             });
 
@@ -865,20 +630,6 @@
                     $("#question_i_" + questions_key[q_id]).attr('style', 'visibility:visible');
                     $("input:hidden[name='mark_for_review_questions[" + questions_key[q_id] + "]']").val(1);
                 }
-                // if ($("input:hidden[name='mark_for_review_questions["+ questions_key[q_id] +"]']").val() == 0) {
-                //     console.log('0');
-                //     $("#question_i_"+questions_key[q_id]).removeAttr('style','visibility:hidden');
-                //     $("#question_i_"+questions_key[q_id]).attr('style','visibility:visible');
-                //     $("input:hidden[name='mark_for_review_questions["+ questions_key[q_id] +"]']").val(1);
-                // }
-
-                // $("#question_i_"+questions_key[q_id]).removeAttr('style','visibility:hidden');
-                // $("#question_i_"+questions_key[q_id]).attr('style','visibility:visible');
-                // $("#question_i_"+questions_key[q_id]).addClass('mark-review');
-                // $("input:radio[name='question["+ questions_key[old_id] +"]']").each(function(){
-                //     $(this).prop("checked",false);
-                // });
-                // $("input:hidden[name='attemted_questions["+ questions_key[old_id] +"]']").val(0);
             });
 
             $("#myBtnl").click(function() {
@@ -930,7 +681,7 @@
                 event.preventDefault();
                 @if ($data['test_start']->show_result == 1)
                     $("#show_result").val(1);
-                    swal({
+                    Swal.fire({
                         title: 'Sweet!',
                         titleText: 'Test has been submitted succesfully....',
                         text: 'Now you can view your result below.',
@@ -950,7 +701,7 @@
                     );
                 @else
                     $("#show_result").val(0);
-                    swal({
+                    Swal.fire({
                         title: 'Sweet!',
                         titleText: 'Test has been submitted succesfully....',
                         text: 'Your result will be declare soon.',
@@ -969,24 +720,6 @@
                         }
                     );
                 @endif
-                // swal({
-                //     title: 'Sweet!',
-                //     titleText: 'Test has been submitted succesfully....',
-                //     text: 'Now you can view your result below.',
-                //     imageUrl: '{{ URL::asset('frontend/images/emoji_with_thumbs_up.png') }}',
-                //     imageWidth: 400,
-                //     imageHeight: 200,
-                //     confirmButtonText:'View Result',
-                // }).then(
-                //     function(data){
-                //         if(data){
-                //             document.getElementById("test_submit_form").submit(); 
-                //         }
-                //     },
-                //     // function(dismiss) {
-                //     //     document.getElementById("test_submit_form").submit(); 
-                //     // }
-                // );
             });
         });
     </script>

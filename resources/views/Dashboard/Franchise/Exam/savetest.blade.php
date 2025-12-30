@@ -26,23 +26,23 @@
 @endsection
 @section('main')
     <div class="container p-0">
-        <form class="card dashboard-container mb-5" method="post" id="testForm">
+        <form class="card dashboard-container mb-5" id="testForm" method="post">
             @error('testError')
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     <strong>Error!</strong> {{ $message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button class="btn-close" data-bs-dismiss="alert" type="button" aria-label="Close"></button>
                 </div>
             @enderror
             @error('testSuccess')
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <strong>Success!</strong> {{ $message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button class="btn-close" data-bs-dismiss="alert" type="button" aria-label="Close"></button>
                 </div>
             @enderror
             @csrf
-            <input type="number" name="id" class="d-none" id="test_id"
+            <input class="d-none" id="test_id" name="id" type="number"
                 value="{{ $data['test'] ? $data['test']['id'] : '0' }}">
-            <input name="form_name" id="testFormName" class="d-none" value="test_form">
+            <input class="d-none" id="testFormName" name="form_name" value="test_form">
 
             <div class="card-body">
                 {{-- part 1 --}}
@@ -50,7 +50,7 @@
                     <div class="col-12">
                         <div class="alertx alert-primary">
                             <small><b>Test Title</b></small>
-                            <input type="text" class="form-control form-control-sm" id="test_title" name="title"
+                            <input class="form-control form-control-sm" id="test_title" name="title" type="text"
                                 value="{{ $data['test'] ? $data['test']['title'] : '' }}" placeholder="Test Title">
                         </div>
                     </div>
@@ -60,13 +60,13 @@
                     <div class="col-md-3 col-sm-6 col-12">
                         <div class="alertx alert-primary">
                             <small><b>Education Type</b></small>
-                            <select class="form-select form-select-sm" onchange="getClassesByEducation(this.value)"
-                                id="education_type_id" name="education_type_id" required>
+                            <select class="form-select form-select-sm" id="education_type_id" name="education_type_id"
+                                onchange="getClassesByEducation(this.value)" required>
                                 <option value="">select</option>
                                 @foreach ($data['educations'] as $key => $education)
-                                    <option
-                                        {{ $data['test'] && $data['test']['education_type_id'] == $education['id'] ? 'selected' : '' }}
-                                        value="{{ $education['id'] }}">{{ $education['name'] }}</option>
+                                    <option value="{{ $education['id'] }}"
+                                        {{ $data['test'] && $data['test']['education_type_id'] == $education['id'] ? 'selected' : '' }}>
+                                        {{ $education['name'] }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -121,13 +121,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="row ">
+                <div class="row">
                     <div class="col-3">
                         <div class="alertx alert-primary">
                             <small><b>Marks per Questions</b></small>
-
-                            <!-- <button style="float:right;" type="" id="divno1" class="btn btn-danger btn-sm">No</button>
-                            <button style="float:right;" type="" class="btn btn-success btn-sm">Yes</button> -->
                         </div>
                         <div id="divinfo1" style="margin-bottom:20px;">
                             <select class="form-select form-select-sm" id="test_marks_per_questions"
@@ -143,9 +140,6 @@
                     <div class="col-3">
                         <div class="alertx alert-primary">
                             <small><b>Negative Marks per Questions</b></small>
-
-                            <!-- <button style="float:right;" type="" id="divno2" class="btn btn-danger btn-sm">No</button>
-                            <button style="float:right;" type="" class="btn btn-success btn-sm">Yes</button> -->
                         </div>
                         <div id="divinfo2" style="margin-bottom:20px;">
                             <select class="form-select form-select-sm" id="test_negative_marks" name="negative_marks"
@@ -159,26 +153,10 @@
                             </select>
                         </div>
                     </div>
-                    <!-- <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary">
-                                <small><b>Subjects(s) / Sections(s)</b></small>
-                                <select class="form-select form-select-sm" id="no_of_sections" name="no_of_sections"  onchange="addSection()"
-                                    required>
-                                    <option value="">Select</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                </select>
-                            </div>
-                        </div> -->
+
                     <div class="col-3">
                         <div class="alertx alert-primary">
                             <small><b>Subjects(s) / Sections(s)</b></small>
-
-                            <!-- <button style="float:right;" type="" id="divno4" class="btn btn-danger btn-sm">No</button>
-                            <button style="float:right;" type="" class="btn btn-success btn-sm">Yes</button> -->
                         </div>
                         <div id="divinfo4" style="margin-bottom:20px;">
                             <select class="form-select form-select-sm" id="test_no_of_sections" name="no_of_sections"
@@ -200,9 +178,6 @@
                     <div class="col-3">
                         <div class="alertx alert-primary">
                             <small><b>Total Questions</b></small>
-
-                            <!-- <button style="float:right;" type="" id="divno3" class="btn btn-danger btn-sm">No</button>
-                            <button style="float:right;" type="" class="btn btn-success btn-sm">Yes</button> -->
                         </div>
                         <div id="divinfo3" style="margin-bottom:20px;">
                             <select class="form-select form-select-sm" id="test_total_questions" name="total_questions"
@@ -222,10 +197,8 @@
                             <small><b>Test Type</b></small>
                             <div id="divinfo3">
                                 <select class="form-select form-select-sm" id="test_type" name="test_type" required>
-                                    <!-- <option value="">Select</option> -->
-                                    <option @if ($data['test']->test_type == '1') selected @endif value="1">Free
+                                    <option value="1" @if ($data['test']->test_type == '1') selected @endif>Free
                                     </option>
-                                    <!-- <option @if ($data['test']->test_type == '0') selected @endif value="0">Paid</option> -->
                                 </select>
                             </div>
                         </div>
@@ -238,260 +211,21 @@
                                 <option value="">Select Category</option>
                                 @foreach ($data['test_category'] as $key => $list)
                                     @if ($list->id != 7)
-                                    @if ($list->id == $data['test']['test_cat'])
-                                        <option value="{{ $list->id }}" selected>
-                                        @else
-                                        <option value="{{ $list->id }}">
+                                        @if ($list->id == $data['test']['test_cat'])
+                                            <option value="{{ $list->id }}" selected>
+                                            @else
+                                            <option value="{{ $list->id }}">
+                                        @endif
+                                        {{ $list->cat_name }}</option>
                                     @endif
-                                    {{ $list->cat_name }}</option>
-                                @endif
                                 @endforeach
                             </select>
                         </div>
                     </div>
                 </div>
-                {{-- part 4 --}}
-                <div class="row mt-3">
-                    <!-- <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary">
-                                <small><b>Education Type</b></small>
-                                <select class="form-select form-select-sm" onchange="getClassesByEducation(this.value)"
-                                    id="education_type_id" name="education_type_id" required>
-                                    <option value="">select</option>
-                                    @foreach ($data['educations'] as $key => $education)
-    <option
-                                            {{ $data['test'] && $data['test']['education_type_id'] == $education['id'] ? 'selected' : '' }}
-                                            value="{{ $education['id'] }}">{{ $education['name'] }}</option>
-    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary">
-                                <small><b>Class/Group/Exam Name</b></small>
-                                <select class="form-select form-select-sm" id="class_group_exam_id" name="class_group_exam_id" onchange="classes_group_exams_change(this.value)">
-                                    <option value="">Select</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary" id="time_to_complete_div">
-                                <small><b>Exam Agency/Board/University</b></small>
-                                <select class="form-select form-select-sm" id="exam_agency_board_university_id" name="exam_agency_board_university_id" onchange="exam_agency_board_university_change(this.value)" required>
-                                    <option value="">Select</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary" id="time_to_complete_div">
-                                <small><b>Other Exam/ Class Detail</b></small>
-                                <select class="form-select form-select-sm" id="other_exam_class_detail_id" name="other_exam_class_detail_id" required>
-                                    <option value="">Select</option>
-                                </select>
-                            </div>
-                        </div> -->
-                    <!-- <div class="col-md-12 col-sm-6 col-12">
-                            <div class="alertx alert-primary {{ ($data['test'] && $data['test']['time_to_complete'] > '0' ? ' noDisplay ' : '') ? ' noDisplay ' : '' }}"
-                                id="time_to_complete_div">
-                                <small><b>No. of Sections</b></small>
-                                <select class="form-select form-select-sm" id="time_to_complete" name="time_to_complete"
-                                    required>
-                                    <option value="">Select</option>
-                                    <option value="">1</option>
-                                    <option value="">2</option>
-                                    <option value="">3</option>
-                                    <option value="">4</option>
-                                    <option value="">5</option>
-                                </select>
-                            </div>
-                        </div> -->
-                    <!-- <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary">
-                                <small><b>Main Subject</b></small>
-                                <select class="form-select form-select-sm" id="subject_id" name="subject_id" onchange="subjectChange(this.value)" required>
-                                    <option value="">Select</option>
-                                    @foreach ($data['subject'] as $subject)
-    <option value="{{ $subject->id }}"> {{ $subject->name }}</option>
-    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary">
-                                <small><b>Subject Part</b></small>
-                                <select class="form-select form-select-sm" id="subject_part_id" name="subject_part_id" onchange="subjectPartChange(this.value)" required>
-                                    <option value="">Select</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary">
-                                <small><b>Chapter Name</b></small>
-                                <select class="form-select form-select-sm" id="subejct_chapter_id" name="subejct_chapter_id" onchange="subjectChapterChange(this.value)" required>
-                                    <option value="">Select</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary " >
-                                <small><b>Lesson Name</b></small>
-                                <select class="form-select form-select-sm" id="chapter_lession_id" name="chapter_lession_id" required>
-                                    <option value="">Select</option>
-                                </select>
-                            </div>
-                        </div> -->
-                    <!-- <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary">
-                                <small><b>Extra Requirements</b></small>
-                                <input type="text" class="form-control form-control-sm" readonly disabled
-                                    placeholder="Extra Requirements">
-                            </div>
-                        </div> -->
-                    <!-- <input id="type_of_education" class="d-none"
-                            value="{{ $data['test'] && $data['test']['education_type_id'] ? $data['test']['education_type_id'] : '0' }}">
-                        <input id="type_of_class" class="d-none"
-                            value="{{ $data['test'] && $data['test']['education_type_child_id'] ? $data['test']['education_type_child_id'] : '0' }}">
-                        <input id="type_of_board" class="d-none"
-                            value="{{ $data['test'] && $data['test']['board_state_agency'] ? $data['test']['board_state_agency'] : '0' }}">
-                        <input id="type_of_other" class="d-none"
-                            value="{{ $data['test'] && $data['test']['other_category_class_id'] ? $data['test']['other_category_class_id'] : '0' }}">
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary">
-                                <small><b>Type of Education</b></small>
-                                <select class="form-select form-select-sm" onchange="getClassesByEducation(this.value)"
-                                    id="education_type_id" name="education_type_id" required>
-                                    <option value=""></option>
-                                    @foreach ($data['educations'] as $key => $education)
-    <option
-                                            {{ $data['test'] && $data['test']['education_type_id'] == $education['id'] ? 'selected' : '' }}
-                                            value="{{ $education['id'] }}">{{ $education['name'] }}</option>
-    @endforeach
-                                </select>
-                            </div>
-                        </div> -->
-                    <!-- <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary">
-                                <small><b>Type of Question</b></small>
-                                <select class="form-select form-select-sm" id="type_of_questions" name="type_of_questions"
-                                    required>
-                                    <option value="">Select</option>
-                                    <option value="1">MCQ</option>
-                                    <option value="2">Value Input</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary">
-                                <small><b>No. of Options</b></small>
-                                <select class="form-select form-select-sm" id="no_of_options" name="no_of_options"
-                                    required>
-                                    <option value="">Select</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary">
-                                <small><b>No. of Questions</b></small>
-                                <select class="form-select form-select-sm" id="no_of_questions" name="no_of_questions"
-                                    required>
-                                    <option value="">Select</option>
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="30">30</option>
-                                    <option value="40">40</option>
-                                    <option value="50">50</option>
-                                </select>
-                            </div>
-                        </div> -->
-                    <!-- <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary">
-                                <small><b>Subjects(s) / Sections(s)</b></small>
-                                <select class="form-select form-select-sm" id="no_of_sections" name="no_of_sections"  onchange="addSection()"
-                                    required>
-                                    <option value="">Select</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                </select>
-                            </div>
-                        </div> -->
-                    <!-- <div class="col-md-3 col-sm-6 col-12">
-                            <div class="alertx alert-primary">
-                                <small><b>Difficulty Level</b></small>
-                                <select class="form-select form-select-sm" id="difficulty_level" name="difficulty_level" required>
-                                    <option value="">Select</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                </select>
-                            </div>
-                        </div> -->
-                </div>
-
-                {{-- part 2 --}}
-                <!-- <div class="row">
-                        <div class="col-3">
-                            <div class="alertx alert-primary">
-                                <small><b>Publish Result</b></small>
-                                <button style="float:right;" type="" class="btn btn-danger btn-sm">No</button>
-                                <button style="float:right;" type="" class="btn btn-success btn-sm">Yes</button>
-                            </div>
-                        </div>
-                        <div class="col-3">
-                            <div class="alertx alert-primary">
-                                <small><b>Publish Solution</b></small>
-                                <button style="float:right;" type="" class="btn btn-danger btn-sm">No</button>
-                                <button style="float:right;" type="" class="btn btn-success btn-sm">Yes</button>
-                            </div>
-                        </div>
-                        <div class="col-3">
-                            <div class="alertx alert-primary">
-                                <small><b>Publish Rank</b></small>
-                                <button style="float:right;" type="" class="btn btn-danger btn-sm">No</button>
-                                <button style="float:right;" type="" class="btn btn-success btn-sm">Yes</button>
-                            </div>
-                        </div>
-                        <div class="col-3">
-                            <div class="alertx alert-primary">
-                                <small><b>Publish Answer(R/W)</b></small>
-                                <button style="float:right;" type="" class="btn btn-danger btn-sm">No</button>
-                                <button style="float:right;" type="" class="btn btn-success btn-sm">Yes</button>
-                            </div>
-                        </div>
-                    </div> -->
-                <button type="submit" class="btn btn-success">Save Test</button>
+                <button class="btn btn-success" type="submit">Save Test</button>
 
             </div>
-            <!-- <div class="card-footer">
-                    <small><b>Select Creator</b></small>
-                    <select class="form-select form-select-sm" id="creater_type" name="creater_type" style="margin-bottom: 10px;"required>
-                        <option value="">Select</option>
-                        <option value="1">Myself</option>
-                        <option value="2">Rohit</option>
-                        <option value="3">Nitin</option>
-                        <option value="4">Joy</option>
-                        <option value="5">Dheer</option>
-                    </select>
-            
-                    <small><b>Select Publisher</b></small>
-                    <select class="form-select form-select-sm" id="publisher_type" name="publisher_type" style="margin-bottom: 20px;"required>
-                    <option value="">Select</option>
-                        <option value="1">Myself</option>
-                        <option value="2">Rohit</option>
-                        <option value="3">Nitin</option>
-                        <option value="4">Joy</option>
-                        <option value="5">Dheer</option>
-                    </select>
-                    <button type="submit" class="btn btn-success">Submit Request</button>
-                    <button type="submit" class="btn btn-success">Create Test</button>
-                </div> -->
         </form>
     </div>
 
@@ -500,40 +234,20 @@
             <div class="dashboard-container mb-5">
                 <div class="row">
                     {{-- Sections Form --}}
-                    <div id="total_sections" class="d-none">{{ $data['test']->sections }}</div>
+                    <div class="d-none" id="total_sections">{{ $data['test']->sections }}</div>
                     <div class="col-12">
                         <div class="card">
-                            <form class="card-body" method="post" id="sections_form">
-                                <!-- <div class="btn-group mb-2" role="group" aria-label="Basic outlined example">
-                                    <button type="button" class="btn btn-outline-primary">
-                                        {{ $data['test']->Educationtype->name }}
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary">
-                                        {{ $data['test']->EducationClass->name }}
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary">
-                                        {{ $data['test']->EducationBoard->name }}
-                                    </button>
-                                    @if ($data['test']->OtherCategoryClass)
-                                        <button type="button" class="btn btn-outline-primary">
-                                            {{ $data['test']->OtherCategoryClass->name }}
-                                        </button>
-                                    @endif
-                                </div> -->
-                                <!-- <button type="button" class="btn btn-primary float-md-end" onclick="addSection()">
-                                    <i class="bi bi-plus-circle me-2"></i> Add Section
-                                </button> -->
+                            <form class="card-body" id="sections_form" method="post">
                                 @error('sectionsError')
                                     <?php
                                     $thisErrors = json_decode($errors);
-                                    // echo $thisErrors->sectionsError->class;
                                     ?>
                                     <div class="alert alert-{{ $thisErrors->sectionsError->class }} alert-dismissible fade show"
                                         role="alert">
                                         <strong
                                             class="me-2">{{ $thisErrors->sectionsError->class == 'success' ? 'Success' : 'Error' }}</strong>
                                         {!! $thisErrors->sectionsError->message !!}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        <button class="btn-close" data-bs-dismiss="alert" type="button"
                                             aria-label="Close"></button>
                                     </div>
                                 @enderror
@@ -542,43 +256,32 @@
                                     @foreach ($data['sections'] as $key => $section)
                                         <div class="alertx alert-primary text-dark test_sections_div"
                                             id="test_sections_{{ $key }}">
-                                            <input id="section_id_{{ $key }}"
-                                                name="section[{{ $key }}][id]" value="{{ $section['id'] }}"
-                                                class="d-none">
+                                            <input class="d-none" id="section_id_{{ $key }}"
+                                                name="section[{{ $key }}][id]" value="{{ $section['id'] }}">
 
-                                            <input name="form_name" id="sectionsFormName" class="d-none"
+                                            <input class="d-none" id="sectionsFormName" name="form_name"
                                                 value="sections_form">
 
                                             <div class="row">
                                                 <div class="col text-primary">
                                                     <h5>Section <span class="section_number"></span></h5>
                                                 </div>
-
-                                                <!-- <div class="col text-end">
-                                                    <button class="btn btn-sm btn-success" type="button" onclick="addSection()">
-                                                        <i class="bi bi-plus-circle"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-danger" type="button"
-                                                        onclick="removeSection({{ $section['id'] }})">
-                                                        <i class="bi bi-trash2"></i>
-                                                    </button>
-                                                </div> -->
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="btn-group mb-2" role="group"
                                                         aria-label="Basic outlined example">
-                                                        <button type="button" class="btn btn-outline-primary">
+                                                        <button class="btn btn-outline-primary" type="button">
                                                             {{ $data['test']->Educationtype->name }}
                                                         </button>
-                                                        <button type="button" class="btn btn-outline-primary">
+                                                        <button class="btn btn-outline-primary" type="button">
                                                             {{ $data['test']->EducationClass->name }}
                                                         </button>
-                                                        <button type="button" class="btn btn-outline-primary">
+                                                        <button class="btn btn-outline-primary" type="button">
                                                             {{ $data['test']->EducationBoard->name }}
                                                         </button>
                                                         @if ($data['test']->gn_OtherCategoryClass)
-                                                            <button type="button" class="btn btn-outline-primary">
+                                                            <button class="btn btn-outline-primary" type="button">
                                                                 {{ $data['test']->gn_OtherCategoryClass->name }}
                                                             </button>
                                                         @endif
@@ -588,11 +291,11 @@
                                                 <div class="col-md-6 text-end">
                                                     <div class="btn-group mb-2" role="group"
                                                         aria-label="Basic outlined example">
-                                                        <button type="button" class="btn btn-outline-primary">
+                                                        <button class="btn btn-outline-primary" type="button">
                                                             {{ $data['test']->gn_marks_per_questions }}
                                                             {{ 'Marks / Question' }}
                                                         </button>
-                                                        <button type="button" class="btn btn-outline-primary"
+                                                        <button class="btn btn-outline-primary" type="button"
                                                             style="padding: 5px;">
                                                             @if ($data['test']->negative_marks == 0)
                                                                 {{ 'No Negative Marking' }}
@@ -601,11 +304,11 @@
                                                                 {{ $data['test']->negative_marks }}{{ '%' }}
                                                             @endif
                                                         </button>
-                                                        <button type="button" class="btn btn-outline-primary">
+                                                        <button class="btn btn-outline-primary" type="button">
                                                             {{ $data['test']->sections }} {{ 'Sections' }}
                                                         </button>
                                                         @if ($data['test']->gn_OtherCategoryClass)
-                                                            <button type="button" class="btn btn-outline-primary">
+                                                            <button class="btn btn-outline-primary" type="button">
                                                                 {{ 'Total ' }}{{ $data['test']->total_questions }}
                                                                 {{ 'Questions' }}
                                                             </button>
@@ -617,18 +320,15 @@
                                                 <div class="col-md-3 col-sm-6 col-12">
                                                     <small><b>Main Subject</b></small>
                                                     <select class="form-select form-select-sm section_subject"
-                                                        key="{{ $key }}" id="subject_{{ $key }}"
+                                                        id="subject_{{ $key }}"
+                                                        name="section[{{ $key }}][subject]"
+                                                        key="{{ $key }}"
                                                         onchange="changeSubject(this.value, '{{ $key }}',{{ $data['test']['education_type_child_id'] }})"
-                                                        name="section[{{ $key }}][subject]" required>
+                                                        required>
                                                         <option value=""></option>
                                                         @foreach ($data['subjects']->where('classes_group_exams_id', $data['test']['education_type_child_id']) as $subject)
-                                                            {{-- <option
-                                                            {{ $section['subject'] == $subject['id'] ? 'selected' : '' }}
-                                                            value="{{ $subject['id'] }}">{{ $subject['name'] }}
-                                                        </option> --}}
-                                                            <option
-                                                                {{ $section['subject'] == $subject->subject->id ? 'selected' : '' }}
-                                                                value="{{ $subject->subject->id }}">
+                                                            <option value="{{ $subject->subject->id }}"
+                                                                {{ $section['subject'] == $subject->subject->id ? 'selected' : '' }}>
                                                                 {{ $subject->subject->name }}
                                                             </option>
                                                         @endforeach
@@ -637,114 +337,98 @@
                                                 <div class="col-md-3 col-sm-6 col-12">
                                                     <small><b>Subject Part</b></small>
                                                     <select class="form-select form-select-sm section_part"
-                                                        key="{{ $key }}" id="subject_part_{{ $key }}"
+                                                        id="subject_part_{{ $key }}"
+                                                        name="section[{{ $key }}][subject_part]"
+                                                        key="{{ $key }}"
                                                         initialValue="{{ $section['subject_part'] ? $section['subject_part'] : '' }}"
                                                         onchange="changeSubjectPart(this.value, '{{ $key }}')"
-                                                        name="section[{{ $key }}][subject_part]" disabled>
+                                                        disabled>
                                                         <option value=""></option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-3 col-sm-6 col-12">
                                                     <small><b>Chapter/Lesson</b></small>
                                                     <select class="form-select form-select-sm section_lesson"
-                                                        key="{{ $key }}"
                                                         id="subject_part_lesson_{{ $key }}"
+                                                        name="section[{{ $key }}][subject_part_lesson]"
+                                                        key="{{ $key }}"
                                                         initialValue="{{ $section['subject_part_lesson'] ? $section['subject_part_lesson'] : '' }}"
-                                                        name="section[{{ $key }}][subject_part_lesson]" disabled>
+                                                        disabled>
                                                         <option value=""></option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-3 col-sm-6 col-12">
                                                     <small><b>Difficulty Level</b></small>
                                                     <select class="form-select form-select-sm section_difficulty"
-                                                        key="{{ $key }}"
                                                         id="difficulty_level_{{ $key }}"
-                                                        name="section[{{ $key }}][difficulty_level]" required>
+                                                        name="section[{{ $key }}][difficulty_level]"
+                                                        key="{{ $key }}" required>
                                                         <option value=""></option>
                                                         @foreach ($data['difficulty_level'] as $difficulty)
-                                                            <option
-                                                                {{ $section['difficulty_level'] == $difficulty ? 'selected' : '' }}
-                                                                value="{{ $difficulty }}">
+                                                            <option value="{{ $difficulty }}"
+                                                                {{ $section['difficulty_level'] == $difficulty ? 'selected' : '' }}>
                                                                 {{ $difficulty }}%
                                                             </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
-                                                <!-- <div class="col-md-3 col-sm-6 col-12">
-                                                    <small><b>Lesson</b></small>
-                                                    <select class="form-select form-select-sm gn_section_lesson"
-                                                        key="{{ $key }}" id="gn_subject_part_lesson_{{ $key }}"
-                                                        initialValue="{{ $section['gn_subject_part_lesson'] ? $section['gn_subject_part_lesson'] : '' }}"
-                                                        name="section[{{ $key }}][gn_subject_part_lesson]" disabled>
-                                                        <option value=""></option>
-                                                    </select>
-                                                </div> -->
                                                 <div class="col-md-3 col-sm-6 col-12">
                                                     <small><b>Type of Questions</b></small>
                                                     <select class="form-select form-select-sm section_questions_type"
-                                                        key="{{ $key }}" id="question_type_{{ $key }}"
+                                                        id="question_type_{{ $key }}"
+                                                        name="section[{{ $key }}][question_type]"
+                                                        key="{{ $key }}"
                                                         onchange="onSelectQuestionType(this.value, {{ $key }})"
-                                                        name="section[{{ $key }}][question_type]" required>
-                                                        <option {{ $section['question_type'] == '1' ? 'selected' : '' }}
-                                                            value="1">MCQ</option>
-                                                        <option {{ $section['question_type'] == '2' ? 'selected' : '' }}
-                                                            value="2">Text</option>
+                                                        required>
+                                                        <option value="1"
+                                                            {{ $section['question_type'] == '1' ? 'selected' : '' }}>MCQ
+                                                        </option>
+                                                        <option value="2"
+                                                            {{ $section['question_type'] == '2' ? 'selected' : '' }}>Text
+                                                        </option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-3 col-sm-6 col-12">
                                                     <small><b>No of options</b></small>
                                                     <select class="form-select form-select-sm section_options"
-                                                        key="{{ $key }}" id="mcq_options_{{ $key }}"
-                                                        {{ $section['question_type'] == '1' ? '' : 'disabled' }}
-                                                        name="section[{{ $key }}][mcq_options]">
+                                                        id="mcq_options_{{ $key }}"
+                                                        name="section[{{ $key }}][mcq_options]"
+                                                        key="{{ $key }}"
+                                                        {{ $section['question_type'] == '1' ? '' : 'disabled' }}>
                                                         <option value=""></option>
-                                                        <option
-                                                            {{ $section['question_type'] == '1' && $section['mcq_options'] == '2' ? 'selected' : '' }}
-                                                            value="2">2</option>
-                                                        <option
-                                                            {{ $section['question_type'] == '1' && $section['mcq_options'] == '3' ? 'selected' : '' }}
-                                                            value="3">3</option>
-                                                        <option
-                                                            {{ $section['question_type'] == '1' && $section['mcq_options'] == '4' ? 'selected' : '' }}
-                                                            value="4">4</option>
-                                                        <option
-                                                            {{ $section['question_type'] == '1' && $section['mcq_options'] == '5' ? 'selected' : '' }}
-                                                            value="5">5</option>
+                                                        <option value="2"
+                                                            {{ $section['question_type'] == '1' && $section['mcq_options'] == '2' ? 'selected' : '' }}>
+                                                            2</option>
+                                                        <option value="3"
+                                                            {{ $section['question_type'] == '1' && $section['mcq_options'] == '3' ? 'selected' : '' }}>
+                                                            3</option>
+                                                        <option value="4"
+                                                            {{ $section['question_type'] == '1' && $section['mcq_options'] == '4' ? 'selected' : '' }}>
+                                                            4</option>
+                                                        <option value="5"
+                                                            {{ $section['question_type'] == '1' && $section['mcq_options'] == '5' ? 'selected' : '' }}>
+                                                            5</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-3 col-sm-6 col-12">
                                                     <small><b>No of questions</b></small>
                                                     <select class="form-select form-select-sm section_questions"
-                                                        key="{{ $key }}"
-                                                        name="section[{{ $key }}][number_of_questions]"
                                                         id="number_of_questions_{{ $key }}"
+                                                        name="section[{{ $key }}][number_of_questions]"
+                                                        key="{{ $key }}"
                                                         initialValue="{{ $section['number_of_questions'] }} "
                                                         onchange="onChangeQustions(this.value,{{ $key }})"
                                                         required>
                                                         <option value=""></option>
                                                     </select>
                                                 </div>
-                                                <!-- <div class="col-md-3 col-sm-6 col-12">
-                                                    <small><b>Test Duration</b></small>
-                                                    <select class="form-select form-select-sm section_questions"
-                                                        key="{{ $key }}"
-                                                        name="section[{{ $key }}][number_of_questions]"
-                                                        id="number_of_questions_{{ $key }}" required>
-                                                        <option value=""></option>
-                                                        @for ($i = 1; $i < 201; $i++)
-    <option
-                                                                {{ $section['number_of_questions'] == $i ? 'selected' : '' }}
-                                                                value="{{ $i }}">{{ $i }}
-                                                            </option>
-    @endfor
-                                                    </select>
-                                                </div> -->
                                                 <div class="col-md-3 col-sm-6 col-12 {{ ($data['test'] && $data['test']['time_to_complete'] > '0' ? ' noDisplay ' : '') ? ' noDisplay ' : '' }}"
                                                     id="time_to_complete_div">
                                                     <small><b>Duration (per Question)</b></small>
                                                     <select class="form-select form-select-sm select_duration"
-                                                        key="{{ $key }}" id="duration__{{ $key }}"
-                                                        name="section[{{ $key }}][duration]" required>
+                                                        id="duration__{{ $key }}"
+                                                        name="section[{{ $key }}][duration]"
+                                                        key="{{ $key }}" required>
                                                         <option value=""></option>
                                                         @for ($i = 1; $i < 11; $i++)
                                                             <option value="{{ $i }}"
@@ -753,103 +437,60 @@
                                                         @endfor
                                                     </select>
                                                 </div>
-                                                <!-- <div class="col-md-3 col-sm-6 col-12">
-                                                    <small><b>Type of Questions</b></small>
-                                                    <select class="form-select form-select-sm section_questions_type"
-                                                        key="{{ $key }}" id="question_type_{{ $key }}"
-                                                        onchange="onSelectQuestionType(this.value, {{ $key }})"
-                                                        name="section[{{ $key }}][question_type]" required>
-                                                        <option value=""></option>
-                                                        <option {{ $section['question_type'] == '1' ? 'selected' : '' }}
-                                                            value="1">MCQ</option>
-                                                        <option {{ $section['question_type'] == '2' ? 'selected' : '' }}
-                                                            value="2">Text</option>
-                                                    </select>
-                                                </div> -->
-
-                                                <!-- <div class="col-md-3 col-sm-6 col-12">
-                                                    <small><b>Difficulty Level</b></small>
-                                                    <select class="form-select form-select-sm section_difficulty"
-                                                        key="{{ $key }}" id="difficulty_level_{{ $key }}"
-                                                        name="section[{{ $key }}][difficulty_level]" required>
-                                                        <option value=""></option>
-                                                        @foreach ($data['difficulty_level'] as $difficulty)
-    <option
-                                                                {{ $section['difficulty_level'] == $difficulty ? 'selected' : '' }}
-                                                                value="{{ $difficulty }}">
-                                                                {{ $difficulty }}%
-                                                            </option>
-    @endforeach
-                                                    </select>
-                                                </div> -->
                                                 <div class="col-md-3 col-sm-6 col-12">
                                                     <small><b>Test Creator</b></small>
                                                     <div class="input-group input-group-sm">
                                                         <select class="form-select form-select-sm section_creator"
-                                                            key="{{ $key }}"
                                                             id="creator_id_{{ $key }}"
-                                                            name="section[{{ $key }}][creator_id]">
+                                                            name="section[{{ $key }}][creator_id]"
+                                                            key="{{ $key }}">
                                                             <option value=""></option>
                                                             @foreach ($data['creators'] as $creator)
-                                                                <option
-                                                                    {{ $section['creator_id'] == $creator['id'] ? 'selected' : '' }}
-                                                                    value="{{ $creator['id'] }}">
+                                                                <option value="{{ $creator['id'] }}"
+                                                                    {{ $section['creator_id'] == $creator['id'] ? 'selected' : '' }}>
                                                                     {{ $creator['name'] }}
                                                                 </option>
                                                             @endforeach
                                                         </select>
-                                                        {{-- @if ($section['creator_id'] != $data['auth_id'])
-                                                        <button class="btn btn-primary" type="button"
-                                                            onclick="notifyCreator('creator_id_{{ $key }}', '{{ $section['id'] }}')">
-                                                            {{ $section['creator_notify'] ? 'Notify Again' : 'Notify' }}
-                                                        </button>
-                                                    @endif --}}
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3 col-sm-6 col-12">
                                                     <small><b>Test Submission Date</b></small>
-                                                    <input type="text" class="form-control form-control-sm flatpickr"
-                                                        key="{{ $key }}"
+                                                    <input class="form-control form-control-sm flatpickr"
                                                         id="date_of_completion_{{ $key }}"
                                                         name="section[{{ $key }}][date_of_completion]"
-                                                        value="{{ $section['date_of_completion'] }}">
+                                                        type="text" value="{{ $section['date_of_completion'] }}"
+                                                        key="{{ $key }}">
                                                 </div>
                                                 <div class="col-md-3 col-sm-6 col-12">
                                                     <small><b>Test Publisher</b></small>
                                                     <div class="input-group input-group-sm">
                                                         <select class="form-select form-select-sm section_creator"
-                                                            key="{{ $key }}"
                                                             id="publisher_id_{{ $key }}"
-                                                            name="section[{{ $key }}][publisher_id]">
+                                                            name="section[{{ $key }}][publisher_id]"
+                                                            key="{{ $key }}">
                                                             <option value=""></option>
                                                             @foreach ($data['publishers'] as $creator)
-                                                                <option
-                                                                    {{ $section['publisher_id'] == $creator['id'] ? 'selected' : '' }}
-                                                                    value="{{ $creator['id'] }}">
+                                                                <option value="{{ $creator['id'] }}"
+                                                                    {{ $section['publisher_id'] == $creator['id'] ? 'selected' : '' }}>
                                                                     {{ $creator['name'] }}
                                                                 </option>
                                                             @endforeach
                                                         </select>
-                                                        {{-- @if ($section['publishers'] != $data['auth_id'])
-                                                        <button class="btn btn-primary" type="button"
-                                                            onclick="notifyCreator('publisher_id_{{ $key }}', '{{ $section['id'] }}')">
-                                                            {{ $section['creator_notify'] ? 'Notify Again' : 'Notify' }}
-                                                        </button>
-                                                    @endif --}}
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3 col-sm-6 col-12">
                                                     <small><b>Test Publishing Date</b></small>
-                                                    <input type="text" class="form-control form-control-sm flatpickr"
-                                                        key="{{ $key }}"
+                                                    <input class="form-control form-control-sm flatpickr"
                                                         id="publishing_date_{{ $key }}"
                                                         name="section[{{ $key }}][publishing_date]"
-                                                        value="{{ $section['publishing_date'] }}">
+                                                        type="text" value="{{ $section['publishing_date'] }}"
+                                                        key="{{ $key }}">
                                                 </div>
                                                 <div class="col-md-12 col-sm-6 col-12">
                                                     <small><b>Instruction/Notes</b></small>
-                                                    <textarea class="form-control" key="{{ $key }}" id="section_instruction_{{ $key }}"
-                                                        name="section[{{ $key }}][section_instruction]" rows="5">{{ $section['section_instruction'] }}</textarea>
+                                                    <textarea class="form-control" id="section_instruction_{{ $key }}"
+                                                        name="section[{{ $key }}][section_instruction]" key="{{ $key }}" rows="5">{{ $section['section_instruction'] }}</textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -857,7 +498,7 @@
                                 @else
                                     <div class="alertx alert-primary mt-4" id="noSectionAlert">
                                         <div class="row">
-                                            <div class="col text-dark text-center pt-2">
+                                            <div class="col text-dark pt-2 text-center">
                                                 <h4>There is no section in this Test, please create some.</h4>
                                             </div>
                                         </div>

@@ -151,54 +151,6 @@ function set_negative_marks() {
         $('#test_negative_marks').attr('disabled','disabled');
     }
 }
-// $("#test_marks_per_questions").change(function() {
-//    if($(this).is(":selected")){
-//        console.log($(this).is(":selected"));
-//         $('#test_negative_marks').removeAttr('disabled');
-//    }
-//    else{
-//    } 
-// });
-// part 3
-// on select education type show class
-
-// async function getClassesByEducation(educationId) {
-//     console.log(educationId);
-//     var formData = new FormData();
-//     formData.append('form_name', 'get_classes');
-//     formData.append('education_id', educationId);
-//     await $.ajax({
-//         url: '/',
-//         type: 'post',
-//         data: formData,
-//         contentType: false,
-//         processData: false,
-//     }).done(function (data) {
-//         console.log(data);
-//         if (data && data.success) {
-//             const classes = data.message;
-//             var options = '<option value="">Class / Group / Exam</option>';
-//             if (classes.length > 0) {
-//                 $(classes).each(function (index, item) {
-//                     var boards = JSON.parse(item.boards).join();
-//                     options += '<option value="' + item.id + '" board="' + boards + '">' + item.name + '</option>';
-//                 });
-//                 $('#education_type_child_id').removeAttr('disabled');
-//             } else {
-//                 $('#education_type_child_id').val('');
-//                 $('#education_type_child_id').attr('disabled', 'disabled');
-//                 alert('No classes / Groups or Exams in this Type, please select another, or add some.');
-//             }
-//             // $('#education_type_child_id').html(options);
-//             $('#education_type_child_id').html(options);
-//         } else {
-//             alert(data.message);
-//         }
-//     }).fail(function (data) {
-//         console.log(data);
-//     })
-// }
-// on select class show all other fields
 
 async function getClassesByEducation(educationId) {
     console.log(educationId);

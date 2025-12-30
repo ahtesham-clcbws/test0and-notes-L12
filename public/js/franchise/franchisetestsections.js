@@ -1,116 +1,3 @@
-// async function changeSubject(id, key) {
-//     var formData = new FormData();
-//     formData.append('form_name', 'get_subject_parts');
-//     formData.append('subject_id', id);
-//     await $.ajax({
-//         url: '/',
-//         type: 'post',
-//         data: formData,
-//         contentType: false,
-//         processData: false,
-//     }).done(function (data) {
-//         if (data && data.success) {
-//             const subjectParts = data.message;
-//             var options = '<option value=""></option>';
-//             var subject_part = $('#subject_part_' + key);
-//             if (subjectParts.length > 0) {
-//                 $(subjectParts).each(function (index, item) {
-//                     options += '<option value="' + item.id + '">' + item.name + '</option>';
-//                 });
-//                 subject_part.removeAttr('disabled');
-//                 // $('#other_category_class_id').removeAttr('disabled');
-//             } else {
-//                 subject_part.attr('disabled', 'disabled');
-//                 // $('#other_category_class_id').attr('disabled', 'disabled');
-//             }
-//             subject_part.val('');
-//             subject_part.html(options);
-//         } else {
-//             alert(data.message);
-//         }
-//     }).fail(function (data) {
-//         console.log(data);
-//     })
-// }
-// async function changeSubjectPart(id, key) {
-//     // console.log(id);
-//     var formData = new FormData();
-//     formData.append('form_name', 'get_subject_part_lessons');
-//     formData.append('subject_part_id', id);
-//     await $.ajax({
-//         url: '/',
-//         type: 'post',
-//         data: formData,
-//         contentType: false,
-//         processData: false,
-//     }).done(function (data) {
-//         // console.log(data);
-//         if (data && data.success) {
-//             const lessons = data.message;
-//             var options = '<option value=""></option>';
-//             var subject_part_lesson = $('#subject_part_lesson_' + key);
-//             if (lessons.length > 0) {
-//                 $(lessons).each(function (index, item) {
-//                     options += '<option value="' + item.id + '">' + item.name + '</option>';
-//                 });
-//                 subject_part_lesson.removeAttr('disabled');
-//                 // $('#other_category_class_id').removeAttr('disabled');
-//             } else {
-//                 subject_part_lesson.attr('disabled', 'disabled');
-//                 // $('#other_category_class_id').attr('disabled', 'disabled');
-//             }
-//             subject_part_lesson.val('');
-//             subject_part_lesson.html(options);
-//         } else {
-//             alert(data.message);
-//         }
-//     }).fail(function (data) {
-//         console.log(data);
-//     })
-// }
-
-// async function changeSubjectChapter(id,key) {
-//     // console.log(id);
-//     var gn_subject_id = $("#subject_" + key).val();
-//     var gn_subject_part_id = $('#subject_part_' + key).val();
-
-//     var formData = new FormData();
-//     formData.append('form_name', 'get_subject_chapter_lession');
-//     formData.append('subject_id', gn_subject_id);
-//     formData.append('subject_part_id', gn_subject_part_id);
-//     formData.append('subject_chapter_id', id);
-
-//     await $.ajax({
-//         url: '/',
-//         type: 'post',
-//         data: formData,
-//         contentType: false,
-//         processData: false
-//     }).done(function (data) {
-//         if (data && data.success) {
-//             const lessons = data.message;
-//             var options = '<option value=""></option>';
-//             var subject_part_lesson = $('#gn_subject_part_lesson_' + key);
-//             if (lessons.length > 0) {
-//                 $(lessons).each(function (index, item) {
-//                     options += '<option value="' + item.id + '">' + item.name + '</option>';
-//                 });
-//                 subject_part_lesson.removeAttr('disabled');
-//                 // $('#other_category_class_id').removeAttr('disabled');
-//             } else {
-//                 subject_part_lesson.attr('disabled', 'disabled');
-//                 // $('#other_category_class_id').attr('disabled', 'disabled');
-//             }
-//             subject_part_lesson.val('');
-//             subject_part_lesson.html(options);
-//         } else {
-//             alert(data.message);
-//         }
-//     }).fail(function (data) {
-//         console.log(data);
-//     })
-// }
-
 async function changeSubject(id, key,class_id) {
     var formData = new FormData();
     formData.append('form_name', 'get_subject_parts');
@@ -310,14 +197,6 @@ async function onChangeQustions(no_of_questions, key) {
                 }
             }
             $('#number_of_questions_'+key).append(option);
-        // }
-        // $('#number_of_questions_'+key).removeAttr('disabled');
-        // $('#number_of_questions_'+key).empty();
-        // var option= '<option value=""></option'
-        // for (let i = 1; i <= t_questions; i++) {
-        //     option += '<option value="'+ i +'">'+ i +' Questions</option>';
-        // }
-        // $('#number_of_questions_'+key).append(option);
     }
 }
 
@@ -335,37 +214,6 @@ function decreaseSectionCount() {
     sectionCounts.html(initialSectionCounts)
     showHideSaveButton()
 }
-
-// addSection();
-// initial functions
-
-// function initialFunctions() {
-//     $('.section_subject').each(function () {
-//         var subjectId = $(this).val();
-//         var key = $(this).attr('key');
-//         if (subjectId) {
-//             changeSubject(subjectId, key).finally(() => {
-//                 var partId = $('#subject_part_' + key).attr('initialValue');
-//                 if (partId) {
-//                     $('#subject_part_' + key).val(partId);
-//                     changeSubjectPart(partId, key).finally(() => {
-//                         var lessonId = $('#subject_part_lesson_' + key).attr('initialValue');
-//                         if (lessonId) {
-//                             $('#subject_part_lesson_' + key).val(lessonId);
-//                             changeSubjectChapter(lessonId,key).finally(() => {
-//                                 gn_lessonId = $('#gn_subject_part_lesson_' + key).attr('initialValue');
-//                                 if (gn_lessonId) {
-//                                     $('#gn_subject_part_lesson' + key).val(gn_lessonId);
-//                                 }
-//                             })
-//                         }
-//                     })
-//                 }
-//             })
-//         }
-//     })
-
-// }
 
 function initialFunctions() {
     $('.section_subject').each(function () {

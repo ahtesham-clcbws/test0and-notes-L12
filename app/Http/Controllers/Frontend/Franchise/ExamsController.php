@@ -91,29 +91,61 @@ class ExamsController extends Controller
             $published = isset($req->published) ? $req->published : '';
 
             if (!empty($search_value)) {
-                $testTableData = TestModal::select(['id', 'title', 'sections', 'total_questions', 'questions_submitted',  'education_type_id',
-                'test_cat', 'price','test_type', 'questions_approved', 'reviewed', 'reviewed_status', 'published','created_at','education_type_child_id','published_status'])
-                    ->where('user_id',Auth::user()->id)->orderBy('id', 'desc')
+                $testTableData = TestModal::select([
+                    'id',
+                    'title',
+                    'sections',
+                    'total_questions',
+                    'questions_submitted',
+                    'education_type_id',
+                    'test_cat',
+                    'price',
+                    'test_type',
+                    'questions_approved',
+                    'reviewed',
+                    'reviewed_status',
+                    'published',
+                    'created_at',
+                    'education_type_child_id',
+                    'published_status'
+                ])
+                    ->where('user_id', Auth::user()->id)->orderBy('id', 'desc')
                     ->where("title", "like", "%" . $search_value . "%")
                     ->orderBy('id', 'desc');
                 $count =  $testTableData->count();
             } else {
-                $testTableData = TestModal::select(['id', 'title', 'sections', 'total_questions', 'questions_submitted',  'education_type_id',
-                'test_cat', 'price','test_type', 'questions_approved', 'reviewed', 'reviewed_status', 'published','created_at','education_type_child_id','published_status'])
-                ->where('user_id',Auth::user()->id)->orderBy('id', 'desc');
+                $testTableData = TestModal::select([
+                    'id',
+                    'title',
+                    'sections',
+                    'total_questions',
+                    'questions_submitted',
+                    'education_type_id',
+                    'test_cat',
+                    'price',
+                    'test_type',
+                    'questions_approved',
+                    'reviewed',
+                    'reviewed_status',
+                    'published',
+                    'created_at',
+                    'education_type_child_id',
+                    'published_status'
+                ])
+                    ->where('user_id', Auth::user()->id)->orderBy('id', 'desc');
                 $count =  $testTableData->count();
             }
 
-            if(!empty( $test_cat)){
+            if (!empty($test_cat)) {
                 $testTableData =  $testTableData->where('test_cat', $test_cat);
                 $count = $testTableData->count();
             }
 
-            if(!empty($published)){
+            if (!empty($published)) {
                 $publish_id = 0;
-                if($published == 'true'){
+                if ($published == 'true') {
                     $publish_id = 1;
-                }else if($published == 'false'){
+                } else if ($published == 'false') {
                     $publish_id = 0;
                 }
                 $testTableData =  $testTableData->where('published', $publish_id);
@@ -135,25 +167,25 @@ class ExamsController extends Controller
                 // dd();
                 $total_questions = $testData['total_questions'];
 
-                $testTableData[$key]['total_questions'] = $testData['total_questions'] . ' / ' . $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count();
+                $testTableData[$key]['total_questions'] = $testData['total_questions'] . ' / ' . $testData->getQuestions()->wherePivot('deleted_at', '=', NULL)->count();
                 $status = '';
 
                 // dd($testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count());
                 // == 'true' ? $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count()  : '0'
 
                 // $questionButton = '';
-                $publish_count = count($testData->getSection()->select('is_published')->where('is_published',1)->get());
-                $creater_count = count($testData->getSection()->select('sent_to_publisher')->where('sent_to_publisher',1)->get());
+                $publish_count = count($testData->getSection()->select('is_published')->where('is_published', 1)->get());
+                $creater_count = count($testData->getSection()->select('sent_to_publisher')->where('sent_to_publisher', 1)->get());
 
-                $admin_publish_count = count($testData->getSection()->select('is_published')->where('publisher_id',Auth::user()->id)->get());
-                $admin_creater_count = count($testData->getSection()->select('sent_to_publisher')->where('creator_id',Auth::user()->id)->get());
+                $admin_publish_count = count($testData->getSection()->select('is_published')->where('publisher_id', Auth::user()->id)->get());
+                $admin_creater_count = count($testData->getSection()->select('sent_to_publisher')->where('creator_id', Auth::user()->id)->get());
 
                 if ($total_questions == 0) {
                     $status = '<span class="badge bg-warning text-dark">Awaiting Sections</span>';
                 } else {
                     // $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count()
                     // if ($testData['total_questions'] !== $testData['questions_submitted'] || $testData['total_questions'] < $testData['questions_submitted']) {
-                    if ($total_questions != $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count() || $total_questions < $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count()) {
+                    if ($total_questions != $testData->getQuestions()->wherePivot('deleted_at', '=', NULL)->count() || $total_questions < $testData->getQuestions()->wherePivot('deleted_at', '=', NULL)->count()) {
                         $status = '<span class="badge bg-warning text-dark">Awaiting Questions</span>';
                         // $questionButton = '<a href="' . route('franchise.dashboard_test_section', [$testData['id']]) . '" title="Test Questions"><i class="bi bi-journal-text text-primary me-2"></i></a>';
                         // $questionButton = $sectionButtons;
@@ -171,10 +203,9 @@ class ExamsController extends Controller
                         }
                         if (!empty($admin_publish_count) || !empty($admin_creater_count)) {
                             if ($admin_publish_count == $testData['sections'] && $admin_creater_count == $testData['sections']) {
-                                $status = '<a href="'.route('franchise.dashboard_publish_test_exam', [$testData['id']]).'"><span class="badge bg-primary">Publish Test</span></a>';
+                                $status = '<a href="' . route('franchise.dashboard_publish_test_exam', [$testData['id']]) . '"><span class="badge bg-primary">Publish Test</span></a>';
                             }
-                        }
-                        else {
+                        } else {
                             if ($creater_count != $testData['sections'] && $publish_count != $testData['sections']) {
                                 $status = '<span class="badge bg-warning text-dark">Created</span>';
                             }
@@ -182,7 +213,7 @@ class ExamsController extends Controller
                                 $status = '<span class="badge bg-warning text-dark">Awaiting Publisher</span>';
                             }
                             if ($creater_count == $testData['sections'] && $publish_count == $testData['sections']) {
-                                $status = '<a href="'.route('franchise.dashboard_publish_test_exam', [$testData['id']]).'"><span class="badge bg-primary">Publish Test</span></a>';
+                                $status = '<a href="' . route('franchise.dashboard_publish_test_exam', [$testData['id']]) . '"><span class="badge bg-primary">Publish Test</span></a>';
                             }
                         }
                         // elseif (condition) {
@@ -195,7 +226,7 @@ class ExamsController extends Controller
                         //     $status = '<span class="badge bg-primary">Published</span>';
                         // }
                         if ($testData['published'] == 1) {
-                            $status = '<a href="'.route('franchise.dashboard_publish_test_exam', [$testData['id']]).'"><span class="badge bg-success">Published</span></a>';
+                            $status = '<a href="' . route('franchise.dashboard_publish_test_exam', [$testData['id']]) . '"><span class="badge bg-success">Published</span></a>';
                         }
                         // if ($total_questions == $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count()) {
                         //     $status = '<a href="'.route('franchise.dashboard_publish_test_exam', [$testData['id']]).'"><span class="badge bg-primary">Published</span></a>';
@@ -219,21 +250,20 @@ class ExamsController extends Controller
                 // dd($testData);
                 $testTableData[$key]['status'] = $status;
                 $testTableData[$key]['created_by'] = Auth::user()->name;
-                $testTableData[$key]['created_date'] = date('d-m-Y',strtotime($testData->created_at));
-                   if(isset($testData->EducationClass->name)){
+                $testTableData[$key]['created_date'] = date('d-m-Y', strtotime($testData->created_at));
+                if (isset($testData->EducationClass->name)) {
                     $testTableData[$key]['class_name'] = $testData->EducationClass->name;
-                }else{
+                } else {
                     $testTableData[$key]['class_name'] = "";
-
                 }
-                $testTableData[$key]['class_type'] = $testData->EducationType != null ? $testData->EducationType->name : '';
-                $testTableData[$key]['test_cat'] = $testData->getTestCat ? $testData->getTestCat->cat_name : '';
+                $testTableData[$key]['class_type'] = optional($testData->EducationType)->name ?? '';
+                $testTableData[$key]['test_cat'] = optional($testData->getTestCat)->cat_name ?? '';
                 $testTableData[$key]['test_type'] = $testData->test_type;
                 $testTableData[$key]['test_fees'] = isset($testData->price) ? $testData->price : '';
 
                 // <a href="' . route('franchise.dashboard_test_sections', [$testData['id']]) . '" title="Test Sections"><i class="bi bi-columns-gap text-primary me-2"></i></a>
                 $actionsHtml = '<a href="' . route('franchise.dashboard_update_test_exam', [$testData['id']]) . '" title="Edit Test"><i class="bi bi-pencil-square text-success me-2"></i></a>
-                <a href="javascript:void(0);" title="Delete Test"><i class="bi bi-trash2-fill text-danger me-2" onclick="deleteTest('.$testData['id'].')"></i></a>';
+                <a href="javascript:void(0);" title="Delete Test"><i class="bi bi-trash2-fill text-danger me-2" onclick="deleteTest(' . $testData['id'] . ')"></i></a>';
 
                 // $actionsHtml = $questionButton.'<a href="' . route('franchise.dashboard_test_sections', [$testData['id']]) . '" title="Test Sections"><i class="bi bi-columns-gap text-primary me-2"></i></a>
                 // <a href="' . route('franchise.dashboard_update_test_exam', [$testData['id']]) . '" title="Edit Test"><i class="bi bi-pencil-square text-success me-2"></i></a>';
@@ -298,9 +328,9 @@ class ExamsController extends Controller
         }
         $this->data['test'] = $test;
 
-        $this->data['group_classes']    = ClassGoupExamModel::where('education_type_id',$this->data['test']->education_type_id)->get();
-        $this->data['agency_boards']    = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id',$this->data['test']->education_type_id)->where('classes_group_exams_id',$this->data['test']->education_type_child_id)->get();
-        $this->data['other_exams']      = Gn_OtherExamClassDetailModel::where('education_type_id',$this->data['test']->education_type_id)->where('classes_group_exams_id',$this->data['test']->education_type_child_id)->where('agency_board_university_id',$this->data['test']->board_state_agency)->get();
+        $this->data['group_classes']    = ClassGoupExamModel::where('education_type_id', $this->data['test']->education_type_id)->get();
+        $this->data['agency_boards']    = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id', $this->data['test']->education_type_id)->where('classes_group_exams_id', $this->data['test']->education_type_child_id)->get();
+        $this->data['other_exams']      = Gn_OtherExamClassDetailModel::where('education_type_id', $this->data['test']->education_type_id)->where('classes_group_exams_id', $this->data['test']->education_type_child_id)->where('agency_board_university_id', $this->data['test']->board_state_agency)->get();
         $this->data['test_category'] = DB::table('test_cat')->get();
 
         if ($req->isMethod('post')) {
@@ -329,17 +359,16 @@ class ExamsController extends Controller
                 if (isset($inputs['id']) && $inputs['id'] > 0) {
                     $section_change = $testMd->getChanges();
                     if (isset($section_change['sections'])) {
-                        $sections_delete = TestSections::where('test_id',$testMd->id);
+                        $sections_delete = TestSections::where('test_id', $testMd->id);
                         $sections_delete->delete();
-                        for ($i=0; $i < $testMd->sections ; $i++) {
+                        for ($i = 0; $i < $testMd->sections; $i++) {
                             $sectionMd = new TestSections();
                             $sectionMd->test_id = $testMd->id;
                             $sectionMd->save();
                         }
                     }
-                }
-                else{
-                    for ($i=0; $i < $testMd->sections ; $i++) {
+                } else {
+                    for ($i = 0; $i < $testMd->sections; $i++) {
                         $sectionMd = new TestSections();
                         $sectionMd->test_id = $testMd->id;
                         $sectionMd->save();
@@ -411,14 +440,28 @@ class ExamsController extends Controller
                     $query                              = $sectionMd->save();
                     $sectionKey                         = $key + 1;
                     if ($query) {
-                        $users = User::whereIn('id',[$section['creator_id'],$section['publisher_id']])->where('status', 'active')->where('deleted_at', null)->get(['email'])->toArray();
+                        $users = User::whereIn('id', [$section['creator_id'], $section['publisher_id']])->where('status', 'active')->where('deleted_at', null)->get(['email'])->toArray();
                         $emails = [];
                         foreach ($users as $user) {
                             array_push($emails, $user['email']);
                         }
+
+                        if ($thisUser = User::find($test->user_id)) {
+                            if($thisUser->institute){
+                                $institute_name = $thisUser->institute['institute_name'];
+                            }else{
+                                $institute_name = '';
+                            }
+                        } else {
+                            $institute_name = '';
+                        }
                         $test_details = [
-                            'subject' => 'Test assigned for '.$section['subject']
+                            'subject' => Subject::find($section['subject'])->name,
+                            'test_name' => $test->title,
+                            'institute_name' => $institute_name,
                         ];
+
+                        // sent test updates to creators and publishers
                         $mailToSend = new NotifyTestUpdate($test_details);
                         $sendMail = Mail::to($emails)->send($mailToSend);
                         array_push($sectionsSaved, $sectionKey);
@@ -446,6 +489,7 @@ class ExamsController extends Controller
 
                 $alertMessage   = $errorMessage . $successMessage;
                 $returnResponse = ['class' => $alertClass, 'message' => $alertMessage];
+
                 // return redirect()->route('franchise.dashboard_tests_list', [$test_id])->withErrors(['sectionsError' => $returnResponse]);
                 return redirect()->route('franchise.dashboard_tests_list')->withErrors(['sectionsError' => $returnResponse]);
                 return print_r($sections);
@@ -469,12 +513,12 @@ class ExamsController extends Controller
         // $this->data['subjects'] = Subject::get();
 
         $matchThis              = ['in_franchise' => '1'];
-        $user_franchise_code    = Auth::user()->institute->branch_code;
+        $user_franchise_code    = optional(Auth::user()->institute)->branch_code;
         // dd($user_franchise_code);
         // $creators = User::where($matchThis)->where('roles', 'like', '%"creator"%')->orWhere('roles', 'like', '%"manager"%')->get();
-        $creators = User::where($matchThis)->where('roles', 'like', '%creator%')->where('franchise_code',$user_franchise_code)->get();
+        $creators = User::where($matchThis)->where('roles', 'like', '%creator%')->where('franchise_code', $user_franchise_code)->get();
         // dd($creators);
-        $creators[count($creators)+1] = Auth::user();
+        $creators[count($creators) + 1] = Auth::user();
         // $creater_count = count($creators);
         foreach ($creators as $key => $creator) {
 
@@ -485,8 +529,8 @@ class ExamsController extends Controller
         // dd($creators);
 
 
-        $publishers = User::where($matchThis)->where('roles', 'like', '%publisher%')->where('franchise_code',$user_franchise_code)->get();
-        $publishers[count($publishers)+1] = Auth::user();
+        $publishers = User::where($matchThis)->where('roles', 'like', '%publisher%')->where('franchise_code', $user_franchise_code)->get();
+        $publishers[count($publishers) + 1] = Auth::user();
         foreach ($publishers as $key => $publisher) {
             if ($publisher['id'] == $this->data['auth_id']) {
                 $publishers[$key]['name'] = 'My Self';
@@ -502,7 +546,7 @@ class ExamsController extends Controller
         return view('Dashboard/Franchise/Exam/savetest')->with('data', $this->data);
     }
 
-    public function publishTest(Request $req,$test_id)
+    public function publishTest(Request $req, $test_id)
     {
         $test = TestModal::find($test_id);
         $this->data['marks'] = ['1', '2', '3', '4'];
@@ -542,24 +586,22 @@ class ExamsController extends Controller
             $inputs = $req->all();
             if ($inputs['form_name'] == 'publish_test') {
                 $publish_test = TestModal::find($test_id);
-                $publish_test->show_result      = isset($inputs['show_result']) ? $inputs['show_result'] == 'on' ? 1 : 0 : 0 ;
-                $publish_test->show_rank        = isset($inputs['show_rank']) ? $inputs['show_rank'] == 'on'? 1 : 0 : 0;
-                $publish_test->show_answer      = isset($inputs['show_answer']) ? $inputs['show_answer'] == 'on'? 1 : 0 : 0;
-                $publish_test->show_solution    = isset($inputs['show_solution']) ? $inputs['show_solution'] == 'on'? 1 : 0 : 0;
+                $publish_test->show_result      = isset($inputs['show_result']) ? $inputs['show_result'] == 'on' ? 1 : 0 : 0;
+                $publish_test->show_rank        = isset($inputs['show_rank']) ? $inputs['show_rank'] == 'on' ? 1 : 0 : 0;
+                $publish_test->show_answer      = isset($inputs['show_answer']) ? $inputs['show_answer'] == 'on' ? 1 : 0 : 0;
+                $publish_test->show_solution    = isset($inputs['show_solution']) ? $inputs['show_solution'] == 'on' ? 1 : 0 : 0;
                 $publish_test->published        = 1;
                 $publish_test->save();
 
                 return redirect()->route('franchise.dashboard_tests_list')->withErrors(['testSuccess' => 'Test succesfully added.']);
-
             }
         }
         $this->data['test'] = $test;
-        $this->data['group_classes']    = ClassGoupExamModel::where('education_type_id',$this->data['test']->education_type_id)->get();
-        $this->data['agency_boards']    = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id',$this->data['test']->education_type_id)->where('classes_group_exams_id',$this->data['test']->education_type_child_id)->get();
-        $this->data['other_exams']      = Gn_OtherExamClassDetailModel::where('education_type_id',$this->data['test']->education_type_id)->where('classes_group_exams_id',$this->data['test']->education_type_child_id)->where('agency_board_university_id',$this->data['test']->board_state_agency)->get();
+        $this->data['group_classes']    = ClassGoupExamModel::where('education_type_id', $this->data['test']->education_type_id)->get();
+        $this->data['agency_boards']    = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id', $this->data['test']->education_type_id)->where('classes_group_exams_id', $this->data['test']->education_type_child_id)->get();
+        $this->data['other_exams']      = Gn_OtherExamClassDetailModel::where('education_type_id', $this->data['test']->education_type_id)->where('classes_group_exams_id', $this->data['test']->education_type_child_id)->where('agency_board_university_id', $this->data['test']->board_state_agency)->get();
 
         return view('Dashboard/Franchise/Exam/publish_test')->with('data', $this->data);
-
     }
 
     public function testSections(Request $req, $test_id)
@@ -662,8 +704,8 @@ class ExamsController extends Controller
         $this->data['total_questions']  = count($questions);
 
         $used_questions                 = $questions->pluck('question_id')->toArray();
-        $unused_questions               = QuestionBankModel::where('subject',$thisSection->subject)->whereOr('subject_part',$thisSection->subject_part)->whereOr('subject_lesson_chapter',$thisSection->subject_part_lesson)->get()->pluck('id')->toArray();
-        $unused_questions               = array_diff($unused_questions,$used_questions);
+        $unused_questions               = QuestionBankModel::where('subject', $thisSection->subject)->whereOr('subject_part', $thisSection->subject_part)->whereOr('subject_lesson_chapter', $thisSection->subject_part_lesson)->get()->pluck('id')->toArray();
+        $unused_questions               = array_diff($unused_questions, $used_questions);
 
         $this->data['unused_questions']   = QuestionBankModel::findOrFail($unused_questions);
 
@@ -677,7 +719,7 @@ class ExamsController extends Controller
 
         return view('Dashboard/Franchise/Exam/section_questions')->with('data', $this->data);
     }
-    public function studentList(Request $req,$test_id)
+    public function studentList(Request $req, $test_id)
     {
         $this->data['pagename'] = 'Student List';
         // $studentListData = Gn_StudentTestAttempt::select(['gn__student_test_attempts.id','users.name as username','test.title'])
@@ -697,22 +739,22 @@ class ExamsController extends Controller
 
             if (!empty($search_value)) {
 
-                $studentListData = Gn_StudentTestAttempt::select(['gn__student_test_attempts.id','users.name as username','test.title as title','gn__student_test_attempts.created_at as created_at','test.created_at as test_create'])
-                ->leftJoin('users','users.id','gn__student_test_attempts.student_id')
-                ->leftJoin('test','test.id','gn__student_test_attempts.test_id')
-                ->where('test.id','=',$test_id)
-                ->orderBy('gn__student_test_attempts.id', 'desc')->skip($start)->take($length)->get();
+                $studentListData = Gn_StudentTestAttempt::select(['gn__student_test_attempts.id', 'users.name as username', 'test.title as title', 'gn__student_test_attempts.created_at as created_at', 'test.created_at as test_create'])
+                    ->leftJoin('users', 'users.id', 'gn__student_test_attempts.student_id')
+                    ->leftJoin('test', 'test.id', 'gn__student_test_attempts.test_id')
+                    ->where('test.id', '=', $test_id)
+                    ->orderBy('gn__student_test_attempts.id', 'desc')->skip($start)->take($length)->get();
                 // $testTableData = TestModal::select(['id', 'title', 'sections', 'total_questions', 'questions_submitted', 'questions_approved', 'reviewed', 'reviewed_status', 'published','created_at','education_type_child_id','published_status'])
                 //     ->where('user_id',Auth::user()->id)->orderBy('id', 'desc')
                 //     ->where("title", "like", "%" . $search_value . "%")
                 //     ->orderBy('id', 'desc')->skip($start)->take($length)->get();
                 $count = Gn_StudentTestAttempt::get()->count();
             } else {
-                $studentListData = Gn_StudentTestAttempt::select(['gn__student_test_attempts.id','users.name as username','test.title as title','gn__student_test_attempts.created_at as test_attempt','test.created_at as test_create'])
-                ->leftJoin('users','users.id','gn__student_test_attempts.student_id')
-                ->leftJoin('test','test.id','gn__student_test_attempts.test_id')
-                ->where('test.id','=',$test_id)
-                ->orderBy('gn__student_test_attempts.id', 'desc')->skip($start)->take($length)->get();
+                $studentListData = Gn_StudentTestAttempt::select(['gn__student_test_attempts.id', 'users.name as username', 'test.title as title', 'gn__student_test_attempts.created_at as test_attempt', 'test.created_at as test_create'])
+                    ->leftJoin('users', 'users.id', 'gn__student_test_attempts.student_id')
+                    ->leftJoin('test', 'test.id', 'gn__student_test_attempts.test_id')
+                    ->where('test.id', '=', $test_id)
+                    ->orderBy('gn__student_test_attempts.id', 'desc')->skip($start)->take($length)->get();
                 $count = Gn_StudentTestAttempt::count();
             }
 
@@ -720,9 +762,8 @@ class ExamsController extends Controller
 
                 $testTableData[$key]['username']                = $testData->username;
                 $testTableData[$key]['title']                   = $testData->title;
-                $testTableData[$key]['test_attempt_date']       = date('d-m-Y',strtotime($testData->test_attempt));
-                $testTableData[$key]['class_name']              = date('d-m-Y',strtotime($testData->test_create));
-
+                $testTableData[$key]['test_attempt_date']       = date('d-m-Y', strtotime($testData->test_attempt));
+                $testTableData[$key]['class_name']              = date('d-m-Y', strtotime($testData->test_create));
             }
 
             $json_data = array(
@@ -772,13 +813,13 @@ class ExamsController extends Controller
             // }
 
             if (!empty($search_value)) {
-                $testTableData = TestModal::select(['id', 'title', 'sections', 'total_questions', 'questions_submitted', 'questions_approved', 'reviewed', 'reviewed_status', 'published','created_at','education_type_child_id','published_status'])
-                    ->where('user_id',Auth::user()->id)->orderBy('id', 'desc')
+                $testTableData = TestModal::select(['id', 'title', 'sections', 'total_questions', 'questions_submitted', 'questions_approved', 'reviewed', 'reviewed_status', 'published', 'created_at', 'education_type_child_id', 'published_status'])
+                    ->where('user_id', Auth::user()->id)->orderBy('id', 'desc')
                     ->where("title", "like", "%" . $search_value . "%")
                     ->orderBy('id', 'desc')->skip($start)->take($length)->get();
                 $count = TestModal::where("title", "like", "%" . $search_value . "%")->count();
             } else {
-                $testTableData = TestModal::select(['id', 'title', 'sections', 'total_questions', 'questions_submitted', 'questions_approved', 'reviewed', 'reviewed_status', 'published','created_at','education_type_child_id','published_status'])->where('user_id',Auth::user()->id)->orderBy('id', 'desc')->skip($start)->take($length)->get();
+                $testTableData = TestModal::select(['id', 'title', 'sections', 'total_questions', 'questions_submitted', 'questions_approved', 'reviewed', 'reviewed_status', 'published', 'created_at', 'education_type_child_id', 'published_status'])->where('user_id', Auth::user()->id)->orderBy('id', 'desc')->skip($start)->take($length)->get();
                 $count = TestModal::count();
             }
 
@@ -795,7 +836,7 @@ class ExamsController extends Controller
                 // dd();
                 $total_questions = $testData['total_questions'];
 
-                $testTableData[$key]['total_questions'] = $testData['total_questions'] . ' / ' . $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count();
+                $testTableData[$key]['total_questions'] = $testData['total_questions'] . ' / ' . $testData->getQuestions()->wherePivot('deleted_at', '=', NULL)->count();
                 $status = '';
 
                 // dd($testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count());
@@ -807,7 +848,7 @@ class ExamsController extends Controller
                 } else {
                     // $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count()
                     // if ($testData['total_questions'] !== $testData['questions_submitted'] || $testData['total_questions'] < $testData['questions_submitted']) {
-                    if ($total_questions != $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count() || $total_questions < $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count()) {
+                    if ($total_questions != $testData->getQuestions()->wherePivot('deleted_at', '=', NULL)->count() || $total_questions < $testData->getQuestions()->wherePivot('deleted_at', '=', NULL)->count()) {
                         $status = '<span class="badge bg-warning text-dark">Awaiting Questions</span>';
                         // $questionButton = '<a href="' . route('franchise.dashboard_test_section', [$testData['id']]) . '" title="Test Questions"><i class="bi bi-journal-text text-primary me-2"></i></a>';
                         // $questionButton = $sectionButtons;
@@ -823,13 +864,13 @@ class ExamsController extends Controller
                                 $status = '<span class="badge bg-warning text-dark">Hold Review</span>';
                             }
                         } else {
-                            $status = '<a href="'.route('franchise.dashboard_publish_test_exam', [$testData['id']]).'"><span class="badge bg-primary">Publish Test</span></a>';
+                            $status = '<a href="' . route('franchise.dashboard_publish_test_exam', [$testData['id']]) . '"><span class="badge bg-primary">Publish Test</span></a>';
                         }
                         // if ($testData['published_status']) {
                         //     $status = '<span class="badge bg-primary">Published</span>';
                         // }
                         if ($testData['published'] == 1) {
-                            $status = '<a href="'.route('franchise.dashboard_publish_test_exam', [$testData['id']]).'"><span class="badge bg-success">Published</span></a>';
+                            $status = '<a href="' . route('franchise.dashboard_publish_test_exam', [$testData['id']]) . '"><span class="badge bg-success">Published</span></a>';
                         }
                         // if ($total_questions == $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count()) {
                         //     $status = '<a href="'.route('franchise.dashboard_publish_test_exam', [$testData['id']]).'"><span class="badge bg-primary">Published</span></a>';
@@ -853,7 +894,7 @@ class ExamsController extends Controller
                 // dd($testData);
                 $testTableData[$key]['status'] = $status;
                 $testTableData[$key]['created_by'] = Auth::user()->name;
-                $testTableData[$key]['created_date'] = date('d-m-Y',strtotime($testData->created_at));
+                $testTableData[$key]['created_date'] = date('d-m-Y', strtotime($testData->created_at));
                 $testTableData[$key]['class_name'] = $testData->EducationClass->name;
 
                 // <a href="' . route('franchise.dashboard_test_sections', [$testData['id']]) . '" title="Test Sections"><i class="bi bi-columns-gap text-primary me-2"></i></a>

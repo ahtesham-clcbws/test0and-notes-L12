@@ -153,7 +153,6 @@ class InternalRequestsController extends Controller
                 //    return json_encode($cities);
             }
             if ($request->input('form_name') == 'get_subject_parts') {
-                // dd($request->all());
                 $class_id       =  $request->input('class_id');
                 $subject_id     =  $request->input('subject_id');
                 $subjectParts   = SubjectPart::where('classes_group_exams_id', '=', $class_id)->where('subject_id', '=', $subject_id)->get();
@@ -562,7 +561,6 @@ class InternalRequestsController extends Controller
                             'institute_code' => $enquiry->branch_code
                         ];
                         Log::info('mail' . $branch_email);
-                        //dd($admin_datails);
                         $super_admins = User::where('roles', 'superadmin')->where('status', 'active')->where('deleted_at', null)->get(['email'])->toArray();
                         $emails = [];
                         foreach ($super_admins as $super_admin) {
@@ -574,7 +572,6 @@ class InternalRequestsController extends Controller
                         try {
 
                             $superAdminMailToSend = new NotifyAdminInstituteSignup($admin_datails);
-                            //dd($superAdminMailToSend,$emails);
                             foreach ($emails as $email) {
                                 Log::info('loop  ' . $email);
                                 //$sendAdminMail = Mail::to($email)->send($superAdminMailToSend);
@@ -582,7 +579,6 @@ class InternalRequestsController extends Controller
 
                             Log::info('Email sent successfully to: ' . implode(', ', $emails));
                         } catch (\Exception $e) {
-                            //dd($e->getMessage());
                             Log::error('Failed to send email. Error: ' . $e->getMessage());
                         }
                         //$superAdminMailToSend = new NotifyAdminInstituteSignup($admin_datails);
@@ -867,7 +863,6 @@ class InternalRequestsController extends Controller
                     // }
                 } else {
                     $agency_board_university = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id', $request->education_type_id)->where('classes_group_exams_id', $request->classes_group_exams_id)->get()->pluck('board_agency_exam_id')->toArray();
-                    // dd($agency_board_university);
                     if (!empty($agency_board_university)) {
                         $board_data = BoardAgencyStateModel::whereIn('id', $agency_board_university)->get();
                         if ($board_data) {
@@ -887,7 +882,6 @@ class InternalRequestsController extends Controller
             }
 
             if ($request->input('form_name') == 'get_other_exam_class_detail') {
-                // dd($request->all());
                 if (gettype($request->classes_group_exams_id) == 'array') {
                     $other_exam_class_detail = Gn_OtherExamClassDetailModel::where('education_type_id', $request->education_type_id)->whereIn('classes_group_exams_id', $request->classes_group_exams_id)->whereIn('agency_board_university_id', $request->class_boards_id)->get();
                 } else {
@@ -910,9 +904,7 @@ class InternalRequestsController extends Controller
             }
 
             if ($request->input('form_name') == 'get_chapter_lession') {
-                // dd($request->all());
                 $lession_data = Gn_SubjectPartLessionNew::where('subject_id', $request->gn_lesson_subject_id)->where('subject_part_id', $request->subject_part_id)->where('subject_chapter_id', $request->gn_lesson_chapter_id)->get();
-                // dd($lession_data);
                 if ($lession_data) {
                     $this->returnResponse['success'] = true;
                     $this->returnResponse['message'] = $lession_data;

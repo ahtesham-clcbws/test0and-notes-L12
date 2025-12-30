@@ -22,4 +22,28 @@ class Studymaterial extends Model
     {
         return $this->belongsTo(FranchiseDetails::class, 'institute_id', 'id');
     }
+
+    public function scopeWithRelations($query)
+    {
+        return $query->leftJoin("users", "users.id", "study_material.created_by")
+            ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
+            ->leftJoin("franchise_details", "franchise_details.id", "study_material.institute_id");
+    }
+
+    public function scopeByCategory($query, $categoryId)
+    {
+        $categories = [
+            1 => 'Study Notes & E-Books',
+            2 => 'Live & Video Classes',
+            3 => 'Static GK & Current Affairs',
+            4 => 'Comprehensive Study Material',
+            5 => 'Short Notes & One Liner',
+            6 => 'Premium Study Notes'
+        ];
+
+        if (collect($categories)->has($categoryId)) {
+            return $query->where('category', $categories[$categoryId]);
+        }
+        return $query;
+    }
 }

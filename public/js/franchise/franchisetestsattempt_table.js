@@ -30,7 +30,7 @@ $('#tests_attempt_table').DataTable({
 		[10, 15, 30, 50],
 		[10, 15, 30, 50]
 	], // page length options
-	bProcessing: true,
+	processing: true,
 	serverSide: true,
 	// scrollY: "400px",
 	// scrollCollapse: true,
@@ -89,6 +89,6 @@ $('#tests_attempt_table').DataTable({
 		orderable: false,
 		targets: [7]
 	}],
-		bFilter: true, // to display datatable search
+		searching: true, // to display datatable search
 	});
 $.fn.DataTable.ext.pager.numbers_length = 7;

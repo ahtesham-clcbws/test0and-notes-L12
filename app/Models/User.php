@@ -263,26 +263,10 @@ class User extends Authenticatable
             ]
         );
         foreach ($data as $value) {
-            $nameKey = $value['namekey'];
-            // $action_required = false;
-            // if (isset($value['action_required'])) {
-            //     $action_required = $value['action_required'];
-            // }
-            $enquiryUpdate = Count::where('namekey', $nameKey)->first();
-            // if (!$enquiryUpdate) {
-            //     $enquiryUpdate = new Count;
-            //     $enquiryUpdate->namekey = $value['namekey'];
-            // }
-            // $enquiryUpdate->box_index = $value['box_index'];
-            // $enquiryUpdate->box_color = $value['box_color'];
-            $enquiryUpdate->count = $value['count'];
-            // $enquiryUpdate->page_url = $value['page_url'];
-            // $enquiryUpdate->count_color = $value['count_color'];
-            // $enquiryUpdate->title = $value['title'];
-            // $enquiryUpdate->page_url = $value['page_url'];
-            // $enquiryUpdate->category = $value['category'];
-            // $enquiryUpdate->action_required = $action_required;
-            $enquiryUpdate->save();
+            Count::updateOrCreate(
+                ['namekey' => $value['namekey']],
+                ['count' => $value['count']]
+            );
         }
         return true;
     }

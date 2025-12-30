@@ -85,19 +85,10 @@ class CorporateEnquiry extends Model
             ]
         );
         foreach ($data as $value) {
-            $nameKey = $value['namekey'];
-            $enquiryUpdate = Count::where('namekey', $nameKey)->first();
-            // if(!$enquiryUpdate) {
-            //     $enquiryUpdate = new Count;
-            //     $enquiryUpdate->namekey = $value['namekey'];
-            // }
-            // $enquiryUpdate->box_index = $value['box_index'];
-            // $enquiryUpdate->box_color = $value['box_color'];
-            $enquiryUpdate->count = $value['count'];
-            // $enquiryUpdate->count_color = $value['count_color'];
-            // $enquiryUpdate->title = $value['title'];
-            // $enquiryUpdate->page_url = $value['page_url'];
-            $enquiryUpdate->save();
+            Count::updateOrCreate(
+                ['namekey' => $value['namekey']],
+                ['count' => $value['count']]
+            );
         }
         return true;
     }

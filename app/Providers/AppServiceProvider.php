@@ -29,13 +29,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Paginator::useBootstrapFive();
-        $classes = ClassGoupExamModel::where(['education_type_id' => 52])->get();
-        $getGovt = ClassGoupExamModel::where(['education_type_id' => 53])->get();
-        $getCompotition = ClassGoupExamModel::where(['education_type_id' => 51])->get();
-        // dd($classes);
-        View::share('classes', $classes);
-        View::share('getGovt', $getGovt);
-        View::share('getCompotition', $getCompotition);
 
         // superadmin only
         Gate::define('superadmin', function (User $user) {
@@ -45,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
                     return true;
                 }
             }
-            return redirect()->route('administrator.login');
+            return false;
         });
         // staffs only
         Gate::define('creator', function (User $user) {
@@ -55,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
                     return true;
                 }
             }
-            return redirect()->route('administrator.login');
+            return false;
         });
         Gate::define('publisher', function (User $user) {
             $roles = explode(',', $user->roles);
@@ -64,7 +57,7 @@ class AppServiceProvider extends ServiceProvider
                     return true;
                 }
             }
-            return redirect()->route('administrator.login');
+            return false;
         });
         Gate::define('manager', function (User $user) {
             $roles = explode(',', $user->roles);
@@ -73,7 +66,7 @@ class AppServiceProvider extends ServiceProvider
                     return true;
                 }
             }
-            return redirect()->route('administrator.login');
+            return false;
         });
         Gate::define('verifier', function (User $user) {
             $roles = explode(',', $user->roles);
@@ -82,7 +75,7 @@ class AppServiceProvider extends ServiceProvider
                     return true;
                 }
             }
-            return redirect()->route('administrator.login');
+            return false;
         });
         Gate::define('reviewer', function (User $user) {
             $roles = explode(',', $user->roles);
@@ -91,7 +84,7 @@ class AppServiceProvider extends ServiceProvider
                     return true;
                 }
             }
-            return redirect()->route('administrator.login');
+            return false;
         });
         // direct student
         Gate::define('student', function (User $user) {
@@ -101,7 +94,7 @@ class AppServiceProvider extends ServiceProvider
                     return true;
                 }
             }
-            return redirect()->route('student.login');
+            return false;
         });
         // franchise only
         Gate::define('franchise', function (User $user) {
@@ -111,7 +104,7 @@ class AppServiceProvider extends ServiceProvider
                     return true;
                 }
             }
-            return redirect()->route('franchise.login');
+            return false;
         });
         // franchise_staff only
         Gate::define('franchise_creator', function (User $user) {
@@ -121,7 +114,7 @@ class AppServiceProvider extends ServiceProvider
                     return true;
                 }
             }
-            return redirect()->route('franchise.login');
+            return false;
         });
         Gate::define('franchise_publisher', function (User $user) {
             $roles = explode(',', $user->roles);
@@ -130,7 +123,7 @@ class AppServiceProvider extends ServiceProvider
                     return true;
                 }
             }
-            return redirect()->route('franchise.login');
+            return false;
         });
         Gate::define('franchise_manager', function (User $user) {
             $roles = explode(',', $user->roles);
@@ -139,7 +132,7 @@ class AppServiceProvider extends ServiceProvider
                     return true;
                 }
             }
-            return redirect()->route('franchise.login');
+            return false;
         });
         Gate::define('franchise_verifier', function (User $user) {
             $roles = explode(',', $user->roles);
@@ -148,7 +141,7 @@ class AppServiceProvider extends ServiceProvider
                     return true;
                 }
             }
-            return redirect()->route('franchise.login');
+            return false;
         });
         Gate::define('franchise_reviewer', function (User $user) {
             $roles = explode(',', $user->roles);
@@ -157,7 +150,7 @@ class AppServiceProvider extends ServiceProvider
                     return true;
                 }
             }
-            return redirect()->route('franchise.login');
+            return false;
         });
         // franchise student
         Gate::define('franchise_student', function (User $user) {
@@ -167,7 +160,7 @@ class AppServiceProvider extends ServiceProvider
                     return true;
                 }
             }
-            return redirect()->route('student.login');
+            return false;
         });
     }
 }

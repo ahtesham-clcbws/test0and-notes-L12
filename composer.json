@@ -23,7 +23,6 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",
         "fakerphp/faker": "^1.9.1",
-        "laravel/breeze": "^2.0",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",
         "mockery/mockery": "^1.4.4",
@@ -47,6 +46,10 @@
         }
     },
     "scripts": {
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd\" --names \"server,assets\" --kill-others \"php artisan serve --port=8000\" \"npm run dev\""
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

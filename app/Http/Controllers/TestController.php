@@ -62,7 +62,7 @@ class TestController extends Controller
 
     public function startTest($name)
     {
-        $test               = TestModal::find($name);
+        $test = TestModal::find($name);
         if (empty($test) || !empty($test->institude)) {
             if (Auth::user()->myInstitute->id == $test->institude->id) {
                 return redirect()->route('student.start-test', [$name]);
@@ -87,7 +87,7 @@ class TestController extends Controller
 
     public function endTest(Request $request, $name)
     {
-        $test               = TestModal::find($name);
+        $test = TestModal::find($name);
         if (empty($test)) {
             return redirect('/');
         }

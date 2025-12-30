@@ -44,7 +44,6 @@ class PlanController extends Controller
             //         $institute[$key] = "Gyanology";
             //     }
             // }
-            // dd($institute);
             return DataTables::of($model)
             ->addIndexColumn()
             ->addColumn('plan_image',function($model){

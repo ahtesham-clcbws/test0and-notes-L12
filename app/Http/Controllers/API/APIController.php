@@ -278,9 +278,6 @@ class APIController extends Controller
         // $data['test_start'] = $test;
         // $this->data['questions']  = $test->getQuestions()->wherePivot('deleted_at','=',NULL);
         //  $data['questions']  = $test->getQuestions()->wherePivot('deleted_at', '=', NULL)->get()->groupBy('pivot.section_id');
-        // dd($test->getQuestions()->wherePivot('deleted_at','=',NULL)->get()->groupBy('pivot.section_id'));
-        // dd($test->getQuestions()->get()->pluck('pivot')->toArray()); subject
-        // dd($this->data['test_start']->getSection);
         $section_time = $test->getSection()->get();
         $time = [];
         $sections = [];

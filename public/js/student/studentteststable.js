@@ -25,59 +25,31 @@ $('#teststable').DataTable({
     createdRow: function (row, data, dataIndex) {
         // Set the data-status attribute, and add a class
         // $(row).addClass('nk-tb-item');
+        console.log(row)
     },
     lengthMenu: [
         [10, 15, 30, 50],
         [10, 15, 30, 50]
-    ], // page length options
-    bProcessing: true,
+    ],
+    processing: true,
     serverSide: true,
-    // scrollY: "400px",
-    // scrollCollapse: true,
     ajax: {
-        url: "", // json datasource
+        url: "",
         type: "post",
-        // data: {
-        //     // key1: value1 - in case if we want send data with request
-        // }
     },
     columns: [
-    //     {
-    //     data: "id",
-    //     // className: "nk-tb-col nk-tb-col-check"
-    // },
     {
         data: "title",
-        // className: "nk-tb-col"
     },
-    // {
-    //     data: "type_text",
-    //     // className: "nk-tb-col"
-    // },
     {
         data: "class_name",
-        // className: "nk-tb-col"
     },
-    // {
-    //     data: "created_by",
-    //     // className: "nk-tb-col"
-    // },
     {
         data: "created_date",
-        // className: "nk-tb-col"
     },
-    // {
-    //     data: "sections",
-    //     // className: "nk-tb-col"
-    // },
     {
         data: "total_questions",
-        // className: "nk-tb-col"
     },
-    // {
-    //     data: "status",
-    //     // className: "nk-tb-col"
-    // },
     {
         data: "actions",
         className: "text-end"
@@ -89,6 +61,6 @@ $('#teststable').DataTable({
         orderable: false,
         targets: [4]
     }],
-    bFilter: true, // to display datatable search
+    searching: true, // to display datatable search
 });
 $.fn.DataTable.ext.pager.numbers_length = 4;

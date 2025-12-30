@@ -191,20 +191,22 @@ class CorporateEnquiry extends Controller
                             'institute_name' => $franchiseDetailsSave->institute_name,
                             'institute_code' => $franchiseDetailsSave->branch_code
                         ];
-                        $mailToSend = new NotifyFranchiseAccountModify($details);
-                        $sendMail = Mail::to($requestData['email'])->send($mailToSend);
+                        try {
+                            $mailToSend = new NotifyFranchiseAccountModify($details);
+                            Mail::to($requestData['email'])->send($mailToSend);
+                            
+                            $returnResponse['success'] = true;
+                            $returnResponse['type'] = 'success';
+                            $returnResponse['message'] = 'Franchise account updated successfully.';
+                        } catch (\Exception $e) {
+                            $returnResponse['type'] = 'warning';
+                            $returnResponse['message'] = 'Franchise details saved, but unable to send email: ' . $e->getMessage();
+                        }
+
                         Log::build([
                             'driver' => 'single',
                             'path' => storage_path('logs/custom.log'),
                         ])->info('Institute account update by admin 7 '.$requestData['email']);
-                        if (count(Mail::failures()) > 0) {
-                            $returnResponse['type'] = 'warning';
-                            $returnResponse['message'] = 'Franchise details saved, but unable to send email.';
-                        } else {
-                            $returnResponse['success'] = true;
-                            $returnResponse['type'] = 'success';
-                            $returnResponse['message'] = 'Franchise account updated successfully.';
-                        }
 
                     }
                     else {

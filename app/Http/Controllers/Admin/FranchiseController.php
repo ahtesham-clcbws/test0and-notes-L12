@@ -136,7 +136,6 @@ class FranchiseController extends Controller
             $data['franchise_publisher']    = true;
             $data['franchise_verifier']     = false;
             $data['franchise_reviewer']     = false;
-            // dd($data->email,$data->mobile);
             if ($data['user']->franchise_roles) {
                 $roles = $data['user']->franchise_roles;
                 // $roles = json_decode($data['user']->roles);
@@ -173,7 +172,6 @@ class FranchiseController extends Controller
                 $data['remainingSubscription'] = 'Expires at ' . date('d-M-Y', strtotime($data['started_at'] . ' + ' . $data['selectedDays'] . ' days'));
             }
 
-            // dd($data);
         }
         if (request()->isMethod('post')) {
             $returnResponse = ['success' => false, 'type' => 'danger', 'message' => 'Server Error XTB-256314'];

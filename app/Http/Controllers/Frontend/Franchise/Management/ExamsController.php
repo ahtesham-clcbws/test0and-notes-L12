@@ -185,7 +185,7 @@ class ExamsController extends Controller
                 $testTableData[$key]['status'] = $status;
                 $testTableData[$key]['created_by'] = $testData->username;
                 $testTableData[$key]['created_date'] = date('d-m-Y',strtotime($testData->created_at));
-                $testTableData[$key]['class_name'] = $testData->EducationClass->name;
+                $testTableData[$key]['class_name'] = optional($testData->EducationClass)->name ?? '';
 
                 // <a href="' . route('franchise.dashboard_test_sections', [$testData['id']]) . '" title="Test Sections"><i class="bi bi-columns-gap text-primary me-2"></i></a>
                 $actionsHtml = '<a href="' . route('franchise.dashboard_update_test_exam', [$testData['id']]) . '" title="Edit Test"><i class="bi bi-pencil-square text-success me-2"></i></a>
@@ -410,7 +410,7 @@ class ExamsController extends Controller
         // $this->data['subjects'] = Subject::get();
 
         $matchThis = ['in_franchise' => '1'];
-        $user_franchise_code = Auth::user()->myInstitute->branch_code;
+        $user_franchise_code = optional(Auth::user()->myInstitute)->branch_code;
         // dd($user_franchise_code);
         // $creators = User::where($matchThis)->where('roles', 'like', '%"creator"%')->orWhere('roles', 'like', '%"manager"%')->get();
         $creators = User::where($matchThis)->where('roles', 'like', '%creator%')->where('franchise_code',$user_franchise_code)->get();

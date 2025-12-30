@@ -1,55 +1,48 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Create The Application
-|--------------------------------------------------------------------------
-|
-| The first thing we will do is create a new Laravel application instance
-| which serves as the "glue" for all the components of Laravel, and is
-| the IoC container for the system binding all of the various parts.
-|
-*/
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Route;
 
-$app = new Illuminate\Foundation\Application(
-    $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
-);
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+        then: function () {
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/api.php'));
 
-/*
-|--------------------------------------------------------------------------
-| Bind Important Interfaces
-|--------------------------------------------------------------------------
-|
-| Next, we need to bind some important interfaces into the container so
-| we will be able to resolve them when needed. The kernels serve the
-| incoming requests to this application from both the web and CLI.
-|
-*/
+            Route::middleware('web')
+                ->group(base_path('routes/administrator.php'));
 
-$app->singleton(
-    Illuminate\Contracts\Http\Kernel::class,
-    App\Http\Kernel::class
-);
+            Route::middleware('web')
+                ->group(base_path('routes/franchise.php'));
 
-$app->singleton(
-    Illuminate\Contracts\Console\Kernel::class,
-    App\Console\Kernel::class
-);
+            Route::middleware('web')
+                ->group(base_path('routes/student.php'));
 
-$app->singleton(
-    Illuminate\Contracts\Debug\ExceptionHandler::class,
-    App\Exceptions\Handler::class
-);
-// $app->configure('cors');
-/*
-|--------------------------------------------------------------------------
-| Return The Application
-|--------------------------------------------------------------------------
-|
-| This script returns the application instance. The instance is given to
-| the calling script so we can separate the building of the instances
-| from the actual running of the application and sending responses.
-|
-*/
-
-return $app;
+            Route::middleware('web')
+                ->group(base_path('routes/web.php'));
+        },
+    )
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'is_admin'          => \App\Http\Middleware\IsAdmin::class,
+            'is_franchise'      => \App\Http\Middleware\IsFranchise::class,
+            'is_student'        => \App\Http\Middleware\IsStudent::class,
+            'is_management'     => \App\Http\Middleware\IsManagement::class,
+            'is_creater'        => \App\Http\Middleware\Management\IsCreater::class,
+            'is_publisher'      => \App\Http\Middleware\Management\IsPublisher::class,
+            'is_manager'        => \App\Http\Middleware\Management\IsManager::class,
+            'is_multi'          => \App\Http\Middleware\Management\IsMulti::class,
+            'adminguest'        => \App\Http\Middleware\IsAdminGuest::class,
+            'franchiseguest'    => \App\Http\Middleware\IsFranchiseGuest::class,
+            'studentguest'      => \App\Http\Middleware\IsStudentGuest::class,
+            'managementguest'   => \App\Http\Middleware\IsManagementGuest::class,
+        ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
+        //
+    })->create();

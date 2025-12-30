@@ -44,12 +44,6 @@ class AuthController extends Controller
             }
 
             if ($userData) {
-                // FacadesAuth::attempt([
-                //     'email' => $input['username'],
-                //     'password' => $input['password']
-                // ]);
-                // $returnResponse['success'] = true;
-                // return json_encode($returnResponse);
                 // send OTP request
                 $getOtp = $this->getMobileOtp($userData['mobile']);
 
@@ -72,47 +66,10 @@ class AuthController extends Controller
                 $returnResponse['message'] = 'User not found, please check the credentials.';
             }
 
-            // if (Auth::attempt($userData)) {
-            //     CorporateEnquiry::generateCounts();
-            //     User::generateCounts();
-            //     return redirect()->route('administrator.dashboard')->with('loginSuccess', 'Welcome User');
-            // }
             return json_encode($returnResponse);
-            // return back()->withErrors(['email' => 'Login failed, You are not authorized.']);
         }
         return view('Auth/superadmin_login');
     }
-    // public function studentlogin()
-    // {
-    //     if (request()->isMethod('post')) {
-    //         $thisRequest = request();
-    //         $input = request()->all();
-    //         $fieldType = '';
-    //         if (filter_var($input['username'], FILTER_VALIDATE_EMAIL)) {
-    //             $fieldType = 'email';
-    //             $input['email'] = $input['username'];
-    //         }
-    //         if (filter_var($input['username'], FILTER_VALIDATE_INT) && strlen(filter_var($input['username'], FILTER_VALIDATE_INT)) == 10) {
-    //             $fieldType = 'mobile';
-    //             $input['mobile'] = $input['username'];
-    //         }
-    //         // $data = request()->validate([
-    //         //     $fieldType => 'required',
-    //         //     'password' => 'required'
-    //         // ], ...$input);
-    //         $data = [
-    //             $fieldType => $input['username'],
-    //             'password' => $input['password'],
-    //             'status' => 'active'
-    //         ];
-    //         // return print_r(auth()->check());
-    //         if (Auth::attempt($data)) {
-    //             return redirect()->route('student.dashboard')->with('loginSuccess', 'Welcome User');
-    //         }
-    //         return back()->withErrors(['email' => 'Login failed, You are not authorized. ']);
-    //     }
-    //     return view('Dashboard/Admin/Auth/login');
-    // }
     public function franchiselogin()
     {
         if (request()->isMethod('post')) {
@@ -172,7 +129,6 @@ class AuthController extends Controller
                     'password' => $input['password']
                 ];
 
-                // return print_r($data);
                 if (Auth::attempt($data)) {
                     return redirect()->route('franchise.dashboard')->with('loginSuccess', 'Welcome User');
                 }
@@ -250,7 +206,6 @@ class AuthController extends Controller
 
         $userCreation = User::create($userData);
 
-        print_r($userCreation);
         return;
     }
 
@@ -319,9 +274,6 @@ class AuthController extends Controller
                     $returnResponse['message']  = 123456; //$otp; //comment by vishal
                 }
 
-                // $returnResponse['success']  = true;
-                // $returnResponse['type']     = 'success';
-                // $returnResponse['message']  = $otp;
             }
         }
         return $returnResponse;
@@ -387,33 +339,7 @@ class AuthController extends Controller
                 ];
 
                 if (Auth::attempt($data)) {
-                    // dd(auth()->user()->role->pluck('role_id')->toArray());
-                    $user_role_type = Auth::user()->role->pluck('role_id')->toArray();
-                    $multi_role     = 0;
-                    // if (count($user_role_type) >= 2) {
-                    //     // return back()->withErrors(['email' => 'Login failed, You are not authorized.']);
-
-                    //     $multi_role = 1;
-                    //     dd(in_array(6,$user_role_type),in_array(7,$user_role_type),in_array(8,$user_role_type));
-                    // }
-                    //manager
-                    // if (empty(array_diff($user_role_type,[6])) || count($user_role_type) >= 2) {
-                    if (empty(array_diff($user_role_type, [6]))) {
-                        return redirect()->route('franchise.management.manager.dashboard')->with('loginSuccess', 'Welcome User');
-                    }
-                    //publisher
-                    if (empty(array_diff($user_role_type, [7]))) {
-                        return redirect()->route('franchise.management.publisher.dashboard')->with('loginSuccess', 'Welcome User');
-                    }
-                    //creater
-                    if (empty(array_diff($user_role_type, [8]))) {
-                        return redirect()->route('franchise.management.creater.dashboard')->with('loginSuccess', 'Welcome User');
-                    }
-
-                    // dd(count($user_role_type));
                     return back()->withErrors(['email' => 'Login failed, You are not authorized.']);
-
-                    // return redirect()->route('franchise.management.dashboard')->with('loginSuccess', 'Welcome User');
                 }
                 return back()->withErrors(['email' => 'Login failed, You are not authorized.']);
             }

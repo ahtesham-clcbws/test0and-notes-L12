@@ -35,6 +35,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('css/style.css') }}">
     <!-- responsive css -->
     <link rel="stylesheet" type="text/css" href="{{ asset('css/responsive.css') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         .input-group .form-control {
             border-radius: .25rem !important;

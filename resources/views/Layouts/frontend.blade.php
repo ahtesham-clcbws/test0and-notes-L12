@@ -15,6 +15,8 @@
         <link type="image/x-icon" href="{{ asset('logos/logo-white-square.png') }}" rel="icon">
         <link type="image/x-icon" href="{{ asset('logos/logo-white-square.png') }}" rel="shortcut-icon">
         <link href="{{ asset('logos/logo-white-square.png') }}" rel="apple-touch-icon">
+
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
         <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Sansita:wght@400;700&display=swap" rel="stylesheet">
