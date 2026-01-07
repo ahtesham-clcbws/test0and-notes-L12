@@ -158,6 +158,10 @@ class CorporateEnquiry extends Controller
                     $franchiseDetailsSave->allowed_to_upload = $requestData['allowed_to_upload'];
                 }
 
+                $franchiseDetailsSave->submit_content = $requestData['submit_content'];
+                $franchiseDetailsSave->add_package = $requestData['add_package'];
+                $franchiseDetailsSave->allowed_to_package = $requestData['allowed_to_package'];
+
                 if ($requestData['name'] !== $franchiseSave['name']) {
                     $franchiseSave->name = $requestData['name'];
                 }
@@ -194,7 +198,7 @@ class CorporateEnquiry extends Controller
                         try {
                             $mailToSend = new NotifyFranchiseAccountModify($details);
                             Mail::to($requestData['email'])->send($mailToSend);
-                            
+
                             $returnResponse['success'] = true;
                             $returnResponse['type'] = 'success';
                             $returnResponse['message'] = 'Franchise account updated successfully.';

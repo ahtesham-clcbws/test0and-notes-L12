@@ -36,7 +36,7 @@
                                                 @if ($data['status'] == 'converted' || $data['status'] == 'activated' || $data['status'] == 'expired' || $data['status'] == 'banned')
                                                 <img id="profile_img"
                                                     src="{{ $data['photoUrl'] ? '/storage/'.$data['photoUrl'] : asset('noimg.png') }}"
-                                                    style="width:80px;height:80px;border:1px solid #c2c2c2;  ">                                                
+                                                    style="width:80px;height:80px;border:1px solid #c2c2c2;  ">
                                                 @else
                                                 <img id="profile_img"
                                                     src="{{ $data['photoUrl'] ? '/storage/'.$data['photoUrl'] : asset('noimg.png') }}"
@@ -130,6 +130,14 @@
                                                 {{ $data['established_year'] }}
                                             </td>
                                         </tr>
+                                        @if($data['institute_images_pdf'])
+                                        <tr>
+                                            <td colspan="2"><b>Institute Images PDF</b></td>
+                                            <td colspan="2">
+                                                <a href="{{ asset('storage/' . $data['institute_images_pdf']) }}" target="_blank">View PDF</a>
+                                            </td>
+                                        </tr>
+                                        @endif
                                         <tr>
                                             <td colspan="2"><b>Branch Code</b></td>
                                             <td colspan="2">
@@ -535,23 +543,105 @@
                                 </div>
                             </div>
 
-                            <div class="d-flex mb-2">
 
-                                <label class="box-heading text-end">
-                                    Allowed content
-                                </label>
+                            <div class="row">
+                                <div class="d-flex mb-2 col-md-6">
 
-                                <div class="box-input">
-                                    <!-- <div class="box-icon"></div> -->
-                                    <div class="input-group">
-                                        <label class="input-group-text" for="inputGroupSelect02"><i
-                                                class="bi bi-intersect"></i></label>
-                                        <select class="form-select" id="inputGroupSelect02" name="allowed_to_upload">
-                                            <option {{ $data['allowed_to_upload'] == 0 ? 'selected' : '' }} value="0">No
-                                            </option>
-                                            <option {{ $data['allowed_to_upload'] == 1 ? 'selected' : '' }} value="1">Yes
-                                            </option>
-                                        </select>
+                                    <label class="box-heading text-end">
+                                        Submit Content
+                                    </label>
+
+                                    <div class="box-input">
+                                        <!-- <div class="box-icon"></div> -->
+                                        <div class="input-group" style="margin-left:25px;">
+                                            <label class="input-group-text" for="inputGroupSelect02"><i
+                                                    class="bi bi-intersect"></i></label>
+                                            <select class="form-select" id="inputGroupSelect02" name="submit_content">
+                                                <option
+                                                    {{ isset($data['details']) && $data['details']['submit_content'] == 0 ? 'selected' : '' }}
+                                                    value="0">No
+                                                </option>
+                                                <option
+                                                    {{ isset($data['details']) && $data['details']['submit_content'] == 1 ? 'selected' : '' }}
+                                                    value="1">Yes
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex mb-2 col-md-6">
+
+                                    <label class="box-heading text-end">
+                                        Publish Content
+                                    </label>
+
+                                    <div class="box-input">
+                                        <!-- <div class="box-icon"></div> -->
+                                        <div class="input-group">
+                                            <label class="input-group-text" for="inputGroupSelect02"><i
+                                                    class="bi bi-intersect"></i></label>
+                                            <select class="form-select" id="inputGroupSelect02" name="allowed_to_upload">
+                                                <option
+                                                    {{ isset($data['details']) && $data['details']['allowed_to_upload'] == 0 ? 'selected' : '' }}
+                                                    value="0">No
+                                                </option>
+                                                <option
+                                                    {{ isset($data['details']) && $data['details']['allowed_to_upload'] == 1 ? 'selected' : '' }}
+                                                    value="1">Yes
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="d-flex mb-2 col-md-6">
+
+                                    <label class="box-heading text-end">
+                                        Create Package
+                                    </label>
+
+                                    <div class="box-input">
+                                        <!-- <div class="box-icon"></div> -->
+                                        <div class="input-group" style="margin-left:25px;">
+                                            <label class="input-group-text" for="inputGroupSelect02"><i
+                                                    class="bi bi-intersect"></i></label>
+                                            <select class="form-select" id="inputGroupSelect02" name="allowed_to_package">
+                                                <option
+                                                    {{ isset($data['details']) && $data['details']['allowed_to_package'] == 0 ? 'selected' : '' }}
+                                                    value="0">No
+                                                </option>
+                                                <option
+                                                    {{ isset($data['details']) && $data['details']['allowed_to_package'] == 1 ? 'selected' : '' }}
+                                                    value="1">Yes
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex mb-2 col-md-6">
+
+                                    <label class="box-heading text-end">
+                                        Add Package
+                                    </label>
+
+                                    <div class="box-input">
+                                        <!-- <div class="box-icon"></div> -->
+                                        <div class="input-group">
+                                            <label class="input-group-text" for="inputGroupSelect02"><i
+                                                    class="bi bi-intersect"></i></label>
+                                            <select class="form-select" id="inputGroupSelect02" name="add_package">
+                                                <option
+                                                    {{ isset($data['details']) && $data['details']['add_package'] == 0 ? 'selected' : '' }}
+                                                    value="0">No
+                                                </option>
+                                                <option
+                                                    {{ isset($data['details']) && $data['details']['add_package'] == 1 ? 'selected' : '' }}
+                                                    value="1">Yes
+                                                </option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

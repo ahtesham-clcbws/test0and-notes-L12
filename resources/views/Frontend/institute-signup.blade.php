@@ -85,6 +85,11 @@
                                     <button type="submit" id="corporate_submit_button"
                                         class="btn full-width btn-md theme-bg text-white">Submit</button>
                                 </div>
+                                <div class="form-group mt-3">
+                                    <p class="text-center">
+                                    Already have an account? <a class="modal-title theme-cl pointerCursor" href="{{ route('franchise.login') }}">Login Here</a>
+                                </p>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -220,11 +225,11 @@
                     //     branchEmailVerify.val(0);
                     //     $(event).css('border-color', 'crimson');
                     // }
-                    
+
                     if (data == true) {
                         branchEmailVerify.val(1);
                         $(event).css('border-color', 'crimson');
-                        
+
                     } else {
                         branchEmailVerify.val();
                         $(event).css('border-color', '#198754');

@@ -116,6 +116,14 @@
                                                 {{ $data['established_year'] }}
                                             </td>
                                         </tr>
+                                        @if($data['institute_images_pdf'] ?? false)
+                                        <tr>
+                                            <td colspan="2"><b>Institute Images PDF</b></td>
+                                            <td colspan="2">
+                                                <a href="{{ asset('storage/' . $data['institute_images_pdf']) }}" target="_blank">View PDF</a>
+                                            </td>
+                                        </tr>
+                                        @endif
                                         <tr>
                                             <td colspan="2"><b>Branch Code</b></td>
                                             <td colspan="2">

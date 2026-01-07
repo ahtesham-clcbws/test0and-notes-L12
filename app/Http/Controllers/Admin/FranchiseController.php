@@ -249,6 +249,7 @@ class FranchiseController extends Controller
 
                 if ($franchiseDetailsSave->save()) {
                     if ($franchiseSave->save()) {
+                        /*
                         $details = [
                             'fullname' => $requestData['name'],
                             'typeMessage' => 'Account updated.',
@@ -264,6 +265,10 @@ class FranchiseController extends Controller
                             $returnResponse['type'] = 'success';
                             $returnResponse['message'] = 'Franchise account updated successfully.';
                         }
+                        */
+                        $returnResponse['success'] = true;
+                        $returnResponse['type'] = 'success';
+                        $returnResponse['message'] = 'Franchise account updated successfully.';
                     } else {
                         $returnResponse['message'] = 'Franchise details not saved, please try again later';
                     }

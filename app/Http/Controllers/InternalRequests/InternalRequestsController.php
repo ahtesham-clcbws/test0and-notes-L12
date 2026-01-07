@@ -497,9 +497,9 @@ class InternalRequestsController extends Controller
                 $branch_code =  $request->input('branch_code');
                 $query = CorporateEnquiry::where('branch_code', $branch_code)->where('status', 'approved')->first();
                 if ($query) {
-                    return json_encode(true);
+                    return json_encode(1);
                 }
-                return json_encode(false);
+                return json_encode(0);
             }
             if ($request->input('form_name') == 'branch_mobile_check') {
                 $branch_mobile =  $request->input('branch_mobile');
