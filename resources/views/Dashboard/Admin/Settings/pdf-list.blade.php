@@ -392,7 +392,7 @@
                                         <option selected disabled>Select Type</option>
                                         <option value="student">Student Form</option>
                                         <option value="institute_enquiry">Institute Enquiry</option>
-                                        <option value="institute_signup">Institute Sign Up</option>
+                                        <option value="corporate_signup">Corporate Sign Up</option>
                                         <option value="website_terms">Website Terms & Condition</option>
                                         <option value="website_privacy_policy">Website Privacy Policy</option>
                                         <option value="links">Important Links</option>                                        

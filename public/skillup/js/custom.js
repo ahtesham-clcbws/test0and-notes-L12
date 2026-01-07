@@ -637,6 +637,9 @@ function sendOtp(type) {
 							mobile_otp_new.focus();
 						}
 					});
+					if (type == 'corporate') {
+						$('#button-mobile-otp').html('OTP Sent');
+					}
 					mobile_input.css('border-color', '#2e3092');
 					mobile_input.css('background-color', 'none');
 					mobile_input.attr('readonly', 'readonly');
@@ -698,6 +701,9 @@ function verifyOtp(type) {
 		// return;
 		if (data == 'true') {
 			showAlert('OTP verified.');
+			if (type == 'corporate') {
+				$('#button-mobile-otp-verify').html('Verified');
+			}
 			mobileInput.attr('readonly', 'readonly');
 			mobileOtpInput.attr('readonly', 'readonly');
 			verifystatus.val(1);

@@ -38,7 +38,9 @@ class CorporateEnquiry extends Model
         'image',
         'status',
         'branch_code',
-        'photoUrl'
+        'branch_code',
+        'photoUrl',
+        'institute_images_pdf'
     ];
     public static function generateCounts()
     {

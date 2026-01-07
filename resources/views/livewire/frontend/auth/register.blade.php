@@ -225,13 +225,13 @@
                                             <label class="checkbox-custom-label" for="terms_check_box">I agree
                                                 to The
                                                 gyanology's <a class="theme-cl"
-                                                    href="{{ url('public/' . $pdf->url) }}" target="_blank">Terms
+                                                    href="https://testandnotes.com/policy-and-terms" target="_blank">Terms
                                                     of
                                                     Services</a></label>
                                         @else
                                             <label class="checkbox-custom-label" for="terms_check_box">I agree
                                                 to The
-                                                gyanology's <a class="theme-cl" href="#">Terms of
+                                                gyanology's <a class="theme-cl" href="https://testandnotes.com/policy-and-terms" target="_blank">Terms of
                                                     Services</a></label>
                                         @endif
                                         @error('form.required_check_registration')

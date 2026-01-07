@@ -30,7 +30,7 @@ class NotifyAdminInstituteSignup extends Mailable
     public function build()
     {
         return $this->from('no-reply@thegyanology.com', 'The Gyanology')
-            ->subject('Gyanology - Institute Signup')
+            ->subject('Gyanology - Corporate Signup')
             ->view('EmailTemplates.notify_admin_institute_signup');
     }
 }

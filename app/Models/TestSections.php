@@ -49,7 +49,7 @@ class TestSections extends Model
         return $this->belongsToMany(QuestionBankModel::class, 'test_questions','section_id','question_id');
     }
 
-    public function subject() {
+    public function relatedSubject() {
         return $this->hasMany(Subject::class, 'id', 'subject');
     }
     public $timestamps = true;

@@ -714,7 +714,7 @@ align-items: center;
                                             <li><a href="#">About</a></li>
                                             <li><a href="#">Home</a></li>
                                             <li><a href="http://tests.thegyanology.com/contact">Contact Us</a></li>
-                                            <!-- <li><a href="{{ route('institute_signup') }}">Admin Signup</a></li>
+                                            <!-- <li><a href="{{ route('corporate_signup') }}">Admin Signup</a></li>
                                             <li><a href="{{ route('franchise.login') }}">Admin Login</a></li> -->
                                         </ul>
                                     </div>

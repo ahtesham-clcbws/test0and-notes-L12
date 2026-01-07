@@ -30,6 +30,7 @@ class FormsController extends Controller
                 'city_id' => 'required|integer',
                 'pincode' => 'required|integer',
                 'corporate_logo' => 'sometimes|file|mimes:jpg,jpeg,png|max:2048',
+                'institute_images_pdf' => 'sometimes|file|mimes:pdf|max:5120',
             ]);
 
             $corporateDb = new CorporateEnquiry();
@@ -50,6 +51,12 @@ class FormsController extends Controller
                 $file = $request->file('corporate_logo');
                 $name = $file->hashName();
                 $corporateDb->photoUrl = $file->storeAs('institute', $name, 'public');
+            }
+
+            if ($request->hasFile('institute_images_pdf')) {
+                $file = $request->file('institute_images_pdf');
+                $name = $file->hashName();
+                $corporateDb->institute_images_pdf = $file->storeAs('institute_pdf', $name, 'public');
             }
 
             $query = $corporateDb->save();

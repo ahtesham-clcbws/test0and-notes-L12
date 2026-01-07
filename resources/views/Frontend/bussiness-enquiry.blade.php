@@ -165,6 +165,22 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-12 mt-2">
+                                    <div class="form-group mb-3">
+                                        <label>Institute images pdf</label>
+                                        <div class="custom-file">
+                                            <input name="institute_images_pdf" id="institute_images_pdf" type="file"
+                                                class="custom-file-input" accept="application/pdf">
+                                            <label class="custom-file-label" for="institute_images_pdf">Choose File</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-2">
+                                    <div class="form-group">
+                                        <input id="terms_checkbox" type="checkbox" required>
+                                        <label for="terms_checkbox">I agree to <a href="https://testandnotes.com/terms-and-conditions" target="_blank">Terms & Conditions</a></label>
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group mt-3">
                                 <button type="submit" id="corporate_submit_button"
