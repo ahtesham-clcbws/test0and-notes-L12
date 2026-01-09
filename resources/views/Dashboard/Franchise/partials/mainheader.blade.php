@@ -87,26 +87,26 @@
     {{-- <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"> --}}
     <ul class="nav w-100 nav-panel info-panel">
         <li class="nav-item">
-           
-            <span class="required_text">
-               {{auth()->user()->institute['institute_name']}} ({{auth()->user()->institute->branch_code}}) <i class="telephone_ic bi bi-telephone"></i> {{auth()->user()->mobile}} 
-            </span>
-            
-        </li>
-        <li class="nav-item">
-            <i class="watch_ic bi bi-clock-history"></i>
-            <span class="required_text">
-            {{'Subcription:'.date('d-M-Y', strtotime(auth()->user()->institute['started_at'] . ' + ' . intval(auth()->user()->institute['days']) . ' days '))}}
-            </span>
-            <span class="required_num">{{(intval(auth()->user()->institute['days'])- round((time()-strtotime(auth()->user()->institute['started_at']))/ (60 * 60 * 24)).' days Left' ) }}</span>
-        </li>
-        <!-- <li class="nav-item">
             <i class="watch_ic bi bi-clock-history"></i>
             <span class="required_text">
                 Required Text
             </span>
-            <span class="required_num">210000</span>
-        </li> -->
+            <span class="required_num">21</span>
+        </li>
+        <li class="nav-item">
+            <i class="watch_ic bi bi-clock-history"></i>
+            <span class="required_text">
+                Required Text
+            </span>
+            <span class="required_num">21</span>
+        </li>
+        <li class="nav-item">
+            <i class="watch_ic bi bi-clock-history"></i>
+            <span class="required_text">
+                Required Text
+            </span>
+            <span class="required_num">21</span>
+        </li>
     </ul>
     <ul class="nav nav-panel icons-panel text-end">
         <li class="nav-item">

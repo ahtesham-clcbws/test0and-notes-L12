@@ -99,7 +99,7 @@ class AuthController extends Controller
                     ];
                     $mailToSend = new SendPasswordReset($details);
                     $sendMail = Mail::to($input['email'])->send($mailToSend);
-                    if (count(Mail::failures()) > 0) {
+                    if (!$sendMail) {
                         return back()->withErrors(['franchiseError' => 'Error sending email, please try again later.']);
                         // $returnResponse['success'] = true;
                         // $returnResponse['type'] = 'success';

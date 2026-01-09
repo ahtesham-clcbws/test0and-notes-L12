@@ -1,7 +1,7 @@
 @extends('Layouts.blackauth')
 
 @section('form')
-    <div class="card" style="background-color:#b2b3b280 !important;">
+    <div class="card" style="background-color:#00000099 !important;">
         <div class="card-header">
             <h3>Corporate Login</h3>
             <div class="d-flex justify-content-end social_icon">
@@ -45,10 +45,10 @@
             <form method="POST" action="" id="forgetForm">
                 @csrf
                 @error('franchiseError')
-                    <p class="text-danger"><small>{!!$message!!} </small></p>
+                    <p class="text-danger"><b>{!!$message!!} </b></p>
                 @enderror
                 @error('franchiseSuccess')
-                    <p class="text-danger"><small>{!!$message!!} </small></p>
+                    <p class="text-danger"><b>{!!$message!!} </b></p>
                 @enderror
                 <input hidden style="display: none;" name="form_name" value="forget_password">
                 <div class="input-group form-group">
@@ -65,9 +65,9 @@
             </form>
         </div>
         <div class="card-footer">
-            {{-- <div class="d-flex justify-content-center links">
-                Don't have an account?<a href="#">Sign Up</a>
-            </div> --}}
+            <div class="d-flex justify-content-center links" style="margin-bottom: 15px;">
+                Don't have an account?<a href="{{ route('corporate_signup') }}" class="ml-2">Sign Up</a>
+            </div>
             <div class="text-center links" id="forgetLink" onclick="showForget()">
                 Problem signing in? <button class="btn btn-link">Reset password</but>
            </div>
@@ -76,5 +76,5 @@
            </div>
         </div>
     </div>
-    
+
 @endsection
