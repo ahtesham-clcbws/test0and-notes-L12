@@ -11,6 +11,7 @@ use App\Http\Controllers\Frontend\CourseController;
 use Illuminate\Support\Facades\Artisan;
 
 use App\Http\Controllers\TestController;
+use App\Livewire\Frontend\Auth\CorporateSignupPage;
 use App\Livewire\Frontend\Auth\ForgotPassword;
 use App\Livewire\Frontend\Auth\Login;
 use App\Livewire\Frontend\Auth\Register;
@@ -40,7 +41,8 @@ Route::get('page', [HomeController::class, 'page'])->name('page');
 Route::post('/', [InternalRequestsController::class, 'index']);
 Route::get('demoemail', [InternalRequestsController::class, 'demoemail']);
 Route::any('corporate-enquiry', [FormsController::class, 'businessEnquiry'])->name('bussines_enquiry');
-Route::any('corporate-signup', [FormsController::class, 'instituteSignup'])->name('corporate_signup');
+// Route::any('corporate-signup', [FormsController::class, 'instituteSignup'])->name('corporate_signup');
+Route::any('corporate-signup', CorporateSignupPage::class)->name('corporate_signup');
 Route::any('reset-password/{studentid}/{resetid}', [FormsController::class, 'studentPasswordReset'])->name('student_recover_password');
 Route::get('start-test', [HomeController::class, 'startTest'])->name('start_test');
 Route::get('about-us', [HomeController::class, 'aboutUs'])->name('about_us');
