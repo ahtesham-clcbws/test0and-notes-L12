@@ -15,7 +15,7 @@ use Livewire\WithFileUploads;
 class ContributorSignUp extends Component
 {
     use WithFileUploads;
-    
+
     public $name;
     public $email;
     public $mobile;
@@ -202,7 +202,7 @@ class ContributorSignUp extends Component
                 $userDetailsDb->save();
                 $this->js('success("Thank you, we will active your request soon.")');
                 $this->reset();
-                // return $this->redirect(route('login'), navigate: true);
+                return $this->redirect('/');
             } else {
                 $this->js('error("Unable to register, please try again later.")');
             }

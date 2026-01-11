@@ -6,74 +6,116 @@
         #imageSaveButton {
             display: none;
         }
-
     </style>
 @endsection
 @section('main')
     <section class="content admin-1">
         <div class="card">
             <div class="card-body">
-                
-                    <form  id="uploadImage" enctype="multipart/form-data" method="post">
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="Select User Image" class="control-label">Select User Image</label>
-                                    <input name="user_image" class="form-control" accept="image/jpeg,image/jpg" type="file"
-                                            onchange="avatarPreview(event)">
-                                    <img class="w-100 mb-2" id="user_profile_image"
-                                        src="{{ $user['details']['photo_url'] ? '/storage/' . $user['details']['photo_url'] : asset('noimg.png') }}">
-                                </div>
-                            </div>
-                                <!-- <button class="btn btn-success w-100 mt-2" type="submit" id="imageSaveButton">
-                                    Save Profile Image
-                                </button> -->
-                            
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="Select User Image" class="control-label">Select Logo</label>
-                                        <input name="logo" class="form-control" accept="image/jpeg,image/jpg" type="file"
-                                        onchange="logoPreview(event)">
-                                        <img class="w-100 mb-2" id="user_logo_image"
-                                        src="{{ $user['details']['logo'] ? '/storage/' . $user['details']['logo'] : asset('noimg.png') }}">
-                                    </div>    
-                                    <!-- <button class="btn btn-success w-100 mt-2" type="submit" id="imageSaveButton2">
-                                        Save Logo
-                                    </button> -->
-                                </div> 
-                                <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="Email" class="control-label">Email</label>
-                                    <input type="email" id="email" name="email"  class="form-control" style="border: 1px solid #aaa;" value="<?php echo $user['details']['email']; ?>" required>
-                                </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="Mobile No." class="control-label">Mobile No.</label>
-                                        <input type="number" id="mobile"  name="mobile" minlength="10" maxlength="10" required="" class="form-control" value="<?php echo $user['details']['mobile']; ?>">
-                                    </div>
-                                </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                            </div>
-                            <div class="col-md-4">
-                            </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-success w-100 mt-2" type="submit" id="imageSaveButton">
-                                    Save Profile Details
-                                </button>
+                @if (session()->has('message'))
+                    <div class="sufee-alert alert with-close alert-success alert-dismissible fade show">
+                        {{ session('message') }}
+                    </div>
+                @endif
+                @if (session()->has('error'))
+                    <div class="sufee-alert alert with-close alert-danger alert-dismissible fade show">
+                        {{ session('error') }}
+                    </div>
+                @endif
+                <form id="uploadImage" enctype="multipart/form-data" method="post">
+                    @csrf
+                    <input id="old_mobile_number" name="old_mobile_number" type="hidden" value="{{ $user->mobile }}">
+                    <input id="verify_mobile_check" name="verify_mobile_check" type="hidden">
+                    <input id="old_email" name="old_email" type="hidden" value="{{ $user->email }}">
+                    <input id="verify_email_check" name="verify_email_check" type="hidden">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="control-label" for="Select User Image">Select User Image</label>
+                                <input class="form-control" name="user_image" type="file" accept="image/jpeg,image/jpg"
+                                    onchange="avatarPreview(event)">
+                                <img class="w-100 mb-2" id="user_profile_image"
+                                    src="{{ $user['details']['photo_url'] ? '/storage/' . $user['details']['photo_url'] : asset('noimg.png') }}">
                             </div>
                         </div>
-                    </form>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="control-label" for="Select User Image">Select Logo</label>
+                                <input class="form-control" name="logo" type="file" accept="image/jpeg,image/jpg"
+                                    onchange="logoPreview(event)">
+                                <img class="w-100 mb-2" id="user_logo_image"
+                                    src="{{ $user['details']['logo'] ? '/storage/' . $user['details']['logo'] : asset('noimg.png') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="control-label" for="Email">Email</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="email" name="email" type="email"
+                                        value="<?php echo $user['details']['email']; ?>" style="border: 1px solid #aaa;" required>
+                                    <button class="btn btn-primary sendEmailOtp" type="button" onclick="sendEmailOtp()">
+                                        Get Otp
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group mt-3">
+                                <label class="control-label" for="Email">Verify Email</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="email_otp" name="email_otp" type="text"
+                                        style="border: 1px solid #aaa;" placeholder="Input OTP">
+                                    <button class="btn btn-primary verifyEmailOtp" type="button"
+                                        onclick="verifyEmailOtp()" disabled>
+                                        Verify
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="control-label" for="Mobile No.">Mobile No.</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="mobile" name="mobile" type="number"
+                                        value="<?php echo $user['details']['mobile']; ?>" minlength="10" maxlength="10" required="">
+                                    <button class="btn btn-primary sendMobileOtp" type="button" onclick="sendMobileOtp()">
+                                        Get Otp
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group mt-3">
+                                <label class="control-label" for="Mobile">Verify Mobile</label>
+                                <div class="input-group">
+                                    <input class="form-control" id="mobile_otp" name="mobile_otp" type="number" minlength="6"
+                                        maxlength="6" placeholder="Input OTP">
+                                    <button class="btn btn-primary verifyMobileOtp" type="button"
+                                        onclick="verifyMobileOtp()" disabled>
+                                        Verify
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                        </div>
+                        <div class="col-md-4">
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-success w-100 mt-2" id="imageSaveButton" type="submit">
+                                Save Profile Details
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </section>
 @endsection
 @section('javascript')
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $('#imageSaveButton').show();
+
         function avatarPreview(event) {
             var output = document.getElementById('user_profile_image');
             if (event.target.files[0]) {
@@ -86,6 +128,7 @@
                 // $('#imageSaveButton').hide();
             }
         }
+
         function logoPreview(event) {
             var output = document.getElementById('user_logo_image');
             if (event.target.files[0]) {
@@ -117,5 +160,137 @@
         //         console.log(error);
         //     })
         // })
+
+        function sendEmailOtp() {
+            var old_email = document.getElementById('old_email').value;
+            var email = document.getElementById('email').value;
+            if (old_email == email) {
+                Swal.fire('Email Already Updated!');
+                $(".sendEmailOtp").removeAttr('disabled', '');
+            } else {
+
+                $(".sendEmailOtp").attr('disabled', '');
+                let timerInterval;
+                Swal.fire({
+                    title: 'Wait...',
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading();
+                        const b = Swal.getHtmlContainer().querySelector('b');
+                        timerInterval = setInterval(() => {
+                            b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
+                        }, 1000);
+                    },
+                });
+                $.get("/corporate/profile/verifyemail/" + email, function(data) {
+                    clearInterval(timerInterval);
+                    if (data == false) {
+                        Swal.fire('Email Already Registered!');
+                        $(".sendEmailOtp").removeAttr('disabled', '');
+                    } else if (data.message) {
+                        Swal.fire(data.message);
+                        $(".sendEmailOtp").removeAttr('disabled', '');
+                    } else {
+                        Swal.fire('Otp Sent!');
+                        $(".verifyEmailOtp").removeAttr('disabled', '');
+                    }
+                });
+            }
+
+        }
+
+        function verifyEmailOtp() {
+            var email = document.getElementById('email').value;
+            var email_otp = document.getElementById('email_otp').value;
+
+            let timerInterval;
+            Swal.fire({
+                title: 'Wait...',
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading();
+                    const b = Swal.getHtmlContainer().querySelector('b');
+                    timerInterval = setInterval(() => {
+                        b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
+                    }, 1000);
+                },
+            });
+            $.get("/corporate/profile/verifyotp/email/" + email + "/" + email_otp, function(data) {
+                clearInterval(timerInterval);
+                if (data == true) {
+                    Swal.fire('Otp Verified!');
+                    $(".verifyEmailOtp").attr('disabled', '');
+                    document.getElementById('verify_email_check').value = '1';
+                } else {
+                    Swal.fire('Please Enter Valid Otp');
+                }
+            });
+        }
+
+        function sendMobileOtp() {
+            var old_mobile_number = document.getElementById('old_mobile_number').value;
+            var mobile_number = document.getElementById('mobile').value;
+            if (old_mobile_number == mobile_number) {
+                Swal.fire('Mobile Number Already Updated!');
+                $(".sendMobileOtp").removeAttr('disabled', '');
+            } else {
+
+                $(".sendMobileOtp").attr('disabled', '');
+                let timerInterval;
+                Swal.fire({
+                    title: 'Wait...',
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        Swal.showLoading();
+                        const b = Swal.getHtmlContainer().querySelector('b');
+                        timerInterval = setInterval(() => {
+                            b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
+                        }, 1000);
+                    },
+                });
+                $.get("/corporate/profile/verifymobile/" + mobile_number, function(data) {
+                    clearInterval(timerInterval);
+                    if (data == false) {
+                        Swal.fire('Mobile Number Already Registered!');
+                        $(".sendMobileOtp").removeAttr('disabled', '');
+                    } else if (data.message) {
+                        Swal.fire(data.message);
+                        $(".sendMobileOtp").removeAttr('disabled', '');
+                    } else {
+                        Swal.fire('Otp Sent!');
+                        $(".verifyMobileOtp").removeAttr('disabled', '');
+                    }
+                });
+            }
+
+        }
+
+        function verifyMobileOtp() {
+            var mobile_number = document.getElementById('mobile').value;
+            var mobile_otp = document.getElementById('mobile_otp').value;
+
+            let timerInterval;
+            Swal.fire({
+                title: 'Wait...',
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading();
+                    const b = Swal.getHtmlContainer().querySelector('b');
+                    timerInterval = setInterval(() => {
+                        b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
+                    }, 1000);
+                },
+            });
+            $.get("/corporate/profile/verifyotp/mobile/" + mobile_number + "/" + mobile_otp, function(data) {
+                clearInterval(timerInterval);
+                if (data == true) {
+                    Swal.fire('Otp Verified!');
+                    $(".verifyMobileOtp").attr('disabled', '');
+                    document.getElementById('verify_mobile_check').value = '1';
+                } else {
+                    Swal.fire('Please Enter Valid Otp');
+                }
+            });
+        }
     </script>
 @endsection

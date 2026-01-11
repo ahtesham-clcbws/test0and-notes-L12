@@ -17,9 +17,18 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Models\OtpVerifications;
+use App\Mail\SendOtpMail;
 
 class UserController extends Controller
 {
+    public $returnResponse = [];
+    public function __construct(){
+        $this->returnResponse = [
+            'message' => null,
+            'success' => false
+        ];
+    }
 
     public function index($type = 'all')
     {
@@ -278,11 +287,26 @@ class UserController extends Controller
             if (request()->input('password')) {
                 $user['password'] = Hash::make($inputs['password']);
             }
+
             if (request()->input('email')) {
-                $user['email'] = $inputs['email'];
+                // $user['email'] = $inputs['email'];
+                if ($inputs['email'] !== $user['email']) {
+                    if (request()->input('verify_email_check') == 1) {
+                         $user['email'] = $inputs['email'];
+                    } else {
+                        return redirect()->back()->with('error', 'Please Verify Email Address');
+                    }
+                }
             }
             if (request()->input('mobile')) {
-                $user['mobile'] = $inputs['mobile'];
+                // $user['mobile'] = $inputs['mobile'];
+                if ($inputs['mobile'] !== $user['mobile']) {
+                    if (request()->input('verify_mobile_check') == 1) {
+                         $user['mobile'] = $inputs['mobile'];
+                    } else {
+                        return redirect()->back()->with('error', 'Please Verify Mobile Number');
+                    }
+                }
             }
             if ($file = request()->file('user_image')) {
                 $name = $file->hashName();
@@ -308,7 +332,7 @@ class UserController extends Controller
             }
             $user->save();
             $details->save();
-            return redirect()->back();
+            return redirect()->back()->with('message', 'Profile Updated Successfully');
         }
         $details['email'] = $user['email'];
         $details['mobile'] = $user['mobile'];
@@ -519,5 +543,110 @@ class UserController extends Controller
 
         $data['franchiseCodes'] = $franchiseCodes;
         return view('Dashboard/Franchise/Dashboard/user_add')->with('data', $data);
+    }
+    public function verifymobile(Request $req, $mobile)
+    {
+        $user = User::where('id', '!=', Auth::user()->id)->where('mobile', $mobile)->first();
+        if ($user) {
+            return false;
+        } else {
+            return $this->getMobileOtp($mobile);
+        }
+    }
+
+    public function verifyemail(Request $req, $email)
+    {
+        $user = User::where('id', '!=', Auth::user()->id)->where('email', $email)->first();
+        if ($user) {
+            return false;
+        } else {
+            return $this->getEmailOtp($email);
+        }
+    }
+
+    public function getMobileOtp($mobileNumber)
+    {
+        $time = date('Y-m-d H:i:s', strtotime('-10 minutes'));
+        $otpData = OtpVerifications::where([['type', '=', 'mobile'], ['credential', '=', $mobileNumber], ['created_at', '>', $time]])->first();
+        // send once in only 10 minutes
+        if ($otpData) {
+            $this->returnResponse['message'] = 'You already request an OTP in last 10 minutes. please wait for another attempt.';
+            return json_encode($this->returnResponse);
+        }
+        $otp            = mt_rand(100000, 999999);
+
+        $message    = rawurlencode('Dear user%nYour OTP for sign up to The Gyanology portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nThe Gyanology Team');
+        $sender     = urlencode("GYNLGY");
+        $apikey     = urlencode("MzQ0YzZhMzU2ZTY2NjI0YjU4Mzc0NDMxNmU3MjYzNmM=");
+        $url        = 'https://api.textlocal.in/send/?apikey=' . $apikey . '&numbers=' . $mobileNumber . '&sender=' . $sender . '&message=' . $message;
+
+        $ch         = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response   = curl_exec($ch);
+        curl_close($ch);
+        $response   = json_decode($response);
+        if ($response) {
+            $otpVerifications               = new OtpVerifications;
+            $otpVerifications->type         = 'mobile';
+            $otpVerifications->credential   = $mobileNumber;
+            $otpVerifications->otp          = $otp;
+            $saveToDb                       = $otpVerifications->save();
+
+            if ($saveToDb && $response->status == 'success') {
+                $this->returnResponse['success'] = true;
+            }
+        }
+
+        return $this->returnResponse;
+    }
+
+    public function getEmailOtp($email)
+    {
+        $time = date('Y-m-d H:i:s', strtotime('-10 minutes'));
+        $otpData = OtpVerifications::where([['type', '=', 'email'], ['credential', '=', $email], ['created_at', '>', $time]])->first();
+        // send once in only 10 minutes
+        if ($otpData) {
+            $this->returnResponse['message'] = 'You already request an OTP in last 10 minutes. please wait for another attempt.';
+            return json_encode($this->returnResponse);
+        }
+        $otp            = mt_rand(100000, 999999);
+
+        $details = [
+            'otp' => $otp
+        ];
+
+        // Mail::to($email)->send(new \App\Mail\SendOtpMail($details));
+        try {
+            Mail::raw('Your OTP for The Gyanology is ' . $otp, function ($message) use ($email) {
+                $message->to($email)
+                  ->subject('OTP Verification');
+            });
+        } catch (\Exception $e) {
+            $this->returnResponse['message'] = 'Failed to send OTP. Please try again.';
+             return json_encode($this->returnResponse);
+        }
+
+        $otpVerifications               = new OtpVerifications;
+        $otpVerifications->type         = 'email';
+        $otpVerifications->credential   = $email;
+        $otpVerifications->otp          = $otp;
+        $saveToDb                       = $otpVerifications->save();
+
+        if ($saveToDb) {
+            $this->returnResponse['success'] = true;
+        }
+
+
+        return $this->returnResponse;
+    }
+
+    public function verifyotp($type, $credential, $otp)
+    {
+        $time = date('Y-m-d H:i:s', strtotime('-11 minutes'));
+        $otpData = OtpVerifications::where([['type', '=', $type], ['credential', '=', $credential], ['otp', '=', $otp], ['created_at', '>', $time]])->first();
+        if ($otpData) {
+            return true;
+        }
+        return false;
     }
 }

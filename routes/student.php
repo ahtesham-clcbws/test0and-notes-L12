@@ -22,18 +22,20 @@ Route::name('student.')->group(function () {
             Route::any('/profile', [DashboardController::class, 'profile'])->name('profile');
             Route::get('/verifynumber/{mobile_number}', [DashboardController::class, 'verifynumber'])->name('verifynumber');
             Route::get('/verifyotp/{mobile_number}/{mobile_otp}', [DashboardController::class, 'verifyotp'])->name('verifyotp');
+            Route::get('/verifyemail/{email}', [DashboardController::class, 'verifyemail'])->name('verifyemail');
+            Route::get('/verifyemailotp/{email}/{otp}', [DashboardController::class, 'verifyemailotp'])->name('verifyemailotp');
             Route::post('/manage_profile_process', [DashboardController::class, 'manage_profile_process'])->name('manage_profile_process');
-            
+
             Route::prefix('test')->group(function () {
                 Route::any('', [ExamsController::class, 'index'])->name('dashboard_tests_list');
-                
+
                 Route::any('dashboard_gyanology_list/{cat?}', [ExamsController::class, 'index'])->name('dashboard_gyanology_list');
                 Route::get('{name}', [ExamsController::class, 'getTest'])->name('test-name');
                 Route::get('start-test/{test_id}', [ExamsController::class, 'startTest'])->name('start-test');
                 Route::get('question-paper/{test_id}', [ExamsController::class, 'questionPaper'])->name('question-paper');
                 Route::get('show-result/{student_id}/{test_id}', [ExamsController::class, 'showResult'])->name('show-result');
                 // Route::get('attempt/{student_id}/{test_id}', [ExamsController::class, 'testAttempt'])->name('test-attempt');
-                
+
                 Route::prefix('section')->group(function () {
                     Route::any('question/{test_id}/{section_id}', [ExamsController::class, 'section_questions'])->name('dashboard_test_section_question');
                     Route::any('questionadd/{test_id}/{section_id}', [ExamsController::class, 'section_question_add'])->name('test_section_question_add');

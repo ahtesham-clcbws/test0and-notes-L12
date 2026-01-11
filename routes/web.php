@@ -82,11 +82,11 @@ Route::get('/clear-cache', function () {
 
 Route::redirect('admin', 'administrator', 301);
 
-// Route::view('resetpassword', 'Dashboard/Admin/reset_password');
-// Route::view('resetpassword_student', 'Dashboard/Student/reset_password');
-// Route::view('resetpassword_franchise', 'Dashboard/Franchise/reset_password');
-// Route::view('resetpassword_creater', 'Dashboard/Franchise/Management/Creater/reset_password');
-// Route::view('resetpassword_publisher', 'Dashboard/Franchise/Management/Publisher/reset_password');
+Route::view('resetpassword', 'Dashboard/Admin/reset_password');
+Route::view('resetpassword_student', 'Dashboard/Student/reset_password');
+Route::view('resetpassword_franchise', 'Dashboard/Franchise/reset_password');
+Route::view('resetpassword_creater', 'Dashboard/Franchise/Management/Creater/reset_password');
+Route::view('resetpassword_publisher', 'Dashboard/Franchise/Management/Publisher/reset_password');
 
 Route::post('resetpassword', [AuthController::class, 'resetPwd']);
 

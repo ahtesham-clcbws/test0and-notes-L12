@@ -14,6 +14,8 @@ use App\Models\TestCat;
 use Illuminate\Support\Facades\DB;
 use App\Models\OtpVerifications;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendOtpMail;
 
 class DashboardController extends Controller
 {
@@ -134,6 +136,67 @@ class DashboardController extends Controller
         }
     }
 
+    public function verifyemail(Request $req, $email)
+    {
+        $user = User::where('id', '!=', Auth::user()->id)->where('email', $email)->first();
+        if ($user) {
+            return false;
+        } else {
+            return $this->getEmailOtp($email);
+        }
+    }
+
+    public function getEmailOtp($email)
+    {
+        $time = date('Y-m-d H:i:s', strtotime('-10 minutes'));
+        $otpData = OtpVerifications::where([['type', '=', 'email'], ['credential', '=', $email], ['created_at', '>', $time]])->first();
+        // send once in only 10 minutes
+        if ($otpData) {
+            $this->returnResponse['message'] = 'You already request an OTP in last 10 minutes. please wait for another attempt.';
+            // return json_encode($this->returnResponse);
+        }
+        $otp            = mt_rand(100000, 999999);
+
+        $details = [
+            'otp' => $otp
+        ];
+
+        // Mail::to($email)->send(new \App\Mail\SendOtpMail($details));
+        try {
+            Mail::raw('Your OTP for The Gyanology is ' . $otp, function ($message) use ($email) {
+                $message->to($email)
+                  ->subject('OTP Verification');
+            });
+        } catch (\Exception $e) {
+            $this->returnResponse['message'] = 'Failed to send OTP. Please try again.';
+             return json_encode($this->returnResponse);
+        }
+
+        $otpVerifications               = new OtpVerifications;
+        $otpVerifications->type         = 'email';
+        $otpVerifications->credential   = $email;
+        $otpVerifications->otp          = $otp;
+        $saveToDb                       = $otpVerifications->save();
+
+        if ($saveToDb) {
+            $this->returnResponse['success'] = true;
+        }
+
+
+        return $this->returnResponse;
+    }
+
+    public function verifyemailotp($email, $otp)
+    {
+        $type =  'email';
+        $time = date('Y-m-d H:i:s', strtotime('-11 minutes'));
+        $otpData = OtpVerifications::where([['type', '=', $type], ['credential', '=', $email], ['otp', '=', $otp], ['created_at', '>', $time]])->first();
+        if ($otpData) {
+            return true;
+        }
+        return false;
+    }
+
     public function manage_profile_process(Request $req)
     {
 
@@ -148,7 +211,16 @@ class DashboardController extends Controller
         if ($verifyemail) {
             $req->session()->flash('message', 'This Email Alredy Registred!');
             return redirect()->back();
-        } else
+        }
+
+        if ($req->email != Auth::user()->email) {
+            if ($req->verify_email_check != 1) {
+                $req->session()->flash('message', 'Please Verify Email Address');
+                 return redirect()->back();
+            }
+        }
+
+        // else
             $user = User::find(Auth::user()->id);
         $user->name = $req->name;
         $user->email = $req->email;

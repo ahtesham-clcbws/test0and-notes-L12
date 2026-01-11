@@ -76,7 +76,7 @@
                                                         wire:model="mobile" min="10" placeholder="Mobile number"
                                                         {{ $otpVerificationStatus && $isOtpSend ? ' readonly ' : '' }}>
                                                     <button class="btn theme-bg-dark append text-white" type="button"
-                                                        style="padding:0; width: 90px;" wire:click="getOtp">
+                                                        style="padding:0; width: 90px; {{ $isOtpSend ? ' background-color: #07ad7f !important; ' : '' }}" wire:click="getOtp">
                                                         <span wire:target="getOtp" wire:loading>Sending OTP...</span>
                                                         <span wire:target="getOtp" wire:loading.remove>Get OTP</span>
                                                     </button>
@@ -99,7 +99,7 @@
                                                         placeholder="Input OTP"
                                                         {{ $otpVerificationStatus && $isOtpSend ? ' readonly ' : '' }}>
                                                     <button class="btn theme-bg-dark append text-white" type="button"
-                                                        style="padding:0;width: 90px;" wire:click="verifyOtp">
+                                                        style="padding:0;width: 90px; {{ $otpVerificationStatus && $isOtpSend ? ' background-color: #07ad7f !important; ' : '' }}" wire:click="verifyOtp">
                                                         <span wire:target="verifyOtp" wire:loading>Verifying
                                                             OTP...</span>
                                                         <span wire:target="verifyOtp"
@@ -166,7 +166,7 @@
                                                     wire:model="institute_code" placeholder="Branch Code"
                                                     {{ $institute_name ? ' readonly ' : '' }}>
                                                 <button class="btn theme-bg-dark append text-white" type="button"
-                                                    style="width: 90px;" wire:click="verifyInstitute"
+                                                    style="width: 90px; {{ $institute_name ? ' background-color: #07ad7f !important; ' : '' }}" wire:click="verifyInstitute"
                                                     {{ $institute_name ? ' disabled ' : '' }}>
                                                     <span wire:target="verifyInstitute"
                                                         wire:loading>Verifying...</span>
@@ -205,7 +205,7 @@
                                             type="checkbox" wire:model="required_check_registration">
                                         <label class="checkbox-custom-label" for="required_check_registration">I agree
                                             to The
-                                            gyanology's <a class="theme-cl" href="#">Terms of
+                                            gyanology's <a class="theme-cl" href="{{  route('policy-page', ['terms-and-conditions']) }}">Terms of
                                                 Services</a></label>
                                     </div>
                                     @error('required_check_registration')
@@ -216,6 +216,14 @@
                                 <div class="col-md-12">
                                     <button class="btn btn-sm full-width theme-bg text-white" type="submit"
                                         style="margin-top:10px;margin-bottom:10px;">Register</button>
+                                </div>
+
+                                <div class="col">
+                                    <p class="text-center">
+                                        <a class="modal-title theme-cl pointerCursor" href="{{ route('management_login') }}">
+                                            Already have an account? Login
+                                        </a>
+                                    </p>
                                 </div>
                             </fieldset>
                         </form>
