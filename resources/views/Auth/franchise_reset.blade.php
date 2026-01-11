@@ -3,7 +3,7 @@
 @section('form')
     <div class="card">
         <div class="card-header">
-            <h3>Institute Set Password</h3>
+            <h3>Corporate Set Password</h3>
             <div class="d-flex justify-content-end social_icon">
                 <img src="{{ asset('logos/logo-white-square.png') }}">
             </div>

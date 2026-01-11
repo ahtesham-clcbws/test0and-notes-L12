@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="card-body">
-            <form method="POST" action="" id="loginForm">
+            <form id="loginForm" method="POST" action="">
                 @csrf
                 @error('error')
                     <p class="text-danger"><b>{{ $message }} </b></p>
@@ -19,23 +19,34 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-key"></i></span>
                         </div>
-                        <input type="password" name="password" class="form-control" id="password" placeholder="Password">
+                        <input class="form-control" id="password" name="password" type="password" placeholder="Password">
+                        <div class="input-group-append">
+                            <button class="btn btn-dark togglePassword" type="button" style="width: 42px;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="input-group form-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-key"></i></span>
                         </div>
-                        <input type="password" name="confirm_password" class="form-control" id="confirm_password"
+                        <input class="form-control" id="confirm_password" name="confirm_password" type="password"
                             placeholder="Confirm Password">
+                        <div class="input-group-append">
+                            <button class="btn btn-dark togglePassword" type="button" style="width: 42px;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
                 @else
                     <p class="text-light"><b>Code not matched. Please reset again.</b><br><br>
-                    <a href="{{ route('franchise.login') }}?password_reset">Reset password again?</a><br>
-                    <a href="{{ route('franchise.login') }}">Back to login</a></p>
+                        <a href="{{ route('franchise.login') }}?password_reset">Reset password again?</a><br>
+                        <a href="{{ route('franchise.login') }}">Back to login</a>
+                    </p>
                 @endif
                 @if ($data['success'])
                     <div class="form-group">
-                        <button type="submit" class="btn float-right login_btn">Update</button>
+                        <button class="btn login_btn float-right" type="submit">Update</button>
                     </div>
                 @endif
             </form>
