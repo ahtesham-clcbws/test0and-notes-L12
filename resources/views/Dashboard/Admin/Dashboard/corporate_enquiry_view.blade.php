@@ -12,18 +12,19 @@
                         </div>
 
                         <div>
-                            <h5>{{ $data['status'] == 'new' || $data['status'] == 'rejected' || $data['status'] == 'expired' ? 'Created on:  '.date('d M Y', strtotime($data['created_at'])) : 'Branch Code:  '.$data['branch_code'] }}</h5>
+                            <h5>{{ $data['status'] == 'new' || $data['status'] == 'rejected' || $data['status'] == 'expired' ? 'Created on:  ' . date('d M Y', strtotime($data['created_at'])) : 'Branch Code:  ' . $data['branch_code'] }}
+                            </h5>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="col-md-12">
                             <div class="table-responsive">
-                                <table class="table table-bordered table-hover">
+                                <table class="table-bordered table-hover table">
                                     <tbody>
                                         <tr>
                                             <td colspan="2"><b>Name</b></td>
                                             <td class="information-txt">{{ $data['name'] }}</td>
-                                            <td rowspan="2" class="userImageCell">
+                                            <td class="userImageCell" rowspan="2">
                                                 {{-- @if ($data['status'] == 'converted' || $data['status'] == 'activated' || $data['status'] == 'expired' || $data['status'] == 'banned')
                                                 <img id="profile_img"
                                                     src="{{ $data['details']['image'] ? '/storage/'.$data['details']['image'] : asset('noimg.png') }}"
@@ -33,14 +34,18 @@
                                                     src="{{ $data['photoUrl'] ? '/storage/'.$data['photoUrl'] : asset('noimg.png') }}"
                                                     style="width:80px;height:80px;border:1px solid #c2c2c2;  ">
                                                 @endif --}}
-                                                @if ($data['status'] == 'converted' || $data['status'] == 'activated' || $data['status'] == 'expired' || $data['status'] == 'banned')
-                                                <img id="profile_img"
-                                                    src="{{ $data['photoUrl'] ? '/storage/'.$data['photoUrl'] : asset('noimg.png') }}"
-                                                    style="width:80px;height:80px;border:1px solid #c2c2c2;  ">
+                                                @if (
+                                                    $data['status'] == 'converted' ||
+                                                        $data['status'] == 'activated' ||
+                                                        $data['status'] == 'expired' ||
+                                                        $data['status'] == 'banned')
+                                                    <img id="profile_img"
+                                                        src="{{ $data['photoUrl'] ? '/storage/' . $data['photoUrl'] : asset('noimg.png') }}"
+                                                        style="width:80px;height:80px;border:1px solid #c2c2c2;  ">
                                                 @else
-                                                <img id="profile_img"
-                                                    src="{{ $data['photoUrl'] ? '/storage/'.$data['photoUrl'] : asset('noimg.png') }}"
-                                                    style="width:80px;height:80px;border:1px solid #c2c2c2;  ">
+                                                    <img id="profile_img"
+                                                        src="{{ $data['photoUrl'] ? '/storage/' . $data['photoUrl'] : asset('noimg.png') }}"
+                                                        style="width:80px;height:80px;border:1px solid #c2c2c2;  ">
                                                 @endif
                                             </td>
                                         </tr>
@@ -89,37 +94,43 @@
                                         <tr>
                                             <td colspan="2"><b>Action</b></td>
                                             <td colspan="2">
-                                                @if ($data['status'] == 'new' || $data['status'] == 'approved' || $data['status'] == 'pending' || $data['status'] == 'banned')
-                                                    <button type="button" class="btn btn-link text-danger action-button"
+                                                @if (
+                                                    $data['status'] == 'new' ||
+                                                        $data['status'] == 'approved' ||
+                                                        $data['status'] == 'pending' ||
+                                                        $data['status'] == 'banned')
+                                                    <button class="btn btn-link text-danger action-button" type="button"
                                                         onclick="showReject()">Reject</button>
                                                 @endif
                                                 @if ($data['status'] == 'activated')
-                                                    <button type="button" class="btn btn-link text-danger action-button">Banned</button>
+                                                    <button class="btn btn-link text-danger action-button"
+                                                        type="button">Banned</button>
                                                 @endif
-                                                @if ($data['status'] == 'new' || $data['status'] == 'rejected' || $data['status'] == 'expired' || $data['status'] == 'banned')
-                                                    <button type="button" class="btn btn-link action-button"
-                                                        onclick="showPending()" style="color: #F48134;">Pending</button>
+                                                @if (
+                                                    $data['status'] == 'new' ||
+                                                        $data['status'] == 'rejected' ||
+                                                        $data['status'] == 'expired' ||
+                                                        $data['status'] == 'banned')
+                                                    <button class="btn btn-link action-button" type="button"
+                                                        style="color: #F48134;" onclick="showPending()">Pending</button>
                                                 @endif
                                                 @if ($data['status'] == 'new')
-                                                    <button type="button" class="btn btn-link text-success action-button"
+                                                    <button class="btn btn-link text-success action-button" type="button"
                                                         onclick="showApproved()">Approve</button>
                                                 @endif
-                                                <button type="button" class="btn btn-link text-info action-button"
+                                                <button class="btn btn-link text-info action-button" type="button"
                                                     onclick="showReply()">Reply</button>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td colspan="2"><b>Status</b></td>
-                                            <td @if ($data['status'] == 'new')
-                                                class="bg-info"
-                                            @elseif($data['status'] == 'approved' || $data['status'] == 'converted' ||
-                                                $data['status'] == 'activated')
+                                            <td @if ($data['status'] == 'new') class="bg-info"
+                                            @elseif($data['status'] == 'approved' || $data['status'] == 'converted' || $data['status'] == 'activated')
                                                 class="bg-success"
                                             @elseif($data['status'] == 'rejected' || $data['status'] == 'expired')
                                                 class="bg-danger"
                                             @else
-                                                class="bg-warning"
-                                                @endif
+                                                class="bg-warning" @endif
                                                 colspan="2">
                                                 <span class="text-white">{{ Str::ucfirst($data['status']) }}</span>
                                             </td>
@@ -130,19 +141,21 @@
                                                 {{ $data['established_year'] }}
                                             </td>
                                         </tr>
-                                        @if($data['institute_images_pdf'])
-                                        <tr>
-                                            <td colspan="2"><b>Institute Images PDF</b></td>
-                                            <td colspan="2">
-                                                <a href="{{ asset('storage/' . $data['institute_images_pdf']) }}" target="_blank">View PDF</a>
-                                            </td>
-                                        </tr>
+                                        @if ($data['institute_images_pdf'])
+                                            <tr>
+                                                <td colspan="2"><b>Institute Images PDF</b></td>
+                                                <td colspan="2">
+                                                    <a href="{{ asset('storage/' . $data['institute_images_pdf']) }}"
+                                                        target="_blank">View PDF</a>
+                                                </td>
+                                            </tr>
                                         @endif
                                         <tr>
                                             <td colspan="2"><b>Branch Code</b></td>
                                             <td colspan="2">
-                                                {{ $data['status'] == 'approved' || $data['status'] == 'converted' ||
-                                                $data['status'] == 'activated' ? $data['branch_code'] : '' }}
+                                                {{ $data['status'] == 'approved' || $data['status'] == 'converted' || $data['status'] == 'activated'
+                                                    ? $data['branch_code']
+                                                    : '' }}
                                             </td>
                                         </tr>
                                         <tr>
@@ -172,7 +185,7 @@
                             </div>
                         </div>
                         <div class="mid-content">
-                            <textarea id="reply-message" name="type" id="" cols="30" rows="10"></textarea>
+                            <textarea id="reply-message" id="" name="type" cols="30" rows="10"></textarea>
                         </div>
                         <div class="control-area">
                             <button class="btn btn-danger" onclick="closeBox()">Close</button>
@@ -193,7 +206,7 @@
                             </div>
                         </div>
                         <div class="mid-content">
-                            <textarea id="approved-message" name="type" id="" cols="30"rows="10">Please use this {{ $data['branch_code'] }} branch code, to signup so we can go further on your request.
+                            <textarea id="approved-message" id="" name="type" cols="30"rows="10">Please use this {{ $data['branch_code'] }} branch code, to signup so we can go further on your request.
                             </textarea>
                         </div>
                         <div class="control-area">
@@ -215,7 +228,7 @@
                             </div>
                         </div>
                         <div class="mid-content">
-                            <textarea id="reject-message" name="type" id="" cols="30" rows="10">We are sorry to inform you that your business request is rejected by our Authorisation Team.
+                            <textarea id="reject-message" id="" name="type" cols="30" rows="10">We are sorry to inform you that your business request is rejected by our Authorisation Team.
                                 The rejection was made, due to insufficient/wrong information while physical inspection by the authorisation
                                 team.</textarea>
                         </div>
@@ -238,7 +251,7 @@
                             </div>
                         </div>
                         <div class="mid-content">
-                            <textarea id="pending-message" name="type" id="" cols="30" rows="10"></textarea>
+                            <textarea id="pending-message" id="" name="type" cols="30" rows="10"></textarea>
                         </div>
                         <div class="control-area">
                             <button class="btn btn-danger" onclick="closeBox()">Close</button>
@@ -247,7 +260,11 @@
                     </div>
                 </div>
 
-                @if ($data['status'] == 'converted' || $data['status'] == 'activated' || $data['status'] == 'expired' || $data['status'] == 'banned')
+                @if (
+                    $data['status'] == 'converted' ||
+                        $data['status'] == 'activated' ||
+                        $data['status'] == 'expired' ||
+                        $data['status'] == 'banned')
                     <form class="card" id="reply-hidden">
                         <div class="card-header" style="background-color:#19467a; color: #fff;">
                             <h5>Set Franchise Type/Role/Subscription</h5>
@@ -265,7 +282,7 @@
                                         <i class="bi bi-briefcase-fill"></i>
                                     </span>
                                     <div class="dropdown" data-control="checkbox-dropdown">
-                                        <label id="label1" class="dropdown-label">Select</label>
+                                        <label class="dropdown-label" id="label1">Select</label>
 
                                         <div class="dropdown-list">
 
@@ -280,30 +297,30 @@
                                             </label> --}}
 
                                             <label class="dropdown-option">
-                                                <input type="checkbox" class="franchise_type" name="type[]"
-                                                    {{ $data['compitition_franchise'] ? 'checked' : '' }}
-                                                    value="compitition_franchise" />
+                                                <input class="franchise_type" name="type[]" type="checkbox"
+                                                    value="compitition_franchise"
+                                                    {{ $data['compitition_franchise'] ? 'checked' : '' }} />
                                                 Competition Franchise
                                             </label>
 
                                             <label class="dropdown-option">
-                                                <input type="checkbox" class="franchise_type" name="type[]"
-                                                    {{ $data['academics_franchise'] ? 'checked' : '' }}
-                                                    value="academics_franchise" />
+                                                <input class="franchise_type" name="type[]" type="checkbox"
+                                                    value="academics_franchise"
+                                                    {{ $data['academics_franchise'] ? 'checked' : '' }} />
                                                 Academics Franchise
                                             </label>
 
                                             <label class="dropdown-option">
-                                                <input type="checkbox" class="franchise_type" name="type[]"
-                                                    {{ $data['school_franchise'] ? 'checked' : '' }}
-                                                    value="school_franchise" />
+                                                <input class="franchise_type" name="type[]" type="checkbox"
+                                                    value="school_franchise"
+                                                    {{ $data['school_franchise'] ? 'checked' : '' }} />
                                                 School Franchise
                                             </label>
 
                                             <label class="dropdown-option">
-                                                <input type="checkbox" class="franchise_type" name="type[]"
-                                                    {{ $data['other_franchise'] ? 'checked' : '' }}
-                                                    value="other_franchise" />
+                                                <input class="franchise_type" name="type[]" type="checkbox"
+                                                    value="other_franchise"
+                                                    {{ $data['other_franchise'] ? 'checked' : '' }} />
                                                 Other Franchise
                                             </label>
 
@@ -323,12 +340,12 @@
                                     <span class="input-group-text" id="addon-wrapping"><i
                                             class="bi bi-gear-fill"></i></span>
                                     <div class="dropdown" data-control="checkbox-dropdown">
-                                        <label id="label2" class="dropdown-label">Select</label>
+                                        <label class="dropdown-label" id="label2">Select</label>
 
                                         <div class="dropdown-list">
-                                            <label for="" class="dropdown-option">
-                                                <input type="checkbox" value="Selection 0" data-toggle="check-all" />
-                                                <a href="#" data-toggle="check-all" class="dropdown-option"
+                                            <label class="dropdown-option" for="">
+                                                <input data-toggle="check-all" type="checkbox" value="Selection 0" />
+                                                <a class="dropdown-option" data-toggle="check-all" href="#"
                                                     style="margin-left: -12px;
                                                                                                                             color: #19467a;
                                                                                                                             margin-top: -4px;">
@@ -337,35 +354,35 @@
                                             </label>
 
                                             <label class="dropdown-option">
-                                                <input type="checkbox" class="franchise_role" name="role[]"
+                                                <input class="franchise_role" name="role[]" type="checkbox"
                                                     value="franchise_manager"
                                                     {{ $data['franchise_manager'] ? 'checked' : '' }} />
                                                 Manager
                                             </label>
 
                                             <label class="dropdown-option">
-                                                <input type="checkbox" class="franchise_role" name="role[]"
+                                                <input class="franchise_role" name="role[]" type="checkbox"
                                                     value="franchise_creator"
                                                     {{ $data['franchise_creator'] ? 'checked' : '' }} />
                                                 Creator
                                             </label>
 
                                             <label class="dropdown-option">
-                                                <input type="checkbox" class="franchise_role" name="role[]"
+                                                <input class="franchise_role" name="role[]" type="checkbox"
                                                     value="franchise_publisher"
                                                     {{ $data['franchise_publisher'] ? 'checked' : '' }} />
                                                 Publisher
                                             </label>
 
                                             <label class="dropdown-option">
-                                                <input type="checkbox" class="franchise_role" name="role[]"
+                                                <input class="franchise_role" name="role[]" type="checkbox"
                                                     value="franchise_verifier"
                                                     {{ $data['franchise_verifier'] ? 'checked' : '' }} />
                                                 Verifier
                                             </label>
 
                                             <label class="dropdown-option">
-                                                <input type="checkbox" class="franchise_role" name="role[]"
+                                                <input class="franchise_role" name="role[]" type="checkbox"
                                                     value="franchise_reviewer"
                                                     {{ $data['franchise_reviewer'] ? 'checked' : '' }} />
                                                 Reviewer
@@ -388,36 +405,39 @@
                                                 class="bi bi-clock-fill"></i></label>
                                         <select class="form-select" id="inputGroupSelect01" name="days"
                                             data-style="btn-new">
-                                            <option {{ $data['selectedDays'] == 0 ? 'selected' : '' }} value="0">No subscription
+                                            <option value="0" {{ $data['selectedDays'] == 0 ? 'selected' : '' }}>No
+                                                subscription
                                             </option>
-                                            <option {{ $data['selectedDays'] == 3 ? 'selected' : '' }} value="3">3 days
-                                            </option>
-                                            <option {{ $data['selectedDays'] == 7 ? 'selected' : '' }} value="7">7 days
-                                            </option>
-                                            <option {{ $data['selectedDays'] == 15 ? 'selected' : '' }} value="15">15
+                                            <option value="3" {{ $data['selectedDays'] == 3 ? 'selected' : '' }}>3
                                                 days
                                             </option>
-                                            <option {{ $data['selectedDays'] == 30 ? 'selected' : '' }} value="30">30
+                                            <option value="7" {{ $data['selectedDays'] == 7 ? 'selected' : '' }}>7
                                                 days
                                             </option>
-                                            <option {{ $data['selectedDays'] == 60 ? 'selected' : '' }} value="60">60
+                                            <option value="15" {{ $data['selectedDays'] == 15 ? 'selected' : '' }}>15
                                                 days
                                             </option>
-                                            <option {{ $data['selectedDays'] == 90 ? 'selected' : '' }} value="90">3
+                                            <option value="30" {{ $data['selectedDays'] == 30 ? 'selected' : '' }}>30
+                                                days
+                                            </option>
+                                            <option value="60" {{ $data['selectedDays'] == 60 ? 'selected' : '' }}>60
+                                                days
+                                            </option>
+                                            <option value="90" {{ $data['selectedDays'] == 90 ? 'selected' : '' }}>3
                                                 months
                                             </option>
-                                            <option {{ $data['selectedDays'] == 120 ? 'selected' : '' }} value="120">4
+                                            <option value="120" {{ $data['selectedDays'] == 120 ? 'selected' : '' }}>4
                                                 months</option>
-                                            <option {{ $data['selectedDays'] == 150 ? 'selected' : '' }} value="150">5
+                                            <option value="150" {{ $data['selectedDays'] == 150 ? 'selected' : '' }}>5
                                                 months</option>
-                                            <option {{ $data['selectedDays'] == 180 ? 'selected' : '' }} value="180">6
+                                            <option value="180" {{ $data['selectedDays'] == 180 ? 'selected' : '' }}>6
                                                 months</option>
-                                            <option {{ $data['selectedDays'] == 270 ? 'selected' : '' }} value="270">9
+                                            <option value="270" {{ $data['selectedDays'] == 270 ? 'selected' : '' }}>9
                                                 months</option>
-                                            <option {{ $data['selectedDays'] == 365 ? 'selected' : '' }} value="365">1
+                                            <option value="365" {{ $data['selectedDays'] == 365 ? 'selected' : '' }}>1
                                                 year
                                             </option>
-                                            <option {{ $data['selectedDays'] == 730 ? 'selected' : '' }} value="730">2
+                                            <option value="730" {{ $data['selectedDays'] == 730 ? 'selected' : '' }}>2
                                                 year
                                             </option>
                                         </select>
@@ -436,7 +456,7 @@
                                     <div class="input-group flex-nowrap">
                                         <span class="input-group-text" id="addon-wrapping"><i
                                                 class="bi bi-person-fill"></i></span>
-                                        <input type="text" name="name" class="form-control"
+                                        <input class="form-control" name="name" type="text"
                                             value="{{ $data['user']->name }}" placeholder="Person name">
                                     </div>
                                 </div>
@@ -453,7 +473,7 @@
                                     <div class="input-group flex-nowrap">
                                         <span class="input-group-text" id="addon-wrapping"><i
                                                 class="bi bi-mortarboard-fill"></i></span>
-                                        <input type="text" name="institute_name" class="form-control"
+                                        <input class="form-control" name="institute_name" type="text"
                                             value="{{ $data['details']->institute_name }}" placeholder="Institute name">
                                     </div>
                                 </div>
@@ -470,8 +490,8 @@
                                     <div class="input-group flex-nowrap">
                                         <span class="input-group-text" id="addon-wrapping"><i
                                                 class="bi bi-phone-fill"></i></span>
-                                        <input type="number" class="form-control" placeholder="Mobile number"
-                                            value="{{ $data['user']->mobile }}" name="mobile">
+                                        <input class="form-control" name="mobile" type="number"
+                                            value="{{ $data['user']->mobile }}" placeholder="Mobile number">
                                     </div>
                                 </div>
                             </div>
@@ -487,8 +507,8 @@
                                     <div class="input-group flex-nowrap">
                                         <span class="input-group-text" id="addon-wrapping"><i
                                                 class="bi bi-envelope-fill"></i></span>
-                                        <input type="email" class="form-control" value="{{ $data['user']->email }}"
-                                            placeholder="E-mail" name="email">
+                                        <input class="form-control" name="email" type="email"
+                                            value="{{ $data['user']->email }}" placeholder="E-mail">
                                     </div>
                                 </div>
                             </div>
@@ -504,8 +524,8 @@
                                     <div class="input-group flex-nowrap">
                                         <span class="input-group-text" id="addon-wrapping"><i
                                                 class="bi bi-key-fill"></i></span>
-                                        <input type="password" class="form-control" placeholder="Password"
-                                            name="password">
+                                        <input class="form-control" name="password" type="password"
+                                            placeholder="Password">
                                     </div>
                                 </div>
                             </div>
@@ -521,8 +541,8 @@
                                     <div class="input-group flex-nowrap">
                                         <span class="input-group-text" id="addon-wrapping"><i
                                                 class="bi bi-house-fill"></i></span>
-                                        <input type="text" class="form-control" placeholder="Institute code"
-                                            value="{{ $data['details']->branch_code }}" name="branch_code">
+                                        <input class="form-control" name="branch_code" type="text"
+                                            value="{{ $data['details']->branch_code }}" placeholder="Institute code">
                                     </div>
                                 </div>
                             </div>
@@ -538,14 +558,13 @@
                                     <div class="input-group flex-nowrap">
                                         <span class="input-group-text" id="addon-wrapping"><i
                                                 class="bi bi-compass-fill"></i></span>
-                                        <input type="password" class="form-control" placeholder="Required box">
+                                        <input class="form-control" type="password" placeholder="Required box">
                                     </div>
                                 </div>
                             </div>
 
-
                             <div class="row">
-                                <div class="d-flex mb-2 col-md-6">
+                                <div class="d-flex col-md-6 mb-2">
 
                                     <label class="box-heading text-end">
                                         Submit Content
@@ -557,19 +576,19 @@
                                             <label class="input-group-text" for="inputGroupSelect02"><i
                                                     class="bi bi-intersect"></i></label>
                                             <select class="form-select" id="inputGroupSelect02" name="submit_content">
-                                                <option
-                                                    {{ isset($data['details']) && $data['details']['submit_content'] == 0 ? 'selected' : '' }}
-                                                    value="0">No
+                                                <option value="0"
+                                                    {{ isset($data['details']) && $data['details']['submit_content'] == 0 ? 'selected' : '' }}>
+                                                    No
                                                 </option>
-                                                <option
-                                                    {{ isset($data['details']) && $data['details']['submit_content'] == 1 ? 'selected' : '' }}
-                                                    value="1">Yes
+                                                <option value="1"
+                                                    {{ isset($data['details']) && $data['details']['submit_content'] == 1 ? 'selected' : '' }}>
+                                                    Yes
                                                 </option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="d-flex mb-2 col-md-6">
+                                <div class="d-flex col-md-6 mb-2">
 
                                     <label class="box-heading text-end">
                                         Publish Content
@@ -581,14 +600,19 @@
                                             <label class="input-group-text" for="inputGroupSelect02"><i
                                                     class="bi bi-intersect"></i></label>
                                             <select class="form-select" id="inputGroupSelect02" name="allowed_to_upload">
-                                                <option
-                                                    {{ isset($data['details']) && $data['details']['allowed_to_upload'] == 0 ? 'selected' : '' }}
-                                                    value="0">No
-                                                </option>
-                                                <option
-                                                    {{ isset($data['details']) && $data['details']['allowed_to_upload'] == 1 ? 'selected' : '' }}
-                                                    value="1">Yes
-                                                </option>
+                                                @if ($data['status'] == 'new' || $data['status'] == 'converted')
+                                                    <option value="0">No</option>
+                                                    <option value="1">Yes</option>
+                                                @else
+                                                    <option value="0"
+                                                        {{ isset($data['details']) && $data['details']['allowed_to_upload'] == 0 ? 'selected' : '' }}>
+                                                        No
+                                                    </option>
+                                                    <option value="1"
+                                                        {{ isset($data['details']) && $data['details']['allowed_to_upload'] == 1 ? 'selected' : '' }}>
+                                                        Yes
+                                                    </option>
+                                                @endif
                                             </select>
                                         </div>
                                     </div>
@@ -596,7 +620,7 @@
                             </div>
 
                             <div class="row">
-                                <div class="d-flex mb-2 col-md-6">
+                                <div class="d-flex col-md-6 mb-2">
 
                                     <label class="box-heading text-end">
                                         Create Package
@@ -607,20 +631,21 @@
                                         <div class="input-group" style="margin-left:25px;">
                                             <label class="input-group-text" for="inputGroupSelect02"><i
                                                     class="bi bi-intersect"></i></label>
-                                            <select class="form-select" id="inputGroupSelect02" name="allowed_to_package">
-                                                <option
-                                                    {{ isset($data['details']) && $data['details']['allowed_to_package'] == 0 ? 'selected' : '' }}
-                                                    value="0">No
+                                            <select class="form-select" id="inputGroupSelect02"
+                                                name="allowed_to_package">
+                                                <option value="0"
+                                                    {{ isset($data['details']) && $data['details']['allowed_to_package'] == 0 ? 'selected' : '' }}>
+                                                    No
                                                 </option>
-                                                <option
-                                                    {{ isset($data['details']) && $data['details']['allowed_to_package'] == 1 ? 'selected' : '' }}
-                                                    value="1">Yes
+                                                <option value="1"
+                                                    {{ isset($data['details']) && $data['details']['allowed_to_package'] == 1 ? 'selected' : '' }}>
+                                                    Yes
                                                 </option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="d-flex mb-2 col-md-6">
+                                <div class="d-flex col-md-6 mb-2">
 
                                     <label class="box-heading text-end">
                                         Add Package
@@ -632,14 +657,14 @@
                                             <label class="input-group-text" for="inputGroupSelect02"><i
                                                     class="bi bi-intersect"></i></label>
                                             <select class="form-select" id="inputGroupSelect02" name="add_package">
-                                                <option
-                                                    {{ isset($data['details']) && $data['details']['add_package'] == 0 ? 'selected' : '' }}
-                                                    value="0">No
+                                                <option value="0"
+                                                    {{ isset($data['details']) && $data['details']['add_package'] == 0 ? 'selected' : '' }}>
+                                                    No
                                                 </option>
-                                                <option
+                                                {{-- <option
                                                     {{ isset($data['details']) && $data['details']['add_package'] == 1 ? 'selected' : '' }}
                                                     value="1">Yes
-                                                </option>
+                                                </option> --}}
                                             </select>
                                         </div>
                                     </div>
@@ -659,10 +684,11 @@
                                                 class="bi bi-person-badge-fill"></i></label>
                                         <select class="form-select" id="inputGroupSelect03" name="status">
                                             <!-- <option selected>Select Option</option> -->
-                                            <option {{ $data['user']['status'] == 'inactive' ? 'selected' : '' }}
-                                                value="inactive">
+                                            <option value="inactive"
+                                                {{ $data['user']['status'] == 'inactive' ? 'selected' : '' }}>
                                                 Inactive</option>
-                                            <option {{ $data['user']['status'] == 'active' ? 'selected' : '' }} value="active">
+                                            <option value="active"
+                                                {{ $data['user']['status'] == 'active' ? 'selected' : '' }}>
                                                 Active</option>
                                         </select>
                                     </div>
@@ -685,19 +711,19 @@
             </div>
             <div class="col-md-6 d-none">
                 <div class="table-responsive">
-                    <table class="table table-bordered border-primary corporate-table">
+                    <table class="table-bordered border-primary corporate-table table">
                         <tbody>
                             <tr>
                                 <th>Actions</th>
                                 <td>
                                     @if ($data['status'] == 'new')
-                                        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
-                                            data-bs-target="#approveBox">Ok</button>
+                                        <button class="btn btn-sm btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#approveBox" type="button">Ok</button>
                                     @endif
-                                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                        data-bs-target="#rejectBox">Reject</button>
-                                    <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
-                                        data-bs-target="#replyBox">Reply</button>
+                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#rejectBox" type="button">Reject</button>
+                                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                        data-bs-target="#replyBox" type="button">Reply</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -706,12 +732,12 @@
             </div>
         </div>
     </section>
-    <div class="toast align-items-center text-white border-0 position-absolute bottom-0 end-0 mb-3" data-delay="5000"
-        role="alert" aria-live="assertive" aria-atomic="true" id="responseToast">
+    <div class="toast align-items-center position-absolute bottom-0 end-0 mb-3 border-0 text-white" id="responseToast"
+        data-delay="5000" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
             <div class="toast-body" id="responseToastMessage">
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+            <button class="btn-close btn-close-white m-auto me-2" data-bs-dismiss="toast" type="button"
                 aria-label="Close"></button>
         </div>
     </div>
@@ -1072,7 +1098,6 @@
         .action-button:not(:last-shild):after {
             content: " | "
         }
-
     </style>
 @endsection
 @section('javascript')
@@ -1189,7 +1214,7 @@
                 showToast(response['message'], myClass);
                 message.val('');
                 closeMessage(message, loader);
-                   setTimeout(() => {
+                setTimeout(() => {
                     location.reload();
                 }, 500);
             }).fail(function(err) {
@@ -1236,9 +1261,9 @@
                 console.log(data);
                 const response = JSON.parse(data);
                 showToast(response['message'], 'bg-' + response['type']);
-                setTimeout(() => {
+                // setTimeout(() => {
                     location.reload();
-                }, 3000);
+                // }, 3000);
                 // return;
             }).fail(function(data) {
                 showToast('Server error, please try again later.', 'bg-danger');
@@ -1399,5 +1424,4 @@
 
         });
     </script>
-
 @endsection
