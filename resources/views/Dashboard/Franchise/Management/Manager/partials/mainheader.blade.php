@@ -263,7 +263,7 @@
                 </div>
                 <ul>
                     <li>
-                        <a href="{{ route('franchise.panel_profile') }}"><i class="bi bi-person"></i> <span>
+                        <a href="{{ route('franchise.management.panel_profile') }}"><i class="bi bi-person"></i> <span>
                             Profile</span></a>
                     </li>
                     <li>

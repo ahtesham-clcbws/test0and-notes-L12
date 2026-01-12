@@ -12,8 +12,8 @@
     <section class="content admin-1">
         <div class="card">
             <div class="card-body">
-               
-               
+
+
                     <form  id="uploadImage" enctype="multipart/form-data" method="post">
                         @csrf
                         <div class="row">
@@ -23,7 +23,7 @@
                             <input name="user_image" class="form-control" accept="image/jpeg,image/jpg" type="file"
                                 onchange="avatarPreview(event)">
                             <img class="w-100 mb-2" id="user_profile_image"
-                                src="{{ isset($user['details']) && $user['details']['photo_url'] ? '/storage/' . $user['details']['photo_url'] : asset('noimg.png') }}">
+                                src="{{ !empty($user['details']['photo_url']) ? '/storage/' . $user['details']['photo_url'] : asset('noimg.png') }}">
                         </div>
                         </div>
                         <div class="col-md-4">
@@ -47,13 +47,13 @@
                             <div class="col-md-4">
                                 <button class="btn btn-success" type="submit" id="imageSaveButton" >
                                     Update Profile Details
-                                </button> 
+                                </button>
                             </div>
                         </div>
-                        
+
                     </form>
-                    
-               
+
+
             </div>
         </div>
     </section>

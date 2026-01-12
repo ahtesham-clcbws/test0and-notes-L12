@@ -72,6 +72,10 @@ Route::name('franchise.')->group(function () {
                 Route::prefix('profile')->group(function () {
                     Route::any('', [UserController::class, 'myProfile'])->name('panel_profile');
                     // Route::any('', [UserController::class,'myProfile_creater_publisher'])->name('panelprofile');
+
+                    Route::get('/verifymobile/{mobile}', [UserController::class, 'verifymobile'])->name('verifymobile');
+                    Route::get('/verifyemail/{email}', [UserController::class, 'verifyemail'])->name('verifyemail');
+                    Route::get('/verifyotp/{type}/{credential}/{otp}', [UserController::class, 'verifyotp'])->name('verifyotp');
                 });
 
                 Route::name('publisher.')->group(function () {

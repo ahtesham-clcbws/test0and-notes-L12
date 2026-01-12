@@ -275,8 +275,14 @@ class UserController extends Controller
         if($user['roles'] == 'franchise'){
             $details = FranchiseDetails::where('user_id', $id)->first();
         }
-        if($user['roles'] == 'creator' || $user['roles'] == 'publisher'){
+        if($user['roles'] == 'creator' || $user['roles'] == 'publisher' || $user['roles'] == 'manager' || $user['roles'] == 'verifier' || $user['roles'] == 'reviewer'){
             $details = UserDetails::where('user_id', $id)->first();
+            if (!$details) {
+                $detailsDb = new UserDetails();
+                $detailsDb->user_id = $id;
+                $detailsDb->save();
+                $details = UserDetails::where('user_id', $id)->first();
+            }
         }
 
         if (request()->isMethod('post')) {
@@ -338,13 +344,19 @@ class UserController extends Controller
         $details['mobile'] = $user['mobile'];
         $user['details'] = $details;
 
-        if($user['roles'] == 'franchise'){
+        if(strpos($user['roles'], 'franchise') !== false){
             return view('Dashboard/Franchise/Settings/profile')->with('user', $user);
         }
 
-        if($user['roles'] == 'creator' || $user['roles'] == 'publisher'){
+        if(strpos($user['roles'], 'creator') !== false || strpos($user['roles'], 'publisher') !== false){
             return view('Dashboard/Franchise/Settings/profile_creater')->with('user', $user);
         }
+
+        if(strpos($user['roles'], 'manager') !== false || strpos($user['roles'], 'verifier') !== false || strpos($user['roles'], 'reviewer') !== false){
+            return view('Dashboard/Franchise/Settings/profile_manager')->with('user', $user);
+        }
+
+        return view('Dashboard/Franchise/Settings/profile_manager')->with('user', $user);
     }
 
     public function myProfile_creater_publisher()

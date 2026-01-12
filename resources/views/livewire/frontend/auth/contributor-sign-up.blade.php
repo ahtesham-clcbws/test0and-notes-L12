@@ -78,7 +78,7 @@
                                                     <button class="btn theme-bg-dark append text-white" type="button"
                                                         style="padding:0; width: 90px; {{ $isOtpSend ? ' background-color: #07ad7f !important; ' : '' }}" wire:click="getOtp">
                                                         <span wire:target="getOtp" wire:loading>Sending OTP...</span>
-                                                        <span wire:target="getOtp" wire:loading.remove>Get OTP</span>
+                                                        <span wire:target="getOtp" wire:loading.remove>{{ $isOtpSend ? 'Sent OTP' : 'Get OTP' }}</span>
                                                     </button>
                                                 </div>
                                                 @error('mobile')
@@ -205,7 +205,7 @@
                                             type="checkbox" wire:model="required_check_registration">
                                         <label class="checkbox-custom-label" for="required_check_registration">I agree
                                             to The
-                                            gyanology's <a class="theme-cl" href="{{  route('policy-page', ['terms-and-conditions']) }}">Terms of
+                                            gyanology's <a class="theme-cl" target="_target" href="{{  route('policy-page', ['terms-and-conditions']) }}">Terms of
                                                 Services</a></label>
                                     </div>
                                     @error('required_check_registration')
