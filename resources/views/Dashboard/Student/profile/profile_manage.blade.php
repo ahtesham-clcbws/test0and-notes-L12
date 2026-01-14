@@ -101,35 +101,23 @@
         </form>
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         function sendOtp() {
             var old_mobile_number = document.getElementById('old_mobile_number').value;
             var mobile_number = document.getElementById('mobile_number').value;
             if (old_mobile_number == mobile_number) {
-                Swal.fire('Mobile Number Already Updated!')
+                alert('Mobile Number Already Updated!');
             } else {
-                let timerInterval;
-                Swal.fire({
-                    title: 'Wait...',
-                    timerProgressBar: true,
-                    didOpen: () => {
-                        Swal.showLoading();
-                        const b = Swal.getHtmlContainer().querySelector('b');
-                        timerInterval = setInterval(() => {
-                            b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
-                        }, 1000);
-                    },
-                });
                 $.get("/student/verifynumber/" + mobile_number, function(data) {
-                    clearInterval(timerInterval);
                     if (data == false) {
-                        Swal.fire('Mobile Number Already Registered!')
-                    } else {
-                        Swal.fire('Otp Sent!');
+                        alert('Mobile Number Already Registered!');
+                    } else if (data.success) {
+                        alert('Otp Sent!');
                         $(".sendOtp").attr('disabled', '');
                         $(".verifyOtp").removeAttr('disabled', '');
+                    } else {
+                        alert(data.message || 'Failed to send OTP');
                     }
                 });
             }
@@ -140,26 +128,13 @@
             var mobile_number = document.getElementById('mobile_number').value;
             var mobile_otp = document.getElementById('mobile_otp').value;
 
-            let timerInterval;
-            Swal.fire({
-                title: 'Wait...',
-                timerProgressBar: true,
-                didOpen: () => {
-                    Swal.showLoading();
-                    const b = Swal.getHtmlContainer().querySelector('b');
-                    timerInterval = setInterval(() => {
-                        b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
-                    }, 1000);
-                },
-            });
             $.get("/student/verifyotp/" + mobile_number + "/" + mobile_otp, function(data) {
-                clearInterval(timerInterval);
                 if (data == true) {
-                    Swal.fire('Otp Verified!');
+                    alert('Otp Verified!');
                     $(".verifyOtp").attr('disabled', '');
                     document.getElementById('verify_check').value = '1';
                 } else {
-                    Swal.fire('Please Enter Valid Otp');
+                    alert('Please Enter Valid Otp');
                 }
             });
         }
@@ -230,28 +205,17 @@
             var old_email = document.getElementById('old_email').value;
             var email = document.getElementById('email_new').value;
             if (old_email == email) {
-                Swal.fire('Email Already Updated!')
+                alert('Email Already Updated!');
             } else {
-                let timerInterval;
-                Swal.fire({
-                    title: 'Wait...',
-                    timerProgressBar: true,
-                    didOpen: () => {
-                        Swal.showLoading();
-                        const b = Swal.getHtmlContainer().querySelector('b');
-                        timerInterval = setInterval(() => {
-                            b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
-                        }, 1000);
-                    },
-                });
                 $.get("/student/verifyemail/" + email, function(data) {
-                    clearInterval(timerInterval);
                     if (data == false) {
-                        Swal.fire('Email Already Registered!')
-                    } else {
-                        Swal.fire('Otp Sent!');
+                        alert('Email Already Registered!');
+                    } else if (data.success) {
+                        alert('Otp Sent!');
                         $(".sendEmailOtp").attr('disabled', '');
                         $(".verifyEmailOtp").removeAttr('disabled', '');
+                    } else {
+                        alert(data.message || 'Failed to send OTP');
                     }
                 });
             }
@@ -262,26 +226,13 @@
             var email = document.getElementById('email_new').value;
             var email_otp = document.getElementById('email_otp').value;
 
-            let timerInterval;
-            Swal.fire({
-                title: 'Wait...',
-                timerProgressBar: true,
-                didOpen: () => {
-                    Swal.showLoading();
-                    const b = Swal.getHtmlContainer().querySelector('b');
-                    timerInterval = setInterval(() => {
-                        b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
-                    }, 1000);
-                },
-            });
             $.get("/student/verifyemailotp/" + email + "/" + email_otp, function(data) {
-                clearInterval(timerInterval);
                 if (data == true) {
-                    Swal.fire('Otp Verified!');
+                    alert('Otp Verified!');
                     $(".verifyEmailOtp").attr('disabled', '');
                     document.getElementById('verify_email_check').value = '1';
                 } else {
-                    Swal.fire('Please Enter Valid Otp');
+                    alert('Please Enter Valid Otp');
                 }
             });
         }

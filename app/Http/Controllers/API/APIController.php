@@ -497,28 +497,29 @@ class APIController extends Controller
         // $response       = Http::get($url);
 
 
-        $message    = rawurlencode('Dear user%nYour OTP for sign up to The Gyanology portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nThe Gyanology Team');
-        $sender     = urlencode("GYNLGY");
-        $apikey     = urlencode("MzQ0YzZhMzU2ZTY2NjI0YjU4Mzc0NDMxNmU3MjYzNmM=");
-        $url        = 'https://api.textlocal.in/send/?apikey=' . $apikey . '&numbers=' . $mobileNumber . '&sender=' . $sender . '&message=' . $message;
+        // $message    = rawurlencode('Dear user%nYour OTP for sign up to The Gyanology portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nThe Gyanology Team');
+        // $sender     = urlencode("GYNLGY");
+        // $apikey     = urlencode("MzQ0YzZhMzU2ZTY2NjI0YjU4Mzc0NDMxNmU3MjYzNmM=");
+        // $url        = 'https://api.textlocal.in/send/?apikey=' . $apikey . '&numbers=' . $mobileNumber . '&sender=' . $sender . '&message=' . $message;
 
-        $ch         = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response   = curl_exec($ch);
-        curl_close($ch);
-        $response   = json_decode($response);
-        if ($response) {
+        // $ch         = curl_init($url);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // $response   = curl_exec($ch);
+        // curl_close($ch);
+        // $response   = json_decode($response);
+        // if ($response) {
             $otpVerifications               = new OtpVerifications;
             $otpVerifications->type         = 'mobile';
             $otpVerifications->credential   = $mobileNumber;
             $otpVerifications->otp          = $otp;
             $saveToDb                       = $otpVerifications->save();
 
-            if ($saveToDb && $response->status == 'success') {
+            // if ($saveToDb && $response->status == 'success') {
+            if ($saveToDb) {
                 $returnResponse['success'] = true;
             }
             return json_encode($returnResponse);
-        }
+        // }
     }
     public function verifyOTP(Request $request)
     {

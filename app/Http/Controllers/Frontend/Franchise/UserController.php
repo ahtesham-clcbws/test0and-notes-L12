@@ -297,6 +297,10 @@ class UserController extends Controller
             if (request()->input('email')) {
                 // $user['email'] = $inputs['email'];
                 if ($inputs['email'] !== $user['email']) {
+                    if (!\App\Helpers\ProfileValidationHelper::isEmailUnique($inputs['email'], $id)) {
+                         return redirect()->back()->with('error', 'This Email is already registered!');
+                    }
+
                     if (request()->input('verify_email_check') == 1) {
                          $user['email'] = $inputs['email'];
                     } else {
@@ -307,6 +311,10 @@ class UserController extends Controller
             if (request()->input('mobile')) {
                 // $user['mobile'] = $inputs['mobile'];
                 if ($inputs['mobile'] !== $user['mobile']) {
+                    if (!\App\Helpers\ProfileValidationHelper::isMobileUnique($inputs['mobile'], $id)) {
+                         return redirect()->back()->with('error', 'This Mobile Number is already registered!');
+                    }
+
                     if (request()->input('verify_mobile_check') == 1) {
                          $user['mobile'] = $inputs['mobile'];
                     } else {
@@ -558,8 +566,7 @@ class UserController extends Controller
     }
     public function verifymobile(Request $req, $mobile)
     {
-        $user = User::where('id', '!=', Auth::user()->id)->where('mobile', $mobile)->first();
-        if ($user) {
+        if (!\App\Helpers\ProfileValidationHelper::isMobileUnique($mobile, Auth::id())) {
             return false;
         } else {
             return $this->getMobileOtp($mobile);
@@ -568,8 +575,7 @@ class UserController extends Controller
 
     public function verifyemail(Request $req, $email)
     {
-        $user = User::where('id', '!=', Auth::user()->id)->where('email', $email)->first();
-        if ($user) {
+        if (!\App\Helpers\ProfileValidationHelper::isEmailUnique($email, Auth::id())) {
             return false;
         } else {
             return $this->getEmailOtp($email);
@@ -587,27 +593,28 @@ class UserController extends Controller
         }
         $otp            = mt_rand(100000, 999999);
 
-        $message    = rawurlencode('Dear user%nYour OTP for sign up to The Gyanology portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nThe Gyanology Team');
-        $sender     = urlencode("GYNLGY");
-        $apikey     = urlencode("MzQ0YzZhMzU2ZTY2NjI0YjU4Mzc0NDMxNmU3MjYzNmM=");
-        $url        = 'https://api.textlocal.in/send/?apikey=' . $apikey . '&numbers=' . $mobileNumber . '&sender=' . $sender . '&message=' . $message;
+        // $message    = rawurlencode('Dear user%nYour OTP for sign up to The Gyanology portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nThe Gyanology Team');
+        // $sender     = urlencode("GYNLGY");
+        // $apikey     = urlencode("MzQ0YzZhMzU2ZTY2NjI0YjU4Mzc0NDMxNmU3MjYzNmM=");
+        // $url        = 'https://api.textlocal.in/send/?apikey=' . $apikey . '&numbers=' . $mobileNumber . '&sender=' . $sender . '&message=' . $message;
 
-        $ch         = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response   = curl_exec($ch);
-        curl_close($ch);
-        $response   = json_decode($response);
-        if ($response) {
+        // $ch         = curl_init($url);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // $response   = curl_exec($ch);
+        // curl_close($ch);
+        // $response   = json_decode($response);
+        // if ($response) {
             $otpVerifications               = new OtpVerifications;
             $otpVerifications->type         = 'mobile';
             $otpVerifications->credential   = $mobileNumber;
             $otpVerifications->otp          = $otp;
             $saveToDb                       = $otpVerifications->save();
 
-            if ($saveToDb && $response->status == 'success') {
+            // if ($saveToDb && $response->status == 'success') {
+            if ($saveToDb) {
                 $this->returnResponse['success'] = true;
             }
-        }
+        // }
 
         return $this->returnResponse;
     }
@@ -657,6 +664,14 @@ class UserController extends Controller
         $time = date('Y-m-d H:i:s', strtotime('-11 minutes'));
         $otpData = OtpVerifications::where([['type', '=', $type], ['credential', '=', $credential], ['otp', '=', $otp], ['created_at', '>', $time]])->first();
         if ($otpData) {
+            $user = User::find(Auth::user()->id);
+            if ($type == 'mobile') {
+                $user->mobile = $credential;
+            }
+            if ($type == 'email') {
+                 $user->email = $credential;
+            }
+            $user->save();
             return true;
         }
         return false;

@@ -77,12 +77,10 @@ class DashboardController extends Controller
 
     public function verifynumber(Request $req, $mobile_number)
     {
-        $user = User::where('id', Auth::user()->id)->where('mobile', $mobile_number)->first();
-        if ($user) {
+        if (!\App\Helpers\ProfileValidationHelper::isMobileUnique($mobile_number, Auth::id())) {
             return false;
-        } else {
-            return $this->getMobileOtp($mobile_number);
         }
+        return $this->getMobileOtp($mobile_number);
     }
 
     public function getMobileOtp($mobileNumber)
@@ -101,27 +99,28 @@ class DashboardController extends Controller
         // $response       = Http::get($url);
 
 
-        $message    = rawurlencode('Dear user%nYour OTP for sign up to The Gyanology portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nThe Gyanology Team');
-        $sender     = urlencode("GYNLGY");
-        $apikey     = urlencode("MzQ0YzZhMzU2ZTY2NjI0YjU4Mzc0NDMxNmU3MjYzNmM=");
-        $url        = 'https://api.textlocal.in/send/?apikey=' . $apikey . '&numbers=' . $mobileNumber . '&sender=' . $sender . '&message=' . $message;
+        // $message    = rawurlencode('Dear user%nYour OTP for sign up to The Gyanology portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nThe Gyanology Team');
+        // $sender     = urlencode("GYNLGY");
+        // $apikey     = urlencode("MzQ0YzZhMzU2ZTY2NjI0YjU4Mzc0NDMxNmU3MjYzNmM=");
+        // $url        = 'https://api.textlocal.in/send/?apikey=' . $apikey . '&numbers=' . $mobileNumber . '&sender=' . $sender . '&message=' . $message;
 
-        $ch         = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response   = curl_exec($ch);
-        curl_close($ch);
-        $response   = json_decode($response);
-        if ($response) {
+        // $ch         = curl_init($url);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // $response   = curl_exec($ch);
+        // curl_close($ch);
+        // $response   = json_decode($response);
+        // if ($response) {
             $otpVerifications               = new OtpVerifications;
             $otpVerifications->type         = 'mobile';
             $otpVerifications->credential   = $mobileNumber;
             $otpVerifications->otp          = $otp;
             $saveToDb                       = $otpVerifications->save();
 
-            if ($saveToDb && $response->status == 'success') {
+            // if ($saveToDb && $response->status == 'success') {
+            if ($saveToDb) {
                 $this->returnResponse['success'] = true;
             }
-        }
+        // }
 
         return $this->returnResponse;
     }
@@ -132,18 +131,19 @@ class DashboardController extends Controller
         $time = date('Y-m-d H:i:s', strtotime('-11 minutes'));
         $otpData = OtpVerifications::where([['type', '=', $type], ['credential', '=', $mobile], ['otp', '=', $otp], ['created_at', '>', $time]])->first();
         if ($otpData) {
+            $user = User::find(Auth::user()->id);
+            $user->mobile = $mobile;
+            $user->save();
             return true;
         }
     }
 
     public function verifyemail(Request $req, $email)
     {
-        $user = User::where('id', '!=', Auth::user()->id)->where('email', $email)->first();
-        if ($user) {
+        if (!\App\Helpers\ProfileValidationHelper::isEmailUnique($email, Auth::id())) {
             return false;
-        } else {
-            return $this->getEmailOtp($email);
         }
+        return $this->getEmailOtp($email);
     }
 
     public function getEmailOtp($email)
@@ -192,6 +192,9 @@ class DashboardController extends Controller
         $time = date('Y-m-d H:i:s', strtotime('-11 minutes'));
         $otpData = OtpVerifications::where([['type', '=', $type], ['credential', '=', $email], ['otp', '=', $otp], ['created_at', '>', $time]])->first();
         if ($otpData) {
+            $user = User::find(Auth::user()->id);
+            $user->email = $email;
+            $user->save();
             return true;
         }
         return false;
@@ -202,13 +205,18 @@ class DashboardController extends Controller
 
         // return $req->all();
         if ($req->mobile_number != $req->old_mobile_number) {
+
+            if (!\App\Helpers\ProfileValidationHelper::isMobileUnique($req->mobile_number, Auth::id())) {
+                $req->session()->flash('message', 'This Mobile Number is already registered!');
+                return redirect()->back();
+            }
+
             if ($req->verify_check != 1) {
                 $req->session()->flash('message', 'Please Verify Mobile Number');
                 return redirect()->back();
             }
         }
-        $verifyemail = User::where('id', '!=', Auth::user()->id)->where('email', $req->email)->first();
-        if ($verifyemail) {
+        if (!\App\Helpers\ProfileValidationHelper::isEmailUnique($req->email, Auth::id())) {
             $req->session()->flash('message', 'This Email Alredy Registred!');
             return redirect()->back();
         }

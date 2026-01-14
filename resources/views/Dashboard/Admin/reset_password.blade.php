@@ -37,7 +37,18 @@
 					<div class="col-md-6">
 						<div class="form-group">
                         	<label for="New Password" class="control-label">New Password</label>
-                            <input type="password" name="new_password"  class="form-control form-control-sm" placeholder="Enter New Password" style="border: 1px solid #aaa;" required>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="ti-unlock"></i>
+                                </span>
+                                <input class="form-control" id="new_password" type="password"
+                                    name="new_password" placeholder="New Password"
+                                    minlength="5">
+                                <button class="btn btn-dark togglePassword" type="button"
+                                    style="width: 42px;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 					<div class="col-md-3">
@@ -47,7 +58,15 @@
 					<div class="col-md-6">
 						<div class="form-group">
                         	<label for="Confirm Password" class="control-label">Confirm Password</label>
-                            <input type="password" name="confirm_password"  class="form-control form-control-sm" placeholder="Enter Confirm Password" style="border: 1px solid #aaa;" required>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="ti-unlock"></i>
+                                </span>
+                                <input type="password" name="confirm_password"  class="form-control" placeholder="Enter Confirm Password" required>
+                                <button class="btn btn-dark togglePassword" type="button" style="width: 42px;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 					<div class="col-md-3">

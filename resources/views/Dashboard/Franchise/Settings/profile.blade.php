@@ -112,7 +112,6 @@
 @endsection
 @section('javascript')
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $('#imageSaveButton').show();
 
@@ -165,34 +164,24 @@
             var old_email = document.getElementById('old_email').value;
             var email = document.getElementById('email').value;
             if (old_email == email) {
-                Swal.fire('Email Already Updated!');
+                alert('Email Already Updated!');
                 $(".sendEmailOtp").removeAttr('disabled', '');
             } else {
 
                 $(".sendEmailOtp").attr('disabled', '');
-                let timerInterval;
-                Swal.fire({
-                    title: 'Wait...',
-                    timerProgressBar: true,
-                    didOpen: () => {
-                        Swal.showLoading();
-                        const b = Swal.getHtmlContainer().querySelector('b');
-                        timerInterval = setInterval(() => {
-                            b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
-                        }, 1000);
-                    },
-                });
                 $.get("/corporate/profile/verifyemail/" + email, function(data) {
-                    clearInterval(timerInterval);
                     if (data == false) {
-                        Swal.fire('Email Already Registered!');
+                        alert('Email Already Registered!');
                         $(".sendEmailOtp").removeAttr('disabled', '');
                     } else if (data.message) {
-                        Swal.fire(data.message);
+                        alert(data.message);
                         $(".sendEmailOtp").removeAttr('disabled', '');
-                    } else {
-                        Swal.fire('Otp Sent!');
+                    } else if (data.success) {
+                        alert('Otp Sent!');
                         $(".verifyEmailOtp").removeAttr('disabled', '');
+                    } else {
+                        alert('Failed to send OTP');
+                        $(".sendEmailOtp").removeAttr('disabled', '');
                     }
                 });
             }
@@ -203,26 +192,13 @@
             var email = document.getElementById('email').value;
             var email_otp = document.getElementById('email_otp').value;
 
-            let timerInterval;
-            Swal.fire({
-                title: 'Wait...',
-                timerProgressBar: true,
-                didOpen: () => {
-                    Swal.showLoading();
-                    const b = Swal.getHtmlContainer().querySelector('b');
-                    timerInterval = setInterval(() => {
-                        b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
-                    }, 1000);
-                },
-            });
             $.get("/corporate/profile/verifyotp/email/" + email + "/" + email_otp, function(data) {
-                clearInterval(timerInterval);
                 if (data == true) {
-                    Swal.fire('Otp Verified!');
+                    alert('Otp Verified!');
                     $(".verifyEmailOtp").attr('disabled', '');
                     document.getElementById('verify_email_check').value = '1';
                 } else {
-                    Swal.fire('Please Enter Valid Otp');
+                    alert('Please Enter Valid Otp');
                 }
             });
         }
@@ -231,34 +207,24 @@
             var old_mobile_number = document.getElementById('old_mobile_number').value;
             var mobile_number = document.getElementById('mobile').value;
             if (old_mobile_number == mobile_number) {
-                Swal.fire('Mobile Number Already Updated!');
+                alert('Mobile Number Already Updated!');
                 $(".sendMobileOtp").removeAttr('disabled', '');
             } else {
 
                 $(".sendMobileOtp").attr('disabled', '');
-                let timerInterval;
-                Swal.fire({
-                    title: 'Wait...',
-                    timerProgressBar: true,
-                    didOpen: () => {
-                        Swal.showLoading();
-                        const b = Swal.getHtmlContainer().querySelector('b');
-                        timerInterval = setInterval(() => {
-                            b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
-                        }, 1000);
-                    },
-                });
                 $.get("/corporate/profile/verifymobile/" + mobile_number, function(data) {
-                    clearInterval(timerInterval);
                     if (data == false) {
-                        Swal.fire('Mobile Number Already Registered!');
+                        alert('Mobile Number Already Registered!');
                         $(".sendMobileOtp").removeAttr('disabled', '');
                     } else if (data.message) {
-                        Swal.fire(data.message);
+                        alert(data.message);
                         $(".sendMobileOtp").removeAttr('disabled', '');
-                    } else {
-                        Swal.fire('Otp Sent!');
+                    } else if (data.success) {
+                        alert('Otp Sent!');
                         $(".verifyMobileOtp").removeAttr('disabled', '');
+                    } else {
+                        alert('Failed to send OTP');
+                        $(".sendMobileOtp").removeAttr('disabled', '');
                     }
                 });
             }
@@ -269,26 +235,13 @@
             var mobile_number = document.getElementById('mobile').value;
             var mobile_otp = document.getElementById('mobile_otp').value;
 
-            let timerInterval;
-            Swal.fire({
-                title: 'Wait...',
-                timerProgressBar: true,
-                didOpen: () => {
-                    Swal.showLoading();
-                    const b = Swal.getHtmlContainer().querySelector('b');
-                    timerInterval = setInterval(() => {
-                        b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
-                    }, 1000);
-                },
-            });
             $.get("/corporate/profile/verifyotp/mobile/" + mobile_number + "/" + mobile_otp, function(data) {
-                clearInterval(timerInterval);
                 if (data == true) {
-                    Swal.fire('Otp Verified!');
+                    alert('Otp Verified!');
                     $(".verifyMobileOtp").attr('disabled', '');
                     document.getElementById('verify_mobile_check').value = '1';
                 } else {
-                    Swal.fire('Please Enter Valid Otp');
+                    alert('Please Enter Valid Otp');
                 }
             });
         }
