@@ -136,7 +136,7 @@ class FranchiseController extends Controller
             $data['franchise_publisher']    = true;
             $data['franchise_verifier']     = false;
             $data['franchise_reviewer']     = false;
-            if ($data['user']->franchise_roles) {
+            if (isset($data['user']) && $data['user']->franchise_roles) {
                 $roles = $data['user']->franchise_roles;
                 // $roles = json_decode($data['user']->roles);
                 if (strpos($roles, 'franchise_manager') !== false) {
