@@ -72,7 +72,7 @@
         font-size: 14px;
         margin-left: 5px;
     }
-    
+
     .flex-container {
       display: flex;
       flex-direction: row;
@@ -86,12 +86,11 @@
       flex: 50%;
       color:brown;
       font-family:'cursive-font', serif;
-      
+
     }
 
 </style>
 <header class="navbar navbar-dark sticky-top bg-white flex-md-nowrap p-0 shadow cust-header" style="background-color: #c4e9fa !important;">
-    {{-- <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">Gyanology</a> --}}
     <div class="navbar-brand col-md-3 col-lg-2 m-0 p-2 bg-white text-center">
         <img src="{{ asset('super/images/logo big size.png') }}" style="max-height: 50px; width: auto;">
     </div>
@@ -100,10 +99,8 @@
         <span class="navbar-toggler-icon"></span>
     </button>
 
-    {{-- <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"> --}}
     <ul class="nav w-100 nav-panel info-panel" style="background-color: #c4e9fa !important;">
         <li class="nav-item" style="margin: 0px 10px">
-            <!-- <i class="watch_ic bi bi-clock-history"></i> -->
             <span class="required_text">
                 @if(auth()->user()->franchise_code)
                     {{ auth()->user()->myInstitute->institute_name }} : {{ DB::table('cities')->select('name')->where('id',auth()->user()->myInstitute->city_id)->first()->name }}
@@ -126,148 +123,7 @@
             <span class="required_num">21</span>
         </li>
     </ul>
-    <ul class="nav nav-panel icons-panel text-end" style="background-color: #c4e9fa !important;">
-        <li class="nav-item">
-            <button class="btn btn-link nav-link dropdown-toggle" type="button" id="notifications1"
-                data-bs-toggle="dropdown">
-                <i class="bi bi-envelope"></i>
-                <span class="notify-count">3</span>
-            </button>
-            <div class="dropdown-content panel-collapse noti_box dropdown-menu dropdown-menu-end"
-                aria-labelledby="notifications1">
-                <div class="profile-box">
-                    <span class="notif_text">New notifications (5)</span>
-                    <span class="all_read">Mark all read</span>
-                </div>
-                <ul>
-                    <li>
-                        <a href="#">
-                            <img src="{{ asset('super/images/watch.png') }}" class="noti_icon">
-                            <span class="noti_text"> Course Package / Book Name Details</span>
-                            <span class="sub_text">Further Details<span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="{{ asset('super/images/watch.png') }}" class="noti_icon">
-                            <span class="noti_text"> Course Package / Book Name Details</span>
-                            <span class="sub_text">Further Details<span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="{{ asset('super/images/watch.png') }}" class="noti_icon">
-                            <span class="noti_text"> Course Package / Book Name Details</span>
-                            <span class="sub_text">Further Details<span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="{{ asset('super/images/watch.png') }}" class="noti_icon">
-                            <span class="noti_text"> Course Package / Book Name Details</span>
-                            <span class="sub_text">Further Details<span>
-                        </a>
-                    </li>
-                </ul>
-                <div class="view_area">
-                    <a href=""> View All</a>
-                </div>
-            </div>
-        </li>
-        <li class="nav-item">
-            <button class="btn btn-link nav-link dropdown-toggle" type="button" id="notifications2"
-                data-bs-toggle="dropdown">
-                <i class="bi bi-clock-history"></i>
-                <span class="notify-count">3</span>
-            </button>
-            <div class="dropdown-content panel-collapse noti_box dropdown-menu dropdown-menu-end"
-                aria-labelledby="notifications2">
-                <div class="profile-box">
-                    <span class="notif_text">New notifications (5)</span>
-                    <span class="all_read">Mark all read</span>
-                </div>
-                <ul>
-                    <li>
-                        <a href="#">
-                            <img src="{{ asset('super/images/watch.png') }}" class="noti_icon">
-                            <span class="noti_text"> Course Package / Book Name Details</span>
-                            <span class="sub_text">Further Details<span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="{{ asset('super/images/watch.png') }}" class="noti_icon">
-                            <span class="noti_text"> Course Package / Book Name Details</span>
-                            <span class="sub_text">Further Details<span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="{{ asset('super/images/watch.png') }}" class="noti_icon">
-                            <span class="noti_text"> Course Package / Book Name Details</span>
-                            <span class="sub_text">Further Details<span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="{{ asset('super/images/watch.png') }}" class="noti_icon">
-                            <span class="noti_text"> Course Package / Book Name Details</span>
-                            <span class="sub_text">Further Details<span>
-                        </a>
-                    </li>
-                </ul>
-                <div class="view_area">
-                    <a href=""> View All</a>
-                </div>
-            </div>
-        </li>
-        <li class="nav-item dropdown custom-dropdown">
-            <button class="btn btn-link nav-link dropdown-toggle" type="button" id="notifications3"
-                data-bs-toggle="dropdown">
-                <i class="bi bi-bell"></i>
-                <span class="notify-count">3</span>
-            </button>
-            <div class="dropdown-content panel-collapse noti_box dropdown-menu dropdown-menu-end"
-                aria-labelledby="notifications3">
-                <div class="profile-box">
-                    <span class="notif_text">New notifications (5)</span>
-                    <span class="all_read">Mark all read</span>
-                </div>
-                <ul>
-                    <li>
-                        <a href="#">
-                            <img src="{{ asset('super/images/watch.png') }}" class="noti_icon">
-                            <span class="noti_text"> Course Package / Book Name Details</span>
-                            <span class="sub_text">Further Details<span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="{{ asset('super/images/watch.png') }}" class="noti_icon">
-                            <span class="noti_text"> Course Package / Book Name Details</span>
-                            <span class="sub_text">Further Details<span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="{{ asset('super/images/watch.png') }}" class="noti_icon">
-                            <span class="noti_text"> Course Package / Book Name Details</span>
-                            <span class="sub_text">Further Details<span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <img src="{{ asset('super/images/watch.png') }}" class="noti_icon">
-                            <span class="noti_text"> Course Package / Book Name Details</span>
-                            <span class="sub_text">Further Details<span>
-                        </a>
-                    </li>
-                </ul>
-                <div class="view_area">
-                    <a href=""> View All</a>
-                </div>
-            </div>
-        </li>
+    <ul class="nav nav-panel icons-panel justify-content-end me-4" style="background-color: #c4e9fa !important;">
         <li class="nav-item user-menu dropdown profile-dropdown">
             <img class="nav-link rounded-circle dropdown-toggle" data-bs-toggle="dropdown" id="userMenu"
                 src="{{ auth()->user()->user_details && auth()->user()->user_details['photo_url'] ? '/storage/'.auth()->user()->user_details['photo_url'] : asset('super/images/default-avatar.jpg') }}">
@@ -276,15 +132,10 @@
                 <div class="profile-box">
                     <img src="{{ auth()->user()->user_details && auth()->user()->user_details['photo_url'] ? '/storage/'.auth()->user()->user_details['photo_url'] : asset('super/images/default-avatar.jpg') }}">
                     <h6>{{auth()->user()->name}}</h6>
-                    {{-- <p>Admin Manager</p> --}}
                 </div>
                 <ul>
                     <li><a href="{{route('student.profile')}}"><i class="bi bi-person" aria-hidden="true"></i> <span> Profile</span></a></li>
-                    <li><a href="#"><i class="bi bi-gear" aria-hidden="true"></i><span> Setting</span></a>
-                    </li>
-                    <li><a href="#"><i class="bi bi-clock" aria-hidden="true"></i><span> Offers</span></a></li>
-                    <li><a href="#"><i class="bi bi-sliders" aria-hidden="true"></i><span> Information</span></a></li>
-                    <li><a href="#"><i class="bi bi-sliders" aria-hidden="true"></i><span> Activity</span></a></li>
+
                     <li><a href="{{ url('resetpassword_student')}}"><i class="bi bi-key" aria-hidden="true"></i><span> Reset Password</span></a></li>
                     <li class="last_rad"><a href="{{ route('logout') }}">
                             <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
@@ -295,9 +146,5 @@
             </div>
         </li>
     </ul>
-    {{-- <div class="navbar-nav d-none d-md-flex d-lg-flex d-xlg-flex d-xxlg-flex">
-        <div class="nav-item text-nowrap">
-            <a class="nav-link px-3" href="{{ route('logout') }}"><span data-feather="log-out"></span></a>
-        </div>
-    </div> --}}
+
 </header>

@@ -33,7 +33,9 @@ class UsersController extends Controller
         ->where($matchThis);
 
         if ($type == 'new') {
-            $data = $data->where('status', 'inactive')->orWhere('status', 'unread')->get();
+            $data = $data->where(function($q) {
+                $q->where('status', 'inactive')->orWhere('status', 'unread');
+            })->get();
         }
         if ($type == 'students') {
             // $data = $data->where('status', 'active')->where('roles', 'student')->get();
@@ -58,8 +60,22 @@ class UsersController extends Controller
             $data = $data->where('is_staff', '1')->where('roles', 'like', '%,%')->get();
         }
 
+        $page_title = 'Users';
+        switch ($type) {
+            case 'students': $page_title = 'Students'; break;
+            case 'managers': $page_title = 'Managers'; break;
+            case 'creators': $page_title = 'Creators'; break;
+            case 'publishers': $page_title = 'Publishers'; break;
+            case 'verifier': $page_title = 'Verifiers'; break;
+            case 'reviewver': $page_title = 'Reviewers'; break;
+            case 'new': $page_title = 'New User Sign Up'; break;
+            case 'multi': $page_title = 'Contributors'; break; // Assuming multi-role users are contributors based on user hint
+            case 'all': default: $page_title = 'All Users'; break;
+        }
+
         $thisData['user'] = $data;
         $thisData['franchise_status'] = $franchise;
+        $thisData['page_title'] = $page_title . ($franchise ? ' (Franchise)' : ' (Direct)');
 
         return view('Dashboard/Admin/Dashboard/users')->with('data', $thisData);
     }

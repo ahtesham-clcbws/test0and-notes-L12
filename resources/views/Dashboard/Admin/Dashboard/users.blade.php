@@ -2,8 +2,21 @@
 
 @section('main')
     <section class="content admin-1 border border-dark">
+        @php
+            $showEducationType = false;
+            $showClassGroup = false;
+            foreach($data['user'] as $list) {
+                if(!empty($list->education_type_name)) {
+                    $showEducationType = true;
+                }
+                if(!empty($list->class_name)) {
+                    $showClassGroup = true;
+                }
+                if($showEducationType && $showClassGroup) break;
+            }
+        @endphp
         <div class="heading">
-            <h5 style="font-size: 18px;">Students</h5>
+            <h5 style="font-size: 18px;">{{ $data['page_title'] }}</h5>
             <button type="button" style="" class="btn btn-success" onclick="printTable()">Print Form</button>
         </div>
 
@@ -15,11 +28,14 @@
                             <th>ID</th>
                             <th>Image</th>
                             <th>Student Name</th>
+                            @if($showEducationType)
                             <th>Education Type</th>
+                            @endif
+                            @if($showClassGroup)
                             <th>Class Group</th>
+                            @endif
                             <th>Email</th>
                             <th>Mobile No</th>
-                            <!--<th>Applied & End date Subscription</th>-->
                             <th>Institute Name & Code</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -36,8 +52,12 @@
                                     style="width:80px;height:80px;border:1px solid #c2c2c2;  ">
                                    </td>
                                 <td>{{$list->name}}</td>
+                                @if($showEducationType)
                                 <td>{{$list->education_type_name}}</td>
+                                @endif
+                                @if($showClassGroup)
                                 <td>{{$list->class_name}}</td>
+                                @endif
                                 <td>{{$list->email}}</td>
                                 <td>{{$list->mobile}}</td>
                                 <td>{{$list->institute_name}}<br>{{$list->institute_code}}</td>
@@ -61,30 +81,4 @@
             </div>
         </div>
     </section>
-@endsection
-
-
-@section('css')
-    {{-- <link rel="stylesheet" type="text/css" href="{{ asset('DataTables/datatables.min.css') }}" /> --}}
-@endsection
-@section('javascript')
-    {{-- <script type="text/javascript" src="{{ asset('DataTables/datatables.min.js') }}"></script> --}}
-    <script>
-        // $(document).ready(function() {
-        //     $('.datatable').DataTable();
-        // });
-        {{--function printTable() {
-            const table = document.getElementById("studentstable");
-            const printWindow = window.open('', '', 'height=500,width=800');
-            printWindow.document.write('<html><head><title>Services Table</title>');
-            printWindow.document.write('<style>table, th, td { border: 1px solid black; border-collapse: collapse; padding: 5px; }</style>');
-            printWindow.document.write('</head><body>');
-            printWindow.document.write(table.outerHTML);
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            printWindow.focus();
-            printWindow.print();
-            printWindow.close();
-        }--}}
-    </script>
 @endsection

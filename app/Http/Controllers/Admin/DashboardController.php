@@ -15,56 +15,105 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        User::generateCounts();
-        $data = array();
-        $countsData = Count::all();
-        // $countsDataGrouped = [];
-        // foreach ($countsData as $key => $value) {
-        //     $category = $value['category'];
-        //     $namekey = $value->toArray()['namekey'];
-        //     $countsDataGrouped[$category][$namekey] = $value->toArray();
-        //     $data[$namekey] = $value->toArray();
-        // }
-        foreach ($countsData as $value) {
-            $data['cards'][] = $value->toArray();
-        }
-        // $countsDataGroupedSorted = [];
-        // foreach ($countsDataGrouped as $key => $countsArray) {
-        //     array_multisort(array_column($countsArray, 'box_index'), SORT_ASC, $countsArray);
-        //     $countsDataGroupedSorted[$key] = $countsArray;
-        //     $data[$key . '_counts'] = $countsArray;
-        // }
-        // return print_r($data);
-        // return;
-        // $data['cardsdata'] = array(
-        //     [
-        //         'color' => 'warning',
-        //         'image' => '/images/icon/demo.png',
-        //         'count' => $count = CorporateEnquiry::where('status', 'new')->count(),
-        //         'countcolor' => 'danger',
-        //         'title' => 'New business Enquiry',
-        //         'action_required' => $count ? true : false,
-        //         'url' => route('administrator.corporate_enquiry_type', 'new')
-        //     ],
-        //     [
-        //         'color' => 'warning',
-        //         'image' => '/images/icon/demo.png',
-        //         'count' => $count = CorporateEnquiry::where('status', 'approved')->count(),
-        //         'countcolor' => 'danger',
-        //         'title' => 'Approved business Enquiry',
-        //         'action_required' => $count ? true : false,
-        //         'url' => route('administrator.corporate_enquiry_type', 'approved')
-        //     ],
-        //     [
-        //         'color' => 'warning',
-        //         'image' => '/images/icon/demo.png',
-        //         'count' => $count = CorporateEnquiry::where('status', 'rejected')->count(),
-        //         'countcolor' => 'danger',
-        //         'title' => 'Rejected business Enquiry',
-        //         'action_required' => $count ? true : false,
-        //         'url' => route('administrator.corporate_enquiry_type', 'rejected')
-        //     ]
-        // );
+        $counts = [];
+
+        // 1. New Business Enquiry
+        $counts['new_business_enquiry'] = \App\Models\CorporateEnquiry::where('status', 'new')->count();
+
+        // 2. Approved Business Enquiry
+        $counts['approved_business_enquiry'] = \App\Models\CorporateEnquiry::where('status', 'approved')->count();
+
+        // 3. Pending Business Enquiry (Rejected)
+        $counts['pending_business_enquiry'] = \App\Models\CorporateEnquiry::where('status', 'rejected')->count();
+
+        // 4. Franchise Discontinue
+        // FranchiseDetails has no status column. Using CorporateEnquiry status 'discontinue' or similar if exists.
+        // If 'discontinue' is not a valid status, this will return 0 but not error.
+        $counts['franchise_discontinue'] = \App\Models\CorporateEnquiry::where('status', 'discontinue')->count();
+
+        // 5. Student Left Direct Portal (Assumed status 'left', in_franchise = 0)
+        $counts['student_left_direct'] = \App\Models\User::where('status', 'left')->where('in_franchise', 0)->count();
+
+        // 6. Contact Forms (This Month) - Using full namespace if needed, assuming App\Models or App\NewModels
+        // logic below uses Carbon
+        $counts['contact_forms_month'] = \App\Models\NewModels\ContactQuery::whereMonth('created_at', \Carbon\Carbon::now()->month)->count();
+
+        // 7. New Corporate Sign Up (converted)
+        $counts['new_corporate_signup'] = \App\Models\CorporateEnquiry::where('status', 'converted')->count();
+
+        // 8. Competition Franchise
+        // Column is 'franchise_types' (plural) and value suffix is '_franchise'
+        // Join with users to ensure user exists (handling soft deletes or orphans)
+        $counts['competition_franchise'] = \App\Models\FranchiseDetails::join('users', 'franchise_details.user_id', '=', 'users.id')
+            ->where('franchise_types', 'like', '%compitition_franchise%')
+            ->where('is_multiple', 0)
+            ->count();
+
+        // 9. Academics Franchise
+        $counts['academics_franchise'] = \App\Models\FranchiseDetails::join('users', 'franchise_details.user_id', '=', 'users.id')
+            ->where('franchise_types', 'like', '%academics_franchise%')
+            ->where('is_multiple', 0)
+            ->count();
+
+        // 10. School Franchise
+        $counts['school_franchise'] = \App\Models\FranchiseDetails::join('users', 'franchise_details.user_id', '=', 'users.id')
+            ->where('franchise_types', 'like', '%school_franchise%')
+            ->where('is_multiple', 0)
+            ->count();
+
+        // 11. Other Franchise
+        $counts['other_franchise'] = \App\Models\FranchiseDetails::join('users', 'franchise_details.user_id', '=', 'users.id')
+            ->where('franchise_types', 'like', '%other_franchise%')
+            ->where('is_multiple', 0)
+            ->count();
+
+        // 12. Multi Franchise
+        $counts['multi_franchise'] = \App\Models\FranchiseDetails::join('users', 'franchise_details.user_id', '=', 'users.id')
+            ->where('is_multiple', 1)
+            ->count();
+
+        // 13. New User Sign Up (Franchise)
+        $counts['new_user_signup_franchise'] = \App\Models\User::where(function($q) {
+            $q->where('status', 'inactive')->orWhere('status', 'unread');
+        })->where('in_franchise', 1)->count();
+
+        // 14. Students (Franchise) - UsersController does not check is_staff for students
+        $counts['students_franchise'] = \App\Models\User::where('roles', 'student')->where('in_franchise', 1)->count();
+
+        // 15. Managers (Franchise)
+        $counts['managers_franchise'] = \App\Models\User::where('roles', 'manager')->where('in_franchise', 1)->where('is_staff', 1)->count();
+
+        // 16. Creators (Franchise)
+        $counts['creators_franchise'] = \App\Models\User::where('roles', 'creator')->where('in_franchise', 1)->where('is_staff', 1)->count();
+
+        // 17. Publishers (Franchise)
+        $counts['publishers_franchise'] = \App\Models\User::where('roles', 'publisher')->where('in_franchise', 1)->where('is_staff', 1)->count();
+
+        // 18. Multi Role (Franchise)
+        $counts['multi_role_franchise'] = \App\Models\User::where('roles', 'like', '%,%')->where('in_franchise', 1)->where('is_staff', 1)->count();
+
+        // 19. New User Sign Up (Direct)
+        $counts['new_user_signup_direct'] = \App\Models\User::where(function($q) {
+            $q->where('status', 'inactive')->orWhere('status', 'unread');
+        })->where('in_franchise', 0)->count();
+
+        // 20. Students (Direct)
+        $counts['students_direct'] = \App\Models\User::where('roles', 'student')->where('in_franchise', 0)->count();
+
+        // 21. Managers (Direct)
+        $counts['managers_direct'] = \App\Models\User::where('roles', 'manager')->where('in_franchise', 0)->where('is_staff', 1)->count();
+
+        // 22. Creators (Direct)
+        $counts['creators_direct'] = \App\Models\User::where('roles', 'creator')->where('in_franchise', 0)->where('is_staff', 1)->count();
+
+        // 23. Publishers (Direct)
+        $counts['publishers_direct'] = \App\Models\User::where('roles', 'publisher')->where('in_franchise', 0)->where('is_staff', 1)->count();
+
+        // 24. Multi Role (Direct)
+        $counts['multi_role_direct'] = \App\Models\User::where('roles', 'like', '%,%')->where('in_franchise', 0)->where('is_staff', 1)->count();
+
+        $data['counts'] = $counts;
+
         return view('Dashboard/Admin/Dashboard/index')->with('data', $data);
     }
     public function courseDetail()

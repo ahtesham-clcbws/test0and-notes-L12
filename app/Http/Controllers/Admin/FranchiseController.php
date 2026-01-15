@@ -62,16 +62,16 @@ class FranchiseController extends Controller
         $users = array();
 
         if ($type == 'compitition') {
-            $data = FranchiseDetails::where('franchise_types', 'compitition_franchise')->where('is_multiple', 0)->get();
+            $data = FranchiseDetails::where('franchise_types', 'like', '%compitition_franchise%')->where('is_multiple', 0)->get();
         }
         if ($type == 'academics') {
-            $data = FranchiseDetails::where('franchise_types', 'academics_franchise')->where('is_multiple', 0)->get();
+            $data = FranchiseDetails::where('franchise_types', 'like', '%academics_franchise%')->where('is_multiple', 0)->get();
         }
         if ($type == 'school') {
-            $data = FranchiseDetails::where('franchise_types', 'school_franchise')->where('is_multiple', 0)->get();
+            $data = FranchiseDetails::where('franchise_types', 'like', '%school_franchise%')->where('is_multiple', 0)->get();
         }
         if ($type == 'other') {
-            $data = FranchiseDetails::where('franchise_types', 'other_franchise')->where('is_multiple', 0)->get();
+            $data = FranchiseDetails::where('franchise_types', 'like', '%other_franchise%')->where('is_multiple', 0)->get();
         }
         if ($type == 'multi') {
             $data = FranchiseDetails::where('is_multiple', 1)->get();

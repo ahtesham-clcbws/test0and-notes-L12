@@ -1,8 +1,10 @@
 /node_modules
+/public/home
 /public/hot
 /public/storage
 /storage/logs
 /storage/debugbar
+/storage/*
 .env
 .env.backup
 .env.live
