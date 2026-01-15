@@ -421,7 +421,7 @@
                                         <span class="input-group-text" id="addon-wrapping"><i
                                                 class="bi bi-person-fill"></i></span>
                                         <input type="text" name="name" class="form-control"
-                                            value="{{ $data['user']->name }}" placeholder="Person name">
+                                            value="{{ isset($data['user']) ? $data['user']->name : '' }}" placeholder="Person name">
                                     </div>
                                 </div>
                             </div>
@@ -455,7 +455,7 @@
                                         <span class="input-group-text" id="addon-wrapping"><i
                                                 class="bi bi-phone-fill"></i></span>
                                         <input type="number" class="form-control" placeholder="Mobile number"
-                                            value="{{ $data['user']->mobile }}" name="mobile">
+                                            value="{{ isset($data['user']) ? $data['user']->mobile : ''}}" name="mobile">
                                     </div>
                                 </div>
                             </div>
@@ -471,7 +471,7 @@
                                     <div class="input-group flex-nowrap">
                                         <span class="input-group-text" id="addon-wrapping"><i
                                                 class="bi bi-envelope-fill"></i></span>
-                                        <input type="email" class="form-control" value="{{ $data['user']->email }}"
+                                        <input type="email" class="form-control" value="{{ isset($data['user']) ? $data['user']->email : '' }}"
                                             placeholder="E-mail" name="email">
                                     </div>
                                 </div>
@@ -640,12 +640,12 @@
                                                 class="bi bi-person-badge-fill"></i></label>
                                         <select class="form-select" id="inputGroupSelect03" name="status">
                                             <!-- <option selected>Select Option</option> -->
-                                            <option {{ $data['user']['status'] == 'inactive' ? 'selected' : '' }}
+                                            <option {{ isset($data['user']) && $data['user']['status'] == 'inactive' ? 'selected' : '' }}
                                                 value="inactive">
                                                 Inactive</option>
-                                            <option {{ $data['user']['status'] == 'active' ? 'selected' : '' }} value="active">
+                                            <option {{ isset($data['user']) && $data['user']['status'] == 'active' ? 'selected' : '' }} value="active">
                                                 Active</option>
-                                                <option {{ $data['user']['status'] == 'expired' ? 'selected' : '' }}
+                                                <option {{ isset($data['user']) && $data['user']['status'] == 'expired' ? 'selected' : '' }}
                                             value="expired">
                                             Expired Subscription</option>
                                         </select>
