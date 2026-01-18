@@ -253,6 +253,22 @@
         padding: 3px 10px;
         font-size: 10px;
     }
+
+    /* Course Image 4:3 Aspect Ratio */
+    .cource-img {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .cource-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
     .slick-list {
         overflow: visible !important;
     }
