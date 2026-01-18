@@ -272,10 +272,21 @@ class UserController extends Controller
     {
         $id = Auth::user()->id;
         $user = User::find($id);
-        if($user['roles'] == 'franchise'){
+        $details = null;
+        if (str_contains($user['roles'], 'franchise')) {
             $details = FranchiseDetails::where('user_id', $id)->first();
         }
-        if($user['roles'] == 'creator' || $user['roles'] == 'publisher' || $user['roles'] == 'manager' || $user['roles'] == 'verifier' || $user['roles'] == 'reviewer'){
+
+        $otherRoles = ['creator', 'publisher', 'manager', 'verifier', 'reviewer'];
+        $isOtherRole = false;
+        foreach ($otherRoles as $role) {
+            if (str_contains($user['roles'], $role)) {
+                $isOtherRole = true;
+                break;
+            }
+        }
+
+        if ($isOtherRole) {
             $details = UserDetails::where('user_id', $id)->first();
             if (!$details) {
                 $detailsDb = new UserDetails();
@@ -286,6 +297,20 @@ class UserController extends Controller
         }
 
         if (request()->isMethod('post')) {
+            // Ensure details record exists before processing
+            if (!$details) {
+                if (str_contains($user['roles'], 'franchise')) {
+                    // For franchise users, we need FranchiseDetails
+                    return redirect()->back()->with('error', 'Franchise details not found. Please contact administrator.');
+                } else {
+                    // For other users, create UserDetails if missing
+                    $detailsDb = new UserDetails();
+                    $detailsDb->user_id = $id;
+                    $detailsDb->save();
+                    $details = UserDetails::where('user_id', $id)->first();
+                }
+            }
+
             $inputs = request()->all();
             if (request()->input('name') && $inputs['name'] !== $user['name']) {
                 $user['name'] = $inputs['name'];
@@ -294,44 +319,19 @@ class UserController extends Controller
                 $user['password'] = Hash::make($inputs['password']);
             }
 
-            if (request()->input('email')) {
-                // $user['email'] = $inputs['email'];
-                if ($inputs['email'] !== $user['email']) {
-                    if (!\App\Helpers\ProfileValidationHelper::isEmailUnique($inputs['email'], $id)) {
-                         return redirect()->back()->with('error', 'This Email is already registered!');
-                    }
-
-                    if (request()->input('verify_email_check') == 1) {
-                         $user['email'] = $inputs['email'];
-                    } else {
-                        return redirect()->back()->with('error', 'Please Verify Email Address');
-                    }
-                }
-            }
-            if (request()->input('mobile')) {
-                // $user['mobile'] = $inputs['mobile'];
-                if ($inputs['mobile'] !== $user['mobile']) {
-                    if (!\App\Helpers\ProfileValidationHelper::isMobileUnique($inputs['mobile'], $id)) {
-                         return redirect()->back()->with('error', 'This Mobile Number is already registered!');
-                    }
-
-                    if (request()->input('verify_mobile_check') == 1) {
-                         $user['mobile'] = $inputs['mobile'];
-                    } else {
-                        return redirect()->back()->with('error', 'Please Verify Mobile Number');
-                    }
-                }
-            }
+            // Image uploads
             if ($file = request()->file('user_image')) {
                 $name = $file->hashName();
                 $details->photo_url = request()->file('user_image')->storeAs('institute/avatar', $name, 'public');
             }
-            if($user['roles'] == 'franchise'){
+            if(str_contains($user['roles'], 'franchise')){
                 if ($file = request()->file('logo')) {
                     $name = $file->hashName();
                     $details->logo = request()->file('logo')->storeAs('institute/logo', $name, 'public');
                 }
             }
+
+            // Address fields
             if (request()->input('address') && $inputs['address'] !== $details['address']) {
                 $details->address = $inputs['address'];
             }
@@ -344,6 +344,7 @@ class UserController extends Controller
             if (request()->input('state') && $inputs['state'] !== $details['state']) {
                 $details->state = $inputs['state'];
             }
+
             $user->save();
             $details->save();
             return redirect()->back()->with('message', 'Profile Updated Successfully');

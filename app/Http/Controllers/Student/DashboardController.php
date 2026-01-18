@@ -202,41 +202,13 @@ class DashboardController extends Controller
 
     public function manage_profile_process(Request $req)
     {
-
-        // return $req->all();
-        if ($req->mobile_number != $req->old_mobile_number) {
-
-            if (!\App\Helpers\ProfileValidationHelper::isMobileUnique($req->mobile_number, Auth::id())) {
-                $req->session()->flash('message', 'This Mobile Number is already registered!');
-                return redirect()->back();
-            }
-
-            if ($req->verify_check != 1) {
-                $req->session()->flash('message', 'Please Verify Mobile Number');
-                return redirect()->back();
-            }
-        }
-        if (!\App\Helpers\ProfileValidationHelper::isEmailUnique($req->email, Auth::id())) {
-            $req->session()->flash('message', 'This Email Alredy Registred!');
-            return redirect()->back();
-        }
-
-        if ($req->email != Auth::user()->email) {
-            if ($req->verify_email_check != 1) {
-                $req->session()->flash('message', 'Please Verify Email Address');
-                 return redirect()->back();
-            }
-        }
-
-        // else
-            $user = User::find(Auth::user()->id);
+        // Update user name
+        $user = User::find(Auth::user()->id);
         $user->name = $req->name;
-        $user->email = $req->email;
-        $user->mobile = $req->mobile_number;
         $user->save();
 
+        // Handle photo upload
         if ($req->hasfile('photo_url')) {
-
             $file = $req->file('photo_url');
             $name = $file->hashName();
             $image_name = $req->file('photo_url')->storeAs('student_uploads/' . $user->id, $name, 'public');
@@ -244,6 +216,7 @@ class DashboardController extends Controller
                 ->where('user_id', Auth::user()->id)
                 ->update(['photo_url' => $image_name]);
         }
+
         $req->session()->flash('message', 'Profile Updated.');
         return redirect()->back();
     }

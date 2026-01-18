@@ -1,111 +1,142 @@
 @extends('Layouts.franchise')
 
 @section('css')
-    <style>
-        #imageSaveButton2,
-        #imageSaveButton {
-            display: none;
-        }
-    </style>
 @endsection
 @section('main')
     <section class="content admin-1">
-        <div class="card">
+        @if (session()->has('message'))
+            <div class="sufee-alert alert with-close alert-success alert-dismissible fade show">
+                {{ session('message') }}
+            </div>
+        @endif
+        @if (session()->has('error'))
+            <div class="sufee-alert alert with-close alert-danger alert-dismissible fade show">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        {{-- Main Profile Form: Images Only --}}
+        <div class="card mb-3">
             <div class="card-body">
-                @if (session()->has('message'))
-                    <div class="sufee-alert alert with-close alert-success alert-dismissible fade show">
-                        {{ session('message') }}
-                    </div>
-                @endif
-                @if (session()->has('error'))
-                    <div class="sufee-alert alert with-close alert-danger alert-dismissible fade show">
-                        {{ session('error') }}
-                    </div>
-                @endif
+                <h5 class="mb-3">Profile Images</h5>
                 <form id="uploadImage" enctype="multipart/form-data" method="post">
                     @csrf
-                    <input id="old_mobile_number" name="old_mobile_number" type="hidden" value="{{ $user->mobile }}">
-                    <input id="verify_mobile_check" name="verify_mobile_check" type="hidden">
-                    <input id="old_email" name="old_email" type="hidden" value="{{ $user->email }}">
-                    <input id="verify_email_check" name="verify_email_check" type="hidden">
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label class="control-label" for="Select User Image">Select User Image</label>
                                 <input class="form-control" name="user_image" type="file" accept="image/jpeg,image/jpg"
                                     onchange="avatarPreview(event)">
-                                <img class="w-100 mb-2" id="user_profile_image"
+                                <img class="w-100 mb-2 mt-2" id="user_profile_image"
                                     src="{{ $user['details']['photo_url'] ? '/storage/' . $user['details']['photo_url'] : asset('noimg.png') }}">
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label class="control-label" for="Select User Image">Select Logo</label>
                                 <input class="form-control" name="logo" type="file" accept="image/jpeg,image/jpg"
                                     onchange="logoPreview(event)">
-                                <img class="w-100 mb-2" id="user_logo_image"
+                                <img class="w-100 mb-2 mt-2" id="user_logo_image"
                                     src="{{ $user['details']['logo'] ? '/storage/' . $user['details']['logo'] : asset('noimg.png') }}">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label class="control-label" for="Email">Email</label>
-                                <div class="input-group">
-                                    <input class="form-control" id="email" name="email" type="email"
-                                        value="<?php echo $user['details']['email']; ?>" style="border: 1px solid #aaa;" required>
-                                    <button class="btn btn-primary sendEmailOtp" type="button" onclick="sendEmailOtp()">
-                                        Get Otp
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="form-group mt-3">
-                                <label class="control-label" for="Email">Verify Email</label>
-                                <div class="input-group">
-                                    <input class="form-control" id="email_otp" name="email_otp" type="text"
-                                        style="border: 1px solid #aaa;" placeholder="Input OTP">
-                                    <button class="btn btn-primary verifyEmailOtp" type="button"
-                                        onclick="verifyEmailOtp()" disabled>
-                                        Verify
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label class="control-label" for="Mobile No.">Mobile No.</label>
-                                <div class="input-group">
-                                    <input class="form-control" id="mobile" name="mobile" type="number"
-                                        value="<?php echo $user['details']['mobile']; ?>" minlength="10" maxlength="10" required="">
-                                    <button class="btn btn-primary sendMobileOtp" type="button" onclick="sendMobileOtp()">
-                                        Get Otp
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="form-group mt-3">
-                                <label class="control-label" for="Mobile">Verify Mobile</label>
-                                <div class="input-group">
-                                    <input class="form-control" id="mobile_otp" name="mobile_otp" type="number" minlength="6"
-                                        maxlength="6" placeholder="Input OTP">
-                                    <button class="btn btn-primary verifyMobileOtp" type="button"
-                                        onclick="verifyMobileOtp()" disabled>
-                                        Verify
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-4">
-                        </div>
-                        <div class="col-md-4">
-                        </div>
-                        <div class="col-md-4">
-                            <button class="btn btn-success w-100 mt-2" id="imageSaveButton" type="submit">
-                                Save Profile Details
+                        <div class="col-md-12">
+                            <button class="btn btn-success float-right mt-2" id="imageSaveButton" type="submit">
+                                Save Profile Images
                             </button>
                         </div>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        {{-- Email Change Section --}}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="mb-3">Change Email Address</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label">Current Email</label>
+                            <input class="form-control" type="text" value="<?php echo $user['details']['email']; ?>" readonly
+                                style="border: 1px solid #aaa; background-color: #f5f5f5;">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" for="Email">New Email</label>
+                            <div class="input-group">
+                                <input class="form-control" id="email" type="email"
+                                    value="<?php echo $user['details']['email']; ?>" style="border: 1px solid #aaa;" placeholder="Enter New Email">
+                                <button class="btn btn-primary sendEmailOtp" type="button" onclick="sendEmailOtp()">
+                                    Get OTP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" for="Email">Verify Email</label>
+                            <div class="input-group">
+                                <input class="form-control" id="email_otp" type="text"
+                                    style="border: 1px solid #aaa;" placeholder="Enter OTP">
+                                <button class="btn btn-primary verifyEmailOtp" type="button"
+                                    onclick="verifyEmailOtp()" disabled>
+                                    Verify
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <input id="old_email" type="hidden" value="{{ $user->email }}">
+            </div>
+        </div>
+
+        {{-- Phone Change Section --}}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="mb-3">Change Mobile Number</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label">Current Mobile</label>
+                            <input class="form-control" type="text" value="<?php echo $user['details']['mobile']; ?>" readonly
+                                style="border: 1px solid #aaa; background-color: #f5f5f5;">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" for="Mobile No.">New Mobile No.</label>
+                            <div class="input-group">
+                                <input class="form-control" id="mobile" type="number"
+                                    value="<?php echo $user['details']['mobile']; ?>" minlength="10" maxlength="10" placeholder="Enter New Mobile">
+                                <button class="btn btn-primary sendMobileOtp" type="button" onclick="sendMobileOtp()">
+                                    Get OTP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" for="Mobile">Verify Mobile</label>
+                            <div class="input-group">
+                                <input class="form-control" id="mobile_otp" type="number" minlength="6"
+                                    maxlength="6" placeholder="Enter OTP">
+                                <button class="btn btn-primary verifyMobileOtp" type="button"
+                                    onclick="verifyMobileOtp()" disabled>
+                                    Verify
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <input id="old_mobile_number" type="hidden" value="{{ $user->mobile }}">
             </div>
         </div>
     </section>
@@ -113,8 +144,6 @@
 @section('javascript')
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script>
-        $('#imageSaveButton').show();
-
         function avatarPreview(event) {
             var output = document.getElementById('user_profile_image');
             if (event.target.files[0]) {
@@ -194,11 +223,10 @@
 
             $.get("/corporate/profile/verifyotp/email/" + email + "/" + email_otp, function(data) {
                 if (data == true) {
-                    alert('Otp Verified!');
-                    $(".verifyEmailOtp").attr('disabled', '');
-                    document.getElementById('verify_email_check').value = '1';
+                    alert('Email Updated Successfully!');
+                    location.reload();
                 } else {
-                    alert('Please Enter Valid Otp');
+                    alert('Please Enter Valid OTP');
                 }
             });
         }
@@ -237,11 +265,10 @@
 
             $.get("/corporate/profile/verifyotp/mobile/" + mobile_number + "/" + mobile_otp, function(data) {
                 if (data == true) {
-                    alert('Otp Verified!');
-                    $(".verifyMobileOtp").attr('disabled', '');
-                    document.getElementById('verify_mobile_check').value = '1';
+                    alert('Mobile Number Updated Successfully!');
+                    location.reload();
                 } else {
-                    alert('Please Enter Valid Otp');
+                    alert('Please Enter Valid OTP');
                 }
             });
         }

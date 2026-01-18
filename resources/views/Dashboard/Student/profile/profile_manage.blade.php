@@ -8,13 +8,14 @@
 
             </div>
         @endif
-        <form class="card dashboard-container mb-5" action="{{ route('student.manage_profile_process') }}" method="post"
+
+        {{-- Main Profile Form: Name and Photo Only --}}
+        <form class="card dashboard-container mb-3" action="{{ route('student.manage_profile_process') }}" method="post"
             enctype="multipart/form-data">
             @csrf
             <div class="card-body">
                 <div class="row">
-
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label" for="Name">Name</label>
                             <input class="form-control form-control-sm" name="name" type="text"
@@ -23,33 +24,58 @@
                         </div>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label" for="photo_url">Select Photo</label>
                             <input class="form-control form-control-sm" name="photo_url" type="file"
                                 style="border: 1px solid #aaa;">
                         </div>
                     </div>
+                </div>
 
-                    <div class="col-md-3">
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <button class="btn btn-primary float-right" type="submit">Update Profile</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        {{-- Email Change Section --}}
+        <div class="card dashboard-container mb-3">
+            <div class="card-body">
+                <h5 class="mb-3">Change Email Address</h5>
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-group">
-                            <label class="control-label" for="Email">Email</label>
+                            <label class="control-label">Current Email</label>
+                            <input class="form-control form-control-sm" type="text" value="{{ $user->email }}" readonly
+                                style="border: 1px solid #aaa; background-color: #f5f5f5;">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" for="Email">New Email</label>
                             <div class="input-group">
-                                <input class="form-control" id="email_new" name="email" type="email"
-                                    value="{{ $user->email }}" oninput="uniqueEmailCheck(this)"
-                                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" placeholder="E-mail">
+                                <input class="form-control" id="email_new" type="email"
+                                    value="{{ $user->email }}"
+                                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" placeholder="Enter New Email">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary sendEmailOtp" type="button" onclick="sendEmailOtp()">
-                                        Get Otp
+                                        Get OTP
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group mt-3">
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
                             <label class="control-label" for="Email">Verify Email</label>
                             <div class="input-group">
-                                <input class="form-control form-control-sm" id="email_otp" name="email_otp" type="text"
-                                    style="border: 1px solid #aaa;" placeholder="Input OTP">
+                                <input class="form-control form-control-sm" id="email_otp" type="text"
+                                    style="border: 1px solid #aaa;" placeholder="Enter OTP">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary verifyEmailOtp" type="button" onclick="verifyEmailOtp()"
                                         disabled>
@@ -59,25 +85,45 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <input id="old_email" type="hidden" value="{{ $user->email }}">
+            </div>
+        </div>
 
-                    <div class="col-md-3">
+        {{-- Phone Change Section --}}
+        <div class="card dashboard-container mb-5">
+            <div class="card-body">
+                <h5 class="mb-3">Change Mobile Number</h5>
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-group">
-                            <label class="control-label" for="Mobile">Mobile</label>
+                            <label class="control-label">Current Mobile</label>
+                            <input class="form-control form-control-sm" type="text" value="{{ $user->mobile }}" readonly
+                                style="border: 1px solid #aaa; background-color: #f5f5f5;">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" for="Mobile">New Mobile</label>
                             <div class="input-group">
-                                <input class="form-control" id="mobile_number" name="mobile_number" type="number"
-                                    value="{{ $user->mobile }}" minlength="10" maxlength="10" placeholder="Mobile">
+                                <input class="form-control" id="mobile_number" type="number"
+                                    value="{{ $user->mobile }}" minlength="10" maxlength="10" placeholder="Enter New Mobile">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary sendOtp" type="button" onclick="sendOtp()">
-                                        Get Otp
+                                        Get OTP
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group mt-3">
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
                             <label class="control-label" for="Mobile">Verify Mobile</label>
                             <div class="input-group">
-                                <input class="form-control" id="mobile_otp" name="mobile_otp" type="number" minlength="6"
-                                    maxlength="6" placeholder="Input OTP">
+                                <input class="form-control" id="mobile_otp" type="number" minlength="6"
+                                    maxlength="6" placeholder="Enter OTP">
                                 <div class="input-group-append">
                                     <button class="btn btn-primary verifyOtp" type="button" onclick="verifyOtp()" disabled>
                                         Verify
@@ -86,20 +132,12 @@
                             </div>
                         </div>
                     </div>
-                    <input id="old_mobile_number" name="old_mobile_number" type="hidden" value="{{ $user->mobile }}">
-                    <input id="verify_check" name="verify_check" type="hidden">
-                    <input id="old_email" name="old_email" type="hidden" value="{{ $user->email }}">
-                    <input id="verify_email_check" name="verify_email_check" type="hidden">
-
-
-                    <div class="row mt-3">
-                        <div class="form-group" style="float:right">
-                            <button class="btn btn-primary" type="submit">Update</button>
-                        </div>
-                    </div>
                 </div>
-        </form>
+                <input id="old_mobile_number" type="hidden" value="{{ $user->mobile }}">
+            </div>
+        </div>
     </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
     <script>
@@ -130,11 +168,10 @@
 
             $.get("/student/verifyotp/" + mobile_number + "/" + mobile_otp, function(data) {
                 if (data == true) {
-                    alert('Otp Verified!');
-                    $(".verifyOtp").attr('disabled', '');
-                    document.getElementById('verify_check').value = '1';
+                    alert('Mobile Number Updated Successfully!');
+                    location.reload();
                 } else {
-                    alert('Please Enter Valid Otp');
+                    alert('Please Enter Valid OTP');
                 }
             });
         }
@@ -228,11 +265,10 @@
 
             $.get("/student/verifyemailotp/" + email + "/" + email_otp, function(data) {
                 if (data == true) {
-                    alert('Otp Verified!');
-                    $(".verifyEmailOtp").attr('disabled', '');
-                    document.getElementById('verify_email_check').value = '1';
+                    alert('Email Updated Successfully!');
+                    location.reload();
                 } else {
-                    alert('Please Enter Valid Otp');
+                    alert('Please Enter Valid OTP');
                 }
             });
         }

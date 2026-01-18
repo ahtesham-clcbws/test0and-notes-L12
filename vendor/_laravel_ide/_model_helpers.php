@@ -12117,8 +12117,8 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<Studymaterial>|Studymaterial newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Studymaterial>|Studymaterial newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Studymaterial>|Studymaterial query()
-     * @method static \Illuminate\Database\Eloquent\Builder<Studymaterial>|Studymaterial withRelations()
-     * @method static \Illuminate\Database\Eloquent\Builder<Studymaterial>|Studymaterial byCategory(mixed $categoryId)
+     * @method static \Illuminate\Database\Eloquent\Builder<Studymaterial>|Studymaterial withRelations() {@see App\Models\Studymaterial::scopeWithRelations()}
+     * @method static \Illuminate\Database\Eloquent\Builder<Studymaterial>|Studymaterial byCategory(mixed $categoryId) {@see App\Models\Studymaterial::scopeByCategory()}
      * @method static mixed select($columns)
      * @method static mixed selectSub($query, $as)
      * @method static mixed selectRaw($expression, array $bindings)
