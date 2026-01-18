@@ -154,6 +154,108 @@
         font-size: small;
         width: 100%;
     }
+
+    /* Flip Card Styles */
+    .flip-card {
+        background-color: transparent;
+        perspective: 1000px;
+        cursor: pointer;
+        /* Ensure the card itself takes full height if in a flex container */
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: left;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+        flex: 1; /* Grow to fill */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .flip-card:hover .flip-card-inner {
+        transform: rotateY(180deg);
+    }
+
+    .flip-card-front, .flip-card-back {
+        width: 100%;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        border-radius: 10px; /* Optional: maintain border radius if needed */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .flip-card-front {
+        background-color: #fff;
+        height: 100%; /* Ensure it fills the inner container */
+        justify-content: space-between;
+    }
+
+    .flip-card-back {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: #fff;
+        color: black;
+        transform: rotateY(180deg);
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        padding: 15px;
+        overflow: hidden; /* Scroll if details exceed front face height */
+        z-index: 10;
+        border: 1px solid #eef0f2;
+    }
+
+    .flip-card-front {
+        background-color: #fff;
+        color: black;
+        /* Image is inside here */
+    }
+
+    .flip-card-back {
+        background-color: #fff;
+        color: black;
+        transform: rotateY(180deg);
+        position: absolute;
+        top: 0;
+        left: 0;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        padding: 10px; /* Reduced padding */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start; /* Align top since content is long */
+        overflow-y: auto; /* Allow scroll for long content */
+        font-size: 11px; /* Smaller text for compact view */
+    }
+
+    .flip-card-back h5 {
+        font-size: 13px;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .flip-card-back ul {
+        margin-bottom: 5px;
+        padding-left: 15px;
+    }
+
+    .flip-card-back .pop-box-text {
+        font-size: 10px;
+    }
+
+    .flip-card-back button {
+        padding: 3px 10px;
+        font-size: 10px;
+    }
+    .slick-list {
+        overflow: visible !important;
+    }
 </style>
 <link href='https://fonts.googleapis.com/css?family=Sansita' rel='stylesheet'>
 @endsection
@@ -278,12 +380,12 @@ use Illuminate\Support\Facades\DB;
 
         <div class="row justify-content-center">
             <div class="col-xl-12 col-lg-12 col-sm-12 only-tow-slider">
-                <div class="best-course space">
+                <div class="best-course space" style="overflow-x:visible;">
                     @if (count($Gn_PackagePackagelist) > 0)
 
                     @foreach ($Gn_PackagePackagelist as $item)
                     @if($item->is_featured != '0')
-                    <div class="cource-item book-cource-item mx-2 {{ 'book-element-'}}" @mouseenter="addRightTooltip('book-cource-item')" @mourseout="removeRightTooltip('book-cource-item')">
+                    <div class="cource-item book-cource-item mx-2 flip-card">
                         <?php
 
                         $educationType = DB::table('education_type')->where('id', $item->education_type)?->first()?->name;
@@ -292,73 +394,65 @@ use Illuminate\Support\Facades\DB;
 
 
                         ?>
-                        <div class="d-flex gap-2 align-items-center">
-                            <p class="academic-title">{{$educationType}}</p>
-                            <p class="academic-title2">{{$classtype}}</p>
-                        </div>
-                        <div class="cource-img">
-                            @if (isset($item->package_image))
-                            <img src="/storage/{{$item->package_image}}" alt="">
-                            @else
-                            <img src="{{ asset("noimg.png") }}" alt="">
-                            @endif
-                        </div>
-                        <div class="course-body">
-                            <a href="#" class="course-category">{{ $item->special_remark_1 }}</a>
-                            <div class="course-desc">
-                                <p class="m-0">{{ $item->plan_name }}</p>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front" style="overflow:hidden;">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <p class="academic-title">{{$educationType}}</p>
+                                    <p class="academic-title2">{{$classtype}}</p>
+                                </div>
+                                <div class="cource-img">
+                                    @if (isset($item->package_image))
+                                    <img src="/storage/{{$item->package_image}}" alt="">
+                                    @else
+                                    <img src="{{ asset("noimg.png") }}" alt="">
+                                    @endif
+                                </div>
+                                <div class="course-body">
+                                    <a href="#" class="course-category">{{ $item->special_remark_1 }}</a>
+                                    <div class="course-desc">
+                                        <p class="m-0">{{ $item->plan_name }}</p>
+                                    </div>
+                                    <div class="rating-box">
+                                        <span class="rating-pres">{{ $item->student_rating }}</span>
+                                        <input class="rating" max="5" oninput="this.style.setProperty('--value', `${this.valueAsNumber}`)" step="0.5" style="--value:<?= $item->student_rating ?>" type="range" value="2.5">
+                                        <span class="rating-text">(@if($item->enrol_student_no != null){{ $item->enrol_student_no }}@else 0 @endif)</span>
+                                    </div>
+                                    <div class="payment-box">
+                                        <span>&#8377; {{ $item->final_fees }}</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="rating-box">
-                                <span class="rating-pres">{{ $item->student_rating }}</span>
-                                <input class="rating" max="5" oninput="this.style.setProperty('--value', `${this.valueAsNumber}`)" step="0.5" style="--value:<?= $item->student_rating ?>" type="range" value="2.5">
-                                {{-- <ul>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star-half" aria-hidden="true"></i></li>
-                                        </ul> --}}
-                                <span class="rating-text">(@if($item->enrol_student_no != null){{ $item->enrol_student_no }}@else 0 @endif)</span>
-                            </div>
-                            <div class="payment-box">
-                                <span>&#8377; {{ $item->final_fees }}</span>
-                            </div>
-                        </div>
-                        <div class="course-hover-box hover_box">
-                            <h5>{{ $item->plan_name }}</h5>
-                            <ul>
-                                @if($item->total_test != '0') <li>&#x2713; {{ $item->total_test }} Test</li>@endif
-                                @if($item->total_video != '0')<li>&#x2713; {{ $item->total_video }} Video/ Live Class</li>@endif
-                                @if($item->total_notes != '0')<li>&#x2713; {{ $item->total_notes }} Study Notes & E-Books</li>@endif
-                                @if($item->current_affairs_allow != '0')<li>&#x2713; {{ $item->current_affairs_allow }} Current Affairs</li>@endif
-                                @if($item->special_remark_1 != '0')<li class="mt-2">&#x2713; {{ $item->special_remark_1 }}</li>@endif
-                                @if($item->special_remark_2 != '0')<li class="mb-2">&#x2713; {{ $item->special_remark_2 }}</li>@endif
+                            <div class="flip-card-back">
+                                <h5>{{ $item->plan_name }}</h5>
+                                <ul>
+                                    @if($item->total_test != '0') <li>&#x2713; {{ $item->total_test }} Test</li>@endif
+                                    @if($item->total_video != '0')<li>&#x2713; {{ $item->total_video }} Video/ Live Class</li>@endif
+                                    @if($item->total_notes != '0')<li>&#x2713; {{ $item->total_notes }} Study Notes & E-Books</li>@endif
+                                    @if($item->current_affairs_allow != '0')<li>&#x2713; {{ $item->current_affairs_allow }} Current Affairs</li>@endif
+                                    @if($item->special_remark_1 != '0')<li class="mt-2">&#x2713; {{ $item->special_remark_1 }}</li>@endif
+                                    @if($item->special_remark_2 != '0')<li class="mb-2">&#x2713; {{ $item->special_remark_2 }}</li>@endif
 
-                            </ul>
-                            <div class="row" style="margin-left:10px;">
-                                <div class="col-12 three-sec">
-                                    <p class="pop-box-text">Offer Start: {{ $item->active_date }}</p>
-                                    <p class="pop-box-text pop2-text">Offer End: {{ $item->expire_date }}</p>
+                                </ul>
+                                <div class="row" style="margin:0px;">
+                                    <div class="col-12 three-sec">
+                                        <p class="pop-box-text">Offer Start: {{ $item->active_date }}</p>
+                                        <p class="pop-box-text pop2-text">Offer End: {{ $item->expire_date }}</p>
+                                    </div>
+                                    <div class="col-12 three-sec">
+                                        <p class="pop-box-text">{{ $item->duration }} Days + {{ $item->free_duration }} Days (Free)</p>
+                                        <p class="pop-box-text pop2-text">Offer Price: {{ $item->package_category }}</p>
+                                    </div>
+                                    <div class="col-12 three-sec">
+                                        <p class="pop-box-text">Actual Price: ₹ {{ $item->actual_fees }}/- Only</p>
+                                        <p class="pop-box-text pop2-text">Offer Price: ₹ {{ $item->final_fees }}/- Only</p>
+                                    </div>
                                 </div>
-                                <div class="col-12 three-sec">
-                                    <p class="pop-box-text">{{ $item->duration }} Days + {{ $item->free_duration }} Days (Free)</p>
-                                    <p class="pop-box-text pop2-text">Offer Price: {{ $item->package_category }}</p>
-                                </div>
-                                <div class="col-12 three-sec">
-                                    <p class="pop-box-text">Actual Price: ₹ {{ $item->actual_fees }}/- Only</p>
-                                    <p class="pop-box-text pop2-text">Offer Price: ₹ {{ $item->final_fees }}/- Only</p>
-                                </div>
-                            </div>
-                            <div class="footer-new-poup mt-2">
-                                <p>Grab This Amazing free Offer</p>
-                                @if(Auth::check())
-                                <a href="{{ route('student.package_manage',[$item->id]) }}"><button>Start</button></a>
-                                @else
-                                <button id="plan_login" data-bs-toggle="modal" data-dashboard="{{ route('student.package_manage',[$item->id]) }}" data-bs-target="#login">Start</button>
-                                @endif
-
-                                <div class="like-bt">
-                                    <i class="fa fa-heart" aria-hidden="true"></i>
+                                <div class="footer-new-poup mt-2">
+                                    @if(Auth::check())
+                                    <a href="{{ route('student.package_manage',[$item->id]) }}"><button>Start</button></a>
+                                    @else
+                                    <button id="plan_login" data-bs-toggle="modal" data-dashboard="{{ route('student.package_manage',[$item->id]) }}" data-bs-target="#login">Start</button>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -376,67 +470,64 @@ use Illuminate\Support\Facades\DB;
                     @if (count($Gn_PackagePlanInstitute) > 0)
                     @foreach ($Gn_PackagePlanInstitute as $item)
                     @if($item->is_featured != '0')
-                    <div class="cource-item book-cource-item mx-2 {{ 'book-element-'}}" @mouseenter="addRightTooltip('book-cource-item')" @mourseout="removeRightTooltip('book-cource-item')">
-                        <div class="cource-img">
-                            @if (isset($item->package_image))
-                            <img src="/storage/{{$item->package_image}}" alt="">
-                            @else
-                            <img src="{{ asset("noimg.png") }}" alt="">
-                            @endif
-                        </div>
-                        <div class="course-body">
-                            <a href="#" class="course-category">{{ $item->special_remark_1 }}</a>
-                            <div class="course-desc">
-                                <p class="m-0">{{ $item->plan_name }}</p>
-                            </div>
-                            <div class="rating-box">
-                                <span class="rating-pres">{{ $item->student_rating }}</span>
-                                <input class="rating" max="5" oninput="this.style.setProperty('--value', `${this.valueAsNumber}`)" step="0.5" style="--value:<?= $item->student_rating ?>" type="range" value="2.5">
-                                {{-- <ul>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star-half" aria-hidden="true"></i></li>
-                                        </ul> --}}
-                                <span class="rating-text">(@if($item->enrol_student_no != null){{ $item->enrol_student_no }}@else 0 @endif)</span>
-                            </div>
-                            <div class="payment-box">
-                                <span>&#8377; {{ $item->final_fees }}</span>
-                            </div>
-                        </div>
-                        <div class="course-hover-box hover_box">
-                            <h5>{{ $item->plan_name }}</h5>
-                            <ul>
-                                @if($item->total_test != '0') <li>&#x2713; {{ $item->total_test }} Test</li>@endif
-                                @if($item->total_video != '0')<li>&#x2713; {{ $item->total_video }} Video/ Live Class</li>@endif
-                                @if($item->total_notes != '0')<li>&#x2713; {{ $item->total_notes }} Study Notes & E-Books</li>@endif
-                                @if($item->current_affairs_allow != '0')<li>&#x2713; {{ $item->current_affairs_allow }} Current Affairs</li>@endif
-                                @if($item->special_remark_1 != '0')<li>&#x2713; {{ $item->special_remark_1 }}</li>@endif
-                                @if($item->special_remark_2 != '0')<li>&#x2713; {{ $item->special_remark_2 }}</li>@endif
-                            </ul>
-                            <div class="row">
-                                <div class="col-12 three-sec">
-                                    <p class="pop-box-text">Offer Start: {{ $item->active_date }}</p>
-                                    <p class="pop-box-text pop2-text">Offer End: {{ $item->expire_date }}</p>
+                    <div class="cource-item book-cource-item mx-2 flip-card">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <div class="cource-img">
+                                    @if (isset($item->package_image))
+                                    <img src="/storage/{{$item->package_image}}" alt="">
+                                    @else
+                                    <img src="{{ asset("noimg.png") }}" alt="">
+                                    @endif
                                 </div>
-                                <div class="col-12 three-sec">
-                                    <p class="pop-box-text">{{ $item->duration }} Days + {{ $item->free_duration }} Days (Free)</p>
-                                    <p class="pop-box-text pop2-text">Offer Price: {{ $item->package_category }}</p>
-                                </div>
-                                <div class="col-12 three-sec">
-                                    <p class="pop-box-text">Actual Price: ₹ {{ $item->actual_fees }}/- Only</p>
-                                    <p class="pop-box-text pop2-text">Offer Price: ₹ {{ $item->final_fees }}/- Only</p>
+                                <div class="course-body">
+                                    <a href="#" class="course-category">{{ $item->special_remark_1 }}</a>
+                                    <div class="course-desc">
+                                        <p class="m-0">{{ $item->plan_name }}</p>
+                                    </div>
+                                    <div class="rating-box">
+                                        <span class="rating-pres">{{ $item->student_rating }}</span>
+                                        <input class="rating" max="5" oninput="this.style.setProperty('--value', `${this.valueAsNumber}`)" step="0.5" style="--value:<?= $item->student_rating ?>" type="range" value="2.5">
+                                        <span class="rating-text">(@if($item->enrol_student_no != null){{ $item->enrol_student_no }}@else 0 @endif)</span>
+                                    </div>
+                                    <div class="payment-box">
+                                        <span>&#8377; {{ $item->final_fees }}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="footer-new-poup mt-2">
-                                @if(Auth::check())
-                                <a href="{{ route('student.package_manage',[$item->id]) }}"><button>Start</button></a>
-                                @else
-                                <button id="plan_login" data-bs-toggle="modal" data-dashboard="{{ route('student.package_manage',[$item->id]) }}" data-bs-target="#login">{{$item->permission_to_download}}</button>
-                                @endif
-                                <div class="like-bt">
-                                    <i class="fa fa-heart" aria-hidden="true"></i>
+                            <div class="flip-card-back">
+                                <h5>{{ $item->plan_name }}</h5>
+                                <ul>
+                                    @if($item->total_test != '0') <li>&#x2713; {{ $item->total_test }} Test</li>@endif
+                                    @if($item->total_video != '0')<li>&#x2713; {{ $item->total_video }} Video/ Live Class</li>@endif
+                                    @if($item->total_notes != '0')<li>&#x2713; {{ $item->total_notes }} Study Notes & E-Books</li>@endif
+                                    @if($item->current_affairs_allow != '0')<li>&#x2713; {{ $item->current_affairs_allow }} Current Affairs</li>@endif
+                                    @if($item->special_remark_1 != '0')<li>&#x2713; {{ $item->special_remark_1 }}</li>@endif
+                                    @if($item->special_remark_2 != '0')<li>&#x2713; {{ $item->special_remark_2 }}</li>@endif
+                                </ul>
+                                <div class="row">
+                                    <div class="col-12 three-sec">
+                                        <p class="pop-box-text">Offer Start: {{ $item->active_date }}</p>
+                                        <p class="pop-box-text pop2-text">Offer End: {{ $item->expire_date }}</p>
+                                    </div>
+                                    <div class="col-12 three-sec">
+                                        <p class="pop-box-text">{{ $item->duration }} Days + {{ $item->free_duration }} Days (Free)</p>
+                                        <p class="pop-box-text pop2-text">Offer Price: {{ $item->package_category }}</p>
+                                    </div>
+                                    <div class="col-12 three-sec">
+                                        <p class="pop-box-text">Actual Price: ₹ {{ $item->actual_fees }}/- Only</p>
+                                        <p class="pop-box-text pop2-text">Offer Price: ₹ {{ $item->final_fees }}/- Only</p>
+                                    </div>
+                                </div>
+                                <div class="footer-new-poup mt-2">
+                                    @if(Auth::check())
+                                    <a href="{{ route('student.package_manage',[$item->id]) }}"><button>Start</button></a>
+                                    @else
+                                    <button id="plan_login" data-bs-toggle="modal" data-dashboard="{{ route('student.package_manage',[$item->id]) }}" data-bs-target="#login">{{$item->permission_to_download}}</button>
+                                    @endif
+                                    <div class="like-bt">
+                                        <i class="fa fa-heart" aria-hidden="true"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -472,70 +563,67 @@ use Illuminate\Support\Facades\DB;
                     <!--@if($result['competitive_courses_status'] == 1)-->
                     @if (count($Gn_PackagePlanGyanology) > 0)
                     @foreach ($Gn_PackagePlanGyanology as $item)
-                    <div class="cource-item book-cource-item mx-2 {{ 'book-element-'}}" @mouseenter="addRightTooltip('book-cource-item')" @mourseout="removeRightTooltip('book-cource-item')">
-                        <div class="d-flex gap-2 align-items-center">
-                            <p class="academic-title">IIT-JEE</p>
-                            <p class="academic-title2">Academics</p>
-                        </div>
-                        <div class="cource-img">
-                            @if (isset($item->package_image))
-                            <img src="/storage/{{$item->package_image}}" alt="">
-                            @else
-                            <img src="{{ asset("noimg.png") }}" alt="">
-                            @endif
-                        </div>
-                        <div class="course-body">
-                            <a href="#" class="course-category">{{ $item->special_remark_1 }}</a>
-                            <div class="course-desc">
-                                <p class="m-0">{{ $item->plan_name }}</p>
-                            </div>
-                            <div class="rating-box">
-                                <span class="rating-pres">{{ $item->student_rating }}</span>
-                                <input class="rating" max="5" oninput="this.style.setProperty('--value', `${this.valueAsNumber}`)" step="0.5" style="--value:<?= $item->student_rating ?>" type="range" value="2.5">
-                                {{-- <ul>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star-half" aria-hidden="true"></i></li>
-                                        </ul> --}}
-                                <span class="rating-text">({{ $item->enrol_student_no }})</span>
-                            </div>
-                            <div class="payment-box">
-                                <span>&#8377; {{ $item->final_fees }}</span>
-                            </div>
-                        </div>
-                        <div class="course-hover-box">
-                            <h5>{{ $item->plan_name }}</h5>
-                            <ul>
-                                <li>{{ $item->total_test }} Test</li>
-                                <li>{{ $item->total_video }} Video/ Live Class</li>
-                                <li>{{ $item->current_affairs_allow }}</li>
-                                <li>{{ $item->special_remark_1 }}</li>
-                                <li>{{ $item->special_remark_2 }}</li>
-                            </ul>
-                            <div class="row">
-                                <div class="col-12 three-sec">
-                                    <p class="pop-box-text">Offer Start: {{ $item->active_date }}</p>
-                                    <p class="pop-box-text pop2-text">Offer End: {{ $item->expire_date }}</p>
+                    <div class="cource-item book-cource-item mx-2 flip-card">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <p class="academic-title">IIT-JEE</p>
+                                    <p class="academic-title2">Academics</p>
                                 </div>
-                                <div class="col-12 three-sec">
-                                    <p class="pop-box-text">{{ $item->duration }} Days + {{ $item->free_duration }} Days (Free)</p>
-                                    <p class="pop-box-text pop2-text">Offer Price: {{ $item->package_category }}</p>
+                                <div class="cource-img">
+                                    @if (isset($item->package_image))
+                                    <img src="/storage/{{$item->package_image}}" alt="">
+                                    @else
+                                    <img src="{{ asset("noimg.png") }}" alt="">
+                                    @endif
                                 </div>
-                                <div class="col-12 three-sec">
-                                    <p class="pop-box-text">Actual Price: ₹ {{ $item->actual_fees }}/- Only</p>
-                                    <p class="pop-box-text pop2-text">Offer Price: ₹ {{ $item->final_fees }}/- Only</p>
+                                <div class="course-body">
+                                    <a href="#" class="course-category">{{ $item->special_remark_1 }}</a>
+                                    <div class="course-desc">
+                                        <p class="m-0">{{ $item->plan_name }}</p>
+                                    </div>
+                                    <div class="rating-box">
+                                        <span class="rating-pres">{{ $item->student_rating }}</span>
+                                        <input class="rating" max="5" oninput="this.style.setProperty('--value', `${this.valueAsNumber}`)" step="0.5" style="--value:<?= $item->student_rating ?>" type="range" value="2.5">
+                                        <span class="rating-text">({{ $item->enrol_student_no }})</span>
+                                    </div>
+                                    <div class="payment-box">
+                                        <span>&#8377; {{ $item->final_fees }}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="footer-new-poup mt-2">
-                                @if(Auth::check())
-                                <a href="{{ route('student.package_manage',[$item->id]) }}"><button>Start</button></a>
-                                @else
-                                <button id="plan_login" data-bs-toggle="modal" data-dashboard="{{ route('student.package_manage',[$item->id]) }}" data-bs-target="#login">Start</button>
-                                @endif
-                                <div class="like-bt">
-                                    <i class="fa fa-heart" aria-hidden="true"></i>
+                            <div class="flip-card-back">
+                                <h5>{{ $item->plan_name }}</h5>
+                                <ul>
+                                    <li>{{ $item->total_test }} Test</li>
+                                    <li>{{ $item->total_video }} Video/ Live Class</li>
+                                    <li>{{ $item->current_affairs_allow }}</li>
+                                    <li>{{ $item->special_remark_1 }}</li>
+                                    <li>{{ $item->special_remark_2 }}</li>
+                                </ul>
+                                <div class="row">
+                                    <div class="col-12 three-sec">
+                                        <p class="pop-box-text">Offer Start: {{ $item->active_date }}</p>
+                                        <p class="pop-box-text pop2-text">Offer End: {{ $item->expire_date }}</p>
+                                    </div>
+                                    <div class="col-12 three-sec">
+                                        <p class="pop-box-text">{{ $item->duration }} Days + {{ $item->free_duration }} Days (Free)</p>
+                                        <p class="pop-box-text pop2-text">Offer Price: {{ $item->package_category }}</p>
+                                    </div>
+                                    <div class="col-12 three-sec">
+                                        <p class="pop-box-text">Actual Price: ₹ {{ $item->actual_fees }}/- Only</p>
+                                        <p class="pop-box-text pop2-text">Offer Price: ₹ {{ $item->final_fees }}/- Only</p>
+                                    </div>
+                                </div>
+                                <div class="footer-new-poup mt-2">
+                                    @if(Auth::check())
+                                    <a href="{{ route('student.package_manage',[$item->id]) }}"><button>Start</button></a>
+                                    @else
+                                    <button id="plan_login" data-bs-toggle="modal" data-dashboard="{{ route('student.package_manage',[$item->id]) }}" data-bs-target="#login">Start</button>
+                                    @endif
+                                    <div class="like-bt">
+                                        <i class="fa fa-heart" aria-hidden="true"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -551,7 +639,7 @@ use Illuminate\Support\Facades\DB;
                 <div class="best-course space">
                     @if (count($Gn_PackagePlanGyanology2) > 0)
                     @foreach ($Gn_PackagePlanGyanology2 as $item)
-                    <div class="cource-item book-cource-item mx-2 {{ 'book-element-'}}" @mouseenter="addRightTooltip('book-cource-item')" @mourseout="removeRightTooltip('book-cource-item')">
+                    <div class="cource-item book-cource-item mx-2 flip-card">
                         <?php
 
                         $educationType2 = DB::table('education_type')->where('id', $item->education_type)?->first()?->name;
@@ -560,69 +648,66 @@ use Illuminate\Support\Facades\DB;
 
 
                         ?>
-                        <div class="d-flex gap-2 align-items-center">
-                            <p class="academic-title">{{ $classtype2 }}</p>
-                            <p class="academic-title2">{{ $educationType2  }}</p>
-                        </div>
-                        <div class="cource-img">
-                            @if (isset($item->package_image))
-                            <img src="/storage/{{$item->package_image}}" alt="">
-                            @else
-                            <img src="{{ asset("noimg.png") }}" alt="">
-                            @endif
-                        </div>
-                        <div class="course-body">
-                            <a href="#" class="course-category">{{ $item->special_remark_1 }}</a>
-                            <div class="course-desc">
-                                <p class="m-0">{{ $item->plan_name }}</p>
-                            </div>
-                            <div class="rating-box">
-                                <span class="rating-pres">{{ $item->student_rating }}</span>
-                                <input class="rating" max="5" oninput="this.style.setProperty('--value', `${this.valueAsNumber}`)" step="0.5" style="--value:<?= $item->student_rating ?>" type="range" value="2.5">
-                                {{-- <ul>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star" aria-hidden="true"></i></li>
-                                            <li><i class="fa fa-star-half" aria-hidden="true"></i></li>
-                                        </ul> --}}
-                                <span class="rating-text">({{ $item->enrol_student_no }})</span>
-                            </div>
-                            <div class="payment-box">
-                                <span>&#8377; {{ $item->final_fees }}</span>
-                            </div>
-                        </div>
-                        <div class="course-hover-box">
-                            <h5>{{ $item->plan_name }}</h5>
-                            <ul>
-                                <li>{{ $item->total_test }} Test</li>
-                                <li>{{ $item->total_video }} Video/ Live Class</li>
-                                <li>{{ $item->current_affairs_allow }}</li>
-                                <li>{{ $item->special_remark_1 }}</li>
-                                <li>{{ $item->special_remark_2 }}</li>
-                            </ul>
-                            <div class="row">
-                                <div class="col-12 three-sec">
-                                    <p class="pop-box-text">Offer Start: {{ $item->active_date }}</p>
-                                    <p class="pop-box-text pop2-text">Offer End: {{ $item->expire_date }}</p>
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <p class="academic-title">{{ $classtype2 }}</p>
+                                    <p class="academic-title2">{{ $educationType2  }}</p>
                                 </div>
-                                <div class="col-12 three-sec">
-                                    <p class="pop-box-text">{{ $item->duration }} Days + {{ $item->free_duration }} Days (Free)</p>
-                                    <p class="pop-box-text pop2-text">Offer Price: {{ $item->package_category }}</p>
+                                <div class="cource-img">
+                                    @if (isset($item->package_image))
+                                    <img src="/storage/{{$item->package_image}}" alt="">
+                                    @else
+                                    <img src="{{ asset("noimg.png") }}" alt="">
+                                    @endif
                                 </div>
-                                <div class="col-12 three-sec">
-                                    <p class="pop-box-text">Actual Price: ₹ {{ $item->actual_fees }}/- Only</p>
-                                    <p class="pop-box-text pop2-text">Offer Price: ₹ {{ $item->final_fees }}/- Only</p>
+                                <div class="course-body">
+                                    <a href="#" class="course-category">{{ $item->special_remark_1 }}</a>
+                                    <div class="course-desc">
+                                        <p class="m-0">{{ $item->plan_name }}</p>
+                                    </div>
+                                    <div class="rating-box">
+                                        <span class="rating-pres">{{ $item->student_rating }}</span>
+                                        <input class="rating" max="5" oninput="this.style.setProperty('--value', `${this.valueAsNumber}`)" step="0.5" style="--value:<?= $item->student_rating ?>" type="range" value="2.5">
+                                        <span class="rating-text">({{ $item->enrol_student_no }})</span>
+                                    </div>
+                                    <div class="payment-box">
+                                        <span>&#8377; {{ $item->final_fees }}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="footer-new-poup mt-2">
-                                @if(Auth::check())
-                                <a href="{{ route('student.package_manage',[$item->id]) }}"><button>Start</button></a>
-                                @else
-                                <button id="plan_login" data-bs-toggle="modal" data-dashboard="{{ route('student.package_manage',[$item->id]) }}" data-bs-target="#login">Start</button>
-                                @endif
-                                <div class="like-bt">
-                                    <i class="fa fa-heart" aria-hidden="true"></i>
+                            <div class="flip-card-back">
+                                <h5>{{ $item->plan_name }}</h5>
+                                <ul>
+                                    <li>{{ $item->total_test }} Test</li>
+                                    <li>{{ $item->total_video }} Video/ Live Class</li>
+                                    <li>{{ $item->current_affairs_allow }}</li>
+                                    <li>{{ $item->special_remark_1 }}</li>
+                                    <li>{{ $item->special_remark_2 }}</li>
+                                </ul>
+                                <div class="row">
+                                    <div class="col-12 three-sec">
+                                        <p class="pop-box-text">Offer Start: {{ $item->active_date }}</p>
+                                        <p class="pop-box-text pop2-text">Offer End: {{ $item->expire_date }}</p>
+                                    </div>
+                                    <div class="col-12 three-sec">
+                                        <p class="pop-box-text">{{ $item->duration }} Days + {{ $item->free_duration }} Days (Free)</p>
+                                        <p class="pop-box-text pop2-text">Offer Price: {{ $item->package_category }}</p>
+                                    </div>
+                                    <div class="col-12 three-sec">
+                                        <p class="pop-box-text">Actual Price: ₹ {{ $item->actual_fees }}/- Only</p>
+                                        <p class="pop-box-text pop2-text">Offer Price: ₹ {{ $item->final_fees }}/- Only</p>
+                                    </div>
+                                </div>
+                                <div class="footer-new-poup mt-2">
+                                    @if(Auth::check())
+                                    <a href="{{ route('student.package_manage',[$item->id]) }}"><button>Start</button></a>
+                                    @else
+                                    <button id="plan_login" data-bs-toggle="modal" data-dashboard="{{ route('student.package_manage',[$item->id]) }}" data-bs-target="#login">Start</button>
+                                    @endif
+                                    <div class="like-bt">
+                                        <i class="fa fa-heart" aria-hidden="true"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1180,13 +1265,13 @@ use Illuminate\Support\Facades\DB;
             });
         });
 
-        $('.book-cource-item').hover(function() {
-            addRightTooltip('book-cource-item')
-        });
+        // $('.book-cource-item').hover(function() {
+        //     addRightTooltip('book-cource-item')
+        // });
 
-        $('.book-cource-item-2').hover(function() {
-            addRightTooltip('book-cource-item-2')
-        });
+        // $('.book-cource-item-2').hover(function() {
+        //     addRightTooltip('book-cource-item-2')
+        // });
 
         const addRightTooltip = (selector) => {
             const elements = $('.' + selector + '.slick-active')
