@@ -30,21 +30,21 @@ class HomeController extends Controller
 
 
         //->where('class', 186)
-        $Gn_PackagePlanGyanology = Gn_PackagePlan::where('is_featured', 1)->where('education_type', 54)->where('expire_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
-        $Gn_PackagePlanGyanology2 = Gn_PackagePlan::where('is_featured', 1)->where('education_type', 52)->where('expire_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+        $Gn_PackagePlanGyanology = Gn_PackagePlan::with(['educationType', 'classType'])->where('is_featured', 1)->where('education_type', 54)->where('expire_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+        $Gn_PackagePlanGyanology2 = Gn_PackagePlan::with(['educationType', 'classType'])->where('is_featured', 1)->where('education_type', 52)->where('expire_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
 
-        $StudymaterialGovComp = Studymaterial::where('study_material.is_featured', 1)
+        $StudymaterialGovComp = Studymaterial::with(['educationType', 'study_class'])->where('study_material.is_featured', 1)
             ->whereIn('study_material.education_type', [51, 53, 54])
             ->whereNotIN('category', ["Static GK & Current Affairs"])
             ->orderBy('study_material.id', 'desc')
             ->limit(6)
             ->get(['study_material.*']);
 
-        $StudymaterialGovComp2 = Studymaterial::where('study_material.is_featured', 1)
+        $StudymaterialGovComp2 = Studymaterial::with(['educationType', 'study_class'])->where('study_material.is_featured', 1)
             ->where('category', "Static GK & Current Affairs")
             ->get(['study_material.*']);
 
-        $StudymaterialGovComp3 = Studymaterial::where('study_material.is_featured', 1)
+        $StudymaterialGovComp3 = Studymaterial::with(['educationType', 'study_class'])->where('study_material.is_featured', 1)
             ->whereIn('study_material.education_type', [52])
             ->where('category', "Study Notes & E-Books")
             ->get(['study_material.*']);
@@ -70,77 +70,89 @@ class HomeController extends Controller
         // ->leftJoin('gn__package_plans', 'gn__package_plans.id', '=', 'study_material.select_package')
         // ->get(['study_material.*', 'gn__package_plans.enrol_student_no']);
 
-        $StudymaterialAffairs = Studymaterial::where('status', 1)->where('education_type', 53)->where('publish_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["study_material.*",]);
+        $StudymaterialAffairs = Studymaterial::with(['educationType', 'study_class'])->where('status', 1)->where('education_type', 53)->where('publish_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["study_material.*",]);
 
         //->where('expire_date', '>=' , $current_date)
-        $Gn_PackagePackagelist = Gn_PackagePlan::where('status', 1)->where('education_type', 53)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
-        $Gn_PackagePlanInstitute = Gn_PackagePlan::where('status', 1)->where('education_type', 51)->where('expire_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+        $Gn_PackagePackagelist = Gn_PackagePlan::with(['educationType', 'classType'])->where('status', 1)->where('education_type', 53)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+        $Gn_PackagePlanInstitute = Gn_PackagePlan::with(['educationType', 'classType'])->where('status', 1)->where('education_type', 51)->where('expire_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
 
 
         //    echo"<pre>"; print_r($Gn_PackagePlanGyanology); die;
 
-        // $data = array();
-        $data = DB::table('landing_page')->where('id', 1)->first();
+        // Batch fetch landing page data
+        $landingPages = DB::table('landing_page')->whereBetween('id', [1, 9])->get()->keyBy('id');
 
-        $result['banner_title_first'] = $data->banner_title_first;
-        $result['banner_title_second'] = $data->banner_title_second;
-        $result['banner_title_third'] = $data->banner_title_third;
-        $result['banner_content'] = $data->banner_content;
-        $result['competitive_courses_status'] = $data->competitive_courses_status;
-        $result['range_of_courses_status'] = $data->range_of_courses_status;
-        $result['banner_photo'] = $data->banner_photo;
-        $result['banner_attr_image_1'] = $data->banner_attr_image_1;
-        $result['banner_attr_image_2'] = $data->banner_attr_image_2;
-        $result['banner_attr_image_3'] = $data->banner_attr_image_3;
-        $result['slider_footer_image'] = $data->slider_footer_image;
+        // Helper to get landing page data safely
+        $getLandingData = function($id) use ($landingPages) {
+            return $landingPages->get($id) ?? (object)[
+                'banner_title_first' => '', 'banner_title_second' => '', 'banner_title_third' => '', 'banner_content' => '',
+                'competitive_courses_status' => 0, 'range_of_courses_status' => 0, 'banner_photo' => '',
+                'banner_attr_image_1' => '', 'banner_attr_image_2' => '', 'banner_attr_image_3' => '', 'slider_footer_image' => ''
+            ];
+        };
 
-        $data = DB::table('landing_page')->where('id', 2)->first();
-        $result['subtitle1_first'] = $data->banner_title_first;
-        $result['subtitle1_second'] = $data->banner_title_second;
-        $result['subtitle1_third'] = $data->banner_title_third;
-        $result['subtitle1_content'] = $data->banner_content;
+        $data1 = $getLandingData(1);
+        $result = [
+            'banner_title_first' => $data1->banner_title_first,
+            'banner_title_second' => $data1->banner_title_second,
+            'banner_title_third' => $data1->banner_title_third,
+            'banner_content' => $data1->banner_content,
+            'competitive_courses_status' => $data1->competitive_courses_status,
+            'range_of_courses_status' => $data1->range_of_courses_status,
+            'banner_photo' => $data1->banner_photo,
+            'banner_attr_image_1' => $data1->banner_attr_image_1,
+            'banner_attr_image_2' => $data1->banner_attr_image_2,
+            'banner_attr_image_3' => $data1->banner_attr_image_3,
+            'slider_footer_image' => $data1->slider_footer_image,
+        ];
 
-        $data = DB::table('landing_page')->where('id', 3)->first();
-        $result['subtitle2_first'] = $data->banner_title_first;
-        $result['subtitle2_second'] = $data->banner_title_second;
-        $result['subtitle2_third'] = $data->banner_title_third;
-        $result['subtitle2_content'] = $data->banner_content;
+        $data2 = $getLandingData(2);
+        $result['subtitle1_first'] = $data2->banner_title_first;
+        $result['subtitle1_second'] = $data2->banner_title_second;
+        $result['subtitle1_third'] = $data2->banner_title_third;
+        $result['subtitle1_content'] = $data2->banner_content;
 
-        $data = DB::table('landing_page')->where('id', 4)->first();
-        $result['subtitle3_first'] = $data->banner_title_first;
-        $result['subtitle3_second'] = $data->banner_title_second;
-        $result['subtitle3_third'] = $data->banner_title_third;
-        $result['subtitle3_content'] = $data->banner_content;
+        $data3 = $getLandingData(3);
+        $result['subtitle2_first'] = $data3->banner_title_first;
+        $result['subtitle2_second'] = $data3->banner_title_second;
+        $result['subtitle2_third'] = $data3->banner_title_third;
+        $result['subtitle2_content'] = $data3->banner_content;
 
-        $data = DB::table('landing_page')->where('id', 5)->first();
-        $result['subtitle4_first'] = $data->banner_title_first;
-        $result['subtitle4_second'] = $data->banner_title_second;
-        $result['subtitle4_third'] = $data->banner_title_third;
-        $result['subtitle4_content'] = $data->banner_content;
+        $data4 = $getLandingData(4);
+        $result['subtitle3_first'] = $data4->banner_title_first;
+        $result['subtitle3_second'] = $data4->banner_title_second;
+        $result['subtitle3_third'] = $data4->banner_title_third;
+        $result['subtitle3_content'] = $data4->banner_content;
 
-        $data = DB::table('landing_page')->where('id', 6)->first();
-        $result['subtitle5_first'] = $data->banner_title_first;
-        $result['subtitle5_second'] = $data->banner_title_second;
-        $result['subtitle5_third'] = $data->banner_title_third;
-        $result['subtitle5_content'] = $data->banner_content;
+        $data5 = $getLandingData(5);
+        $result['subtitle4_first'] = $data5->banner_title_first;
+        $result['subtitle4_second'] = $data5->banner_title_second;
+        $result['subtitle4_third'] = $data5->banner_title_third;
+        $result['subtitle4_content'] = $data5->banner_content;
 
-        $data = DB::table('landing_page')->where('id', 7)->first();
-        $result['subtitle6_first'] = $data->banner_title_first;
-        $result['subtitle6_second'] = $data->banner_title_second;
-        $result['subtitle6_third'] = $data->banner_title_third;
-        $result['subtitle6_content'] = $data->banner_content;
+        $data6 = $getLandingData(6);
+        $result['subtitle5_first'] = $data6->banner_title_first;
+        $result['subtitle5_second'] = $data6->banner_title_second;
+        $result['subtitle5_third'] = $data6->banner_title_third;
+        $result['subtitle5_content'] = $data6->banner_content;
 
-        $data = DB::table('landing_page')->where('id', 8)->first();
-        $result['subtitle7_first'] = $data->banner_title_first;
-        $result['subtitle7_second'] = $data->banner_title_second;
-        $result['subtitle7_third'] = $data->banner_title_third;
-        $result['subtitle7_content'] = $data->banner_content;
+        $data7 = $getLandingData(7);
+        $result['subtitle6_first'] = $data7->banner_title_first;
+        $result['subtitle6_second'] = $data7->banner_title_second;
+        $result['subtitle6_third'] = $data7->banner_title_third;
+        $result['subtitle6_content'] = $data7->banner_content;
 
-        $data = DB::table('landing_page')->where('id', 9)->first();
-        $result['subtitle8_first'] = $data->banner_title_first;
-        $result['subtitle8_second'] = $data->banner_title_second;
-        $result['subtitle8_third'] = $data->banner_title_third;
-        $result['subtitle8_content'] = $data->banner_content;
+        $data8 = $getLandingData(8);
+        $result['subtitle7_first'] = $data8->banner_title_first;
+        $result['subtitle7_second'] = $data8->banner_title_second;
+        $result['subtitle7_third'] = $data8->banner_title_third;
+        $result['subtitle7_content'] = $data8->banner_content;
+
+        $data9 = $getLandingData(9);
+        $result['subtitle8_first'] = $data9->banner_title_first;
+        $result['subtitle8_second'] = $data9->banner_title_second;
+        $result['subtitle8_third'] = $data9->banner_title_third;
+        $result['subtitle8_content'] = $data9->banner_content;
 
         $pdf = Pdf::where('type', 'student')->orderBy('id', 'DESC')->first();
         return view('Frontend/home', compact('Gn_PackagePlanGyanology', 'Gn_PackagePlanGyanology2', 'StudymaterialGovComp', 'StudymaterialGovComp2', 'StudymaterialGovComp3', 'StudymaterialGovComp4', 'StudymaterialGovComp5', 'Gn_PackagePackagelist', 'Gn_PackagePlanInstitute', 'result', 'pdf'));

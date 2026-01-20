@@ -23,6 +23,11 @@ class Studymaterial extends Model
         return $this->belongsTo(FranchiseDetails::class, 'institute_id', 'id');
     }
 
+    public function educationType()
+    {
+        return $this->belongsTo(Educationtype::class, 'education_type', 'id');
+    }
+
     public function scopeWithRelations($query)
     {
         return $query->leftJoin("users", "users.id", "study_material.created_by")

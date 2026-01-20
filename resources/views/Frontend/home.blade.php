@@ -414,18 +414,11 @@
                             @foreach ($Gn_PackagePackagelist as $item)
                                 @if ($item->is_featured != '0')
                                     <div class="cource-item book-cource-item flip-card mx-2">
-                                        <?php
-
-                                        $educationType = DB::table('education_type')->where('id', $item->education_type)?->first()?->name;
-
-                                        $classtype = DB::table('classes_groups_exams')->where('id', $item->class)?->first()?->name;
-
-                                        ?>
                                         <div class="flip-card-inner">
                                             <div class="flip-card-front" style="overflow:hidden;">
                                                 <div class="d-flex align-items-center gap-2">
-                                                    <p class="academic-title">{{ $educationType }}</p>
-                                                    <p class="academic-title2">{{ $classtype }}</p>
+                                                    <p class="academic-title">{{ $item->educationType?->name }}</p>
+                                                    <p class="academic-title2">{{ $item->classType?->name }}</p>
                                                 </div>
                                                 <div class="cource-img">
                                                     @if (isset($item->package_image))
@@ -650,8 +643,8 @@
                                     <div class="flip-card-inner">
                                         <div class="flip-card-front">
                                             <div class="d-flex align-items-center gap-2">
-                                                <p class="academic-title">IIT-JEE</p>
-                                                <p class="academic-title2">Academics</p>
+                                                <p class="academic-title">{{ $item->classType?->name }}</p>
+                                                <p class="academic-title2">{{ $item->educationType?->name }}</p>
                                             </div>
                                             <div class="cource-img">
                                                 @if (isset($item->package_image))
@@ -734,18 +727,11 @@
                         @if (count($Gn_PackagePlanGyanology2) > 0)
                             @foreach ($Gn_PackagePlanGyanology2 as $item)
                                 <div class="cource-item book-cource-item flip-card mx-2">
-                                    <?php
-
-                                    $educationType2 = DB::table('education_type')->where('id', $item->education_type)?->first()?->name;
-
-                                    $classtype2 = DB::table('classes_groups_exams')->where('id', $item->class)?->first()?->name;
-
-                                    ?>
                                     <div class="flip-card-inner">
                                         <div class="flip-card-front">
                                             <div class="d-flex align-items-center gap-2">
-                                                <p class="academic-title">{{ $classtype2 }}</p>
-                                                <p class="academic-title2">{{ $educationType2 }}</p>
+                                                <p class="academic-title">{{ $item->classType?->name }}</p>
+                                                <p class="academic-title2">{{ $item->educationType?->name }}</p>
                                             </div>
                                             <div class="cource-img">
                                                 @if (isset($item->package_image))
