@@ -3,7 +3,8 @@
 /public/storage
 /storage/logs
 /storage/debugbar
-/storage/*
+/storage/framework
+/storage/app
 .env
 .env.backup
 .env.live
@@ -19,3 +20,5 @@ yarn-error.log
 /.vscode
 *.zip
 TODO.md
+!/public/home/
+!/public/home/*
