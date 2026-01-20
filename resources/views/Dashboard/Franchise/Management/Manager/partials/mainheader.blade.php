@@ -123,18 +123,6 @@
                         <a href="{{ route('franchise.management.panel_profile') }}"><i class="bi bi-person"></i> <span>
                             Profile</span></a>
                     </li>
-                    <li>
-                        <a href="#"><i class="bi bi-gear"></i><span> Setting</span></a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="bi bi-clock"></i><span> Offers</span></a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="bi bi-sliders"></i><span> Information</span></a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="bi bi-sliders"></i><span> Activity</span></a>
-                    </li>
                     <li><a href="{{ url('resetpassword')}}"><i class="bi bi-key" aria-hidden="true"></i><span> Reset Password</span></a></li>
                     <li class="last_rad"><a href="{{ route('logout') }}">
                             <i class="bi bi-box-arrow-right"></i>

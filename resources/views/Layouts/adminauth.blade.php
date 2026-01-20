@@ -104,6 +104,8 @@
             $('#loginForm').toggle();
         </script>
     @enderror
+
+    @yield('scripts')
 </body>
 
 </html>

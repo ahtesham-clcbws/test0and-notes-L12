@@ -12,8 +12,8 @@
     <section class="content admin-1">
         <div class="card">
             <div class="card-body">
-               
-               
+
+
                     <form  id="uploadImage" enctype="multipart/form-data" method="post">
                         @csrf
                         <div class="row">
@@ -41,19 +41,15 @@
                         </div>
                         <div class="row">
                             <div class="col-md-4">
-                            </div>
-                            <div class="col-md-4">
-                            </div>
-                            <div class="col-md-4">
                                 <button class="btn btn-success" type="submit" id="imageSaveButton" >
                                     Update Profile Details
-                                </button> 
+                                </button>
                             </div>
                         </div>
-                        
+
                     </form>
-                    
-               
+
+
             </div>
         </div>
     </section>

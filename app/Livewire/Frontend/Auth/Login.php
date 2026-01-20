@@ -3,6 +3,7 @@
 namespace App\Livewire\Frontend\Auth;
 
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Url;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -22,6 +23,9 @@ class Login extends Component
         return view('livewire.frontend.auth.login');
     }
 
+    #[Url]
+    public $redirect = '';
+
     public function login()
     {
         $this->validate();
@@ -35,6 +39,11 @@ class Login extends Component
             }
             if (Auth::attempt([$fieldType => $this->username, 'password' => $this->password], $this->remember_me)) {
                 $this->js('success("Login successful")');
+
+                if (!empty($this->redirect)) {
+                    return redirect($this->redirect);
+                }
+
                 return redirect('/student');
             } else {
                 $this->addError('username', 'Credentials do not match');
