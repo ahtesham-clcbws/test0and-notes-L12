@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Gyanology.com</title>
+    <title>Test and Notes.com</title>
 </head>
 
 <body>
@@ -10,7 +10,7 @@
     <p>We recieve your request successfully, we will get back to you soon.</p>
     <p>
         Thank you <br>
-        Team, Gyanology
+        Team, Test and Notes
     </p>
 </body>
 

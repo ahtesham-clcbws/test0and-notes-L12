@@ -100,7 +100,7 @@ align-items: center;
         .font-family-geometric-black-bt {
             font-family: geometric_black_bt;
         }
-        
+
         .Column{
       width: 12%;
       float: left;
@@ -171,7 +171,7 @@ align-items: center;
 </head>
 
 <body>
-    
+
     <div id="main-wrapper">
 
         <!-- Start Navigation -->
@@ -291,7 +291,7 @@ align-items: center;
                                         <li><a href="instructor-detail.html">Instructor Detail</a></li>
                                     </ul>
                                 </li> -->
-                                
+
                                 <!--<li><a href="{{ route('page') }}">Academics<span class="submenu-indicator"></span></a>-->
                                 <!--<li><a href="{{ route('page') }}">Academics<span class="submenu-indicator"></span></a>-->
                                 <!--<li><a href="{{ route('page') }}">Competition<span class="submenu-indicator"></span></a>-->
@@ -335,7 +335,7 @@ align-items: center;
                             @if(Auth::check() && auth()->user()->isAdminAllowed == 0 && auth()->user()->is_franchise == 0 && auth()->user()->is_staff == 0 && auth()->user()->status == 'active')
                                 <ul class="nav-menu nav-menu-social align-to-right">
                                     <li>
-                                        <h5>Hi, {{ auth()->user()->name }}</h5>                                            
+                                        <h5>Hi, {{ auth()->user()->name }}</h5>
                                     </li>
                                     <li class="add-listing theme-bg">
                                         <a href="{{ route('student.dashboard') }}">
@@ -387,7 +387,7 @@ align-items: center;
               <button class="btn btn-success">Start Free</button>
           </div>
         </div>
-        
+
       </div>
       <div class="col-lg-3 col-md-2 col-sm-12 rounded" style="border: 1px solid black; margin:1px 3px;">
         <img class="mx-auto d-block" src="icon1.png">
@@ -451,11 +451,11 @@ align-items: center;
             </div>
           </div>
         </div>
-      
+
     </div>
   </div>
             </div>
-  
+
             <div class="container mt-5">
                 <div class="row">
     <div class="col-lg-8 col-sm-12" style="margin-right: 10px;">
@@ -585,7 +585,7 @@ align-items: center;
           </div>
       </div>
     </div>
-    
+
     <div class="col-lg-3 col-sm-12" style=" margin-left: 3px;">
       <div class="sticky">
       <div>
@@ -620,7 +620,7 @@ align-items: center;
                   <td class="px-1 py-2">Salary:</td>
                   <td class="px-1 py-2">I21,700 - I69,100</td>
                 </tr>
-                
+
               </tbody>
           </table>
       </div>
@@ -628,22 +628,22 @@ align-items: center;
           <h4 style="color:blue;">Important Websites</h4>
           <div class="bg-white p-2 pb-5" style="border:1px solid black;">
             <div>
-              <a href="#" class="text-dark text-decoration-none">http://tests.thegyanology.com/</a>
+              <a href="#" class="text-dark text-decoration-none">http://testandnotes.com/</a>
             </div>
             <div>
-              <a href="#" class="text-dark text-decoration-none">http://tests.thegyanology.com/</a>
+              <a href="#" class="text-dark text-decoration-none">http://testandnotes.com/</a>
             </div>
             <div>
-              <a href="#" class="text-dark text-decoration-none">http://tests.thegyanology.com/</a>
+              <a href="#" class="text-dark text-decoration-none">http://testandnotes.com/</a>
             </div>
             <div>
-              <a href="#" class="text-dark text-decoration-none">http://tests.thegyanology.com/</a>
+              <a href="#" class="text-dark text-decoration-none">http://testandnotes.com/</a>
             </div>
             <div>
-              <a href="#" class="text-dark text-decoration-none">http://tests.thegyanology.com/</a>
+              <a href="#" class="text-dark text-decoration-none">http://testandnotes.com/</a>
             </div>
           </div>
-          
+
       </div>
       </div>
     </div>
@@ -713,7 +713,7 @@ align-items: center;
                                         <ul class="footer-menu">
                                             <li><a href="#">About</a></li>
                                             <li><a href="#">Home</a></li>
-                                            <li><a href="http://tests.thegyanology.com/contact">Contact Us</a></li>
+                                            <li><a href="http://testandnotes.com/contact">Contact Us</a></li>
                                             <!-- <li><a href="{{ route('corporate_signup') }}">Admin Signup</a></li>
                                             <li><a href="{{ route('franchise.login') }}">Admin Login</a></li> -->
                                         </ul>
@@ -997,7 +997,7 @@ align-items: center;
                                             </div>
                                             <input type="text" id="institute_name" class="form-control"
                                                 style="display: none;" readonly disabled>
-                                                
+
                                         </div>
                                     </div>
                                     <div class="col-6">
@@ -1046,12 +1046,12 @@ align-items: center;
                                             @if(isset($pdf))
                                         <label for="required_check_registration" class="checkbox-custom-label">I agree
                                             to The
-                                            gyanology's <a href="{{ url('public/'. $pdf->url) }}" class="theme-cl" target="_blank">Terms of
+                                            Test and Notes's <a href="{{ url('public/'. $pdf->url) }}" class="theme-cl" target="_blank">Terms of
                                                 Services</a></label>
-                                                @else 
+                                                @else
                                                 <label for="required_check_registration" class="checkbox-custom-label">I agree
                                             to The
-                                            gyanology's <a href="#" class="theme-cl">Terms of
+                                            Test and Notes's <a href="#" class="theme-cl">Terms of
                                                 Services</a></label>
                                                 @endif
                                     </div>
@@ -1129,7 +1129,7 @@ align-items: center;
     <!-- <script src="{{ asset('frontend/js/sweetalert.min.js') }}"></script> -->
     <script src="{{ asset('skillup/js/custom.js') }}"></script>
     <script>
-    
+
     var acc = document.getElementsByClassName("accordion");
 var i;
 
@@ -1141,7 +1141,7 @@ for (i = 0; i < acc.length; i++) {
       panel.style.maxHeight = null;
     } else {
       panel.style.maxHeight = panel.scrollHeight + "px";
-    } 
+    }
   });
 }
         var registration = $('#registration');

@@ -205,7 +205,7 @@
                                             type="checkbox" wire:model="required_check_registration">
                                         <label class="checkbox-custom-label" for="required_check_registration">I agree
                                             to The
-                                            gyanology's <a class="theme-cl" target="_target" href="{{  route('policy-page', ['terms-and-conditions']) }}">Terms of
+                                            Test and Notes's <a class="theme-cl" target="_target" href="{{  route('policy-page', ['terms-and-conditions']) }}">Terms of
                                                 Services</a></label>
                                     </div>
                                     @error('required_check_registration')

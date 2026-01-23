@@ -16,7 +16,7 @@ class ManageImportantLinks extends Component
     public $length = 2;
     public $search = '';
     public ImportantLinkForm $form;
-    
+
     public function render()
     {
         $important_links = ImportantLink::orderByDesc('id')
@@ -51,6 +51,16 @@ class ManageImportantLinks extends Component
         try {
             $important_link = ImportantLink::find($id);
             $this->form->setData($important_link);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function deleteLink($id) {
+        try {
+            $important_link = ImportantLink::find($id);
+            $important_link->delete();
+            $this->js('window.location.reload()');
         } catch (\Throwable $th) {
             throw $th;
         }

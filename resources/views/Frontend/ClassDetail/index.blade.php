@@ -231,10 +231,16 @@
                                     <h5 class="mb-0">{{ $item->cat_name }}</h5>
 
                                     <div class="start">
+                                        @php
+                                            $targetRoute = route('student.dashboard_gyanology_list', ['cat' => $item->id]);
+                                            $loginRoute = route('login', ['redirect' => $targetRoute]);
+                                            $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
+                                        @endphp
+
                                         @if ($item->cat_name == 'Premium Test')
-                                            <a href="{{route('student.dashboard_gyanology_list', ['cat' => $item->id])}}" class="start-btn border">Explore Now</a>
+                                            <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Explore Now</a>
                                         @else
-                                            <a href="{{route('student.dashboard_gyanology_list', ['cat' => $item->id])}}" class="start-btn border">Start Free</a>
+                                            <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Start Free</a>
                                         @endif
                                     </div>
                                 </div>
@@ -247,7 +253,12 @@
                                 <h5 class="mb-0">Institute Test</h5>
 
                                 <div class="start">
-                                        <a href="{{route('student.dashboard_tests_list')}}" class="start-btn border">Start Free</a>
+                                    @php
+                                        $targetRoute = route('student.dashboard_tests_list');
+                                        $loginRoute = route('login', ['redirect' => $targetRoute]);
+                                        $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
+                                    @endphp
+                                    <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Start Free</a>
                                 </div>
                             </div>
                         </div>
@@ -262,7 +273,12 @@
                                 <h5 class="mb-0">Study Notes & E-Books</h5>
 
                                 <div class="start">
-                                        <a href="{{route('student.show')}}" class="start-btn border">Start Free</a>
+                                    @php
+                                        $targetRoute = route('student.show');
+                                        $loginRoute = route('login', ['redirect' => $targetRoute]);
+                                        $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
+                                    @endphp
+                                    <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Start Free</a>
                                 </div>
                             </div>
                         </div>
@@ -273,7 +289,12 @@
                                 <h5 class="mb-0">Live & Video Classes</h5>
 
                                 <div class="start">
-                                        <a href="{{route('student.showvideo')}}" class="start-btn border">Start Free</a>
+                                    @php
+                                        $targetRoute = route('student.showvideo');
+                                        $loginRoute = route('login', ['redirect' => $targetRoute]);
+                                        $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
+                                    @endphp
+                                    <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Start Free</a>
                                 </div>
                             </div>
                         </div>
@@ -284,7 +305,12 @@
                                 <h5 class="mb-0">Static GK & Current Affairs</h5>
 
                                 <div class="start">
-                                        <a href="{{route('student.showgk')}}" class="start-btn border">Start Free</a>
+                                    @php
+                                        $targetRoute = route('student.showgk');
+                                        $loginRoute = route('login', ['redirect' => $targetRoute]);
+                                        $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
+                                    @endphp
+                                    <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Start Free</a>
                                 </div>
                             </div>
                         </div>
@@ -295,7 +321,12 @@
                                 <h5 class="mb-0">Comprehensive Study Material</h5>
 
                                 <div class="start">
-                                        <a href="{{route('student.show')}}" class="start-btn border">Start Free</a>
+                                    @php
+                                        $targetRoute = route('student.show');
+                                        $loginRoute = route('login', ['redirect' => $targetRoute]);
+                                        $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
+                                    @endphp
+                                    <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Start Free</a>
                                 </div>
                             </div>
                         </div>
@@ -306,7 +337,12 @@
                                 <h5 class="mb-0">Short Notes & One Liner</h5>
 
                                 <div class="start">
-                                        <a href="{{route('student.show')}}" class="start-btn border">Start Free</a>
+                                    @php
+                                        $targetRoute = route('student.show');
+                                        $loginRoute = route('login', ['redirect' => $targetRoute]);
+                                        $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
+                                    @endphp
+                                    <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Start Free</a>
                                 </div>
                             </div>
                         </div>
@@ -317,7 +353,12 @@
                                 <h5 class="mb-0">Premium Study Notes</h5>
 
                                 <div class="start">
-                                        <a href="{{route('student.show')}}" class="start-btn border">Start Free</a>
+                                    @php
+                                        $targetRoute = route('student.show');
+                                        $loginRoute = route('login', ['redirect' => $targetRoute]);
+                                        $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
+                                    @endphp
+                                    <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Start Free</a>
                                 </div>
                             </div>
                         </div>
@@ -331,7 +372,12 @@
                                 <h5 class="mb-0">Free Packages</h5>
 
                                 <div class="start">
-                                        <a href="{{route('student.plan')}}" class="start-btn border">Start Free</a>
+                                    @php
+                                        $targetRoute = route('student.plan');
+                                        $loginRoute = route('login', ['redirect' => $targetRoute]);
+                                        $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
+                                    @endphp
+                                    <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Start Free</a>
                                 </div>
                             </div>
                         </div>
@@ -342,7 +388,12 @@
                                 <h5 class="mb-0">Premium Packages</h5>
 
                                 <div class="start">
-                                        <a href="{{route('student.plan')}}" class="start-btn border">Explore Now</a>
+                                    @php
+                                        $targetRoute = route('student.plan');
+                                        $loginRoute = route('login', ['redirect' => $targetRoute]);
+                                        $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
+                                    @endphp
+                                    <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Explore Now</a>
                                 </div>
                             </div>
                         </div>

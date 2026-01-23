@@ -26,8 +26,8 @@ class StudentPlanController extends Controller
             return DataTables::of($model)
                 ->addIndexColumn()
                 ->addColumn('plan_name', '{{ $plan_name }}')
-                ->addColumn('package_type', '{{ $package_type == 1 ? "Institute" : "Gyanology" }}')
-                ->addColumn('institute_id', '{{ $my_institute_name == null ? "Gyanology" : $my_institute_name}}')
+                ->addColumn('package_type', '{{ $package_type == 1 ? "Institute" : "Test and Notes" }}')
+                ->addColumn('institute_id', '{{ $my_institute_name == null ? "Test and Notes" : $my_institute_name}}')
                 ->addColumn('tests', function ($model) {
                     $tests = '';
                     foreach ($model->test()->get()->pluck('title') as $key => $mytest) {
@@ -70,11 +70,11 @@ class StudentPlanController extends Controller
             return Datatables::of($model)
                 ->addIndexColumn()
                 ->addColumn('plan_name', '{{ $plan_name }}')
-                ->addColumn('package_type', '{{ $package_type == 1 ? "Institute" : "Gyanology" }}')
+                ->addColumn('package_type', '{{ $package_type == 1 ? "Institute" : "Test and Notes" }}')
                 ->addColumn('plan_start_date', '{{ date("d-m-Y",$plan_start_date) }}')
                 ->addColumn('plan_end_date', '{{ date("d-m-Y",$plan_end_date) }}')
-                // ->addColumn('package_type','{{ $package_type == 1 ? "Institute" : "Gyanology" }}')
-                // ->addColumn('institute_id','{{ $my_institute_name == null ? "Gyanology" : $my_institute_name}}')
+                // ->addColumn('package_type','{{ $package_type == 1 ? "Institute" : "Test and Notes" }}')
+                // ->addColumn('institute_id','{{ $my_institute_name == null ? "Test and Notes" : $my_institute_name}}')
                 // ->addColumn('tests',function($model){
                 //     $tests = '';
                 //     foreach ($model->test()->get()->pluck('title') as $key => $mytest) {

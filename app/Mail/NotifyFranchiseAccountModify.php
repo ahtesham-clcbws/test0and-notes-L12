@@ -30,7 +30,7 @@ class NotifyFranchiseAccountModify extends Mailable
     public function build()
     {
         return $this
-            ->subject('Gyanology - Franchise Account update')
+            ->subject('Test and Notes - Franchise Account update')
             ->view('EmailTemplates.notify_franchise_account_update');
     }
 }

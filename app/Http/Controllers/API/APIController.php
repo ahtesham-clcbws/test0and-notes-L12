@@ -121,7 +121,7 @@ class APIController extends Controller
         }
         return  response()->json(['status' => 1, 'test_list' => $testTableData]);
     }
-    //gyanology test
+    //Test and Notes test
     public function gyanologyTest(Request $request)
     {
         $testTableData = TestModal::where('user_id', null)->get();
@@ -166,7 +166,7 @@ class APIController extends Controller
             $r['title'] = $testData->test->title;
             $r['class_name'] = $testData->test->EducationClass->name;
             $r['test_date'] = date('d-m-Y', strtotime($testData->created_at));
-            $r['test_category']  = $testData->test->user_id != null ? 'Institude' : 'Gyanology';
+            $r['test_category']  = $testData->test->user_id != null ? 'Institude' : 'Test and Notes';
             $r['total_marks'] =  $testData->test->gn_marks_per_questions * $testData->test->total_questions;
             $r['test_sections']    = $testData->test->sections;
             $r['total_question']   = $testData->test->total_questions;
@@ -491,13 +491,13 @@ class APIController extends Controller
             return json_encode($returnResponse);
         }
         $otp            = mt_rand(100000, 999999);
-        // $mobileMessage  = 'Dear user, Your OTP for sign up to The Gyanology portal is ' . $otp . '. Valid for 10 minutes. Please do not share this OTP. Regards, The Gyanology Team';
+        // $mobileMessage  = 'Dear user, Your OTP for sign up to Test and Notes portal is ' . $otp . '. Valid for 10 minutes. Please do not share this OTP. Regards, Test and Notes Team';
         // $templateId     = 1207163026060776390;
         // $url            = 'http://198.24.149.4/API/pushsms.aspx?loginID=rajji1&password=kanpureduup78&mobile=' . $mobileNumber . '&text=' . $mobileMessage . '&senderid=GYNLGY&route_id=2&Unicode=0&Template_id=' . $templateId;
         // $response       = Http::get($url);
 
 
-        // $message    = rawurlencode('Dear user%nYour OTP for sign up to The Gyanology portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nThe Gyanology Team');
+        // $message    = rawurlencode('Dear user%nYour OTP for sign up to Test and Notes portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nTest and Notes Team');
         // $sender     = urlencode("GYNLGY");
         // $apikey     = urlencode("MzQ0YzZhMzU2ZTY2NjI0YjU4Mzc0NDMxNmU3MjYzNmM=");
         // $url        = 'https://api.textlocal.in/send/?apikey=' . $apikey . '&numbers=' . $mobileNumber . '&sender=' . $sender . '&message=' . $message;

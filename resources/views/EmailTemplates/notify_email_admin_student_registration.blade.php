@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Gyanology.com</title>
+    <title>Test and Notes.com</title>
 </head>
 
 <body>
@@ -10,7 +10,7 @@
     <p>Student {{ $details['fullname'] }} with email id {{ $details['email_id'] }} registered <?php if($details['institute_code']) echo 'with institute code '.$details['institute_code']?></p>
     <p>
         Thank you <br>
-        Team, Gyanology
+        Team, Test and Notes
     </p>
 </body>
 

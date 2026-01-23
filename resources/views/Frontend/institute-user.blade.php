@@ -166,7 +166,7 @@
                                         required="">
                                     <label class="checkbox-custom-label" for="required_check_registration">I agree
                                         to The
-                                        gyanology's <a class="theme-cl" href="#">Terms of
+                                        Test and Notes's <a class="theme-cl" href="#">Terms of
                                             Services</a></label>
                                 </div>
 

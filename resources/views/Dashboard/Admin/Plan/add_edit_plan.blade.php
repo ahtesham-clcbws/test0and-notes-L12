@@ -156,7 +156,7 @@
                                 } else {
                                     echo 'checked="checked"';
                                 } ?>>
-                            <label class="control-label" for="" style="margin-right: 15px;">Gyanology</label>
+                            <label class="control-label" for="" style="margin-right: 15px;">Test and Notes</label>
 
                             <input class="" id="package_type" name="package_type" type="radio" value="1"
                                 <?php if (isset($data['package'][0]['package_type']) && $data['package'][0]['package_type'] == 1) {

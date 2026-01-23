@@ -18,9 +18,8 @@ class CourseController extends Controller
 
         $education_type_data = DB::table('education_type')->where('id', $edu_id)->first();
         $classes_groups_exams_data = DB::table('classes_groups_exams')->where('id', $class_id)->first();
-        $tests_category_data = TestCat::get();
+        $tests_category_data = \App\Models\TestCat::get();
 
-        $tests =  DB::table('test')->where('education_type_id', $edu_id)->where('education_type_child_id', $class_id)->where('published', 1)->get();
         $students_count = DB::table('user_details')->where('education_type', $edu_id)->where('class', $class_id)->count();
         $course_detail  = CourseDetail::where('class_group_examp_id',$class_id)->orderBy('id','DESC')->first();
 

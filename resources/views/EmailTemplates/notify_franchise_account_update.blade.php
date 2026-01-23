@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Gyanology.com</title>
+    <title>Test and Notes.com</title>
 </head>
 
 <body>
@@ -23,7 +23,7 @@
         Sales Team <br>
         XXXXXXXXXXXXXXXXXXXX <br>
         0000000000 <br>
-        <a href="http://thegyanology.com">www.thegyanology.com</a>
+        <a href="http://testandnotes.com">www.testandnotes.com</a>
     </p>
 
 </body>

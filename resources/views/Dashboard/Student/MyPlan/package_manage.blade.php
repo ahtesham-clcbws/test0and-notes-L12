@@ -81,7 +81,7 @@
                                 <td><i class="bi bi-file-pdf"></i> <label style="color: #00A300;">{{$onematerial->publish_status}}</label><br>{{$onematerial->publish_date}}</td>
                                 @if($onematerial->institute_id == 0)
 
-                                <td>The Gyanology</td>
+                                <td>Test and Notes</td>
 
                                 @else
                                 <td>{{auth()->user()->myInstitute?->institute_name ?? ''}}</td>
@@ -92,7 +92,7 @@
                                 @endphp
 
 
-                                <td><a href="http://tests.thegyanology.com/student/material/viewmaterial/{{$filename}}" target="_blank" class="download" data="{{$onematerial->file}}" style="margin:0" auto;display:block;text-align:="" center;="" title="View File">View</a></td>
+                                <td><a href="http://testandnotes.com/student/material/viewmaterial/{{$filename}}" target="_blank" class="download" data="{{$onematerial->file}}" style="margin:0" auto;display:block;text-align:="" center;="" title="View File">View</a></td>
                                 <td><a href="#" class="download" data="{{$onematerial->file}}" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0" auto;display:block;text-align:="" center;="" title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td>
                             </tr>
                             @endforeach
@@ -142,7 +142,7 @@
                                 <td><i class="bi bi-youtube"></i> <label style="color: #00A300;">{{$onevideo->publish_status}}</label><br>{{$onevideo->publish_date}}</td>
                                 @if($onevideo->institute_id == 0)
 
-                                <td>The Gyanology</td>
+                                <td>Test and Notes</td>
 
                                 @else
                                 <td>{{auth()->user()->myInstitute?->institute_name ?? ''}}</td>
@@ -158,7 +158,7 @@
                                 @php
                                 $filename = basename($onematerial->file);
                                 @endphp
-                                <td><a href="http://tests.thegyanology.com/student/material/viewmaterial/{{$filename}}" target="_blank" class="download" data="{{$onevideo->file}}" style="margin:0" auto;display:block;text-align:="" center;="" title="View File">View</a></td>
+                                <td><a href="http://testandnotes.com/student/material/viewmaterial/{{$filename}}" target="_blank" class="download" data="{{$onevideo->file}}" style="margin:0" auto;display:block;text-align:="" center;="" title="View File">View</a></td>
                                 <td><a href="#" class="download" data="{{$onevideo->file}}" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0" auto;display:block;text-align:="" center;="" title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td>
                                 @endif
 
@@ -210,7 +210,7 @@
                                 <td><i class="bi bi-file-pdf"></i> <label style="color: #00A300;">{{$one_gk->publish_status}}</label><br>{{$one_gk->publish_date}}</td>
                                 @if($one_gk->institute_id != 0)
 
-                                <td>The Gyanology</td>
+                                <td>Test and Notes</td>
 
                                 @else
                                 <td>{{auth()->user()->myInstitute?->institute_name ?? ''}}</td>
@@ -225,8 +225,8 @@
                                 @php
                                 $filename = basename($one_gk->file);
                                 @endphp
-                                <td><a href="http://tests.thegyanology.com/student/material/viewmaterial/{{$filename}}" target="_blank" class="download" data="{{$one_gk->file}}" style="margin:0" auto;display:block;text-align:="" center;="" title="View File">View</a></td>
-                                <td><a href="http://tests.thegyanology.com/student/material/download/{{$filename}}" class="download" data="{{$filename}}" style="margin:0" auto;display:block;text-align:="" center;="" title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td>
+                                <td><a href="http://testandnotes.com/student/material/viewmaterial/{{$filename}}" target="_blank" class="download" data="{{$one_gk->file}}" style="margin:0" auto;display:block;text-align:="" center;="" title="View File">View</a></td>
+                                <td><a href="http://testandnotes.com/student/material/download/{{$filename}}" class="download" data="{{$filename}}" style="margin:0" auto;display:block;text-align:="" center;="" title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td>
                                 @endif
                             </tr>
                             @endforeach

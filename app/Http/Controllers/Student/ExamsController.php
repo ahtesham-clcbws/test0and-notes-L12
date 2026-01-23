@@ -402,7 +402,7 @@ class ExamsController extends Controller
                 $testTableData[$key]['title']           = $testData->test->title;
                 $testTableData[$key]['class_name']      = $testData->test->EducationClass->name;
                 $testTableData[$key]['test_date']       = date('d-m-Y', strtotime($testData->created_at));
-                $testTableData[$key]['test_category']   = $testData->test->user_id != null ? 'Institude' : 'Gyanology';
+                $testTableData[$key]['test_category']   = $testData->test->user_id != null ? 'Institude' : 'Test and Notes';
                 $testTableData[$key]['actions']         = $action;
             }
 

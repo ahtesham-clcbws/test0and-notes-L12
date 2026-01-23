@@ -224,14 +224,14 @@
                                         @if (isset($pdf))
                                             <label class="checkbox-custom-label" for="terms_check_box">I agree
                                                 to The
-                                                gyanology's <a class="theme-cl"
+                                                Test and Notes's <a class="theme-cl"
                                                     href="https://testandnotes.com/policy-and-terms" target="_blank">Terms
                                                     of
                                                     Services</a></label>
                                         @else
                                             <label class="checkbox-custom-label" for="terms_check_box">I agree
                                                 to The
-                                                gyanology's <a class="theme-cl" href="https://testandnotes.com/policy-and-terms" target="_blank">Terms of
+                                                Test and Notes's <a class="theme-cl" href="https://testandnotes.com/policy-and-terms" target="_blank">Terms of
                                                     Services</a></label>
                                         @endif
                                         @error('form.required_check_registration')

@@ -2,7 +2,7 @@
 <html>
 
     <head>
-        <title>Gyanology.com</title>
+        <title>Test and Notes.com</title>
     </head>
 
     <body>

@@ -368,7 +368,7 @@
                                             <label class="form-check-label">
                                                 <input class="form-check-input ckbok" name="corporate_terms"
                                                     type="checkbox">
-                                                <p> I agree to The gyanology's </p>
+                                                <p> I agree to Test and Notes's </p>
                                                 <a href="">Terms of Services</a>
                                             </label>
                                         </div>
@@ -557,7 +557,7 @@
                                         <div class="form-check ckktx">
                                             <label class="form-check-label">
                                                 <input class="form-check-input ckbok" type="checkbox">
-                                                <p> I agree to The gyanology's </p>
+                                                <p> I agree to Test and Notes's </p>
                                                 <a href="">Terms of Services</a>
                                             </label>
                                         </div>

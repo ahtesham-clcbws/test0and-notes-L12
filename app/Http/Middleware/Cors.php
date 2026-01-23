@@ -22,7 +22,7 @@ class Cors
         // ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
         ->header('Content-Type', 'application/json');
         // ->header('Accept', 'application/json')
-        // ->header('X-Powered-By', 'Gyanology');
+        // ->header('X-Powered-By', 'Test and Notes');
         return $response;
     }
 }

@@ -594,7 +594,7 @@ class UserController extends Controller
         }
         $otp            = mt_rand(100000, 999999);
 
-        // $message    = rawurlencode('Dear user%nYour OTP for sign up to The Gyanology portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nThe Gyanology Team');
+        // $message    = rawurlencode('Dear user%nYour OTP for sign up to Test and Notes portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nTest and Notes Team');
         // $sender     = urlencode("GYNLGY");
         // $apikey     = urlencode("MzQ0YzZhMzU2ZTY2NjI0YjU4Mzc0NDMxNmU3MjYzNmM=");
         // $url        = 'https://api.textlocal.in/send/?apikey=' . $apikey . '&numbers=' . $mobileNumber . '&sender=' . $sender . '&message=' . $message;
@@ -637,7 +637,7 @@ class UserController extends Controller
 
         // Mail::to($email)->send(new \App\Mail\SendOtpMail($details));
         try {
-            Mail::raw('Your OTP for The Gyanology is ' . $otp, function ($message) use ($email) {
+            Mail::raw('Your OTP for Test and Notes is ' . $otp, function ($message) use ($email) {
                 $message->to($email)
                   ->subject('OTP Verification');
             });

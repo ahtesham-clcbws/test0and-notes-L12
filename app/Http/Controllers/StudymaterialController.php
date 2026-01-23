@@ -515,9 +515,9 @@ class StudymaterialController extends Controller
                 })
                 ->addColumn('created_by', function ($model) {
                     if ($model['institute_id'] == 0)
-                        return 'The Gyanology';
+                        return 'Test and Notes';
                     else
-                        return Auth::user()->myInstitute ? Auth::user()->myInstitute->institute_name : 'The Gyanology';
+                        return Auth::user()->myInstitute ? Auth::user()->myInstitute->institute_name : 'Test and Notes';
                 })
                 ->addColumn('view', function ($model) {
                     $style = '';
@@ -638,7 +638,7 @@ class StudymaterialController extends Controller
                 })
                 ->addColumn('created_by', function ($model) {
                     if ($model['institute_id'] == 0)
-                        return 'The Gyanology';
+                        return 'Test and Notes';
                     else
                         return Auth::user()->myInstitute->institute_name;
                 })
@@ -773,7 +773,7 @@ class StudymaterialController extends Controller
                 })
                 ->addColumn('created_by', function ($model) {
                     if ($model['institute_id'] == 0)
-                        return 'The Gyanology';
+                        return 'Test and Notes';
                     else
                         return Auth::user()->myInstitute->institute_name;
                 })

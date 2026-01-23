@@ -3,10 +3,11 @@
 namespace App\Livewire\Admin\Pages;
 
 use App\Models\NewModels\Pages;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
-// #[Layout('administrator.layouts.master')]
+#[Layout('Layouts.admin')]
 class PagesView extends Component
 {
     public Pages $page;
@@ -45,7 +46,7 @@ class PagesView extends Component
                 $this->page->save();
 
                 $this->js('success("Page saved successfully.")');
-                return $this->redirect('/administrator/home/policy-pages');
+                return $this->redirect(route('administrator.website_pages'));
             } catch (\Throwable $th) {
                 // throw $th;
                 logger('page data save error: ' . json_encode($th));

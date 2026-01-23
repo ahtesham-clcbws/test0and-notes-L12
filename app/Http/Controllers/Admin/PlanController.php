@@ -41,7 +41,7 @@ class PlanController extends Controller
             //         $institute[$key] = $package->myInstitute;
             //     }
             //     else {
-            //         $institute[$key] = "Gyanology";
+            //         $institute[$key] = "Test and Notes";
             //     }
             // }
             return DataTables::of($model)
@@ -63,8 +63,8 @@ class PlanController extends Controller
                 else
                     return $test_data = '<a href="'.'plan/is_featured/'.$model['id'].'/0'.'" class="btn btn-sm btn-primary" >Featured</a>';
             })
-            // ->addColumn('package_type','{{ $package_type == 1 ? "Institute" : "Gyanology" }}')
-            ->addColumn('institute_id','{{ $my_institute_name == null ? "The Gyanology" : $my_institute_name}}')
+            // ->addColumn('package_type','{{ $package_type == 1 ? "Institute" : "Test and Notes" }}')
+            ->addColumn('institute_id','{{ $my_institute_name == null ? "Test and Notes" : $my_institute_name}}')
             ->addColumn('tests',function($model){
                 $tests = '';$test_data='';
                 foreach ($model->test()->get()->pluck('title') as $key => $mytest) {

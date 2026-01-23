@@ -253,7 +253,7 @@ class FranchiseController extends Controller
                         $details = [
                             'fullname' => $requestData['name'],
                             'typeMessage' => 'Account updated.',
-                            'message' => 'We are glad to inform you that your business request is approved by our Authorisation Team.<br>We alloted a unique code for your institute which is required to sign up / registration process.<br>www.thegyanology.com<br>Your institute code is : XXXXXXXXXXX123<br>Please sign up with this unique code.'
+                            'message' => 'We are glad to inform you that your business request is approved by our Authorisation Team.<br>We alloted a unique code for your institute which is required to sign up / registration process.<br>www.testandnotes.com<br>Your institute code is : XXXXXXXXXXX123<br>Please sign up with this unique code.'
                         ];
                         $mailToSend = new sendFranchiseEmail($details);
                         $sendMail = Mail::to($requestData['email'])->send($mailToSend);

@@ -30,7 +30,7 @@ class NotifyUserAccountChanges extends Mailable
     public function build()
     {
         return $this
-            ->subject('Gyanology - Account Changes')
+            ->subject('Test and Notes - Account Changes')
             ->view('EmailTemplates.notify_user_account_changes');
     }
 }

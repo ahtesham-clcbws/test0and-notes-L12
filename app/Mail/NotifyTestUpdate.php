@@ -30,7 +30,7 @@ class NotifyTestUpdate extends Mailable
     public function build()
     {
         return $this
-            ->subject('Gyanology - Test update')
+            ->subject('Test and Notes - Test update')
             ->view('EmailTemplates.notify_test_update');
     }
 }

@@ -30,7 +30,7 @@ class InstituteApproveEmail extends Mailable
     public function build()
     {
         return $this
-            ->subject('Gyanology Corporate Enquiry')
+            ->subject('Test and Notes Corporate Enquiry')
             ->view('EmailTemplates.franchise_email_approve');
     }
 }

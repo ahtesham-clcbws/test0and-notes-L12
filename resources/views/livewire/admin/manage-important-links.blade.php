@@ -30,23 +30,6 @@
             </form>
 
             <div class="card rounded">
-                {{-- <div class="card-header">
-                    <div class="d-flex gap-4 py-2" style="justify-content: space-between;">
-                        <div>
-                            <select class="form-control">
-                                <option value="5">5</option>
-                                <option value="10">10</option>
-                                <option value="20">20</option>
-                                <option value="30">30</option>
-                                <option value="50">50</option>
-                            </select>
-                        </div>
-                        <div>
-                            <input class="form-control" type="search" placeholder="search ..."
-                                wire:model.live='search' />
-                        </div>
-                    </div>
-                </div> --}}
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table-bordered table-sm w-100">
@@ -74,6 +57,7 @@
                                         </td>
                                         <td class="text-end">
                                             <button class="btn btn-link" wire:click='editLink({{ $important_link->id }})'>Edit</button>
+                                            <button class="btn btn-link text-danger" wire:confirm="Are you sure!\nYou want to delete this link?" wire:click='deleteLink({{ $important_link->id }})'>Delete</button>
                                         </td>
                                     </tr>
                                 @endforeach

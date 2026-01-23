@@ -30,7 +30,7 @@ class NotifyAdminStudentSignup extends Mailable
     public function build()
     {
         return $this
-            ->subject('Gyanology - Student Signup')
+            ->subject('Test and Notes - Student Signup')
             ->view('EmailTemplates.notify_email_admin_student_registration');
     }
 }

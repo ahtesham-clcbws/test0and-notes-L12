@@ -19,7 +19,7 @@
 								<th scope="col">Sr</th>
                                 <th scope="col">Plan Name</th>
                                 <th scope="col">Package Type</th>
-                                <th scope="col">Institute/Gyanology</th>
+                                <th scope="col">Institute/Test and Notes</th>
                                 <th scope="col">Test</th>
                                 <th scope="col">Duration</th>
                                 <th scope="col">Fees</th>
