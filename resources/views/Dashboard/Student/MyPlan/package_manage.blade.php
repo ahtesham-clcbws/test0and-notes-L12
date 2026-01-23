@@ -136,7 +136,7 @@
                             @if($onevideo)
                             <tr class="odd">
                                 <td class="sorting_1">1</td>
-                                <td>{{$onevideo->plan_name ? ''}}</td>
+                                <td>{{$onevideo->plan_name ?? ''}}</td>
                                 <td>{{$onevideo->name ?? ''}}</td>
                                 <td>{{$onevideo->sub_title ?? ''}}</td>
                                 <td><i class="bi bi-youtube"></i> <label style="color: #00A300;">{{$onevideo->publish_status}}</label><br>{{$onevideo->publish_date}}</td>
