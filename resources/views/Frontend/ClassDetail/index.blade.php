@@ -294,7 +294,7 @@
 
                                 <div class="start">
                                     @php
-                                        $targetRoute = route('student.show');
+                                        $targetRoute = route('student.showComprehensive');
                                         $loginRoute = route('login', ['redirect' => $targetRoute]);
                                         $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                     @endphp
@@ -310,7 +310,7 @@
 
                                 <div class="start">
                                     @php
-                                        $targetRoute = route('student.show');
+                                        $targetRoute = route('student.showShortNotes');
                                         $loginRoute = route('login', ['redirect' => $targetRoute]);
                                         $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                     @endphp
@@ -326,7 +326,7 @@
 
                                 <div class="start">
                                     @php
-                                        $targetRoute = route('student.show');
+                                        $targetRoute = route('student.showPremium');
                                         $loginRoute = route('login', ['redirect' => $targetRoute]);
                                         $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                     @endphp
