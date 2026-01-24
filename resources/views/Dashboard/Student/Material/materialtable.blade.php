@@ -71,7 +71,7 @@
             "lengthChange": true,
             bprocessing: true,
             serverSide: true,
-            ajax: '<?= route("student.show") ?>',
+            ajax: '{{ route(Route::currentRouteName()) }}',
             lengthMenu: [[10, 15, 30, 50],[10, 15, 30, 50]],
             responsive: {
                 details: true
