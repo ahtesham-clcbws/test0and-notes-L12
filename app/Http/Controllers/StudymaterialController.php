@@ -857,6 +857,10 @@ class StudymaterialController extends Controller
             $title = '<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Live & Video Classes</b>';
         if ($name == 'student.showgk') {
             if ($student->education_type == 51)
+                $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Static GK & Current Affairs</b>';
+            if ($student->education_type == 52)
+                $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Comprehensive Study Material</b>';
+        }
         return view("Dashboard/Student/Material/materialtable", compact('title'));
     }
 
