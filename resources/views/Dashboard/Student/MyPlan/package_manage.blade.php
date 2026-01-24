@@ -202,7 +202,7 @@
                         </thead>
                         <tbody>
                             @foreach($onegk as $one_gk)
-                            @if($onegk)
+                            @if($one_gk)
                             <tr class="odd">
                                 <td class="sorting_1">1</td>
                                 <td>{{$one_gk->title}}</td>

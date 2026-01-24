@@ -185,6 +185,12 @@ class ExamsController extends Controller
 
     public function package_manage(Request $req, $id)
     {
+        $result = [
+            'onegk' => [],
+            'live_video' => [],
+            'study_material' => [],
+            'test' => []
+        ];
         $test_id = DB::table('gn__package_plan_tests')
             ->select('gn_package_plan_id', 'test_id')
             ->where('gn_package_plan_id', $id)
@@ -208,41 +214,53 @@ class ExamsController extends Controller
 
         $static_gk_ids = array_map('intval', explode(',', $static_gk_id->static_gk_id));
         foreach ($static_gk_ids as  $onegkid) {
-            $result['onegk'][] = DB::table('study_material')
+            $data = DB::table('study_material')
                 ->leftJoin("classes_groups_exams", "study_material.class", "classes_groups_exams.id")
                 ->select("study_material.*", "classes_groups_exams.name")
                 ->where('study_material.id', $onegkid)
                 ->first();
+            if ($data) {
+                $result['onegk'][] = $data;
+            }
         }
 
 
         $video_ids = array_map('intval', explode(',', $video_id->video_id));
         foreach ($video_ids as  $onevideo) {
-            $result['live_video'][] = DB::table('study_material')
+            $data = DB::table('study_material')
                 ->leftJoin("classes_groups_exams", "study_material.class", "classes_groups_exams.id")
                 ->select("study_material.*", "classes_groups_exams.name")
                 ->where('study_material.id', $onevideo)
                 ->first();
+            if ($data) {
+                $result['live_video'][] = $data;
+            }
         }
 
 
         $study_material_ids = array_map('intval', explode(',', $study_material_id[0]->study_material_id));
         foreach ($study_material_ids as  $onematerial) {
-            $result['study_material'][] = DB::table('study_material')
+            $data = DB::table('study_material')
                 ->leftJoin("classes_groups_exams", "study_material.class", "classes_groups_exams.id")
                 ->select("study_material.*", "classes_groups_exams.name")
                 ->where('study_material.id', $onematerial)
                 ->first();
+            if ($data) {
+                $result['study_material'][] = $data;
+            }
         }
 
 
 
         foreach ($test_id as $onetest) {
-            $result['test'][] = DB::table('test')
+            $data = DB::table('test')
                 ->leftjoin('classes_groups_exams', 'test.education_type_child_id', '=', 'classes_groups_exams.id')
                 ->select('test.*', 'classes_groups_exams.name as class_name')
                 ->where('test.id', $onetest->test_id)
                 ->first();
+            if ($data) {
+                $result['test'][] = $data;
+            }
         }
         return view('Dashboard/Student/MyPlan/package_manage', $result);
     }
