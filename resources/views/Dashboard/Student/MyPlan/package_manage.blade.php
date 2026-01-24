@@ -202,6 +202,7 @@
                         </thead>
                         <tbody>
                             @foreach($onegk as $one_gk)
+                            @if($onegk)
                             <tr class="odd">
                                 <td class="sorting_1">1</td>
                                 <td>{{$one_gk->title}}</td>
@@ -229,6 +230,7 @@
                                 <td><a href="http://testandnotes.com/student/material/download/{{$filename}}" class="download" data="{{$filename}}" style="margin:0" auto;display:block;text-align:="" center;="" title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td>
                                 @endif
                             </tr>
+                            @endif
                             @endforeach
                         </tbody>
                     </table>
