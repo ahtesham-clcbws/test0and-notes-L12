@@ -216,11 +216,15 @@
                         Materials</a>
                     <a href="javascript:void(0)" onclick="handleTab(this)" class="custom-tab-list"
                         data-value="package">Packages</a>
+                    <a href="javascript:void(0)" onclick="handleTab(this)" class="custom-tab-list"
+                        data-value="live-classes">Live Classes</a>
+                    <a href="javascript:void(0)" onclick="handleTab(this)" class="custom-tab-list"
+                        data-value="current-affairs">Current Affairs</a>
                 </div>
             </div>
             <div class="py-4">
                 <div class="custom-tab-content" id="test">
-                    <div class="row text-center">
+                    <div class="row text-center justify-content-center">
 
                         <!-- Team item -->
                         @foreach ($tests_category_data as $item)
@@ -265,7 +269,7 @@
                     </div>
                 </div>
                 <div class="custom-tab-content" id="study" style="display: none;">
-                    <div class="row text-center">
+                    <div class="row text-center justify-content-center">
                         <div class="col-xl-3 col-sm-6 mb-5">
                             <div class="bg-white rounded shadow-sm py-4 px-4"><img
                                     src="/student1/images/student_note.png" alt="" width="100"
@@ -275,38 +279,6 @@
                                 <div class="start">
                                     @php
                                         $targetRoute = route('student.show');
-                                        $loginRoute = route('login', ['redirect' => $targetRoute]);
-                                        $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
-                                    @endphp
-                                    <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Start Free</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 col-sm-6 mb-5">
-                            <div class="bg-white rounded shadow-sm py-4 px-4"><img
-                                    src="/student1/images/video_note.png" alt="" width="100"
-                                    class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
-                                <h5 class="mb-0">Live & Video Classes</h5>
-
-                                <div class="start">
-                                    @php
-                                        $targetRoute = route('student.showvideo');
-                                        $loginRoute = route('login', ['redirect' => $targetRoute]);
-                                        $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
-                                    @endphp
-                                    <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Start Free</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 col-sm-6 mb-5">
-                            <div class="bg-white rounded shadow-sm py-4 px-4"><img
-                                    src="/student1/images/gk.png" alt="" width="100"
-                                    class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
-                                <h5 class="mb-0">Static GK & Current Affairs</h5>
-
-                                <div class="start">
-                                    @php
-                                        $targetRoute = route('student.showgk');
                                         $loginRoute = route('login', ['redirect' => $targetRoute]);
                                         $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                     @endphp
@@ -362,9 +334,10 @@
                                 </div>
                             </div>
                         </div>
-                    </div></div>
+                    </div>
+                </div>
                 <div class="custom-tab-content" id="package" style="display: none;">
-                    <div class="row text-center">
+                    <div class="row text-center justify-content-center">
                         <div class="col-xl-3 col-sm-6 mb-5">
                             <div class="bg-white rounded shadow-sm py-4 px-4"><img
                                     src="/student1/images/menu-package.jpeg" alt="" width="100"
@@ -394,6 +367,48 @@
                                         $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                     @endphp
                                     <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Explore Now</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="custom-tab-content" id="live-classes" style="display: none;">
+                    <div class="row text-center justify-content-center">
+                        <div class="col-xl-3 col-sm-6 mb-5">
+                            <div class="bg-white rounded shadow-sm py-4 px-4"><img
+                                    src="/student1/images/video_note.png" alt="" width="100"
+                                    class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
+                                <h5 class="mb-0">Live & Video Classes</h5>
+
+                                <div class="start">
+                                    @php
+                                        $targetRoute = route('student.showvideo');
+                                        $loginRoute = route('login', ['redirect' => $targetRoute]);
+                                        $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
+                                    @endphp
+                                    <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Start Free</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="custom-tab-content" id="current-affairs" style="display: none;">
+                    <div class="row text-center justify-content-center">
+                        <div class="col-xl-3 col-sm-6 mb-5">
+                            <div class="bg-white rounded shadow-sm py-4 px-4"><img
+                                    src="/student1/images/gk.png" alt="" width="100"
+                                    class="img-fluid rounded-circle mb-3 img-thumbnail shadow-sm">
+                                <h5 class="mb-0">Static GK & Current Affairs</h5>
+
+                                <div class="start">
+                                    @php
+                                        $targetRoute = route('student.showgk');
+                                        $loginRoute = route('login', ['redirect' => $targetRoute]);
+                                        $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
+                                    @endphp
+                                    <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="start-btn border">Start Free</a>
                                 </div>
                             </div>
                         </div>

@@ -857,10 +857,396 @@ class StudymaterialController extends Controller
             $title = '<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Live & Video Classes</b>';
         if ($name == 'student.showgk') {
             if ($student->education_type == 51)
-                $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Static GK & Current Affairs</b>';
-            if ($student->education_type == 52)
-                $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Comprehensive Study Material</b>';
+        return view("Dashboard/Student/Material/materialtable", compact('title'));
+    }
+
+    public function showComprehensive(Request $request)
+    {
+        $name = Route::currentRouteName();
+
+        $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
+        if ($request->ajax()) {
+            $model      = Studymaterial::select("study_material.id", "title", "sub_title", "institute_id", "publish_status", "publish_date", "document_type", "created_by", "file", "video_link", "permission_to_download", "users.name as name", "classes_groups_exams.name as class_group")
+                ->leftJoin("users", "users.id", "study_material.created_by")
+                ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
+                ->where("study_material.status", 1)
+                ->where("study_material.material_seen", 1)
+                ->where("study_material.class", $student->class)
+                ->whereIn("study_material.institute_id", array(Auth::user()->myInstitute->id, 0))
+                ->where("study_material.category", 'Comprehensive Study Material');
+
+            $model = $model->orderBy('study_material.id', 'desc');
+            $model->get();
+
+            return Datatables::of($model)
+                ->addIndexColumn()
+                ->addColumn('title', '{{ $title }}')
+                ->addColumn('class', '{{ $class_group }}')
+                ->addColumn('sub_title', '{{ $sub_title }}')
+                ->addColumn('availability', function ($model) {
+                    $type = '';
+                    if ($model['document_type'] == 'PDF')
+                        $type = '<i class="bi bi-file-pdf"></i>';
+                    if ($model['document_type'] == 'WORD')
+                        $type = '<i class="bi bi-file-word"></i>';
+                    if ($model['document_type'] == 'EXCEL')
+                        $type = '<i class="bi bi-file-excel"></i>';
+                    if ($model['document_type'] == 'VIDEO')
+                        $type = '<i class="bi bi-camera-video"></i>';
+                    if ($model['document_type'] == 'AUDIO')
+                        $type = '<i class="bi bi-file-music"></i>';
+                    if ($model['document_type'] == 'YOUTUBE')
+                        $type = '<i class="bi bi-youtube"></i>';
+
+                    if ($model['publish_status'] == 'Submit')
+                        return $type . ' <label style="color:#AA336A;">Scheduled</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
+                    else
+                        return $type . ' <label style="color: #00A300;">' . $model['publish_status'] . '</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
+                })
+                ->addColumn('created_by', function ($model) {
+                    if ($model['institute_id'] == 0)
+                        return 'Test and Notes';
+                    else
+                        return Auth::user()->myInstitute->institute_name;
+                })
+                ->addColumn('view', function ($model) {
+                    $style = '';
+                    $file = '';
+                    $href = '';
+                    if ($model['file'] != "NA")
+                        $file = explode('/', $model['file']);
+                    if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
+                        $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                        $href = "#";
+                    } else {
+                        if ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL') {
+                            $href = route('student.viewmaterial', [$file[1]]);
+                            $style = 'style=margin:0 auto;display:block;text-align: center;';
+                        } else {
+                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            $href = "#";
+                        }
+                    }
+
+                    if ($model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
+                    } elseif ($model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
+                    } elseif ($model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
+                    } else {
+                        if ($model['document_type'] == 'YOUTUBE' || $model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO')
+                            return $downloadHtml = '-';
+                        else
+                            return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
+                    }
+                })
+                ->addColumn('download', function ($model) {
+                    $style = '';
+                    $file = '';
+                    $href = '';
+                    if ($model['file'] != "NA")
+                        $file = explode('/', $model['file']);
+                    if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
+                        if ($model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO') {
+                            $style = 'style=margin:0 auto;display:block;text-align: center;';
+                            $href = route('student.download', [$file[1]]);
+                        } elseif ($model['document_type'] == 'YOUTUBE') {
+                            $style = 'style=margin:0 auto;display:block;text-align: center;';
+                            $href = $model['video_link'];
+                        } else {
+                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            $href = "#";
+                        }
+                    } else {
+                        $style = 'style=margin:0 auto;display:block;text-align: center;';
+                        if ($model['document_type'] != 'YOUTUBE')
+                            $href = route('student.download', [$file[1]]);
+                        else
+                            $href = $model['video_link'];
+                    }
+
+
+                    if ($model['file'] != "NA" && $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    } else {
+                        if ($model['document_type'] == 'YOUTUBE')
+                            return $downloadHtml = '<a href="' . $href . '" target="_blank"  class="download" data="#" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
+                        else
+                            return $downloadHtml = '<a href="#"  class="download" data="#" ' . $style . ' title="Coming Soon"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    }
+                })
+                ->rawColumns(['availability', 'view', 'download'])
+                ->make(true);
         }
+
+        if ($name == 'student.showComprehensive')
+             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Comprehensive Study Material</b>';
+
+        return view("Dashboard/Student/Material/materialtable", compact('title'));
+    }
+
+    public function showShortNotes(Request $request)
+    {
+        $name = Route::currentRouteName();
+
+        $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
+        if ($request->ajax()) {
+            $model      = Studymaterial::select("study_material.id", "title", "sub_title", "institute_id", "publish_status", "publish_date", "document_type", "created_by", "file", "video_link", "permission_to_download", "users.name as name", "classes_groups_exams.name as class_group")
+                ->leftJoin("users", "users.id", "study_material.created_by")
+                ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
+                ->where("study_material.status", 1)
+                ->where("study_material.material_seen", 1)
+                ->where("study_material.class", $student->class)
+                ->whereIn("study_material.institute_id", array(Auth::user()->myInstitute->id, 0))
+                ->where("study_material.category", 'Short Notes & One Liner');
+
+            $model = $model->orderBy('study_material.id', 'desc');
+            $model->get();
+
+            return Datatables::of($model)
+                ->addIndexColumn()
+                ->addColumn('title', '{{ $title }}')
+                ->addColumn('class', '{{ $class_group }}')
+                ->addColumn('sub_title', '{{ $sub_title }}')
+                ->addColumn('availability', function ($model) {
+                    $type = '';
+                    if ($model['document_type'] == 'PDF')
+                        $type = '<i class="bi bi-file-pdf"></i>';
+                    if ($model['document_type'] == 'WORD')
+                        $type = '<i class="bi bi-file-word"></i>';
+                    if ($model['document_type'] == 'EXCEL')
+                        $type = '<i class="bi bi-file-excel"></i>';
+                    if ($model['document_type'] == 'VIDEO')
+                        $type = '<i class="bi bi-camera-video"></i>';
+                    if ($model['document_type'] == 'AUDIO')
+                        $type = '<i class="bi bi-file-music"></i>';
+                    if ($model['document_type'] == 'YOUTUBE')
+                        $type = '<i class="bi bi-youtube"></i>';
+
+                    if ($model['publish_status'] == 'Submit')
+                        return $type . ' <label style="color:#AA336A;">Scheduled</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
+                    else
+                        return $type . ' <label style="color: #00A300;">' . $model['publish_status'] . '</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
+                })
+                ->addColumn('created_by', function ($model) {
+                    if ($model['institute_id'] == 0)
+                        return 'Test and Notes';
+                    else
+                        return Auth::user()->myInstitute->institute_name;
+                })
+                ->addColumn('view', function ($model) {
+                    $style = '';
+                    $file = '';
+                    $href = '';
+                    if ($model['file'] != "NA")
+                        $file = explode('/', $model['file']);
+                    if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
+                        $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                        $href = "#";
+                    } else {
+                        if ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL') {
+                            $href = route('student.viewmaterial', [$file[1]]);
+                            $style = 'style=margin:0 auto;display:block;text-align: center;';
+                        } else {
+                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            $href = "#";
+                        }
+                    }
+
+                    if ($model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
+                    } elseif ($model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
+                    } elseif ($model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
+                    } else {
+                        if ($model['document_type'] == 'YOUTUBE' || $model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO')
+                            return $downloadHtml = '-';
+                        else
+                            return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
+                    }
+                })
+                ->addColumn('download', function ($model) {
+                    $style = '';
+                    $file = '';
+                    $href = '';
+                    if ($model['file'] != "NA")
+                        $file = explode('/', $model['file']);
+                    if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
+                        if ($model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO') {
+                            $style = 'style=margin:0 auto;display:block;text-align: center;';
+                            $href = route('student.download', [$file[1]]);
+                        } elseif ($model['document_type'] == 'YOUTUBE') {
+                            $style = 'style=margin:0 auto;display:block;text-align: center;';
+                            $href = $model['video_link'];
+                        } else {
+                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            $href = "#";
+                        }
+                    } else {
+                        $style = 'style=margin:0 auto;display:block;text-align: center;';
+                        if ($model['document_type'] != 'YOUTUBE')
+                            $href = route('student.download', [$file[1]]);
+                        else
+                            $href = $model['video_link'];
+                    }
+
+
+                    if ($model['file'] != "NA" && $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    } else {
+                        if ($model['document_type'] == 'YOUTUBE')
+                            return $downloadHtml = '<a href="' . $href . '" target="_blank"  class="download" data="#" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
+                        else
+                            return $downloadHtml = '<a href="#"  class="download" data="#" ' . $style . ' title="Coming Soon"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    }
+                })
+                ->rawColumns(['availability', 'view', 'download'])
+                ->make(true);
+        }
+
+        if ($name == 'student.showShortNotes')
+             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Short Notes & One Liner</b>';
+
+        return view("Dashboard/Student/Material/materialtable", compact('title'));
+    }
+
+    public function showPremium(Request $request)
+    {
+        $name = Route::currentRouteName();
+
+        $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
+        if ($request->ajax()) {
+            $model      = Studymaterial::select("study_material.id", "title", "sub_title", "institute_id", "publish_status", "publish_date", "document_type", "created_by", "file", "video_link", "permission_to_download", "users.name as name", "classes_groups_exams.name as class_group")
+                ->leftJoin("users", "users.id", "study_material.created_by")
+                ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
+                ->where("study_material.status", 1)
+                ->where("study_material.material_seen", 1)
+                ->where("study_material.class", $student->class)
+                ->whereIn("study_material.institute_id", array(Auth::user()->myInstitute->id, 0))
+                ->where("study_material.category", 'Premium Study Notes');
+
+            $model = $model->orderBy('study_material.id', 'desc');
+            $model->get();
+
+            return Datatables::of($model)
+                ->addIndexColumn()
+                ->addColumn('title', '{{ $title }}')
+                ->addColumn('class', '{{ $class_group }}')
+                ->addColumn('sub_title', '{{ $sub_title }}')
+                ->addColumn('availability', function ($model) {
+                    $type = '';
+                    if ($model['document_type'] == 'PDF')
+                        $type = '<i class="bi bi-file-pdf"></i>';
+                    if ($model['document_type'] == 'WORD')
+                        $type = '<i class="bi bi-file-word"></i>';
+                    if ($model['document_type'] == 'EXCEL')
+                        $type = '<i class="bi bi-file-excel"></i>';
+                    if ($model['document_type'] == 'VIDEO')
+                        $type = '<i class="bi bi-camera-video"></i>';
+                    if ($model['document_type'] == 'AUDIO')
+                        $type = '<i class="bi bi-file-music"></i>';
+                    if ($model['document_type'] == 'YOUTUBE')
+                        $type = '<i class="bi bi-youtube"></i>';
+
+                    if ($model['publish_status'] == 'Submit')
+                        return $type . ' <label style="color:#AA336A;">Scheduled</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
+                    else
+                        return $type . ' <label style="color: #00A300;">' . $model['publish_status'] . '</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
+                })
+                ->addColumn('created_by', function ($model) {
+                    if ($model['institute_id'] == 0)
+                        return 'Test and Notes';
+                    else
+                        return Auth::user()->myInstitute->institute_name;
+                })
+                ->addColumn('view', function ($model) {
+                    $style = '';
+                    $file = '';
+                    $href = '';
+                    if ($model['file'] != "NA")
+                        $file = explode('/', $model['file']);
+                    if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
+                        $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                        $href = "#";
+                    } else {
+                        if ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL') {
+                            $href = route('student.viewmaterial', [$file[1]]);
+                            $style = 'style=margin:0 auto;display:block;text-align: center;';
+                        } else {
+                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            $href = "#";
+                        }
+                    }
+
+                    if ($model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
+                    } elseif ($model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
+                    } elseif ($model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
+                    } else {
+                        if ($model['document_type'] == 'YOUTUBE' || $model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO')
+                            return $downloadHtml = '-';
+                        else
+                            return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
+                    }
+                })
+                ->addColumn('download', function ($model) {
+                    $style = '';
+                    $file = '';
+                    $href = '';
+                    if ($model['file'] != "NA")
+                        $file = explode('/', $model['file']);
+                    if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
+                        if ($model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO') {
+                            $style = 'style=margin:0 auto;display:block;text-align: center;';
+                            $href = route('student.download', [$file[1]]);
+                        } elseif ($model['document_type'] == 'YOUTUBE') {
+                            $style = 'style=margin:0 auto;display:block;text-align: center;';
+                            $href = $model['video_link'];
+                        } else {
+                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            $href = "#";
+                        }
+                    } else {
+                        $style = 'style=margin:0 auto;display:block;text-align: center;';
+                        if ($model['document_type'] != 'YOUTUBE')
+                            $href = route('student.download', [$file[1]]);
+                        else
+                            $href = $model['video_link'];
+                    }
+
+
+                    if ($model['file'] != "NA" && $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
+                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    } else {
+                        if ($model['document_type'] == 'YOUTUBE')
+                            return $downloadHtml = '<a href="' . $href . '" target="_blank"  class="download" data="#" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
+                        else
+                            return $downloadHtml = '<a href="#"  class="download" data="#" ' . $style . ' title="Coming Soon"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    }
+                })
+                ->rawColumns(['availability', 'view', 'download'])
+                ->make(true);
+        }
+
+        if ($name == 'student.showPremium')
+             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Premium Study Notes</b>';
+
         return view("Dashboard/Student/Material/materialtable", compact('title'));
     }
 

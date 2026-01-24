@@ -57,6 +57,10 @@ Route::name('student.')->group(function () {
                 Route::any('show', [StudymaterialController::class, 'show'])->name('show');
                 Route::any('showvideo', [StudymaterialController::class, 'showvideo'])->name('showvideo');
                 Route::any('showgk', [StudymaterialController::class, 'showgk'])->name('showgk');
+                Route::any('showComprehensive', [StudymaterialController::class, 'showComprehensive'])->name('showComprehensive');
+                Route::any('showShortNotes', [StudymaterialController::class, 'showShortNotes'])->name('showShortNotes');
+                Route::any('showPremium', [StudymaterialController::class, 'showPremium'])->name('showPremium');
+
                 Route::any('download/{file}', [StudymaterialController::class, 'download'])->name('download');
                 Route::any('viewmaterial/{file}', [StudymaterialController::class, 'viewMaterial'])->name('viewmaterial');
             });
