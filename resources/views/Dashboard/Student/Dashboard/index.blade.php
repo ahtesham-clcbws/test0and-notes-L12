@@ -143,19 +143,10 @@
                             <div class="img_area_stu" style="border-color:red">
                                 <img class="box_icon" src="{{ asset('student1/images/gk.png') }}">
                             </div>
-                            @if($education_type == 51)
                             <div class="head_area">
                                 <div class="number text-primary" style="color:inherit;margin-top:10px;"><?php echo $gk_count; ?></div>
                                 <div class="num_heading">Static GK & Current Affairs</div>
                             </div>
-                            @endif
-
-                            @if($education_type == 52)
-                            <div class="head_area">
-                                <div class="number text-primary" style="color:inherit;margin-top:10px;"><?php echo $comprehensive_count; ?></div>
-                                <div class="num_heading">Comprehensive Study Material</div>
-                            </div>
-                            @endif
                         </div>
                         <div class="part2">
                             <div class="box_heading">
@@ -170,20 +161,40 @@
                 </div>
                 <div class="col">
                     <div class="card custom-dash-card" style="border-color:black; border-radius:10px;">
-                        <div class="part1 py-1" style="background-color:#fff466; border-top-left-radius: 10px; border-top-right-radius: 10px;">
+                        <div class="part1 py-1" style="background-color:#ace1f9; border-top-left-radius: 10px; border-top-right-radius: 10px;">
                             <div class="img_area_stu" style="border-color:red">
-                                <img class="box_icon" src="{{ asset('student1/images/sc_image.jpg') }}">
+                                <img class="box_icon" src="{{ asset('student1/images/institute_test.png') }}">
                             </div>
                             <div class="head_area">
-                                <div class="number text-primary" style="color:inherit;margin-top:10px;">Free</div>
-                                <div class="num_heading">Scholarship Offer / Facility</div>
+                                <div class="number text-primary" style="color:inherit;margin-top:10px;"><?php echo $comprehensive_count; ?></div>
+                                <div class="num_heading">Comprehensive Study Material</div>
                             </div>
                         </div>
                         <div class="part2">
                             <div class="box_heading">
-                                <a href="{{ route('student.dashboard_tests_list') }}" class="text-primary" style="color:inherit">
-                                    View Details!
-                                    {{-- <span data-feather="arrow-right-circle-fill"></span> --}}
+                                <a href="{{ route('student.showComprehensive') }}" class="text-primary" style="color:inherit">
+                                    View Details
+                                    <i class="bi bi-arrow-right-circle icon_img"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card custom-dash-card" style="border-color:black; border-radius:10px;">
+                        <div class="part1 py-1" style="background-color:#dee9a2; border-top-left-radius: 10px; border-top-right-radius: 10px;">
+                            <div class="img_area_stu" style="border-color:red">
+                                <img class="box_icon" src="{{ asset('student1/images/institute_test.png') }}">
+                            </div>
+                            <div class="head_area">
+                                <div class="number text-primary" style="color:inherit;margin-top:10px;"><?php echo $short_notes_count; ?></div>
+                                <div class="num_heading">Short Notes & One Liner</div>
+                            </div>
+                        </div>
+                        <div class="part2">
+                            <div class="box_heading">
+                                <a href="{{ route('student.showShortNotes') }}" class="text-primary" style="color:inherit">
+                                    View Details
                                     <i class="bi bi-arrow-right-circle icon_img"></i>
                                 </a>
                             </div>
@@ -194,39 +205,16 @@
                     <div class="card custom-dash-card" style="border-color:black; border-radius:10px;">
                         <div class="part1 py-1" style="background-color:#facacb; border-top-left-radius: 10px; border-top-right-radius: 10px;">
                             <div class="img_area_stu" style="border-color:red">
-                                <img class="box_icon" src="{{ asset('student1/images/news.jpg') }}">
+                                <img class="box_icon" src="{{ asset('student1/images/institute_test.png') }}">
                             </div>
                             <div class="head_area">
-                                <div class="number text-primary" style="color:inherit;margin-top:10px;">3</div>
-                                <div class="num_heading">Latest News & Information</div>
+                                <div class="number text-primary" style="color:inherit;margin-top:10px;"><?php echo $premium_count; ?></div>
+                                <div class="num_heading">Premium Study Notes</div>
                             </div>
                         </div>
                         <div class="part2">
                             <div class="box_heading">
-                                <a href="{{ route('student.dashboard_gyanology_list') }}" class="text-primary" style="color:inherit">
-                                    View Details!
-                                    {{-- <span data-feather="arrow-right-circle-fill"></span> --}}
-                                    <i class="bi bi-arrow-right-circle icon_img"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="col">
-                    <div class="card custom-dash-card" style="border-color:black; border-radius:10px;">
-                        <div class="part1 py-1" style="background-color:#fece5e; border-top-left-radius: 10px; border-top-right-radius: 10px;">
-                            <div class="img_area_stu" style="border-color:red">
-                                <img class="box_icon" src="{{ asset('student1/images/guidance.jpg') }}">
-                            </div>
-                            <div class="head_area">
-                                <div class="number text-primary" style="color:inherit;margin-top:10px;">Free</div>
-                                <div class="num_heading">Carrer Guidance</div>
-                            </div>
-                        </div>
-                        <div class="part2">
-                            <div class="box_heading">
-                                <a href="{{ route('student.showvideo') }}" class="text-primary" style="color:inherit">
+                                <a href="{{ route('student.showPremium') }}" class="text-primary" style="color:inherit">
                                     View Details
                                     <i class="bi bi-arrow-right-circle icon_img"></i>
                                 </a>

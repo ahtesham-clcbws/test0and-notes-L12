@@ -738,10 +738,7 @@ class StudymaterialController extends Controller
                 ->where("study_material.material_seen", 1)
                 ->where("study_material.class", $student->class)
                 ->whereIn("study_material.institute_id", array(Auth::user()->myInstitute->id, 0));
-            if ($student->education_type == 51)
-                $model->where("study_material.category", 'Static GK & Current Affairs');
-            if ($student->education_type == 52)
-                $model->where("study_material.category", 'Comprehensive Study Material');
+            $model->where("study_material.category", 'Static GK & Current Affairs');
 
             $model = $model->orderBy('study_material.id', 'desc');
             $model->get();
@@ -851,15 +848,8 @@ class StudymaterialController extends Controller
                 ->rawColumns(['availability', 'view', 'download'])
                 ->make(true);
         }
-        if ($name == 'student.show')
-            $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp; <b class="text-primary">Study Notes & E-Books</b>';
-        if ($name == 'student.showvideo')
-            $title = '<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Live & Video Classes</b>';
         if ($name == 'student.showgk') {
-            if ($student->education_type == 51)
-                $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Static GK & Current Affairs</b>';
-            if ($student->education_type == 52)
-                $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Comprehensive Study Material</b>';
+            $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Static GK & Current Affairs</b>';
         }
         return view("Dashboard/Student/Material/materialtable", compact('title'));
     }

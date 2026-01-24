@@ -60,9 +60,15 @@ class DashboardController extends Controller
 
         $comprehensive_count = Studymaterial::where('category', 'Comprehensive Study Material')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('class', $class)->where("status", 1)->where("material_seen", 1)->get();
         $comprehensive_count = $comprehensive_count->count($comprehensive_count);
+
+        $short_notes_count = Studymaterial::where('category', 'Short Notes & One Liner')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('class', $class)->where("status", 1)->where("material_seen", 1)->get();
+        $short_notes_count = $short_notes_count->count($short_notes_count);
+
+        $premium_count = Studymaterial::where('category', 'Premium Study Notes')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('class', $class)->where("status", 1)->where("material_seen", 1)->get();
+        $premium_count = $premium_count->count($premium_count);
         // dd($testCount);
 
-        return view('Dashboard/Student/Dashboard/index', compact('testAttemptCount', 'testCount', 'testInstitute', 'notes_count', 'video_count', 'gk_count', 'comprehensive_count', 'education_type', 'testTotal', 'test_cat'));
+        return view('Dashboard/Student/Dashboard/index', compact('testAttemptCount', 'testCount', 'testInstitute', 'notes_count', 'video_count', 'gk_count', 'comprehensive_count', 'short_notes_count', 'premium_count', 'education_type', 'testTotal', 'test_cat'));
     }
 
     public function profile(Request $req)
