@@ -92,8 +92,8 @@
                                 @endphp
 
 
-                                <td><a href="http://testandnotes.com/student/material/viewmaterial/{{$filename}}" target="_blank" class="download" data="{{$onematerial->file}}" style="margin:0" auto;display:block;text-align:="" center;="" title="View File">View</a></td>
-                                {{-- <td><a href="#" class="download" data="{{$onematerial->file}}" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0" auto;display:block;text-align:="" center;="" title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td> --}}
+                                <td><a href="http://testandnotes.com/student/material/viewmaterial/{{$filename}}" target="_blank" class="download" data="{{$onematerial->file}}" style="margin:0"  title="View File">View</a></td>
+                                {{-- <td><a href="#" class="download" data="{{$onematerial->file}}" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0"  title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td> --}}
                                 <td><a download href="{{ url('/storage/study_material/'.$onematerial->file) }}" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0" title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td>
                             </tr>
                             @endforeach
@@ -152,14 +152,14 @@
 
                                 @if($onevideo->file == 'NA')
 
-                                <td><a href="#" target="_blank" class="download" data="NA" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0" auto;display:block;text-align:="" center;="" title="View File">View</a></td>
-                                <td><a href="{{$onevideo->video_link}}" target="_blank" class="download" data="#" style="margin:0" auto;display:block;text-align:="" center;="" title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a></td>
+                                <td><a href="#" target="_blank" class="download" data="NA" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0"  title="View File">View</a></td>
+                                <td><a href="{{$onevideo->video_link}}" target="_blank" class="download" data="#" style="margin:0"  title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a></td>
 
                                 @else
                                 @php
                                 $filename = basename($onematerial->file);
                                 @endphp
-                                <td><a href="/student/material/viewmaterial/{{$filename}}" target="_blank" class="download" data="{{$onevideo->file}}" style="margin:0" auto;display:block;text-align:="" center;="" title="View File">View</a></td>
+                                <td><a href="/student/material/viewmaterial/{{$filename}}" target="_blank" class="download" data="{{$onevideo->file}}" style="margin:0"  title="View File">View</a></td>
                                 <td><a download href="{{ url('/storage/study_material/'.$onevideo->file) }}" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0" title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td>
                                 @endif
 
@@ -220,15 +220,15 @@
                                 @endif
                                 @if($one_gk->file == 'NA')
 
-                                <td><a href="#" target="_blank" class="download" data="NA" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0" auto;display:block;text-align:="" center;="" title="View File">View</a></td>
-                                <td><a href="#" class="download" data="study_material/StudentStudyMAterialLIsting.pdf" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0" auto;display:block;text-align:="" center;="" title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td>
+                                <td><a href="#" target="_blank" class="download" data="NA" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0"  title="View File">View</a></td>
+                                <td><a href="#" class="download" data="study_material/StudentStudyMAterialLIsting.pdf" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0"  title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td>
 
                                 @else
                                 @php
                                 $filename = basename($one_gk->file);
                                 @endphp
-                                <td><a href="http://testandnotes.com/student/material/viewmaterial/{{$filename}}" target="_blank" class="download" data="{{$one_gk->file}}" style="margin:0" auto;display:block;text-align:="" center;="" title="View File">View</a></td>
-                                <td><a href="http://testandnotes.com/student/material/download/{{$filename}}" class="download" data="{{$filename}}" style="margin:0" auto;display:block;text-align:="" center;="" title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td>
+                                <td><a href="http://testandnotes.com/student/material/viewmaterial/{{$filename}}" target="_blank" class="download" data="{{$one_gk->file}}" style="margin:0"  title="View File">View</a></td>
+                                <td><a href={{ url('/storage/study_material/'.$filename) }}  download  style="margin:0"  title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td>
                                 @endif
                             </tr>
                             @endif
