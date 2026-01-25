@@ -158,8 +158,8 @@
                                 @php
                                 $filename = basename($onematerial->file);
                                 @endphp
-                                <td><a href="http://testandnotes.com/student/material/viewmaterial/{{$filename}}" target="_blank" class="download" data="{{$onevideo->file}}" style="margin:0" auto;display:block;text-align:="" center;="" title="View File">View</a></td>
-                                <td><a href="#" class="download" data="{{$onevideo->file}}" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0" auto;display:block;text-align:="" center;="" title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td>
+                                <td><a href="/student/material/viewmaterial/{{$filename}}" target="_blank" class="download" data="{{$onevideo->file}}" style="margin:0" auto;display:block;text-align:="" center;="" title="View File">View</a></td>
+                                <td><a download href="{{ url('/storage/study_material/'.$onevideo->file) }}" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0" title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td>
                                 @endif
 
                             </tr>
