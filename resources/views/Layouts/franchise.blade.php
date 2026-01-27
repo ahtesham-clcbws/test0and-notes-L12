@@ -51,7 +51,7 @@
                     <div class="w-100 dashboard-header mb-4">
                         <h2 class="d-inline-block">
                             <i class="bi bi-{{ isset($pageicon) ? $pageicon : 'house-fill' }}"></i>
-                            {{ isset($data['pagename']) ? $data['pagename'] : 'Institute Dashboard' }}
+                            {{ isset($data['pagename']) ? $data['pagename'] : 'Corporate Dashboard' }}
                         </h2>
                     </div>
                     @yield('main')
@@ -383,11 +383,11 @@ async function classes_group_exams_change(id) {
         }
     }).fail(function (data) {
         console.log(data);
-    })  
+    })
 }
 
 async function exam_agency_board_university_change(id) {
-    
+
     var education_type_id       = $("#education_type_id").val();
     var classes_group_exams_id  = $('#class_group_exam_id').val();
     var class_boards_id         = id;
@@ -397,7 +397,7 @@ async function exam_agency_board_university_change(id) {
     formData.append('education_type_id', education_type_id);
     formData.append('classes_group_exams_id',classes_group_exams_id);
     formData.append('class_boards_id',class_boards_id);
- 
+
     await $.ajax({
         url: '/',
         type: 'post',
@@ -428,7 +428,7 @@ async function exam_agency_board_university_change(id) {
         }
     }).fail(function (data) {
         console.log(data);
-    })  
+    })
 }
 
 async function partClassChange(class_id) {

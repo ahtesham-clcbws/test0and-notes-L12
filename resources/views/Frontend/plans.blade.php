@@ -9,7 +9,7 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-12 col-md-12">
-                
+
                 <div class="breadcrumbs-wrap">
                     <h1 class="breadcrumb-title text-light">Our Packages</h1>
                     <nav class="transparent">
@@ -19,7 +19,7 @@
                         </ol>
                     </nav>
                 </div>
-                
+
             </div>
         </div>
     </div>
@@ -29,7 +29,7 @@
 <!-- ============================ Pricing Table ================================== -->
 <section class="min">
     <div class="container">
-    
+
         <div class="row justify-content-center">
             <div class="col-lg-7 col-md-8">
                 <div class="sec-heading center">
@@ -38,9 +38,9 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="row align-items-center">
-            
+
             <!-- Single Package -->
             @foreach($gn_PackagePlan as $key => $packagePlan)
             <div class="col-lg-4 col-md-4">
@@ -63,13 +63,18 @@
                         </ul>
                     </div>
                     <div class="prt_footer">
-                        <a href="{{ route('student.plan-checkout',[$packagePlan->id]) }}" class="btn choose_package active">Buy Now</a>
+                        @php
+                            $targetRoute = route('student.plan-checkout', [$packagePlan->id]);
+                            $loginRoute = route('login', ['redirect' => $targetRoute]);
+                            $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
+                        @endphp
+                        <a href="{{ $isStudent ? $targetRoute : $loginRoute }}" class="btn choose_package active">Buy Now</a>
                     </div>
                 </div>
             </div>
             @endforeach
-            
-            
+
+
             <!-- Single Package -->
             {{-- <div class="col-lg-4 col-md-4">
                 <div class="pricing_wrap">
@@ -95,7 +100,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Single Package -->
             <div class="col-lg-4 col-md-4">
                 <div class="pricing_wrap">
@@ -120,9 +125,9 @@
                     </div>
                 </div>
             </div> --}}
-            
+
         </div>
-        
+
     </div>
 </section>
 <!-- ============================ Pricing Table End ================================== -->
@@ -130,7 +135,7 @@
 <!-- ============================ partner Start ================================== -->
 <section class="gray">
     <div class="container">
-    
+
         <div class="row justify-content-center">
             <div class="col-lg-7 col-md-8">
                 <div class="sec-heading center">
@@ -139,92 +144,92 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="row justify-content-center">
-            
+
             <!-- Single Item -->
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
                 <div class="crs_partn">
                     <div class="p-3">
                         <img src="https://via.placeholder.com/400x110" class="img-fluid" alt="" />
                     </div>
-                </div>							
+                </div>
             </div>
-            
+
             <!-- Single Item -->
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
                 <div class="crs_partn">
                     <div class="p-3">
                         <img src="https://via.placeholder.com/400x110" class="img-fluid" alt="" />
                     </div>
-                </div>							
+                </div>
             </div>
-            
+
             <!-- Single Item -->
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
                 <div class="crs_partn">
                     <div class="p-3">
                         <img src="https://via.placeholder.com/400x110" class="img-fluid" alt="" />
                     </div>
-                </div>							
+                </div>
             </div>
-            
+
             <!-- Single Item -->
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
                 <div class="crs_partn">
                     <div class="p-3">
                         <img src="https://via.placeholder.com/400x110" class="img-fluid" alt="" />
                     </div>
-                </div>							
+                </div>
             </div>
-            
+
             <!-- Single Item -->
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
                 <div class="crs_partn">
                     <div class="p-3">
                         <img src="https://via.placeholder.com/400x110" class="img-fluid" alt="" />
                     </div>
-                </div>							
+                </div>
             </div>
-            
+
             <!-- Single Item -->
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
                 <div class="crs_partn">
                     <div class="p-3">
                         <img src="https://via.placeholder.com/400x110" class="img-fluid" alt="" />
                     </div>
-                </div>							
+                </div>
             </div>
-            
+
             <!-- Single Item -->
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
                 <div class="crs_partn">
                     <div class="p-3">
                         <img src="https://via.placeholder.com/400x110" class="img-fluid" alt="" />
                     </div>
-                </div>							
+                </div>
             </div>
-            
+
             <!-- Single Item -->
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
                 <div class="crs_partn">
                     <div class="p-3">
                         <img src="https://via.placeholder.com/400x110" class="img-fluid" alt="" />
                     </div>
-                </div>							
+                </div>
             </div>
-            
+
             <!-- Single Item -->
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-6">
                 <div class="crs_partn">
                     <div class="p-3">
                         <img src="https://via.placeholder.com/400x110" class="img-fluid" alt="" />
                     </div>
-                </div>							
+                </div>
             </div>
-            
+
         </div>
-        
+
     </div>
 </section>
 <div class="clearfix"></div>
@@ -233,7 +238,7 @@
 <!-- ============================ Students Reviews ================================== -->
 <section>
     <div class="container">
-    
+
         <div class="row justify-content-center">
             <div class="col-lg-7 col-md-8">
                 <div class="sec-heading center">
@@ -242,12 +247,12 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="row justify-content-center">
             <div class="col-xl-12 col-lg-12 col-sm-12">
-                
+
                 <div class="reviews-slide space">
-                    
+
                     <!-- Single Item -->
                     <div class="single_items lios_item">
                         <div class="_testimonial_wrios shadow_none border">
@@ -268,13 +273,13 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="facts-detail">
                                 <p>Faucibus tristique felis potenti ultrices ornare rhoncus semper hac facilisi Rutrum tellus lorem sem velit nisi non pharetra in dui.</p>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Single Item -->
                     <div class="single_items lios_item">
                         <div class="_testimonial_wrios shadow_none border">
@@ -295,13 +300,13 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="facts-detail">
                                 <p>Faucibus tristique felis potenti ultrices ornare rhoncus semper hac facilisi Rutrum tellus lorem sem velit nisi non pharetra in dui.</p>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Single Item -->
                     <div class="single_items lios_item">
                         <div class="_testimonial_wrios shadow_none border">
@@ -322,13 +327,13 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="facts-detail">
                                 <p>Faucibus tristique felis potenti ultrices ornare rhoncus semper hac facilisi Rutrum tellus lorem sem velit nisi non pharetra in dui.</p>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Single Item -->
                     <div class="single_items lios_item">
                         <div class="_testimonial_wrios shadow_none border">
@@ -349,13 +354,13 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="facts-detail">
                                 <p>Faucibus tristique felis potenti ultrices ornare rhoncus semper hac facilisi Rutrum tellus lorem sem velit nisi non pharetra in dui.</p>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Single Item -->
                     <div class="single_items lios_item">
                         <div class="_testimonial_wrios shadow_none border">
@@ -376,18 +381,18 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="facts-detail">
                                 <p>Faucibus tristique felis potenti ultrices ornare rhoncus semper hac facilisi Rutrum tellus lorem sem velit nisi non pharetra in dui.</p>
                             </div>
                         </div>
                     </div>
-                
+
                 </div>
-            
+
             </div>
         </div>
-        
+
     </div>
 </section>
 <!-- ============================ Students Reviews End ================================== -->

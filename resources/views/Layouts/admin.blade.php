@@ -46,8 +46,7 @@
                     <div class="custom-dashboard pb-2 pt-3">
                         <div class="w-100 dashboard-header mb-4">
                             <h2 class="d-inline-block">
-                                <!--<i class="bi bi-{{ isset($pageicon) ? $pageicon : 'house-fill' }}"></i>-->
-                                {{ isset($data['pagename']) ? $data['pagename'] : '' }}
+                                {{ isset($data['pagename']) ? $data['pagename'] : 'Administrator' }}
                             </h2>
                         </div>
                         @yield('main')

@@ -39,8 +39,9 @@
                     <div class="w-100 dashboard-header mb-4">
                         <h5 class="d-inline-block text-danger">
                             <i class="bi bi-{{ isset($pageicon) ? $pageicon : 'house-fill' }}"></i>
-                            {{request()->route()->getName()}}
-                            <!--{{ isset($pagename) ? $pagename : 'Student\'s Dashboard' }}-->
+                            {{ isset($data['pagename']) ? $data['pagename'] : 'Student Dashboard' }}
+                            {{-- Student Dashboard --}}
+                            {{-- {{ $pagename ?? ($data['pagename'] ?? str(request()->route()?->getName() ?? 'Dashboard')->after('student.')->headline()) }} --}}
                         </h5>
                     </div>
                     @yield('main')
