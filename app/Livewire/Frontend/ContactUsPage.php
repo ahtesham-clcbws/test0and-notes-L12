@@ -22,7 +22,7 @@ class ContactUsPage extends Component
         try {
             $this->form->saveContact();
             $this->form->reset();
-            $this->js("success('Successfully send contact')");
+            $this->js("success('Your Enquiry Form Submitted Successfully, we will contact you, if needed')");
         } catch (\Throwable $th) {
             $this->js("error('Failed to send contact')");
             throw $th;

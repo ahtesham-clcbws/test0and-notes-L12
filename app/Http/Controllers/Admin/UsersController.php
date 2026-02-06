@@ -59,6 +59,9 @@ class UsersController extends Controller
         if ($type == 'multi') {
             $data = $data->where('is_staff', '1')->where('roles', 'like', '%,%')->get();
         }
+        if ($type == 'left') {
+            $data = $data->where('status', 'left')->get();
+        }
 
         $page_title = 'Users';
         switch ($type) {

@@ -42,7 +42,9 @@ class UserController extends Controller
         $data = User::where($matchThis);
 
         if ($type == 'new') {
-            $data = $data->where('status', 'unread')->orWhere('status','inactive')->get();
+            $data = $data->where(function ($query) {
+                $query->where('status', 'unread')->orWhere('status', 'inactive');
+            })->get();
         }
         if ($type == 'students') {
             $data = $data->where('status', 'active')->where('roles', 'student')->get();
@@ -71,7 +73,9 @@ class UserController extends Controller
         $branchCode = $myDetails->branch_code;
 
         $matchThis = ['in_franchise' => '1', 'franchise_code' => $branchCode, 'isAdminAllowed' => '0'];
-        $data = User::where($matchThis)->where('status', 'inactive')->orWhere('status', 'unread')->get();
+        $data = User::where($matchThis)->where(function ($query) {
+            $query->where('status', 'inactive')->orWhere('status', 'unread');
+        })->get();
 
         return view('Dashboard/Franchise/Dashboard/new_signup')->with('data', $data);
     }

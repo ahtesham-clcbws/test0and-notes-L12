@@ -16,12 +16,14 @@ class DashboardController extends Controller
         $myDetails = FranchiseDetails::where('user_id', $id)->first();
         $branchCode = $myDetails->branch_code;
 
-        $matchNew           = ['in_franchise' => '1', 'franchise_code' => $branchCode, 'isAdminAllowed' => '0', 'is_staff' => '0', 'status' => 'unread'];
+        $matchNew           = ['in_franchise' => '1', 'franchise_code' => $branchCode, 'isAdminAllowed' => '0', 'is_staff' => '0'];
         $matchStudents      = ['in_franchise' => '1', 'franchise_code' => $branchCode, 'isAdminAllowed' => '0', 'is_staff' => '0', 'status' => 'active'];
         $matchManagers      = ['in_franchise' => '1', 'franchise_code' => $branchCode, 'isAdminAllowed' => '0', 'is_staff' => '1', 'status' => 'active'];
         $matchCreators      = ['in_franchise' => '1', 'franchise_code' => $branchCode, 'isAdminAllowed' => '0', 'is_staff' => '1', 'status' => 'active'];
         $matchPublishers    = ['in_franchise' => '1', 'franchise_code' => $branchCode, 'isAdminAllowed' => '0', 'is_staff' => '1', 'status' => 'active'];
-        $newSignup          = User::where($matchNew)->get()->count();
+        $newSignup          = User::where($matchNew)->where(function ($query) {
+            $query->where('status', 'unread')->orWhere('status', 'inactive');
+        })->get()->count();
         $totalStudents      = User::where($matchStudents)->where('roles','student')->get()->count();
         $totalManagers      = User::where($matchManagers)->where('roles', 'like', 'manager')->get()->count();
         $totalCreators      = User::where($matchCreators)->where('roles', 'like', 'creator')->get()->count();

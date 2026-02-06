@@ -28,7 +28,9 @@
                         <div class="form-group">
                             <label class="control-label" for="photo_url">Select Photo</label>
                             <input class="form-control form-control-sm" name="photo_url" type="file"
-                                style="border: 1px solid #aaa;">
+                                style="border: 1px solid #aaa;" onchange="previewImage(event)">
+                            <img id="photo_preview" src="" alt="Image Preview"
+                                style="display: none; max-width: 100%; height: auto; margin-top: 10px; border: 1px solid #ccc; padding: 5px;">
                         </div>
                     </div>
                 </div>
@@ -274,5 +276,15 @@
         }
 
         //     $('#change_profile input[type=file]').submit(function(event) {
+
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function() {
+                var output = document.getElementById('photo_preview');
+                output.src = reader.result;
+                output.style.display = 'block';
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
     </script>
 @endsection

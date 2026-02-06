@@ -20,6 +20,6 @@ class IsStudent
             return $next($request);
         }
         Auth::logout();
-        return redirect()->route('student.login')->with('error',"You don't have admin access.");
+        return redirect()->route('login')->with('error',"You don't have admin access.");
     }
 }

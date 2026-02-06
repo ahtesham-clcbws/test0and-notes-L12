@@ -664,6 +664,7 @@ class ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8
     );
 
     public static $classMap = array (
+        'App\\Helpers\\ProfileValidationHelper' => __DIR__ . '/../..' . '/app/Helpers/ProfileValidationHelper.php',
         'App\\Http\\Controllers\\API\\APIController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/APIController.php',
         'App\\Http\\Controllers\\API\\BaseController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/BaseController.php',
         'App\\Http\\Controllers\\API\\InternalRequestsController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/InternalRequestsController.php',
@@ -739,6 +740,7 @@ class ComposerStaticInit1dc588e091de15ddfe69ce0e0e6bbaf8
         'App\\Livewire\\Forms\\Frontend\\StudentRegistrationForm' => __DIR__ . '/../..' . '/app/Livewire/Forms/Frontend/StudentRegistrationForm.php',
         'App\\Livewire\\Forms\\ImportantLinkForm' => __DIR__ . '/../..' . '/app/Livewire/Forms/ImportantLinkForm.php',
         'App\\Livewire\\Frontend\\Auth\\ContributorSignUp' => __DIR__ . '/../..' . '/app/Livewire/Frontend/Auth/ContributorSignUp.php',
+        'App\\Livewire\\Frontend\\Auth\\CorporateSignupPage' => __DIR__ . '/../..' . '/app/Livewire/Frontend/Auth/CorporateSignupPage.php',
         'App\\Livewire\\Frontend\\Auth\\ForgotPassword' => __DIR__ . '/../..' . '/app/Livewire/Frontend/Auth/ForgotPassword.php',
         'App\\Livewire\\Frontend\\Auth\\Login' => __DIR__ . '/../..' . '/app/Livewire/Frontend/Auth/Login.php',
         'App\\Livewire\\Frontend\\Auth\\Register' => __DIR__ . '/../..' . '/app/Livewire/Frontend/Auth/Register.php',

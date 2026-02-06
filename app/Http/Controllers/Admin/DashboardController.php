@@ -75,22 +75,22 @@ class DashboardController extends Controller
         // 13. New User Sign Up (Franchise)
         $counts['new_user_signup_franchise'] = \App\Models\User::where(function($q) {
             $q->where('status', 'inactive')->orWhere('status', 'unread');
-        })->where('in_franchise', 1)->count();
+        })->where('in_franchise', 1)->where('isAdminAllowed', 0)->count();
 
         // 14. Students (Franchise) - UsersController does not check is_staff for students
-        $counts['students_franchise'] = \App\Models\User::where('roles', 'student')->where('in_franchise', 1)->count();
+        $counts['students_franchise'] = \App\Models\User::where('roles', 'student')->where('in_franchise', 1)->where('isAdminAllowed', 0)->count();
 
         // 15. Managers (Franchise)
-        $counts['managers_franchise'] = \App\Models\User::where('roles', 'manager')->where('in_franchise', 1)->where('is_staff', 1)->count();
+        $counts['managers_franchise'] = \App\Models\User::where('roles', 'manager')->where('in_franchise', 1)->where('is_staff', 1)->where('isAdminAllowed', 0)->count();
 
         // 16. Creators (Franchise)
-        $counts['creators_franchise'] = \App\Models\User::where('roles', 'creator')->where('in_franchise', 1)->where('is_staff', 1)->count();
+        $counts['creators_franchise'] = \App\Models\User::where('roles', 'creator')->where('in_franchise', 1)->where('is_staff', 1)->where('isAdminAllowed', 0)->count();
 
         // 17. Publishers (Franchise)
-        $counts['publishers_franchise'] = \App\Models\User::where('roles', 'publisher')->where('in_franchise', 1)->where('is_staff', 1)->count();
+        $counts['publishers_franchise'] = \App\Models\User::where('roles', 'publisher')->where('in_franchise', 1)->where('is_staff', 1)->where('isAdminAllowed', 0)->count();
 
         // 18. Multi Role (Franchise)
-        $counts['multi_role_franchise'] = \App\Models\User::where('roles', 'like', '%,%')->where('in_franchise', 1)->where('is_staff', 1)->count();
+        $counts['multi_role_franchise'] = \App\Models\User::where('roles', 'like', '%,%')->where('in_franchise', 1)->where('is_staff', 1)->where('isAdminAllowed', 0)->count();
 
         // 19. New User Sign Up (Direct)
         $counts['new_user_signup_direct'] = \App\Models\User::where(function($q) {

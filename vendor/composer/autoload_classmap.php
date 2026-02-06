@@ -6,6 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Helpers\\ProfileValidationHelper' => $baseDir . '/app/Helpers/ProfileValidationHelper.php',
     'App\\Http\\Controllers\\API\\APIController' => $baseDir . '/app/Http/Controllers/API/APIController.php',
     'App\\Http\\Controllers\\API\\BaseController' => $baseDir . '/app/Http/Controllers/API/BaseController.php',
     'App\\Http\\Controllers\\API\\InternalRequestsController' => $baseDir . '/app/Http/Controllers/API/InternalRequestsController.php',
@@ -81,6 +82,7 @@ return array(
     'App\\Livewire\\Forms\\Frontend\\StudentRegistrationForm' => $baseDir . '/app/Livewire/Forms/Frontend/StudentRegistrationForm.php',
     'App\\Livewire\\Forms\\ImportantLinkForm' => $baseDir . '/app/Livewire/Forms/ImportantLinkForm.php',
     'App\\Livewire\\Frontend\\Auth\\ContributorSignUp' => $baseDir . '/app/Livewire/Frontend/Auth/ContributorSignUp.php',
+    'App\\Livewire\\Frontend\\Auth\\CorporateSignupPage' => $baseDir . '/app/Livewire/Frontend/Auth/CorporateSignupPage.php',
     'App\\Livewire\\Frontend\\Auth\\ForgotPassword' => $baseDir . '/app/Livewire/Frontend/Auth/ForgotPassword.php',
     'App\\Livewire\\Frontend\\Auth\\Login' => $baseDir . '/app/Livewire/Frontend/Auth/Login.php',
     'App\\Livewire\\Frontend\\Auth\\Register' => $baseDir . '/app/Livewire/Frontend/Auth/Register.php',

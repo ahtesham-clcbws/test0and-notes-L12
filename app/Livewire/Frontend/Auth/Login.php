@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Frontend\Auth;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Validate;
@@ -10,7 +11,6 @@ use Livewire\Component;
 class Login extends Component
 {
     #[Validate('required', message: 'Mobile/Email is required')]
-    // #[Validate('exists:users,email', message: 'Credentials do not match')]
     public $username;
 
     #[Validate('required', message: 'Password is required')]
@@ -36,6 +36,11 @@ class Login extends Component
             }
             if (filter_var($this->username, FILTER_VALIDATE_INT) && strlen(filter_var($this->username, FILTER_VALIDATE_INT)) == 10) {
                 $fieldType = 'mobile';
+            }
+            $user = User::where($fieldType, $this->username)->first();
+            if($user->roles !== 'student'){
+                $this->addError('username', 'Credentials do not match');
+                return;
             }
             if (Auth::attempt([$fieldType => $this->username, 'password' => $this->password], $this->remember_me)) {
                 $this->js('success("Login successful")');

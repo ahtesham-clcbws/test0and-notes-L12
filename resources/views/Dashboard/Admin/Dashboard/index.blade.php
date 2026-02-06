@@ -84,7 +84,7 @@
                             </div>
                             <div class="part2" style="border-top-color:#EC9E4F">
                                 <div class="box_heading">
-                                    <a href="/administrator/corporate-enquiry/new" style="color:#e10d0a">
+                                    <a href="/administrator/corporate-enquiry/type/discontinue" style="color:#e10d0a">
                                         View Details
 
                                         <i class="bi bi-arrow-right-circle icon_img"></i>
@@ -106,7 +106,7 @@
                             </div>
                             <div class="part2" style="border-top-color:#EC9E4F">
                                 <div class="box_heading">
-                                    <a href="/administrator/corporate-enquiry/new" style="color:#e10d0a">
+                                    <a href="/administrator/users/type/left" style="color:#e10d0a">
                                         View Details
 
                                         <i class="bi bi-arrow-right-circle icon_img"></i>

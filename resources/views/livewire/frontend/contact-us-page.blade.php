@@ -26,6 +26,7 @@
         <div class="container">
             <div class="row align-items-start">
                 <div class="col-xl-7 col-md-12 col-sm-12">
+                    <div class="border p-3 rounded">
                     <div class="form-group">
                         <h4>We'd love to here from you</h4>
                         <span>Send a message and we'll responed as soos as possible </span>
@@ -109,6 +110,7 @@
                             </div>
                         </div>
                     </form>
+                    </div>
                 </div>
 
                 <div class="col-xl-5 col-md-12 col-sm-12">

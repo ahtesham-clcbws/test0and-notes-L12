@@ -12,7 +12,7 @@
                             top: 76px;
                         "></i>
                 <div class="col-sm-6">
-                    <h1>Institute Dashboard</h1>
+                    <h1>Contributor Dashboard</h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
 
