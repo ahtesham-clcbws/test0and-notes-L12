@@ -85,20 +85,19 @@
         {{-- <script src="{{ asset('frontend/js/sweetalert.min.js') }}"></script> --}}
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            let class_group = {{ isset($class) ? $class : 0 }};
-            let board = {{ isset($board) ? $board : 0 }};
-            let other_exam = {{ isset($other_exam) ? $other_exam : 0 }};
-            let subject = {{ isset($subject) ? $subject : 0 }};
-            let subject_part = {{ isset($subject_part) ? $subject_part : 0 }};
-            let video = {{ isset($video) ? $video : 0 }};
-            let notes = {{ isset($notes) ? $notes : 0 }};
-            let gk = {{ isset($gk) ? $gk : 0 }};
-            // let test =  {{ isset($test) ? json_encode($test) : 0 }};
-            let package = {{ isset($package) ? $package : 0 }};
+            let class_group = "{{ isset($class) ? $class : 0 }}";
+            let board = "{{ isset($board) ? $board : 0 }}";
+            let other_exam = "{{ isset($other_exam) ? $other_exam : 0 }}";
+            let subject = "{{ isset($subject) ? $subject : 0 }}";
+            let subject_part = "{{ isset($subject_part) ? $subject_part : 0 }}";
+            let video = "{{ isset($video) ? $video : '0' }}";
+            let notes = "{{ isset($notes) ? $notes : '0' }}";
+            let gk = "{{ isset($gk) ? $gk : '0' }}";
+            let package_info = "{{ isset($package) ? $package : 0 }}";
 
             let test = 0;
-            @if (isset($test) && intval($test) > 0)
-                test = {{ $test }};
+            @if (isset($test) && $test != '0' && $test != '')
+                test = {!! $test !!};
             @endif
         </script>
 
@@ -341,8 +340,8 @@
 
                                 $(package_data).each(function(index, item) {
                                     var selected = "";
-                                    if (package != 0) {
-                                        package_arry = package.toString().split(',');
+                                    if (package_info != 0) {
+                                        package_arry = package_info.toString().split(',');
                                         console.log("package_arry:", package_arry);
                                         if (jQuery.inArray(item.id.toString(), package_arry) !== -1) {
                                             console.log('item.id:', item.id);

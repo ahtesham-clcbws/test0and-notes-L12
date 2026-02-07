@@ -1,43 +1,23 @@
-# Implementation Plan - Sidebar Navigation Improvements
+# Fix Package Edit Page JS Errors
 
-Improve the sidebar user experience by ensuring active sections are expanded and the active link is scrolled into view.
+This plan addresses a JavaScript syntax error and a reference error on the package edit page (`administrator/plan/add/{id}`). The image 404 error will not be addressed per user request.
+
+## Technical Analysis
+- **Syntax Error**: Variables like `video`, `notes`, and `gk` are being injected directly from Blade without quotes. Since these values are often comma-separated strings of IDs (e.g., "1,2"), they result in invalid JavaScript like `let video = 1,2;`.
+- **Reference Error**: `class_group` is reported as undefined because the script block containing its definition fails to parse entirely due to the syntax error.
+- **JSON Encoding**: The `test` variable in the layout is being rendered with `{{ $test }}`, which escapes quotes and breaks the JSON structure.
 
 ## Proposed Changes
 
-### [MODIFY] [sidebar.blade.php](file:///i:/test-and-notes-upgrading/resources/views/Dashboard/Admin/partials/sidebar.blade.php)
-
-- Add a dynamic `active` class to all `nav-link` elements using `request()->routeIs()`.
-- For each `collapse` div:
-    - Add the `show` class if any sub-route is active.
-- For each `btn-toggle` (trigger):
-    - Remove the `collapsed` class if the section is active.
-    - Set `aria-expanded="true"` if the section is active.
-- Add a `<script>` block at the end of the file to:
-    - Find the active link.
-    - Scroll it into view using `scrollIntoView()`.
-
-#### Section Route Mappings:
-- **Dashboard**: `administrator.dashboard`
-- **Corporate Enquiries**: `administrator.corporate_enquiry*`
-- **Franchise**: `administrator.franchise_*`, `administrator.admin_franchise_view`
-- **Franchise Users**: Prefix `administrator/users/type/*/franchise`
-- **Direct Users**: Prefix `administrator/users/type/*` (excluding franchise)
-- **Admin & Contributors**: `administrator.add_user`, `administrator.admin_panel_profile`
-- **Test & Quizes**: `administrator.dashboard_tests_*`, `administrator.dashboard_add_exams`, `administrator.dashboard_tests_attempt`, `administrator.manage_test_cat*`, `administrator.add_category`, `administrator.edit_category`
-- **Education Types**: `administrator.dashboard_eductaion_type`
-- **Subjects**: `administrator.dashboard_subjects`
-- **Study Material**: `administrator.material*`, `administrator.store`
-- **Package**: `administrator.plan*`
-- **Question Bank**: `administrator.dashboard_question_*`
-- **Books**: `administrator.books`, `administrator.book_*`
-- **Course Details**: `administrator.course-detail-*`
-- **Settings**: `administrator.dashboard_default_numbers`, `administrator.website_pages*`, `administrator.manage.faq*`, `administrator.manage.important_links*`, `administrator.manage.contact*`, `administrator.manage_home*`, `administrator.dashboard_add_test_category`, `administrator.dashboard_add_pdf_content`
+### [Admin Layout]
+#### [MODIFY] [admin.blade.php](file:///i:/test-and-notes-upgrading/resources/views/Layouts/admin.blade.php)
+- Wrap ID list variables (`video`, `notes`, `gk`) in quotes or use `json_encode` to ensure they are treated as strings in JS.
+- Change `{{ $test }}` to `{!! $test !!}` to prevent escaping JSON characters.
+- Rename `package` variable to `package_info` to avoid potential reserved word conflicts.
 
 ## Verification Plan
 
 ### Manual Verification
-- Navigate to "Course List": Observe that "Course Details" is expanded, the link is highlighted, and it scrolls to it if necessary.
-- Navigate to "Add Course": Same observation.
-- Navigate to "Edit Course": Same observation.
-- Navigate to "New Signup" (Franchise Users): Observe "Franchise Users" is expanded.
-- Navigate to "New Signup" (Direct Users): Observe "Direct Users" is expanded.
+- Load the package edit page and check the browser console for any `SyntaxError` or `ReferenceError`.
+- Verify that the "Add Test", "Add Video", and "Add Study Notes" multi-selects are correctly pre-populated with existing data.
+- Ensure the "Class/Group/Exam Name" dropdown is correctly populated on page load.
