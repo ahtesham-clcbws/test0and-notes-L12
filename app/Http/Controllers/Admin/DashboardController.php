@@ -193,6 +193,76 @@ class DashboardController extends Controller
     }
     public function courseMasterList()
     {
-        return view('Dashboard.admin.Dashboard.course-master-list');
+        $courses = CourseDetail::all();
+        return view('Dashboard.Admin.Dashboard.course-master-list', compact('courses'));
+    }
+
+    public function courseDetailEdit($id)
+    {
+        $course = CourseDetail::findOrFail($id);
+        $course_data = DB::table('classes_groups_exams')->get();
+        $education_type = Educationtype::get();
+        $board = BoardAgencyStateModel::get();
+
+        return view('Dashboard.Admin.Dashboard.course-detail-edit', compact('course', 'course_data', 'education_type', 'board'));
+    }
+
+    public function courseDetailUpdate(Request $request, $id)
+    {
+        $courseDetails = CourseDetail::findOrFail($id);
+
+        if ($request->isMethod('POST')) {
+            $noti_img = $courseDetails->notification_image;
+            $exam_img = $courseDetails->exam_detail;
+            $course_logo = $courseDetails->course_image;
+
+            if ($request->hasFile('notification_file')) {
+                $file = $request->file('notification_file');
+                $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
+                $notificationFilePath = public_path('/uploads/notification_image');
+                $file->move($notificationFilePath, $fileName);
+                $noti_img = '/uploads/notification_image/' . $fileName;
+            }
+            if ($request->hasFile('exam_details_file')) {
+                $file = $request->file('exam_details_file');
+                $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
+                $examDetailsFilePath = public_path('/uploads/exam_details');
+                $file->move($examDetailsFilePath, $fileName);
+                $exam_img = '/uploads/exam_details/' . $fileName;
+            }
+            if ($request->hasFile('course_logo')) {
+                $file = $request->file('course_logo');
+                $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
+                $courseLogo = public_path('/uploads/course_logo');
+                $file->move($courseLogo, $fileName);
+                $course_logo = '/uploads/course_logo/' . $fileName;
+            }
+
+            $courseDetails->description = $request->input('overview');
+            $courseDetails->class_group_examp_id = $request->input('course_name');
+            $courseDetails->course_short_name = $request->input('course_name');
+            $courseDetails->course_full_name = $request->input('course_full_name');
+
+            $courseDetails->registration = $request->input('registration');
+            $courseDetails->exam_date = $request->input('exam_Date');
+            $courseDetails->exam_mode = $request->input('exam_mode');
+
+            $courseDetails->vacancies = $request->input('vacancies');
+            $courseDetails->salary = $request->input('pay_scale');
+
+            $courseDetails->eligibility = $request->input('eligibility');
+            $courseDetails->official_site = $request->input('official_site');
+            $courseDetails->notification_image = $noti_img;
+            $courseDetails->exam_detail = $exam_img;
+            $courseDetails->course_image = $course_logo;
+            $courseDetails->education_id = $request->education_type;
+            $courseDetails->board_id = $request->board;
+            $courseDetails->required_A = $request->required_first;
+            $courseDetails->required_B = $request->required_second;
+
+            $courseDetails->save();
+
+            return redirect()->route('administrator.course-detail-list')->with('success', 'Course details updated successfully!');
+        }
     }
 }

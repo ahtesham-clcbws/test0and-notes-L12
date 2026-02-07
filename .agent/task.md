@@ -1,6 +1,5 @@
-# Student Profile Photo Preview
+# Sidebar Cleanup
 
-- [x] Fix `student.login` route undefined error <!-- id: 3 -->
-- [x] Locate `student/profile` route and view <!-- id: 0 -->
-- [x] Implement image preview logic in the view <!-- id: 1 -->
-- [x] Verify functionality <!-- id: 2 -->
+- [x] Remove redundant placeholder sections from `sidebar.blade.php` <!-- id: 0 -->
+- [x] Update walkthrough with cleanup details <!-- id: 1 -->
+- [x] Verify sidebar layout after removal <!-- id: 2 -->

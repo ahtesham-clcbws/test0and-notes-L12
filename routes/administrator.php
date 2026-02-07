@@ -40,7 +40,10 @@ Route::name('administrator.')->group(function () {
                 Route::any('delete/{id}', [CorporateEnquiry::class, 'delete'])->name('corporate_enquiry_delete');
             });
             Route::get('course-detail-master', [DashboardController::class, 'courseDetail'])->name('course-detail-add');
+            Route::get('course-detail-list', [DashboardController::class, 'courseMasterList'])->name('course-detail-list');
+            Route::get('course-detail-edit/{id}', [DashboardController::class, 'courseDetailEdit'])->name('course-detail-edit');
             Route::post('course-detail-store', [DashboardController::class, 'courseDetailStore'])->name('course-detail-store');
+            Route::post('course-detail-update/{id}', [DashboardController::class, 'courseDetailUpdate'])->name('course-detail-update');
 
             Route::prefix('franchise')->group(function () {
                 Route::any('', [FranchiseController::class, 'index'])->name('franchise_all');
