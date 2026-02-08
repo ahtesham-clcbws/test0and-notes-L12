@@ -4,36 +4,33 @@
     } else {
         $class = 0;
     }
-@endphp
-@php
+    if (isset($data['package']) && isset($data['package'][0]['board_state_agency'])) {
+        $board = $data['package'][0]['board_state_agency'];
+    } else {
+        $board = 0;
+    }
     if (isset($data['package']) && isset($data['package'][0]['video_id'])) {
         $video = $data['package'][0]['video_id'];
     } else {
         $video = 0;
     }
-@endphp
-@php
     if (isset($data['package']) && isset($data['package'][0]['study_material_id'])) {
         $notes = $data['package'][0]['study_material_id'];
     } else {
         $notes = 0;
     }
-@endphp
-@php
     if (isset($data['package']) && isset($data['package'][0]['static_gk_id'])) {
         $gk = $data['package'][0]['static_gk_id'];
     } else {
         $gk = 0;
     }
-@endphp
-@php
     if (isset($data['test_data'])) {
         $test = json_encode($data['test_data']);
     } else {
         $test = 0;
     }
 @endphp
-@extends('Layouts.admin', ['class' => $class, 'video' => $video, 'notes' => $notes, 'test' => $test])
+@extends('Layouts.admin', ['class' => $class, 'board' => $board, 'video' => $video, 'notes' => $notes, 'gk' => $gk, 'test' => $test])
 
 @section('css')
     <style>

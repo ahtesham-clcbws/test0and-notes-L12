@@ -47,7 +47,7 @@ class ContributorSignUp extends Component
             'password' => 'required|min:8',
             'confirm_password' => 'required|min:8|same:password',
             'institute_code' => [
-                'required',
+                'nullable',
                 \Illuminate\Validation\Rule::exists('corporate_enquiries', 'branch_code')->where(function ($query) {
                     return $query->where('status', 'activated');
                 }),
@@ -75,7 +75,7 @@ class ContributorSignUp extends Component
             'confirm_password.required' => 'Confirm Password is required.',
             'confirm_password.min' => 'Confirm Password must be at least 8 characters.',
             'confirm_password.same' => 'Password and Confirm Password must match.',
-            'institute_code.required' => 'Institute Code is required.',
+
             'institute_code.exists' => 'Invalid Institute Code or Institute is not active.',
             'user_logo.mimes' => 'Profile Image must be a file of type: jpeg, png, jpg.',
             'user_logo.max' => 'Profile Image must not be greater than 200 kilobytes.',
@@ -121,6 +121,12 @@ class ContributorSignUp extends Component
 
     public function verifyInstitute()
     {
+        if (empty($this->institute_code)) {
+            $this->institute_name = '';
+            $this->resetValidation('institute_code');
+            return;
+        }
+
         $this->validateOnly('institute_code');
 
         $institute = CorporateEnquiry::where('branch_code', $this->institute_code)
@@ -159,13 +165,7 @@ class ContributorSignUp extends Component
 
     public function render()
     {
-        $education_types = Educationtype::all();
-        $classes_groups_exams = ClassGoupExamModel::all();
-
-        return view('livewire.frontend.auth.contributor-sign-up', [
-            'education_types' => $education_types,
-            'classes_groups_exams' => $classes_groups_exams
-        ]);
+        return view('livewire.frontend.auth.contributor-sign-up');
     }
 
 

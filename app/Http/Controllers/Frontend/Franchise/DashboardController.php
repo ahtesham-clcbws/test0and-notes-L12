@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $myDetails = FranchiseDetails::where('user_id', $id)->first();
         $branchCode = $myDetails->branch_code;
 
-        $matchNew           = ['in_franchise' => '1', 'franchise_code' => $branchCode, 'isAdminAllowed' => '0', 'is_staff' => '0'];
+        $matchNew           = ['in_franchise' => '1', 'franchise_code' => $branchCode, 'isAdminAllowed' => '0'];
         $matchStudents      = ['in_franchise' => '1', 'franchise_code' => $branchCode, 'isAdminAllowed' => '0', 'is_staff' => '0', 'status' => 'active'];
         $matchManagers      = ['in_franchise' => '1', 'franchise_code' => $branchCode, 'isAdminAllowed' => '0', 'is_staff' => '1', 'status' => 'active'];
         $matchCreators      = ['in_franchise' => '1', 'franchise_code' => $branchCode, 'isAdminAllowed' => '0', 'is_staff' => '1', 'status' => 'active'];

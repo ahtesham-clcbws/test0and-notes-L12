@@ -1,25 +1,16 @@
-# Walkthrough - Package Edit Page JS Fixes
+# Walkthrough - Resolve Franchise Dashboard Count Discrepancy
 
-I have fixed the JavaScript errors on the package edit page.
+I have resolved the discrepancy between the "New User Signup" count on the franchise dashboard and the actual list of users displayed when clicking the card.
 
 ## Changes Made
 
-### 1. JavaScript Variable Injection
-- **File**: [admin.blade.php](file:///i:/test-and-notes-upgrading/resources/views/Layouts/admin.blade.php)
-- **Fix**: Wrapped variables `class_group`, `board`, `other_exam`, `subject`, `subject_part`, `video`, `notes`, and `gk` in quotes.
-- **Reason**: These variables often contain comma-separated IDs (e.g., `1,2,3`). Without quotes, they result in syntax errors like `let video = 1,2,3;`. Wrapping them in quotes ensures they are treated as valid JavaScript strings.
+### 1. Dashboard Count Logic Update
+- **File**: [DashboardController.php](file:///i:/test-and-notes-upgrading/app/Http/Controllers/Frontend/Franchise/DashboardController.php)
+- **Change**: Removed the `'is_staff' => '0'` filter from the `$matchNew` array in the `index()` method.
+- **Effect**: The dashboard card now counts all newly registered users (students and contributors) who are either 'unread' or 'inactive', aligning perfectly with the filter used in the `UserController`.
 
-### 2. JSON Rendering
-- **File**: [admin.blade.php](file:///i:/test-and-notes-upgrading/resources/views/Layouts/admin.blade.php)
-- **Fix**: Changed `{{ $test }}` to `{!! $test !!}` and added a safety check for empty/zero values.
-- **Reason**: Blade's default `{{ }}` escaping was breaking the JSON structure by escaping quotes. Using `{!! !!}` preserves the raw JSON.
+## Verification Results
 
-### 3. Variable Renaming
-- **File**: [admin.blade.php](file:///i:/test-and-notes-upgrading/resources/views/Layouts/admin.blade.php)
-- **Fix**: Renamed the JavaScript variable `package` to `package_info`.
-- **Reason**: `package` is a reserved word in strict mode JavaScript, which can cause issues in some environments or future updates.
-
-## Verification
-- Syntax error "Unexpected number" is resolved.
-- Reference error "class_group is not defined" is resolved (as the script now parses correctly).
-- The package edit page should now load and function correctly, including correctly pre-selecting values in dropdowns.
+### Manual Verification
+- Navigated to the franchise dashboard and compared the "New User Signup" count with the actual user list.
+- Confirmed that the count now includes all users regardless of their `is_staff` status, provided they match the other criteria (unread/inactive status, belongs to the correct franchise).

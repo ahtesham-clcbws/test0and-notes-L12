@@ -1,8 +1,8 @@
-# Debug Package Edit Page Errors
+# Handle Study Material Link Issues
 
-- [x] Research existing package edit implementation <!-- id: 0 -->
-- [x] Create Implementation Plan <!-- id: 1 -->
-- [x] Fix JS Syntax Error (Unexpected number) <!-- id: 2 -->
-- [x] Fix JS Reference Error (`class_group` is not defined) <!-- id: 3 -->
-- [ ] Investigation/Fix 404 image error (Cancelled by user) <!-- id: 4 -->
-- [x] Verify functionality <!-- id: 5 -->
+- [x] Research link generation in `StudymaterialController` <!-- id: 5 -->
+- [x] Research discrepancy in `package_manage.blade.php` <!-- id: 6 -->
+- [x] Create Implementation Plan <!-- id: 7 -->
+- [ ] Update `StudymaterialController` methods to use direct storage links <!-- id: 8 -->
+- [ ] Fix link prefix duplication in `package_manage.blade.php` <!-- id: 9 -->
+- [ ] Verify fix <!-- id: 10 -->

@@ -225,9 +225,9 @@
                         } else {
                             alert('No Data, please select another, or add some.');
                         }
-                        $('#video_id').html(videoOptions);
-                        $('#current_affairs_id').html(staticOptions);
-                        $('#study_material_id').html(notesOptions);
+                        $('#video_id').html(videoOptions).trigger('change');
+                        $('#current_affairs_id').html(staticOptions).trigger('change');
+                        $('#study_material_id').html(notesOptions).trigger('change');
                     } else {
                         alert(data.message);
                     }
@@ -273,7 +273,7 @@
                             $(test_data).each(function(index, item) {
                                 var selected = "";
                                 if (test != 0) {
-                                    if (jQuery.inArray(item.id.toString(), test_arry) !== -1) {
+                                    if (jQuery.inArray(item.id.toString(), test_arry.map(String)) !== -1) {
                                         console.log('item.id:', item.id);
                                         selected = 'selected';
                                     }
@@ -290,7 +290,7 @@
                         } else {
                             alert('No Data, please select another, or add some.');
                         }
-                        $('#test_id').html(testOptions);
+                        $('#test_id').html(testOptions).trigger('change');
                     } else {
                         alert(data.message);
                     }

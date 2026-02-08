@@ -191,12 +191,11 @@ class PlanController extends Controller
                 $package_plan->save();
 
                 if (!empty($request->test_id)) {
+                    if ($request->plan_id != '') {
+                        Gn_PackagePlanTest::where('gn_package_plan_id', $package_plan->id)->delete();
+                    }
                     foreach ($request->test_id as $id) {
                         $package_plan_test                      = new Gn_PackagePlanTest();
-                        if($request->plan_test_id != ''){
-                            $package_plan_test->exists = true;
-                            $package_plan_test->id = $request->plan_test_id; //already exists in database.
-                        }
                         $package_plan_test->gn_package_plan_id  = $package_plan->id;
                         $package_plan_test->test_id             = $id;
                         $package_plan_test->save();

@@ -111,15 +111,14 @@
 
 
                                         <td><a class="download"
-                                                href="http://testandnotes.com/student/material/viewmaterial/{{ $filename }}"
-                                                title="View File" style="margin:0" target="_blank"
-                                                data="{{ $onematerial->file }}">View</a></td>
+                                                href="{{ url('storage/' . $onematerial->file) }}"
+                                                title="View File" style="margin:0" target="_blank">View</a></td>
                                         {{-- <td><a href="#" class="download" data="{{$onematerial->file}}" style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0"  title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a></td> --}}
-                                        <td><a href="{{ url('/storage/study_material/' . $onematerial->file) }}"
+                                        <td><a href="{{ url('storage/' . $onematerial->file) }}"
                                                 title="Download File"
-                                                style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0"
+                                                style="margin:0"
                                                 download><i class="bi bi-download text-danger me-2"
-                                                    aria-hidden="true"></i></a></td>
+                                                     aria-hidden="true"></i></a></td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -206,12 +205,11 @@
                                                     $filename = basename($onevideo->file);
                                                 @endphp
                                                 <td><a class="download"
-                                                        href="/student/material/viewmaterial/{{ $filename }}"
-                                                        title="View File" style="margin:0" target="_blank"
-                                                        data="{{ $onevideo->file }}">View</a></td>
-                                                <td><a href="{{ url('/storage/study_material/' . $onevideo->file) }}"
+                                                        href="{{ url('storage/' . $onevideo->file) }}"
+                                                        title="View File" style="margin:0" target="_blank">View</a></td>
+                                                <td><a href="{{ url('storage/' . $onevideo->file) }}"
                                                         title="Download File"
-                                                        style="color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0"
+                                                        style="margin:0"
                                                         download><i class="bi bi-download text-danger me-2"
                                                             aria-hidden="true"></i></a></td>
                                             @endif
@@ -306,10 +304,9 @@
                                                     $filename = basename($one_gk->file);
                                                 @endphp
                                                 <td><a class="download"
-                                                        href="http://testandnotes.com/student/material/viewmaterial/{{ $filename }}"
-                                                        title="View File" style="margin:0" target="_blank"
-                                                        data="{{ $one_gk->file }}">View</a></td>
-                                                <td><a href="{{ url('/storage/study_material/' . $filename) }}"
+                                                        href="{{ url('storage/' . $one_gk->file) }}"
+                                                        title="View File" style="margin:0" target="_blank">View</a></td>
+                                                <td><a href="{{ url('storage/' . $one_gk->file) }}"
                                                         title="Download File" style="margin:0" download><i
                                                             class="bi bi-download text-danger me-2"
                                                             aria-hidden="true"></i></a></td>

@@ -521,16 +521,13 @@ class StudymaterialController extends Controller
                 })
                 ->addColumn('view', function ($model) {
                     $style = '';
-                    $file = '';
                     $href = '';
-                    if ($model['file'] != "NA")
-                        $file = explode('/', $model['file']);
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
                         $href = "#";
                     } else {
-                        if ($model['document_type'] != 'YOUTUBE' || $model['document_type'] != 'AUDIO' || $model['document_type'] != 'VIDEO') {
-                            $href = route('student.viewmaterial', [$file[1]]);
+                        if ($model['file'] != "NA" && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
+                            $href = url('storage/' . $model['file']);
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                         } else {
                             $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
@@ -538,48 +535,32 @@ class StudymaterialController extends Controller
                         }
                     }
 
-                    if ($model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } elseif ($model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } elseif ($model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } else {
-                        if ($model['document_type'] == 'YOUTUBE' || $model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO')
-                            return $downloadHtml = '-';
-                        else
-                            return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    }
+                    return '<a href=' . $href . ' target="_blank" class="view" ' . $style . ' title="View File">View</a>';
                 })
                 ->addColumn('download', function ($model) {
                     $style = '';
-                    $file = '';
                     $href = '';
-                    if ($model['file'] != "NA")
-                        $file = explode('/', $model['file']);
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
                         $href = "#";
                     } else {
                         $style = 'style=margin:0 auto;display:block;text-align: center;';
-                        if ($model['document_type'] != 'YOUTUBE')
-                            $href = route('student.download', [$file[1]]);
-                        else
+                        if ($model['document_type'] != 'YOUTUBE') {
+                            if ($model['file'] != "NA") {
+                                $href = url('storage/' . $model['file']);
+                            } else {
+                                $href = "#";
+                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            }
+                        } else {
                             $href = $model['video_link'];
+                        }
                     }
 
-
-                    if ($model['file'] != "NA" && $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
-                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
-                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    if ($model['document_type'] == 'YOUTUBE') {
+                        return '<a href="' . $href . '" target="_blank" class="download" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
                     } else {
-                        if ($model['document_type'] == 'YOUTUBE')
-                            return $downloadHtml = '<a href="' . $href . '" target="_blank"  class="download" data="#" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
-                        else
-                            return $downloadHtml = '<a href="#"  class="download" data="#" ' . $style . ' title="Coming Soon"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href=' . $href . ' class="download" ' . $style . ' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
                     }
                 })
                 ->rawColumns(['availability', 'view', 'download'])
@@ -644,16 +625,13 @@ class StudymaterialController extends Controller
                 })
                 ->addColumn('view', function ($model) {
                     $style = '';
-                    $file = '';
                     $href = '';
-                    if ($model['file'] != "NA")
-                        $file = explode('/', $model['file']);
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
                         $href = "#";
                     } else {
-                        if ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL') {
-                            $href = route('student.viewmaterial', [$file[1]]);
+                        if ($model['file'] != "NA" && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
+                            $href = url('storage/' . $model['file']);
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                         } else {
                             $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
@@ -661,29 +639,20 @@ class StudymaterialController extends Controller
                         }
                     }
 
-                    if ($model['document_type'] != 'AUDIO' || $model['document_type'] != 'VIDEO' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } elseif ($model['document_type'] != 'AUDIO' || $model['document_type'] != 'VIDEO' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } elseif ($model['document_type'] != 'AUDIO' || $model['document_type'] != 'VIDEO' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } else {
-                        if ($model['document_type'] == 'YOUTUBE' || $model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO')
-                            return $downloadHtml = '-';
-                        else
-                            return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    }
+                    return '<a href=' . $href . ' target="_blank" class="view" ' . $style . ' title="View File">View</a>';
                 })
                 ->addColumn('download', function ($model) {
                     $style = '';
-                    $file = '';
                     $href = '';
-                    if ($model['file'] != "NA")
-                        $file = explode('/', $model['file']);
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         if ($model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
-                            $href = route('student.download', [$file[1]]);
+                            if ($model['file'] != "NA") {
+                                $href = url('storage/' . $model['file']);
+                            } else {
+                                $href = "#";
+                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            }
                         } elseif ($model['document_type'] == 'YOUTUBE') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                             $href = $model['video_link'];
@@ -693,24 +662,22 @@ class StudymaterialController extends Controller
                         }
                     } else {
                         $style = 'style=margin:0 auto;display:block;text-align: center;';
-                        if ($model['document_type'] != 'YOUTUBE')
-                            $href = route('student.download', [$file[1]]);
-                        else
+                        if ($model['document_type'] != 'YOUTUBE') {
+                            if ($model['file'] != "NA") {
+                                $href = url('storage/' . $model['file']);
+                            } else {
+                                $href = "#";
+                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            }
+                        } else {
                             $href = $model['video_link'];
+                        }
                     }
 
-
-                    if ($model['file'] != "NA" && $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
-                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
-                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    if ($model['document_type'] == 'YOUTUBE') {
+                        return '<a href="' . $href . '" target="_blank" class="download" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
                     } else {
-                        if ($model['document_type'] == 'YOUTUBE')
-                            return $downloadHtml = '<a href="' . $href . '" target="_blank"  class="download" data="#" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
-                        else
-                            return $downloadHtml = '<a href="#"  class="download" data="#" ' . $style . ' title="Coming Soon"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href=' . $href . ' class="download" ' . $style . ' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
                     }
                 })
                 ->rawColumns(['availability', 'view', 'download'])
@@ -776,16 +743,13 @@ class StudymaterialController extends Controller
                 })
                 ->addColumn('view', function ($model) {
                     $style = '';
-                    $file = '';
                     $href = '';
-                    if ($model['file'] != "NA")
-                        $file = explode('/', $model['file']);
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
                         $href = "#";
                     } else {
-                        if ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL') {
-                            $href = route('student.viewmaterial', [$file[1]]);
+                        if ($model['file'] != "NA" && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
+                            $href = url('storage/' . $model['file']);
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                         } else {
                             $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
@@ -793,29 +757,20 @@ class StudymaterialController extends Controller
                         }
                     }
 
-                    if ($model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } elseif ($model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } elseif ($model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } else {
-                        if ($model['document_type'] == 'YOUTUBE' || $model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO')
-                            return $downloadHtml = '-';
-                        else
-                            return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    }
+                    return '<a href=' . $href . ' target="_blank" class="view" ' . $style . ' title="View File">View</a>';
                 })
                 ->addColumn('download', function ($model) {
                     $style = '';
-                    $file = '';
                     $href = '';
-                    if ($model['file'] != "NA")
-                        $file = explode('/', $model['file']);
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         if ($model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
-                            $href = route('student.download', [$file[1]]);
+                            if ($model['file'] != "NA") {
+                                $href = url('storage/' . $model['file']);
+                            } else {
+                                $href = "#";
+                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            }
                         } elseif ($model['document_type'] == 'YOUTUBE') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                             $href = $model['video_link'];
@@ -825,24 +780,22 @@ class StudymaterialController extends Controller
                         }
                     } else {
                         $style = 'style=margin:0 auto;display:block;text-align: center;';
-                        if ($model['document_type'] != 'YOUTUBE')
-                            $href = route('student.download', [$file[1]]);
-                        else
+                        if ($model['document_type'] != 'YOUTUBE') {
+                            if ($model['file'] != "NA") {
+                                $href = url('storage/' . $model['file']);
+                            } else {
+                                $href = "#";
+                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            }
+                        } else {
                             $href = $model['video_link'];
+                        }
                     }
 
-
-                    if ($model['file'] != "NA" && $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
-                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
-                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    if ($model['document_type'] == 'YOUTUBE') {
+                        return '<a href="' . $href . '" target="_blank" class="download" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
                     } else {
-                        if ($model['document_type'] == 'YOUTUBE')
-                            return $downloadHtml = '<a href="' . $href . '" target="_blank"  class="download" data="#" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
-                        else
-                            return $downloadHtml = '<a href="#"  class="download" data="#" ' . $style . ' title="Coming Soon"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href=' . $href . ' class="download" ' . $style . ' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
                     }
                 })
                 ->rawColumns(['availability', 'view', 'download'])
@@ -905,16 +858,13 @@ class StudymaterialController extends Controller
                 })
                 ->addColumn('view', function ($model) {
                     $style = '';
-                    $file = '';
                     $href = '';
-                    if ($model['file'] != "NA")
-                        $file = explode('/', $model['file']);
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
                         $href = "#";
                     } else {
-                        if ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL') {
-                            $href = route('student.viewmaterial', [$file[1]]);
+                        if ($model['file'] != "NA" && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
+                            $href = url('storage/' . $model['file']);
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                         } else {
                             $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
@@ -922,29 +872,20 @@ class StudymaterialController extends Controller
                         }
                     }
 
-                    if ($model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } elseif ($model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } elseif ($model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } else {
-                        if ($model['document_type'] == 'YOUTUBE' || $model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO')
-                            return $downloadHtml = '-';
-                        else
-                            return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    }
+                    return '<a href=' . $href . ' target="_blank" class="view" ' . $style . ' title="View File">View</a>';
                 })
                 ->addColumn('download', function ($model) {
                     $style = '';
-                    $file = '';
                     $href = '';
-                    if ($model['file'] != "NA")
-                        $file = explode('/', $model['file']);
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         if ($model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
-                            $href = route('student.download', [$file[1]]);
+                            if ($model['file'] != "NA") {
+                                $href = url('storage/' . $model['file']);
+                            } else {
+                                $href = "#";
+                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            }
                         } elseif ($model['document_type'] == 'YOUTUBE') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                             $href = $model['video_link'];
@@ -954,24 +895,22 @@ class StudymaterialController extends Controller
                         }
                     } else {
                         $style = 'style=margin:0 auto;display:block;text-align: center;';
-                        if ($model['document_type'] != 'YOUTUBE')
-                            $href = route('student.download', [$file[1]]);
-                        else
+                        if ($model['document_type'] != 'YOUTUBE') {
+                            if ($model['file'] != "NA") {
+                                $href = url('storage/' . $model['file']);
+                            } else {
+                                $href = "#";
+                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            }
+                        } else {
                             $href = $model['video_link'];
+                        }
                     }
 
-
-                    if ($model['file'] != "NA" && $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
-                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
-                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    if ($model['document_type'] == 'YOUTUBE') {
+                        return '<a href="' . $href . '" target="_blank" class="download" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
                     } else {
-                        if ($model['document_type'] == 'YOUTUBE')
-                            return $downloadHtml = '<a href="' . $href . '" target="_blank"  class="download" data="#" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
-                        else
-                            return $downloadHtml = '<a href="#"  class="download" data="#" ' . $style . ' title="Coming Soon"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href=' . $href . ' class="download" ' . $style . ' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
                     }
                 })
                 ->rawColumns(['availability', 'view', 'download'])
@@ -1035,16 +974,13 @@ class StudymaterialController extends Controller
                 })
                 ->addColumn('view', function ($model) {
                     $style = '';
-                    $file = '';
                     $href = '';
-                    if ($model['file'] != "NA")
-                        $file = explode('/', $model['file']);
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
                         $href = "#";
                     } else {
-                        if ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL') {
-                            $href = route('student.viewmaterial', [$file[1]]);
+                        if ($model['file'] != "NA" && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
+                            $href = url('storage/' . $model['file']);
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                         } else {
                             $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
@@ -1052,29 +988,20 @@ class StudymaterialController extends Controller
                         }
                     }
 
-                    if ($model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } elseif ($model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } elseif ($model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } else {
-                        if ($model['document_type'] == 'YOUTUBE' || $model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO')
-                            return $downloadHtml = '-';
-                        else
-                            return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    }
+                    return '<a href=' . $href . ' target="_blank" class="view" ' . $style . ' title="View File">View</a>';
                 })
                 ->addColumn('download', function ($model) {
                     $style = '';
-                    $file = '';
                     $href = '';
-                    if ($model['file'] != "NA")
-                        $file = explode('/', $model['file']);
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         if ($model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
-                            $href = route('student.download', [$file[1]]);
+                            if ($model['file'] != "NA") {
+                                $href = url('storage/' . $model['file']);
+                            } else {
+                                $href = "#";
+                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            }
                         } elseif ($model['document_type'] == 'YOUTUBE') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                             $href = $model['video_link'];
@@ -1084,24 +1011,22 @@ class StudymaterialController extends Controller
                         }
                     } else {
                         $style = 'style=margin:0 auto;display:block;text-align: center;';
-                        if ($model['document_type'] != 'YOUTUBE')
-                            $href = route('student.download', [$file[1]]);
-                        else
+                        if ($model['document_type'] != 'YOUTUBE') {
+                            if ($model['file'] != "NA") {
+                                $href = url('storage/' . $model['file']);
+                            } else {
+                                $href = "#";
+                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            }
+                        } else {
                             $href = $model['video_link'];
+                        }
                     }
 
-
-                    if ($model['file'] != "NA" && $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
-                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
-                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    if ($model['document_type'] == 'YOUTUBE') {
+                        return '<a href="' . $href . '" target="_blank" class="download" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
                     } else {
-                        if ($model['document_type'] == 'YOUTUBE')
-                            return $downloadHtml = '<a href="' . $href . '" target="_blank"  class="download" data="#" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
-                        else
-                            return $downloadHtml = '<a href="#"  class="download" data="#" ' . $style . ' title="Coming Soon"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href=' . $href . ' class="download" ' . $style . ' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
                     }
                 })
                 ->rawColumns(['availability', 'view', 'download'])
@@ -1165,16 +1090,13 @@ class StudymaterialController extends Controller
                 })
                 ->addColumn('view', function ($model) {
                     $style = '';
-                    $file = '';
                     $href = '';
-                    if ($model['file'] != "NA")
-                        $file = explode('/', $model['file']);
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
                         $href = "#";
                     } else {
-                        if ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL') {
-                            $href = route('student.viewmaterial', [$file[1]]);
+                        if ($model['file'] != "NA" && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
+                            $href = url('storage/' . $model['file']);
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                         } else {
                             $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
@@ -1182,29 +1104,20 @@ class StudymaterialController extends Controller
                         }
                     }
 
-                    if ($model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } elseif ($model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } elseif ($model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    } else {
-                        if ($model['document_type'] == 'YOUTUBE' || $model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO')
-                            return $downloadHtml = '-';
-                        else
-                            return $downloadHtml = '<a href=' . $href . ' target="_blank" class="download" data=' . $model['file'] . ' ' . $style . ' title="View File">View</a>';
-                    }
+                    return '<a href=' . $href . ' target="_blank" class="view" ' . $style . ' title="View File">View</a>';
                 })
                 ->addColumn('download', function ($model) {
                     $style = '';
-                    $file = '';
                     $href = '';
-                    if ($model['file'] != "NA")
-                        $file = explode('/', $model['file']);
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         if ($model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
-                            $href = route('student.download', [$file[1]]);
+                            if ($model['file'] != "NA") {
+                                $href = url('storage/' . $model['file']);
+                            } else {
+                                $href = "#";
+                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            }
                         } elseif ($model['document_type'] == 'YOUTUBE') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                             $href = $model['video_link'];
@@ -1214,24 +1127,22 @@ class StudymaterialController extends Controller
                         }
                     } else {
                         $style = 'style=margin:0 auto;display:block;text-align: center;';
-                        if ($model['document_type'] != 'YOUTUBE')
-                            $href = route('student.download', [$file[1]]);
-                        else
+                        if ($model['document_type'] != 'YOUTUBE') {
+                            if ($model['file'] != "NA") {
+                                $href = url('storage/' . $model['file']);
+                            } else {
+                                $href = "#";
+                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                            }
+                        } else {
                             $href = $model['video_link'];
+                        }
                     }
 
-
-                    if ($model['file'] != "NA" && $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Free View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
-                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
-                    } elseif ($model['file'] != "NA" && $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download' && $model['file'] != 'NA') {
-                        return $downloadHtml = '<a href=' . $href . ' class="download" data=' . $model['file'] . ' ' . $style . ' title="Download File"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                    if ($model['document_type'] == 'YOUTUBE') {
+                        return '<a href="' . $href . '" target="_blank" class="download" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
                     } else {
-                        if ($model['document_type'] == 'YOUTUBE')
-                            return $downloadHtml = '<a href="' . $href . '" target="_blank"  class="download" data="#" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
-                        else
-                            return $downloadHtml = '<a href="#"  class="download" data="#" ' . $style . ' title="Coming Soon"><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href=' . $href . ' class="download" ' . $style . ' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
                     }
                 })
                 ->rawColumns(['availability', 'view', 'download'])

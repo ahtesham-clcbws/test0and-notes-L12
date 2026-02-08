@@ -1123,13 +1123,13 @@
                                                     @endphp
 
                                                     @if (Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active')
-                                                        <a href="{{ route('student.viewmaterial', $fileName) }}"
-                                                            tabindex="0"><button tabindex="0"
+                                                        <a href="{{ url('storage/' . $item->file) }}"
+                                                            tabindex="0" target="_blank"><button tabindex="0"
                                                                 style="width:100%; padding: 0px; font-size: 16px">{{ $item->permission_to_download }}</button></a>
                                                     @else
                                                         @if ($fileName)
-                                                            <a href="{{ route('login', ['redirect' => route('student.viewmaterial', $fileName)]) }}"
-                                                                style="width:100%; padding: 0px 10px; font-size: 16px; display:inline-block; text-align:center;">{{ $item->permission_to_download }}</a>
+                                                            <a href="{{ route('login', ['redirect' => url('storage/' . $item->file)]) }}"
+                                                                style="width:100%; padding: 0px 10px; font-size: 16px; display:inline-block; text-align:center;" target="_blank">{{ $item->permission_to_download }}</a>
                                                         @endif
                                                     @endif
                                                 </div>
@@ -1185,12 +1185,12 @@
                                             @endphp
 
                                             @if (Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active')
-                                                <a href="{{ route('student.viewmaterial', $fileName) }}"
-                                                    tabindex="0"><button tabindex="0"
+                                                <a href="{{ url('storage/' . $item->file) }}"
+                                                    tabindex="0" target="_blank"><button tabindex="0"
                                                         style="width:100%; padding: 0px; font-size: 16px;font-size: small;">{{ $item->permission_to_download }}</button></a>
                                             @else
-                                                <a href="{{ route('login', ['redirect' => route('student.viewmaterial', $fileName)]) }}"
-                                                    style="font-size: small;">{{ $item->permission_to_download }}</a>
+                                                <a href="{{ route('login', ['redirect' => url('storage/' . $item->file)]) }}"
+                                                    style="font-size: small;" target="_blank">{{ $item->permission_to_download }}</a>
                                             @endif
                                         </div>
                                     </div>
@@ -1244,12 +1244,12 @@
                                             @endphp
 
                                             @if (Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active')
-                                                <a href="{{ route('student.viewmaterial', $fileName) }}"
-                                                    tabindex="0"><button tabindex="0"
+                                                <a href="{{ url('storage/' . $item->file) }}"
+                                                    tabindex="0" target="_blank"><button tabindex="0"
                                                         style="width:100%; padding: 0px; font-size: 16px; font-size: small;">{{ $item->permission_to_download }}</button></a>
                                             @else
-                                                <a href="{{ route('login', ['redirect' => route('student.viewmaterial', $fileName)]) }}"
-                                                    style="font-size: small;">{{ $item->permission_to_download }}</a>
+                                                <a href="{{ route('login', ['redirect' => url('storage/' . $item->file)]) }}"
+                                                    style="font-size: small;" target="_blank">{{ $item->permission_to_download }}</a>
                                             @endif
                                         </div>
                                     </div>
