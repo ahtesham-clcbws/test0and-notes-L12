@@ -57,7 +57,7 @@ class ExamsController extends Controller
     public function index(Request $req)
     {
         $this->data['pagename'] = 'All Tests';
-        
+
         if ($req->isMethod('post')) {
             $result = $this->examService->getPaginatedTests($req->all());
             return json_encode($result);
@@ -608,6 +608,7 @@ class ExamsController extends Controller
                         $education_type = Educationtype::find($inputs['id']);
                         if (!empty($education_type)) {
                             $education_type->name   = $value;
+                            $education_type->slug   = $inputs['slug'] ?? \Illuminate\Support\Str::slug($value);
                             $queryMd                = $education_type;
                             $query                  = $queryMd->save();
                         }
@@ -618,6 +619,7 @@ class ExamsController extends Controller
                     foreach ($inputs['name'] as $data) {
                         $educationMd        = new Educationtype();
                         $educationMd->name  = $data;
+                        $educationMd->slug  = \Illuminate\Support\Str::slug($data);
                         $queryMd            = $educationMd;
                         $query              = $queryMd->save();
                     }
@@ -719,43 +721,6 @@ class ExamsController extends Controller
                         $update_class->class_group_exam_name = $class_id;
                         $update_class->save();
                     }
-
-                    // $examMd                    = ClassGoupExamModel::find($inputs['id']);
-                    // $examMd->education_type_id = $inputs['exam_education_type_id'];
-                    // $examMd->name              = $inputs['name'];
-                    // $queryMd                   = $examMd;
-                    // $query                     = $queryMd->save();
-
-                    // foreach ($inputs['name'] as $key => $data) {
-                    //     $examMd                     = new ClassGoupExamModel();
-                    //     $examMd->education_type_id  = $inputs['exam_education_type_id'];
-                    //     $examMd->name               = $data;
-                    //     $examMd->save();
-
-                    //     $assign_class_group                         = new Gn_AssignClassGroupExamName();
-                    //     $assign_class_group->education_type_id      = $inputs['exam_education_type_id'];
-                    //     $assign_class_group->classes_group_exams_id = $examMd->id;
-                    //     $assign_class_group->save();
-
-                    //     $this->data['classes_group_exams_id'][$key] = $examMd->id;
-                    // }
-
-                    // $verify_education_type = Gn_DisplayClassGroupExamName::where('education_type_id','=',$inputs['exam_education_type_id'])->first();
-                    // if (!empty($verify_education_type)) {
-                    //     $class_id = json_decode($verify_education_type->class_group_exam_name);
-                    //     $class_id = array_merge($class_id,$this->data['classes_group_exams_id']);
-                    //     $verify_education_type->class_group_exam_name = json_encode($class_id);
-                    //     $queryMd    = $verify_education_type;
-                    //     $query      = $queryMd->save();
-                    // }
-                    // else{
-                    //     $gn_DisplayClassGroupExamName = new Gn_DisplayClassGroupExamName();
-                    //     $gn_DisplayClassGroupExamName->education_type_id     = $inputs['exam_education_type_id'];
-                    //     $gn_DisplayClassGroupExamName->class_group_exam_name = json_encode($this->data['classes_group_exams_id']);
-                    //     $queryMd    = $gn_DisplayClassGroupExamName;
-                    //     $query      = $queryMd->save();
-                    // }
-
                 }
                 else {
                     foreach ($inputs['name'] as $key => $data) {
@@ -788,15 +753,26 @@ class ExamsController extends Controller
                         $query      = $queryMd->save();
                     }
                 }
+            }
+            if ($inputs['form_name'] == 'master_class_form') {
+                $requestName = 'Master Class';
+                $requestType = 'class';
 
-                // $examMd      = new ClassGoupExamModel();
-                // if ($inputs['id'] > 0) {
-                //     $examMd  = ClassGoupExamModel::find($inputs['id']);
-                // }
-                // $examMd->education_type_id = $inputs['exam_education_type_id'];
-                // $examMd->name              = $inputs['name'];
-                // $queryMd                   = $examMd;
-                // $query                     = $queryMd->save();
+                if ($inputs['id'] > 0) {
+                    $class = ClassGoupExamModel::find($inputs['id']);
+                    if ($class) {
+                        $class->name = $inputs['name'];
+                        $class->summary = $inputs['summary'];
+
+                        if ($req->hasFile('image')) {
+                            $path = $req->file('image')->store('classes', 'public');
+                            $class->image = $path;
+                        }
+
+                        $queryMd = $class;
+                        $query = $class->save();
+                    }
+                }
             }
             // if ($inputs['form_name'] == 'board_form') {
             //     $requestName = 'Board / State / Exam Agency';

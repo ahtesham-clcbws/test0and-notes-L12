@@ -1629,6 +1629,8 @@ namespace App\Models {
      * @property string|null $subjects
      * @property string|null $boards
      * @property mixed $education_type_id
+     * @property string|null $summary
+     * @property string|null $image
      * @property string|null $name
      * @property int $id
      * @property-read \App\Models\Educationtype $education
@@ -1640,6 +1642,8 @@ namespace App\Models {
      * @property-read int|null $class_boards1_count
      * @method static \Illuminate\Database\Eloquent\Builder<ClassGoupExamModel>|ClassGoupExamModel whereId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ClassGoupExamModel>|ClassGoupExamModel whereName($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<ClassGoupExamModel>|ClassGoupExamModel whereImage($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<ClassGoupExamModel>|ClassGoupExamModel whereSummary($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ClassGoupExamModel>|ClassGoupExamModel whereEducationTypeId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ClassGoupExamModel>|ClassGoupExamModel whereBoards($value)
      * @method static \Illuminate\Database\Eloquent\Builder<ClassGoupExamModel>|ClassGoupExamModel whereSubjects($value)
@@ -3612,12 +3616,14 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $deleted_at
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
+     * @property string|null $slug
      * @property string|null $name
      * @property int $id
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ClassGoupExamModel> $class_exam
      * @property-read int|null $class_exam_count
      * @method static \Illuminate\Database\Eloquent\Builder<Educationtype>|Educationtype whereId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Educationtype>|Educationtype whereName($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Educationtype>|Educationtype whereSlug($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Educationtype>|Educationtype whereCreatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Educationtype>|Educationtype whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Educationtype>|Educationtype whereDeletedAt($value)

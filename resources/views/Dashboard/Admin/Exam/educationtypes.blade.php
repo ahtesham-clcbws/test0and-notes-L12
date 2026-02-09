@@ -115,7 +115,7 @@
                                     @foreach ($data['classes'] as $key => $class)
                                         <tr>
                                             <th scope="row">{{ $key + 1 }}</th>
-                                            
+
                                             <td>{{ $class['name'] }}</td>
                                             <td>
                                                 @foreach ($class->class_boards as $board)
@@ -169,6 +169,10 @@
                                     <option value=""></option>
                                 </select>
                             </div>
+                            <div class="mb-3">
+                                <label for="education_slug" class="form-label"> Slug</label>
+                                <input type="text" name="slug" class="form-control form-control-sm" id="education_slug">
+                            </div>
                             <!-- <div class="mb-3">
                                 <label for="education_name" class="form-label">Name / Title</label>
                                 <input type="text" name="name" class="form-control form-control-sm" id="education_name" required>
@@ -188,7 +192,7 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">Education Type</th>
-                                        <!-- <th scope="col">Classes / Groups / Exams</th> -->
+                                        <th scope="col">Slug</th>
                                         <th scope="col" class="text-end">Actions</th>
                                     </tr>
                                 </thead>
@@ -197,11 +201,11 @@
                                         <tr>
                                             <th scope="row">{{ $key + 1 }}</th>
                                             <td>{{ $education['name'] }}</td>
-                                            <!-- <td>{{ $education['classes'] }}</td> -->
+                                            <td>{{ $education['slug'] }}</td>
                                             <td class="text-end">
                                                 <a href="javascript:void(0);"><i
                                                         class="bi bi-pencil-square text-success me-2"
-                                                        onclick="editForm({{ $education['id'] }}, '{{ $education['name'] }}', 'education')"></i></a>
+                                                        onclick="editForm({{ $education['id'] }}, '{{ $education['name'] }}', 'education', 0, '', '', '', '{{ $education['slug'] }}')"></i></a>
                                                 <a href="javascript:void(0);"><i class="bi bi-trash2-fill text-danger" onclick="deleteEducationType({{ $education['id'] }})"></i></a>
                                             </td>
                                         </tr>
@@ -260,7 +264,7 @@
                                 <input type="text" name="name" class="form-control form-control-sm" id="class_group_exam_name"
                                     required>
                             </div> -->
-                            
+
                             <div class="btn-group btn-group-sm w-100" role="group">
                                 <button type="button" class="btn btn-danger resetbtn" id="class_group_examReset"
                                     onclick="resetForm('class_group_exam')">Reset</button>
@@ -285,7 +289,7 @@
                                     @foreach ($data['exam'] as $key => $exam)
                                         <tr>
                                             <th scope="row">{{ $key + 1 }}</th>
-                                            
+
                                             <td>@if(!empty($exam->education['name']))
                                                     {{ $exam->education['name'] }}
                                                 @else
@@ -360,7 +364,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            
+
                             <div class="btn-group btn-group-sm w-100" role="group">
                                 <button type="button" class="btn btn-danger resetbtn" id="boardReset"
                                     onclick="resetForm('board')">Reset</button>
@@ -386,7 +390,7 @@
                                     @foreach ($data['gn_exam_agency_board'] as $key => $board)
                                         <tr>
                                             <th scope="row">{{ $key + 1 }}</th>
-                                            
+
                                             <td>
                                                 @if(!empty($board->education['name']))
                                                     {{ $board->education['name'] }}
@@ -498,7 +502,7 @@
                                 <input type="text" name="name" class="form-control form-control-sm" id="board_name"
                                     required>
                             </div> -->
-                            
+
                             <div class="btn-group btn-group-sm w-100" role="group">
                                 <button type="button" class="btn btn-danger resetbtn" id="otherExamReset"
                                     onclick="resetForm('otherExam')">Reset</button>
@@ -635,6 +639,75 @@
                         </div>
                     </div>
                 </div> -->
+        </div>
+        <div class="row border-bottom mt-3 pb-3">
+            {{-- Master Class List --}}
+            <div class="col-md-4 col-sm-12">
+                <form class="card" method="post" id="masterClassForm" enctype="multipart/form-data">
+                    @csrf
+                    <div class="card-header bg-primary text-white">Edit Master Class</div>
+                    <input type="hidden" name="id" id="master_class_id" value="0">
+                    <input type="hidden" name="form_name" value="master_class_form">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" name="name" id="master_class_name" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Image</label>
+                            <input type="file" name="image" class="form-control form-control-sm">
+                            <div id="master_class_image_preview" class="mt-2 text-center"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Summary</label>
+                            <textarea name="summary" id="master_class_summary" class="form-control form-control-sm" rows="3"></textarea>
+                        </div>
+                        <div class="btn-group btn-group-sm w-100">
+                            <button type="button" class="btn btn-danger" onclick="resetMasterClassForm()">Reset</button>
+                            <button type="submit" class="btn btn-success">Update Class</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-8 col-sm-12">
+                <div class="card">
+                    <div class="card-header">Master Class List</div>
+                    <div class="card-body">
+                        <table class="table table-sm datatable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>Summary</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($data['class_data'] as $key => $class)
+                                    <tr>
+                                        <td>{{ $key + 1 }}</td>
+                                        <td>
+                                            @if($class->image)
+                                                <img src="/storage/{{ $class->image }}" width="50">
+                                            @else
+                                                <img src="{{ asset('default.webp') }}" width="50">
+                                            @endif
+                                        </td>
+                                        <td>{{ $class->name }}</td>
+                                        <td><small>{{ Str::limit($class->summary, 50) }}</small></td>
+                                        <td class="text-end">
+                                            <a href="javascript:void(0);" onclick="editMasterClass({{ $class->id }}, '{{ addslashes($class->name) }}', '{{ addslashes($class->summary) }}', '{{ $class->image }}')">
+                                                <i class="bi bi-pencil-square text-success"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection

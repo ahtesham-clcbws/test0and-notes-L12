@@ -1,5 +1,5 @@
 function inititateSelect2() {
-    
+
     $("#education_type_id").select2({
         placeholder: "Education Type",
         allowClear: true
@@ -64,10 +64,13 @@ function resetForm(formName) {
     $('#' + formName + 'Reset').hide();
 }
 
-function editForm(id, name, formName, education = 0, boards = '', subjects = '', class_exam = '') {
+function editForm(id, name, formName, education = 0, boards = '', subjects = '', class_exam = '', slug = '') {
     $('#' + formName + '_id').val(id);
     $('#' + formName + '_name').empty();
-    $('#' + formName + '_name').append("<option value="+ name +" selected>"+ name +"</option>");
+    $('#' + formName + '_name').append("<option value=\"" + name + "\" selected>" + name + "</option>");
+    if (formName == 'education') {
+        $('#education_slug').val(slug);
+    }
     console.log(formName);
     if (formName == 'class_group_exam') {
         $('#exam_education_type_id').val(education);
@@ -78,7 +81,7 @@ function editForm(id, name, formName, education = 0, boards = '', subjects = '',
         $('#class_group_exam_name_id').val(JSON.parse(name));
         inititateSelect2();
     }
-    
+
     if (formName == 'board') {
         educationTypeChange(education,class_exam);
         $('#board_education_type_id').val(education);
@@ -86,7 +89,7 @@ function editForm(id, name, formName, education = 0, boards = '', subjects = '',
         $('#board_name_id').val(JSON.parse(name));
         inititateSelect2();
     }
-    
+
     if(formName== 'otherExam'){
 
         other_exam_education_type_change(education).finally(() => {
@@ -176,7 +179,7 @@ async function other_exam_education_type_change(id,class_exam) {
     }).fail(function (data) {
         console.log(data);
     })
-    
+
     if(class_exam){
         other_exam_classes_group_exams_change(class_exam);
     }
@@ -214,7 +217,7 @@ async function other_exam_classes_group_exams_change(id,boards) {
         }
     }).fail(function (data) {
         console.log(data);
-    })  
+    })
 }
 
 async function quickAddEducationTypeChange(id) {
@@ -260,7 +263,7 @@ async function classes_group_exams_change(id) {
     for (let i = 0; i < classes_group_exams_id.length; i++) {
         formData.append('classes_group_exams_id[]',classes_group_exams_id[i]);
     }
- 
+
     await $.ajax({
         url: '/',
         type: 'post',
@@ -287,11 +290,11 @@ async function classes_group_exams_change(id) {
         }
     }).fail(function (data) {
         console.log(data);
-    })  
+    })
 }
 
 async function classes_exams_board_change(id) {
-    
+
     var education_type_id       = $("#education_type_id").val();
     var classes_group_exams_id  = $('#class_group_exam').val();
     var class_boards_id         = $('#class_boards').val();
@@ -305,7 +308,7 @@ async function classes_exams_board_change(id) {
     for (let i = 0; i < class_boards_id.length; i++) {
         formData.append('class_boards_id[]',class_boards_id[i]);
     }
- 
+
     await $.ajax({
         url: '/',
         type: 'post',
@@ -332,7 +335,7 @@ async function classes_exams_board_change(id) {
         }
     }).fail(function (data) {
         console.log(data);
-    })  
+    })
 }
 
 async function deleteEducationType(id){
@@ -352,7 +355,7 @@ async function deleteEducationType(id){
         location.reload();
     }).fail(function (data) {
         console.log(data);
-    })  
+    })
 }
 
 async function deleteClassGroup(class_id,education_id){
@@ -373,7 +376,7 @@ async function deleteClassGroup(class_id,education_id){
         location.reload();
     }).fail(function (data) {
         console.log(data);
-    })  
+    })
 }
 
 async function deleteExamAgencyBoard(education_id,class_id,exam_agency_id,gn_display_id){
@@ -396,7 +399,7 @@ async function deleteExamAgencyBoard(education_id,class_id,exam_agency_id,gn_dis
         location.reload();
     }).fail(function (data) {
         console.log(data);
-    })  
+    })
 }
 
 async function deleteOtherExamClass(education_type_id,classes_group_exams_id,agency_board_university_id){
@@ -418,5 +421,26 @@ async function deleteOtherExamClass(education_type_id,classes_group_exams_id,age
         location.reload();
     }).fail(function (data) {
         console.log(data);
-    })  
+    })
+}
+
+function editMasterClass(id, name, summary, image) {
+    $('#master_class_id').val(id);
+    $('#master_class_name').val(name);
+    $('#master_class_summary').val(summary);
+    if (image) {
+        $('#master_class_image_preview').html('<img src="/storage/' + image + '" width="100">');
+    } else {
+        $('#master_class_image_preview').empty();
+    }
+    // Smooth scroll to form
+    $('html, body').animate({
+        scrollTop: $("#masterClassForm").offset().top - 100
+    }, 500);
+}
+
+function resetMasterClassForm() {
+    $('#masterClassForm')[0].reset();
+    $('#master_class_id').val(0);
+    $('#master_class_image_preview').empty();
 }

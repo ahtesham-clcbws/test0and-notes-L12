@@ -299,9 +299,7 @@
                             </h1>
                             <p class="font-lg mb-4">{{ $result['banner_content'] }}</p>
                             <div class="inline_btn">
-                                <a class="btn theme-bg register text-white" data-bs-toggle="modal" data-bs-target="#login"
-                                    href="#">Get Started</a>
-                                <!-- <a class="btn light_btn" href="explore-category.html">Become An Instructor</a> -->
+                                <a class="btn theme-bg register text-white" href="/login">Get Started</a>
                             </div>
                         </div>
                     </div>

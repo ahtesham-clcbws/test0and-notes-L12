@@ -25,9 +25,11 @@
                 <ul class="list-unstyled">
                     <li><a class="text-white" href="{{ route('about_us') }}">About Us</a></li>
                     <li><a class="text-white" href="#">Free for You</a></li>
-                    <li><a class="text-white" href="#">Compitition</a></li>
-                    <li><a class="text-white" href="#">Academics</a></li>
-                    <li><a class="text-white" href="#">Govt Jobs</a></li>
+                    @foreach(education_types() as $edu)
+                        @if(isset($edu->slug))
+                            <li><a class="text-white" href="{{ url($edu->slug) }}">{{ $edu->name }}</a></li>
+                        @endif
+                    @endforeach
                 </ul>
             </div>
             <div class="col-md-3">

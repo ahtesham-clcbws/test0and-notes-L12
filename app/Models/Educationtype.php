@@ -15,7 +15,8 @@ class Educationtype extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'name'
+        'name',
+        'slug'
     ];
 
     public function class_exam()

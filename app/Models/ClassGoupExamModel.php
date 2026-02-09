@@ -18,7 +18,9 @@ class ClassGoupExamModel extends Model
         'name',
         'education_type_id',
         'boards',
-        'subjects'
+        'subjects',
+        'image',
+        'summary'
     ];
 
     public function education()
@@ -30,7 +32,7 @@ class ClassGoupExamModel extends Model
     {
         return $this->belongsToMany(BoardAgencyStateModel::class, 'assign_classes_boards', 'class_id', 'board_id');
     }
-    
+
     public function class_subjects()
     {
         return $this->belongsToMany(Subject::class, 'assign_classes_subjects', 'class_id', 'subject_id');
