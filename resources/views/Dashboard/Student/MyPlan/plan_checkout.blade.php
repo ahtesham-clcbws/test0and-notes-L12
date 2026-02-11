@@ -127,7 +127,7 @@
             "key": "{{ env('RAZORPAY_KEY') }}",
             "amount": "{{ ($package_plan->final_fees)*100 }}",
             "currency": "INR",
-            "name": "GYANOLOGY",
+            "name": "Test & Notes",
             "description": "{{ $package_plan->plan_name }}",
             "order_id": "{{ $order_id }}",
             "prefill": {

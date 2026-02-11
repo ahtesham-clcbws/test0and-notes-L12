@@ -30,8 +30,8 @@ class HomeController extends Controller
 
 
         //->where('class', 186)
-        $Gn_PackagePlanGyanology = Gn_PackagePlan::with(['educationType', 'classType'])->where('is_featured', 1)->where('education_type', 54)->where('expire_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
-        $Gn_PackagePlanGyanology2 = Gn_PackagePlan::with(['educationType', 'classType'])->where('is_featured', 1)->where('education_type', 52)->where('expire_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+        $Gn_PackagePlanTestAndNotes = Gn_PackagePlan::with(['educationType', 'classType'])->where('is_featured', 1)->where('education_type', 54)->where('expire_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+        $Gn_PackagePlanTestAndNotes2 = Gn_PackagePlan::with(['educationType', 'classType'])->where('is_featured', 1)->where('education_type', 52)->where('expire_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
 
         $StudymaterialGovComp = Studymaterial::with(['educationType', 'study_class'])->where('study_material.is_featured', 1)
             ->whereIn('study_material.education_type', [51, 53, 54])
@@ -77,7 +77,7 @@ class HomeController extends Controller
         $Gn_PackagePlanInstitute = Gn_PackagePlan::with(['educationType', 'classType'])->where('status', 1)->where('education_type', 51)->where('expire_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
 
 
-        //    echo"<pre>"; print_r($Gn_PackagePlanGyanology); die;
+        //    echo"<pre>"; print_r($Gn_PackagePlanTestAndNotes); die;
 
         // Batch fetch landing page data
         $landingPages = DB::table('landing_page')->whereBetween('id', [1, 9])->get()->keyBy('id');
@@ -155,7 +155,7 @@ class HomeController extends Controller
         $result['subtitle8_content'] = $data9->banner_content;
 
         $pdf = Pdf::where('type', 'student')->orderBy('id', 'DESC')->first();
-        return view('Frontend/home', compact('Gn_PackagePlanGyanology', 'Gn_PackagePlanGyanology2', 'StudymaterialGovComp', 'StudymaterialGovComp2', 'StudymaterialGovComp3', 'StudymaterialGovComp4', 'StudymaterialGovComp5', 'Gn_PackagePackagelist', 'Gn_PackagePlanInstitute', 'result', 'pdf'));
+        return view('Frontend/home', compact('Gn_PackagePlanTestAndNotes', 'Gn_PackagePlanTestAndNotes2', 'StudymaterialGovComp', 'StudymaterialGovComp2', 'StudymaterialGovComp3', 'StudymaterialGovComp4', 'StudymaterialGovComp5', 'Gn_PackagePackagelist', 'Gn_PackagePlanInstitute', 'result', 'pdf'));
     }
 
     public function page()

@@ -36,8 +36,8 @@ Route::get('getstudymaterial', [ApiController::class, 'studymaterial']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('userdetails', [ApiController::class, 'userDetails']);
     Route::get('institutetest', [ApiController::class, 'instituteTest']);
-    Route::get('gyanologytest', [ApiController::class, 'gyanologyTest']);
-    Route::post('startgyanologytest', [ApiController::class, 'startGyanologyTest']);
+    Route::get('testAndNotesTest', [ApiController::class, 'testAndNotesTest']);
+    Route::post('startTestAndNotesTest', [ApiController::class, 'startTestAndNotesTest']);
     Route::post('attempttedtest', [ApiController::class, 'attempttedTest']);
     Route::post('endtest', [ApiController::class, 'endTest']);
 

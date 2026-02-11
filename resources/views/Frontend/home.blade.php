@@ -635,8 +635,8 @@
                 <div class="col-xl-12 col-lg-12 col-sm-12 only-tow-slider">
                     <div class="best-course space">
                         <!--@if ($result['competitive_courses_status'] == 1)-->
-                        @if (count($Gn_PackagePlanGyanology) > 0)
-                            @foreach ($Gn_PackagePlanGyanology as $item)
+                        @if (count($Gn_PackagePlanTestAndNotes) > 0)
+                            @foreach ($Gn_PackagePlanTestAndNotes as $item)
                                 <div class="cource-item book-cource-item flip-card mx-2">
                                     <div class="flip-card-inner">
                                         <div class="flip-card-front">
@@ -722,8 +722,8 @@
             <div class="row justify-content-center">
                 <div class="col-xl-12 col-lg-12 col-sm-12 only-tow-slider">
                     <div class="best-course space">
-                        @if (count($Gn_PackagePlanGyanology2) > 0)
-                            @foreach ($Gn_PackagePlanGyanology2 as $item)
+                        @if (count($Gn_PackagePlanTestAndNotes2) > 0)
+                            @foreach ($Gn_PackagePlanTestAndNotes2 as $item)
                                 <div class="cource-item book-cource-item flip-card mx-2">
                                     <div class="flip-card-inner">
                                         <div class="flip-card-front">

@@ -122,7 +122,7 @@ class APIController extends Controller
         return  response()->json(['status' => 1, 'test_list' => $testTableData]);
     }
     //Test and Notes test
-    public function gyanologyTest(Request $request)
+    public function testAndNotesTest(Request $request)
     {
         $testTableData = TestModal::where('user_id', null)->get();
         // return $testTableData;
@@ -267,7 +267,7 @@ class APIController extends Controller
         }
         return  response()->json(['status' => 1, 'test_list' => $ret_data, 'count' => $count]);
     }
-    public function startGyanologyTest(Request $request)
+    public function startTestAndNotesTest(Request $request)
     {
         // return $request->test_id;
         $test = TestModal::find($request->test_id);
