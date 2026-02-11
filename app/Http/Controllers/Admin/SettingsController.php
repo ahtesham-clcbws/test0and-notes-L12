@@ -157,21 +157,6 @@ class SettingsController extends Controller
         }
 
 
-        if($request->hasfile('slider_footer_image')){
-        $images = [];
-        foreach($request->file('slider_footer_image') as $image) {
-            $name = microtime(true) . time() . rand(1, 100) . '.' . $image->getClientOriginalExtension();
-            $path ='home/slider/';
-            $image->move($path, $name);
-            $images[] = $name;
-        }
-        $firstArray = DB::table('landing_page')->find('1')->slider_footer_image;
-         $thirdArray = array_merge(json_decode($firstArray), $images);
-
-         $query->update([
-            'slider_footer_image' => $thirdArray,
-        ]);
-        }
 
 
         $banner_attr_image_1 = '';
@@ -310,35 +295,75 @@ class SettingsController extends Controller
          return redirect()->back();
     }
 
-    public function slider_delete(Request $request,$image){
+    public function slider_delete(Request $request, $image)
+    {
+        // 1. Fetch the record
+        $landingPage = DB::table('landing_page')->where('id', '1')->first();
 
-        $old_profile = 'home/slider/' .$image;
-        if(file_exists($old_profile)) {
-
-            File::delete($old_profile);
+        if (!$landingPage) {
+            return redirect()->back()->with('error', 'Landing page record not found.');
         }
-        $arrImage=DB::table('landing_page')->where('id','1')->first();
 
-        $array = json_decode($arrImage->slider_footer_image);
-        // foreach($array as $key => $list){
+        $sliderImages = json_decode($landingPage->slider_footer_image, true);
 
-        //     if($list == $image){
-        //         // unset($array[$key]);
-        //         \array_diff($array, [$image]);
-        //     }
-        // }
-        $key = array_search($image, $array);
-        if ($key !== false) {
-            unset($array[$key]);
+        // 2. Check if image exists in the array
+        if (($key = array_search($image, $sliderImages)) !== false) {
+            // 3. Remove from array
+            unset($sliderImages[$key]);
+
+            // Re-index array to prevent JSON object conversion if looking for array
+            $sliderImages = array_values($sliderImages);
+
+            // 4. Update Database
+            DB::table('landing_page')
+                ->where('id', '1')
+                ->update([
+                    'slider_footer_image' => json_encode($sliderImages),
+                ]);
+
+            // 5. Delete file only after successful DB update (or at least valid check)
+            $filePath = public_path('home/slider/' . $image);
+            if (File::exists($filePath)) {
+                File::delete($filePath);
+            }
+
+            return redirect()->back()->with('success', 'Image deleted successfully.');
         }
-        // return $array;
-        $query = DB::table('landing_page')
-        ->where('id', '1')
-        ->update([
-            'slider_footer_image' => array_values($array),
-        ]);
-        return redirect()->back();
+
+        return redirect()->back()->with('error', 'Image not found in slider list.');
     }
+
+    public function upload_partner_logos(Request $request)
+    {
+        if ($request->hasfile('slider_footer_image')) {
+            $images = [];
+            foreach ($request->file('slider_footer_image') as $image) {
+                $name = microtime(true) . time() . rand(1, 100) . '.' . $image->getClientOriginalExtension();
+                $path = 'home/slider/';
+                $image->move($path, $name);
+                $images[] = $name;
+            }
+
+            $currentData = DB::table('landing_page')->find('1')->slider_footer_image;
+            $currentImages = $currentData ? json_decode($currentData, true) : [];
+
+            // Ensure we have an array
+            if (!is_array($currentImages)) {
+                $currentImages = [];
+            }
+
+            $updatedImages = array_merge($currentImages, $images);
+
+            DB::table('landing_page')->where('id', '1')->update([
+                'slider_footer_image' => json_encode($updatedImages),
+            ]);
+
+            return redirect()->back()->with('success', 'Partner logos uploaded successfully.');
+        }
+
+        return redirect()->back()->with('error', 'No images selected.');
+    }
+
     public function pdfList()
     {
         $pdfList = Pdf::get();
