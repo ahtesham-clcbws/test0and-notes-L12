@@ -5,7 +5,7 @@
                 <div class="col-lg-12 col-md-12">
 
                     <div class="breadcrumbs-wrap">
-                        <h1 class="breadcrumb-title">Register</h1>
+                        <h1 class="breadcrumb-title">Student's Registration</h1>
                         <nav class="transparent">
                             <ol class="breadcrumb p-0">
                                 <li class="breadcrumb-item"><a href="/">Home</a></li>
@@ -41,7 +41,7 @@
                                         @enderror
                                     </div>
                                 </div>
- 
+
                                 <div class="col-md-6 col-12">
                                     <div class="form-group mb-3">
                                         <div class="input-group">
@@ -56,7 +56,7 @@
                                         @enderror
                                     </div>
                                 </div>
- 
+
                                 <div class="col-md-6 col-12">
                                     <div class="form-group mb-3">
                                         <div class="input-group">
@@ -249,7 +249,7 @@
                                 </div>
                             </div>
                         </fieldset>
-                        
+
                         <div class="row">
                             <div class="col">
                                 <button class="btn btn-sm full-width theme-bg text-white" type="submit">

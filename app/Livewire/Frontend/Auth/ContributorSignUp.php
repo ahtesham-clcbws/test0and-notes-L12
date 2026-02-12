@@ -202,7 +202,7 @@ class ContributorSignUp extends Component
                 $userDetailsDb->save();
                 $this->js('success("Thank you, we will active your request soon.")');
                 $this->reset();
-                return $this->redirect('/');
+                $this->js("setTimeout(() => window.location.href = '/', 1500)");
             } else {
                 $this->js('error("Unable to register, please try again later.")');
             }
