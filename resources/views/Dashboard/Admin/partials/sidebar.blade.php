@@ -482,6 +482,12 @@
                                 Pdf Content List
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('administrator.manage.reviews') ? 'active' : '' }}"
+                                href="{{ route('administrator.manage.reviews') }}">
+                                Manage Reviews
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </li>

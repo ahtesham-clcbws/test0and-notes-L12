@@ -370,24 +370,24 @@
                             <div class="alert alert-danger" role="alert">
                                 {{ $message }}
                             </div>
-                        @enderror    
+                        @enderror
                         <div class="d-flex mb-2">
                             <label class="box-heading text-end">
                                 Title
                             </label>
                             <div class="box-input">
-                                <div class="input-group flex-nowrap">                                    
+                                <div class="input-group flex-nowrap">
                                     <input type="text" name="title" class="form-control" placeholder="Title"
                                         required>
                                 </div>
                             </div>
-                        </div>                    
+                        </div>
                         <div class="d-flex mb-2">
                             <label class="box-heading text-end">
                                 Type
                             </label>
                             <div class="box-input">
-                                <div class="input-group">                                    
+                                <div class="input-group">
                                     <select class="form-select" id="inputGroupSelect02" name="type" required>
                                         <option selected disabled>Select Type</option>
                                         <option value="student">Student Form</option>
@@ -395,11 +395,11 @@
                                         <option value="corporate_signup">Corporate Sign Up</option>
                                         <option value="website_terms">Website Terms & Condition</option>
                                         <option value="website_privacy_policy">Website Privacy Policy</option>
-                                        <option value="links">Important Links</option>                                        
+                                        <option value="links">Important Links</option>
                                     </select>
                                 </div>
                             </div>
-                        </div>                        
+                        </div>
                         <div class="d-flex mb-2">
                             <label class="box-heading text-end">
                                 Add Pdf
@@ -410,7 +410,7 @@
                                         class="form-control">
                                 </div>
                             </div>
-                        </div>                                                                        
+                        </div>
                         <div class="d-flex mb-2">
                             <label class="box-heading text-end">
                             </label>
@@ -437,27 +437,27 @@
                 <tbody id="allPdf">
                     @if(isset($pdfList))
                     @foreach($pdfList as $key=>$list)
-                    @php 
+                    @php
                     $filePath = $list->url;
-                    @endphp 
+                    @endphp
                     <tr data-id="{{$key+1}}" class="row_{{$list->id}}">
                     <th scope="row" >{{$key+1}}</th>
                     <td>{{$list->title}}</td>
                     <td>{{$list->type}}</td>
-                    <td><a href="{{ url('public/'.$filePath)}}" target="_blank"><i class="bi bi-file-pdf"></i> </a></td>
+                    <td><a href="{{ asset('storage/' . ltrim($filePath, '/')) }}" target="_blank"><i class="bi bi-file-pdf"></i> </a></td>
                     <td>
                         <button class="btn btn-outline-danger delete-file" data-id="{{$list->id}}"><i class="bi bi-trash"></i></span></button>
                     </td>
-                    
+
                     </tr>
                     @endforeach
                    @endif
                 </tbody>
-                </table>  
-            </div>            
+                </table>
+            </div>
         </div>
     </section>
-    
+
     <div class="toast align-items-center text-white border-0 position-absolute bottom-0 end-0 mb-3" data-delay="5000"
         role="alert" aria-live="assertive" aria-atomic="true" id="responseToast">
         <div class="d-flex">
@@ -471,16 +471,16 @@
 @section('javascript')
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
-   
+
     </script>
     <script>
 $(document).ready(function() {
     $('#uploadPdf').on('submit', function(event) {
-        
+
         event.preventDefault();
         var formData = new FormData(this);
         $.ajax({
-            url: "{{route('administrator.pdf_submit')}}", 
+            url: "{{route('administrator.pdf_submit')}}",
             type: 'POST',
             data: formData,
             processData: false,
@@ -498,10 +498,10 @@ $(document).ready(function() {
                     var html = '';
                     html+=
                     `<tr data-id="${no}">
-                        <th scope="row">${no}</th>                                
+                        <th scope="row">${no}</th>
                         <td>${title}</td>
                         <td>${type}</td>
-                        <td><a href="{{url('public/')}}/${url}" target="_blank"><i class="bi bi-file-pdf"></i> </a></td>
+                        <td><a href="{{ asset('storage/' . ltrim($url, '/')) }}" target="_blank"><i class="bi bi-file-pdf"></i> </a></td>
                         <td><button class="btn btn-outline-danger delete-file" data-id="${id}"><i class="bi bi-trash"></i></span></button></td>
                     </tr>`;
                         $('#allPdf').append(html);
@@ -509,7 +509,7 @@ $(document).ready(function() {
 
                 }else{
 
-                }                                            
+                }
                 console.log(response);
             },
             error: function(xhr, status, error) {
@@ -527,7 +527,7 @@ $(document).ready(function() {
         if (confirm('Are you sure you want to delete this item?')) {
             $.ajax({
                 url:"{{route('administrator.pdf_delete')}}",
-                type: 'post', 
+                type: 'post',
                 data: {
                     _token: '{{ csrf_token() }}',
                     id:id,
@@ -550,5 +550,5 @@ $(document).ready(function() {
     });
 });
     </script>
-    
+
 @endsection

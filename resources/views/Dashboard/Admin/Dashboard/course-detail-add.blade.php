@@ -355,10 +355,10 @@
             content: " | "
         }
         .form-title {
-            font-weight: bold;       
-            color: #19467a;          
-            margin-top: 10px;       
-            font-size: 16px;        
+            font-weight: bold;
+            color: #19467a;
+            margin-top: 10px;
+            font-size: 16px;
         }
 
     </style>
@@ -367,15 +367,15 @@
 <h2>Course/Exam Master</h2>
 <div class="row py-5 pl-3 pr-3">
     <div class="container card p-0">
-        
+
         <div class="card-body">
 
             <form action="{{route('administrator.course-detail-store')}}" method="POST" enctype="multipart/form-data" id="course_detail_form">
                 @csrf
                 <div class="row">
                     <input type="hidden" name="id" value="{{$course->id ?? ''}}" autocomplete="off">
-                    
-                    
+
+
                     <div class="col-md-3 col-lg-3">
                         <div class="form-group">
                             <p class="form-title"> Featured Image (JPG, PNG Only)</p>
@@ -394,7 +394,7 @@
                             <select name="education_type" class="form-control input-focus" required onchange="educationTypeChange(this.value)">
                                 <option selected disabled >Select Board</option>
                                 @foreach($education_type as $edu)
-                                
+
                                 <option value="{{$edu->id}}">{{$edu->name}}</option>
                                 @endforeach
                             </select>
@@ -406,7 +406,7 @@
                             <select name="course_name" class="form-control input-focus" required id="board_class_group_exam">
                                 <option selected disabled >Select Class Group</option>
                                 @foreach($course_data as $course)
-                                
+
                                 <option value="{{$course->id}}">{{$course->name}}</option>
                                 @endforeach
                             </select>
@@ -419,7 +419,7 @@
                             <select name="board" class="form-control input-focus" required>
                                 <option selected disabled >Select Board</option>
                                 @foreach($board as $val)
-                                
+
                                 <option value="{{$val->id}}">{{$val->name}}</option>
                                 @endforeach
                             </select>
@@ -498,7 +498,7 @@
                             <input type="text" value="{{old('official_site', $course->official_site ?? '')}}" name="official_site" class="form-control input-focus" placeholder="	https://ppntestsite.com/career" required>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-3 col-lg-3">
                         <div class="form-group">
                             <p class="form-title">Required Text A (Optional)</p>
@@ -523,7 +523,7 @@
                             <input type="file" onchange="validateImage(this,'imagepdf')" class="form-control input-focus" value="{{old('exam_details_file', $course->exam_details_file ?? '')}}" name="exam_details_file" required accept="application/pdf">
                         </div>
                     </div>
-                    
+
                     <!--<div class="col-md-3 col-lg-3">-->
                     <!--    <div class="form-group">-->
                     <!--        <p>E-Prospectus</p>-->
@@ -538,7 +538,7 @@
                             </div>
                         </div>
 
-                       
+
                     </div>
 
                     <div class="col-lg-12">
@@ -552,19 +552,19 @@
 </div>
 </form>
 </div>
-</div>   
+</div>
 @endsection
 @section('javascript')
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    
+
     {{-- <script>
 $(document).ready(function() {
     $('#uploadPdf').on('submit', function(event) {
-        
+
         event.preventDefault();
         var formData = new FormData(this);
         $.ajax({
-            url: "{{route('administrator.pdf_submit')}}", 
+            url: "{{route('administrator.pdf_submit')}}",
             type: 'POST',
             data: formData,
             processData: false,
@@ -582,10 +582,10 @@ $(document).ready(function() {
                     var html = '';
                     html+=
                     `<tr data-id="${no}">
-                        <th scope="row">${no}</th>                                
+                        <th scope="row">${no}</th>
                         <td>${title}</td>
                         <td>${type}</td>
-                        <td><a href="{{url('public/')}}/${url}" target="_blank"><i class="bi bi-file-pdf"></i> </a></td>
+                        <td><a href="{{ asset('storage/' . ltrim($url, '/')) }}" target="_blank"><i class="bi bi-file-pdf"></i> </a></td>
                         <td><button class="btn btn-outline-danger delete-file" data-id="${id}"><i class="bi bi-trash"></i></span></button></td>
                     </tr>`;
                         $('#allPdf').append(html);
@@ -593,7 +593,7 @@ $(document).ready(function() {
 
                 }else{
 
-                }                                            
+                }
                 console.log(response);
             },
             error: function(xhr, status, error) {
@@ -611,7 +611,7 @@ $(document).ready(function() {
         if (confirm('Are you sure you want to delete this item?')) {
             $.ajax({
                 url:"{{route('administrator.pdf_delete')}}",
-                type: 'post', 
+                type: 'post',
                 data: {
                     _token: '{{ csrf_token() }}',
                     id:id,
@@ -642,7 +642,7 @@ $(document).ready(function() {
 //         .catch(error => {
 //             console.error(error);
 //         });
-// </script>  
+// </script>
 <script>
     async function educationTypeChange(id,class_exam) {
     var formData = new FormData();
@@ -655,7 +655,7 @@ $(document).ready(function() {
         contentType: false,
         processData: false
     }).done(function (data) {
-      
+
         if (data && data.success) {
             const class_group_exam = data.message;
             var options = '<option selected disabled >Select Class Group</option>';

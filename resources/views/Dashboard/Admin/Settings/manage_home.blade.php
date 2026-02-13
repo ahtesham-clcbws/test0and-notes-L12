@@ -383,7 +383,7 @@
             @foreach (json_decode($slider_footer_image) as $list)
                 <div class="col-md-3 mb-4">
                     <div class="card relative shadow-sm">
-                        <img src="{{ url('home/slider/' . $list) }}" alt="Slider Image" class="card-img-top"
+                        <img src="{{ asset('storage/home/slider/' . $list) }}" alt="Slider Image" class="card-img-top"
                             style="height: 150px; object-fit: cover;" />
                         <div class="absolute" style="top: 5px; right: 5px; left: auto;">
                             <a href="{{ route('administrator.slider_delete', [$list]) }}" class="btn btn-danger btn-sm rounded-circle"

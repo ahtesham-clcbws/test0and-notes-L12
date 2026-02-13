@@ -58,7 +58,7 @@
                                     <td>{{ $index + 1 }}</td>
                                     <td>
                                         @if($course->course_image)
-                                            <img src="{{ asset($course->course_image) }}" alt="Logo" class="course-logo">
+                                            <img src="{{ asset('storage/' . ltrim($course->course_image, '/')) }}" alt="Logo" class="course-logo">
                                         @else
                                             <span class="text-muted">No Logo</span>
                                         @endif

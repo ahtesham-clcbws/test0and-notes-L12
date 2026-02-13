@@ -394,7 +394,7 @@
                             <p class="form-title"> Featured Image (JPG, PNG Only)</p>
                             <input type="file" class="form-control input-focus" onchange="validateImage(this)" name="featured_image" accept="image/*">
                             @if($course->course_image) {{-- Assuming featured image mapping --}}
-                                <img src="{{asset($course->course_image)}}" class="img-preview-small">
+                                <img src="{{asset('storage/' . ltrim($course->course_image, '/'))}}" class="img-preview-small">
                             @endif
                         </div>
                     </div>
@@ -403,7 +403,7 @@
                             <p class="form-title">Course Logo (JPG, PNG Only)</p>
                             <input type="file" class="form-control input-focus" onchange="validateImage(this)" name="course_logo" accept="image/*">
                             @if($course->course_image)
-                                <img src="{{asset($course->course_image)}}" class="img-preview-small">
+                                <img src="{{asset('storage/' . ltrim($course->course_image, '/'))}}" class="img-preview-small">
                             @endif
                         </div>
                     </div>
@@ -535,7 +535,7 @@
                             <p class="form-title">Gazzete Notification (PDF Only)</p>
                             <input type="file" class="form-control input-focus" name="notification_file" accept="application/pdf">
                             @if($course->notification_image)
-                                <a href="{{asset($course->notification_image)}}" target="_blank" class="existing-file">View Existing PDF</a>
+                                <a href="{{asset('storage/' . ltrim($course->notification_image, '/'))}}" target="_blank" class="existing-file">View Existing PDF</a>
                             @endif
                         </div>
                     </div>
@@ -544,7 +544,7 @@
                             <p class="form-title">Exam Details (PDF Only)</p>
                             <input type="file" class="form-control input-focus" name="exam_details_file" accept="application/pdf">
                             @if($course->exam_detail)
-                                <a href="{{asset($course->exam_detail)}}" target="_blank" class="existing-file">View Existing PDF</a>
+                                <a href="{{asset('storage/' . ltrim($course->exam_detail, '/'))}}" target="_blank" class="existing-file">View Existing PDF</a>
                             @endif
                         </div>
                     </div>

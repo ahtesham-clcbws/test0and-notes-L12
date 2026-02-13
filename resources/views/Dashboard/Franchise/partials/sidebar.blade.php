@@ -245,6 +245,12 @@
                     </ul>
                 </div>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('franchise.review.index') }}" aria-current="page">
+                    <i class="bi bi-star-fill"></i>
+                    Review
+                </a>
+            </li>
         </ul>
     </div>
 </nav>

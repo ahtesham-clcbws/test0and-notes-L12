@@ -149,6 +149,8 @@ Route::name('administrator.')->group(function () {
                 Route::get('/contact_enquiry', ContactList::class)->name('manage.contactEnquiry');
                 Route::get('/contact_enquiry/{id}', ContactListReply::class)->name('manage.contactEnquiryReply');
                 Route::get('/contact-replies/{id}', ContactRepliesList::class)->name('manage.contactRelpiesList');
+
+                Route::any('reviews', \App\Livewire\Admin\ManageReviews::class)->name('manage.reviews');
             });
         });
     });

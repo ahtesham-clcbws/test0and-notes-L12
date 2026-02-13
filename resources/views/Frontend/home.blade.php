@@ -308,13 +308,18 @@
                     <div class="side_block extream_img">
                         <div class="list_crs_img">
                             <img class="img-fluid elsio cirl animate-fl-y"
-                                src="{{ url('home/' . $result['banner_attr_image_1']) }}" alt="" />
-                            <img class="img-fluid elsio arrow animate-fl-x"
-                                src="{{ url('home/' . $result['banner_attr_image_2']) }}" alt="" />
-                            <img class="img-fluid elsio moon animate-fl-x"
-                                src="{{ url('home/' . $result['banner_attr_image_3']) }}" alt="" />
+                                src="{{ asset('storage/home/' . $result['banner_attr_image_1']) }}" alt="" />
+                            </div>
+                            <div class="banner_attr_thumb thumb_2">
+                                <img
+                                src="{{ asset('storage/home/' . $result['banner_attr_image_2']) }}" alt="" />
+                            </div>
+                            <div class="banner_attr_thumb thumb_3">
+                                <img
+                                src="{{ asset('storage/home/' . $result['banner_attr_image_3']) }}" alt="" />
+                            </div>
                         </div>
-                        <img class="img-fluid" src="{{ url('home/' . $result['banner_photo']) }}" alt="" />
+                        <img class="img-fluid" src="{{ asset('storage/home/' . $result['banner_photo']) }}" alt="" />
                     </div>
                 </div>
             </div>
@@ -1358,7 +1363,7 @@
                     <div class="video-ebooks-pdf space">
                         {{-- {{ $result['slider_footer_image'] }} --}}
                         @foreach (json_decode($result['slider_footer_image']) as $list)
-                            <img class="mx-3" src="{{ url('home/slider/' . $list) }}" />
+                            <img class="mx-3" src="{{ asset('storage/home/slider/' . $list) }}" />
                         @endforeach
                     </div>
                 </div>

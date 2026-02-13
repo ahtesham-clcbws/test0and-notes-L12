@@ -331,6 +331,8 @@ align-items: center;
                                 </li>
                                 <li><a href="{{ route('contact_us') }}">Free For You<span class="submenu-indicator"></span></a>
                                 </li>
+                                <td><a href="{{ asset('storage/'.$filePath)}}" target="_blank"><i class="bi bi-file-pdf"></i> </a></td>
+                                </li>
                             </ul>
                             @if(Auth::check() && auth()->user()->isAdminAllowed == 0 && auth()->user()->is_franchise == 0 && auth()->user()->is_staff == 0 && auth()->user()->status == 'active')
                                 <ul class="nav-menu nav-menu-social align-to-right">
@@ -1046,7 +1048,7 @@ align-items: center;
                                             @if(isset($pdf))
                                         <label for="required_check_registration" class="checkbox-custom-label">I agree
                                             to The
-                                            Test and Notes's <a href="{{ url('public/'. $pdf->url) }}" class="theme-cl" target="_blank">Terms of
+                                            Test and Notes's <a href="{{ asset('storage/'. $pdf->url) }}" class="theme-cl" target="_blank">Terms of
                                                 Services</a></label>
                                                 @else
                                                 <label for="required_check_registration" class="checkbox-custom-label">I agree

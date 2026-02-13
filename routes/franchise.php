@@ -259,6 +259,11 @@ Route::name('franchise.')->group(function () {
                     Route::any('{test_id}', [ExamsController::class, 'section'])->name('dashboard_test_section');
                 });
             });
+
+            Route::prefix('review')->group(function () {
+                Route::get('', [App\Http\Controllers\Frontend\Franchise\ReviewController::class, 'index'])->name('review.index');
+                Route::post('store', [App\Http\Controllers\Frontend\Franchise\ReviewController::class, 'store'])->name('review.store');
+            });
         });
 
     });

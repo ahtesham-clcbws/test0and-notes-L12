@@ -133,6 +133,18 @@
                     </ul>
                 </div>
             </li>
+            <li class="nav-item" style="border: 1px solid black;border-top: 0;">
+                <a class="nav-link" href="{{ route('student.review.index') }}" aria-current="page">
+                    <div class="row">
+                        <div class="col-4">
+                            <img class="box_icon" src="{{ asset('student1/images/test_attempt.png') }}">
+                        </div>
+                        <div class="col-8" style="margin:auto;">
+                            Review
+                        </div>
+                    </div>
+                </a>
+            </li>
         </ul>
     </div>
 </nav>

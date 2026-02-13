@@ -10,6 +10,7 @@ use App\Models\Educationtype;
 use App\Models\BoardAgencyStateModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
 {
@@ -142,23 +143,23 @@ class DashboardController extends Controller
             if ($request->hasFile('notification_file')) {
                 $file = $request->file('notification_file');
                 $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
-                $notificationFilePath = public_path('/uploads/notification_image');
-                $file->move($notificationFilePath, $fileName);
-                $noti_img = '/uploads/notification_image/'.$fileName;
+                $path = 'uploads/notification_image/' . $fileName;
+                Storage::disk('public')->put($path, file_get_contents($file));
+                $noti_img = $path;
             }
             if ($request->hasFile('exam_details_file')) {
                 $file = $request->file('exam_details_file');
                 $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
-                $examDetailsFilePath = public_path('/uploads/exam_details');
-                $file->move($examDetailsFilePath, $fileName);
-                $exam_img = '/uploads/exam_details/'.$fileName;
+                $path = 'uploads/exam_details/' . $fileName;
+                Storage::disk('public')->put($path, file_get_contents($file));
+                $exam_img = $path;
             }
             if ($request->hasFile('course_logo')) {
                 $file = $request->file('course_logo');
                 $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
-                $courseLogo = public_path('/uploads/course_logo');
-                $file->move($courseLogo, $fileName);
-                $course_logo = '/uploads/course_logo/'.$fileName;
+                $path = 'uploads/course_logo/' . $fileName;
+                Storage::disk('public')->put($path, file_get_contents($file));
+                $course_logo = $path;
             }
 
             $courseDetails = new CourseDetail();
@@ -219,23 +220,23 @@ class DashboardController extends Controller
             if ($request->hasFile('notification_file')) {
                 $file = $request->file('notification_file');
                 $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
-                $notificationFilePath = public_path('/uploads/notification_image');
-                $file->move($notificationFilePath, $fileName);
-                $noti_img = '/uploads/notification_image/' . $fileName;
+                $path = 'uploads/notification_image/' . $fileName;
+                Storage::disk('public')->put($path, file_get_contents($file));
+                $noti_img = $path;
             }
             if ($request->hasFile('exam_details_file')) {
                 $file = $request->file('exam_details_file');
                 $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
-                $examDetailsFilePath = public_path('/uploads/exam_details');
-                $file->move($examDetailsFilePath, $fileName);
-                $exam_img = '/uploads/exam_details/' . $fileName;
+                $path = 'uploads/exam_details/' . $fileName;
+                Storage::disk('public')->put($path, file_get_contents($file));
+                $exam_img = $path;
             }
             if ($request->hasFile('course_logo')) {
                 $file = $request->file('course_logo');
                 $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
-                $courseLogo = public_path('/uploads/course_logo');
-                $file->move($courseLogo, $fileName);
-                $course_logo = '/uploads/course_logo/' . $fileName;
+                $path = 'uploads/course_logo/' . $fileName;
+                Storage::disk('public')->put($path, file_get_contents($file));
+                $course_logo = $path;
             }
 
             $courseDetails->description = $request->input('overview');

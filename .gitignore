@@ -1,4 +1,5 @@
 /node_modules
+/vendor
 /public/hot
 /public/storage
 /storage/debugbar
@@ -19,5 +20,12 @@ yarn-error.log
 /.vscode
 *.zip
 TODO.md
-!/public/home/
-!/public/home/*
+
+# Dynamic Uploads
+/public/home/*
+/public/settingPdf/*
+/public/uploads/*
+/public/student_uploads/*
+/public/admin/*
+/public/institute/*
+/public/contributor_uploads/*

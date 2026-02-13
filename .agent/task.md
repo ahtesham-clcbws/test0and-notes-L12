@@ -1,13 +1,14 @@
-# Task: Deep Portal Audit & Inconsistency Analysis
+# Review System Implementation
 
-- [x] Audit Backend Infrastructure
-    - [x] Analyze Route consistency and Middleware application
-    - [x] Verify Model relationships and naming conventions
-    - [x] Check Controller logic patterns and duplication
-- [x] Audit Frontend Panels
-    - [x] Check CSS/JS consistency across Resident/Admin/Staff panels
-    - [x] Analyze UI pattern divergence (Sidebars, Headers, Buttons)
-- [x] Document Findings
-    - [x] Compile Architectural inconsistencies
-    - [x] Compile UI/UX and Frontend issues
-    - [x] Generate Full Extended Report
+- [ ] Database & Model Setup
+    - [ ] Create `Review` migration
+    - [ ] Create `Review` model
+- [ ] Admin Panel (Filament)
+    - [ ] Create `ReviewResource`
+    - [ ] Implement approval and featuring logic
+- [ ] Student Portal
+    - [ ] Create Review submission page/form
+    - [ ] Add link to student sidebar/navigation
+- [ ] Verification
+    - [ ] Test review submission
+    - [ ] Test admin moderation
