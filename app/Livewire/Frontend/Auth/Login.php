@@ -38,8 +38,8 @@ class Login extends Component
                 $fieldType = 'mobile';
             }
             $user = User::where($fieldType, $this->username)->first();
-            if($user->roles !== 'student'){
-                $this->addError('username', 'Credentials do not match');
+            if(!$user || $user->roles !== 'student' || $user->status !== 'active'){
+                $this->addError('username', 'Your account is not active or credentials do not match');
                 return;
             }
             if (Auth::attempt([$fieldType => $this->username, 'password' => $this->password], $this->remember_me)) {

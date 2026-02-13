@@ -87,16 +87,16 @@ class ExamsController extends Controller
                 if (Auth::user()->roles == 'student') {
                     // For agent, point 1. added those 2 (&& Auth::user()->myInstitute && Auth::user()->myInstitute->test) to remove errors from datatable
                     if ($type == 1 && Auth::user()->myInstitute && Auth::user()->myInstitute->test) {
-                        $testTableData = Auth::user()->myInstitute->test()->select(['id', 'title', 'sections', 'total_questions', 'questions_submitted', 'questions_approved', 'reviewed', 'reviewed_status', 'published', 'created_at', 'education_type_child_id', 'published_status'])->where('education_type_child_id', $UserDetails->class)->where('user_id', '<>', NULL)->where('published', 1)->orderBy('id', 'desc')->skip($start)->take($length)->get();
-                        $count = Auth::user()->myInstitute->test()->where('education_type_child_id', $UserDetails->class)->where('test_type', $type)->count();
+                        $testTableData = Auth::user()->myInstitute->test()->select(['id', 'title', 'sections', 'total_questions', 'questions_submitted', 'questions_approved', 'reviewed', 'reviewed_status', 'published', 'created_at', 'education_type_child_id', 'published_status'])->where('education_type_id', $UserDetails->education_type)->where('user_id', '<>', NULL)->where('published', 1)->orderBy('id', 'desc')->skip($start)->take($length)->get();
+                        $count = Auth::user()->myInstitute->test()->where('education_type_id', $UserDetails->education_type)->where('test_type', $type)->count();
                     }
                     if ($type == 0) {
-                        $testTableData = TestModal::select(['id', 'title', 'sections', 'total_questions', 'questions_submitted', 'questions_approved', 'reviewed', 'reviewed_status', 'published', 'created_at', 'education_type_child_id', 'published_status'])->where('education_type_child_id', $UserDetails->class)->where('user_id', NULL)->where('published', 1);
+                        $testTableData = TestModal::select(['id', 'title', 'sections', 'total_questions', 'questions_submitted', 'questions_approved', 'reviewed', 'reviewed_status', 'published', 'created_at', 'education_type_child_id', 'published_status'])->where('education_type_id', $UserDetails->education_type)->where('user_id', NULL)->where('published', 1);
                         if (isset($cat) && $cat != "") {
                             $testTableData = $testTableData->where('test_cat', $cat);
                         }
                         $testTableData = $testTableData->orderBy('id', 'desc')->skip($start)->take($length)->get();
-                        $count = TestModal::where('education_type_child_id', $UserDetails->class)->where('test_type', $type)->count();
+                        $count = TestModal::where('education_type_id', $UserDetails->education_type)->where('test_type', $type)->count();
                     }
                 } else {
                      if (Auth::user()->myInstitute) {

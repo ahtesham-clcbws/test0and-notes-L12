@@ -482,7 +482,7 @@ class StudymaterialController extends Controller
                 ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
                 ->where("study_material.status", 1)
                 ->where("study_material.material_seen", 1)
-                ->where("study_material.class", $student->class)
+                ->where("study_material.education_type", $student->education_type)
                 // ->whereIn("study_material.institute_id", array(Auth::user()->myInstitute->id, 0))
                 ->where("study_material.category", 'Study Notes & E-Books');
             $model = $model->orderBy('study_material.id', 'desc');
@@ -586,7 +586,7 @@ class StudymaterialController extends Controller
                 ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
                 ->where("study_material.status", 1)
                 ->where("study_material.material_seen", 1)
-                ->where("study_material.class", $student->class)
+                ->where("study_material.education_type", $student->education_type)
                 ->whereIn("study_material.institute_id", array(Auth::user()->myInstitute->id, 0))
                 ->where("study_material.category", 'Live & Video Classes');
             $model = $model->orderBy('study_material.id', 'desc');
@@ -703,7 +703,7 @@ class StudymaterialController extends Controller
                 ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
                 ->where("study_material.status", 1)
                 ->where("study_material.material_seen", 1)
-                ->where("study_material.class", $student->class)
+                ->where("study_material.education_type", $student->education_type)
                 ->whereIn("study_material.institute_id", array(Auth::user()->myInstitute->id, 0));
             $model->where("study_material.category", 'Static GK & Current Affairs');
 

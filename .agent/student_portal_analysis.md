@@ -1,14 +1,14 @@
 # Student Portal: Deep Structural Analysis
 
 ## Overview
-The Student Portal is a comprehensive platform designed for educational engagement, allowing students to take tests, purchase exam packages, and access study materials. The portal's content is dynamically filtered based on the student's **Education Type** and **Class/Group/Exam** selected during registration.
+The Student Portal is a comprehensive platform designed for educational engagement, allowing students to take tests, purchase exam packages, and access study materials. The portal's content is dynamically filtered based on the student's **Education Type** (broad access) and **Class/Group/Exam** (contextual detail).
 
 ## 1. Registration & Context Initialization
 - **Component**: `App\Livewire\Frontend\Auth\Register`
 - **Logic**: 
   - Students select an `education_type_id` and a `class_group_exam_id`.
   - Upon registration, these IDs are saved in the `user_details` table.
-  - `education_type_id` (Education Type) and `class` (Class/Group) act as the primary keys for content filtering across the entire portal.
+  - `education_type_id` acts as the primary filter for content accessibility, while `class` provides specific context.
 
 ## 2. Student Dashboard
 - **Controller**: `App\Http\Controllers\Student\DashboardController@index`
@@ -17,7 +17,7 @@ The Student Portal is a comprehensive platform designed for educational engageme
   - Provides a high-level summary of the student's activity.
   - **Metrics**: Displays counts for Test Attempts, Institute Tests, and Category-based tests (Gyanology).
   - **Study Materials**: Categorized counts for Notes, Videos, GK, Comprehensive materials, etc.
-  - **Filtering**: All counts are filtered using `UserDetails->class` to ensure relevance to the student's chosen path.
+  - **Filtering**: All counts are now filtered using `UserDetails->education_type` to ensure the student can see all relevant materials in their field.
 
 ## 3. Test Taking System
 - **Controller**: `App\Http\Controllers\Student\ExamsController`

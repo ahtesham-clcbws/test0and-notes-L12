@@ -35,7 +35,7 @@ class DashboardController extends Controller
         $testAttempt = Gn_StudentTestAttempt::where('student_id', $stud_id)->get();
         $testAttemptCount = $testAttempt->count();
 
-        $testTotal = TestModal::where('user_id', NULL)->where('published', 1)->where('education_type_child_id', $class)->get();
+        $testTotal = TestModal::where('user_id', NULL)->where('published', 1)->where('education_type_id', $education_type)->get();
         // $testCount = $testTotal->count();
 
         $testCount = [];
@@ -44,27 +44,27 @@ class DashboardController extends Controller
             $testCount[$cat->id] = $testTotal->where('test_cat', $cat->id)->count();
         }
         if (!empty(Auth::user()->myInstitute)) {
-            $testInstitute = Auth::user()->myInstitute->test()->where('published', 1)->where('education_type_child_id', $class)->count();
+            $testInstitute = Auth::user()->myInstitute->test()->where('published', 1)->where('education_type_id', $education_type)->count();
         } else {
             $testInstitute = 0;
         }
 
-        $notes_count = Studymaterial::where('category', 'Study Notes & E-Books')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('class', $class)->where("status", 1)->where("material_seen", 1)->get();
+        $notes_count = Studymaterial::where('category', 'Study Notes & E-Books')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('education_type', $education_type)->where("status", 1)->where("material_seen", 1)->get();
         $notes_count = $notes_count->count($notes_count);
 
-        $video_count = Studymaterial::where('category', 'Live & Video Classes')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('class', $class)->where("status", 1)->where("material_seen", 1)->get();
+        $video_count = Studymaterial::where('category', 'Live & Video Classes')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('education_type', $education_type)->where("status", 1)->where("material_seen", 1)->get();
         $video_count = $video_count->count($video_count);
 
-        $gk_count = Studymaterial::where('category', 'Static GK & Current Affairs')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('class', $class)->where("status", 1)->where("material_seen", 1)->get();
+        $gk_count = Studymaterial::where('category', 'Static GK & Current Affairs')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('education_type', $education_type)->where("status", 1)->where("material_seen", 1)->get();
         $gk_count = $gk_count->count($gk_count);
 
-        $comprehensive_count = Studymaterial::where('category', 'Comprehensive Study Material')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('class', $class)->where("status", 1)->where("material_seen", 1)->get();
+        $comprehensive_count = Studymaterial::where('category', 'Comprehensive Study Material')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('education_type', $education_type)->where("status", 1)->where("material_seen", 1)->get();
         $comprehensive_count = $comprehensive_count->count($comprehensive_count);
 
-        $short_notes_count = Studymaterial::where('category', 'Short Notes & One Liner')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('class', $class)->where("status", 1)->where("material_seen", 1)->get();
+        $short_notes_count = Studymaterial::where('category', 'Short Notes & One Liner')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('education_type', $education_type)->where("status", 1)->where("material_seen", 1)->get();
         $short_notes_count = $short_notes_count->count($short_notes_count);
 
-        $premium_count = Studymaterial::where('category', 'Premium Study Notes')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('class', $class)->where("status", 1)->where("material_seen", 1)->get();
+        $premium_count = Studymaterial::where('category', 'Premium Study Notes')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('education_type', $education_type)->where("status", 1)->where("material_seen", 1)->get();
         $premium_count = $premium_count->count($premium_count);
         // dd($testCount);
 
