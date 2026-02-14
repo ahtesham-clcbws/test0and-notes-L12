@@ -12,7 +12,7 @@ use App\Models\Gn_PackagePlan;
 
 use App\Models\Pdf;
 
-use App\Models\{Studymaterial, User};
+use App\Models\{Studymaterial, User, Review};
 use App\Notifications\ContactFormAdminNotify;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -155,7 +155,8 @@ class HomeController extends Controller
         $result['subtitle8_content'] = $data9->banner_content;
 
         $pdf = Pdf::where('type', 'student')->orderBy('id', 'DESC')->first();
-        return view('Frontend/home', compact('Gn_PackagePlanTestAndNotes', 'Gn_PackagePlanTestAndNotes2', 'StudymaterialGovComp', 'StudymaterialGovComp2', 'StudymaterialGovComp3', 'StudymaterialGovComp4', 'StudymaterialGovComp5', 'Gn_PackagePackagelist', 'Gn_PackagePlanInstitute', 'result', 'pdf'));
+        $reviews = Review::with('user.user_details')->where('is_featured', 1)->where('is_approved', 1)->latest()->take(9)->get();
+        return view('Frontend/home', compact('Gn_PackagePlanTestAndNotes', 'Gn_PackagePlanTestAndNotes2', 'StudymaterialGovComp', 'StudymaterialGovComp2', 'StudymaterialGovComp3', 'StudymaterialGovComp4', 'StudymaterialGovComp5', 'Gn_PackagePackagelist', 'Gn_PackagePlanInstitute', 'result', 'pdf', 'reviews'));
     }
 
     public function page()

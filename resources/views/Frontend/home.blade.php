@@ -1280,67 +1280,43 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-xl-4 col-lg-6 col-md-12 col-sm-12">
-                    <div class="edu_cat_2 review-first-block-color row align-text m-0 mb-4">
-                        <div class="d-flex">
-                            <div class="w-25 text-center">
-                                <img class="img-fluid rounded-circle" src="https://www.w3schools.com/w3images/avatar2.png"
-                                    alt="" width="100" height="100">
-                                <div class="mt-1 text-center">
-                                    <div class="review-font-size">Student Name</div>
-                                    <div class="review-font-size">SSC-CGL</div>
-                                    <div class="review-font-size">City Name</div>
+            <div class="reviews-slider">
+                @if (isset($reviews) && count($reviews) > 0)
+                    @php
+                        $colors = ['review-first-block-color', 'review-second-block-color', 'review-third-block-color'];
+                    @endphp
+                    @foreach ($reviews as $review)
+                        <div class="px-3">
+                            <div class="edu_cat_2 {{ $colors[$loop->index % 3] }} row align-text m-0 mb-4">
+                                <div class="d-flex">
+                                    <div class="w-25 text-center">
+                                        @if (optional($review->user?->user_details)->photo_url)
+                                            <img class="img-fluid rounded-circle"
+                                                src="{{ asset('storage/' . $review->user->user_details->photo_url) }}"
+                                                alt="" width="100" height="100">
+                                        @else
+                                            <img class="img-fluid rounded-circle"
+                                                src="https://www.w3schools.com/w3images/avatar2.png" alt=""
+                                                width="100" height="100">
+                                        @endif
+                                        <div class="mt-1 text-center">
+                                            <div class="review-font-size">{{ $review->user->name ?? 'Student' }}</div>
+                                            <div class="review-font-size">
+                                                {{ $review->user?->user_details?->city ?? '' }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="w-75 d-flex justify-content-center align-items-center m-2 text-justify">
+                                        {{ $review->review_text }}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="w-75 d-flex justify-content-center align-items-center m-2 text-center">
-                                There are many variations of passages of Lorem Ipsum available, but the majority have
-                                suffered alteration in some form, by injected humour, or randomised words which don't look
-                                even slightly believable.
-                            </div>
                         </div>
+                    @endforeach
+                @else
+                    <div class="col-12 text-center">
+                        <p>No featured reviews yet.</p>
                     </div>
-                </div>
-                <div class="col-xl-4 col-lg-6 col-md-12 col-sm-12">
-                    <div class="edu_cat_2 review-second-block-color row align-text m-0 mb-4">
-                        <div class="d-flex">
-                            <div class="w-25 text-center">
-                                <img class="img-fluid rounded-circle" src="https://www.w3schools.com/w3images/avatar2.png"
-                                    alt="" width="100" height="100">
-                                <div class="mt-1 text-center">
-                                    <div class="review-font-size">Student Name</div>
-                                    <div class="review-font-size">SSC-CGL</div>
-                                    <div class="review-font-size">City Name</div>
-                                </div>
-                            </div>
-                            <div class="w-75 d-flex justify-content-center align-items-center m-2 text-center">
-                                There are many variations of passages of Lorem Ipsum available, but the majority have
-                                suffered alteration in some form, by injected humour, or randomised words which don't look
-                                even slightly believable.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xl-4 col-lg-6 col-md-12 col-sm-12">
-                    <div class="edu_cat_2 review-third-block-color row align-text m-0 mb-4">
-                        <div class="d-flex">
-                            <div class="w-25 text-center">
-                                <img class="img-fluid rounded-circle" src="https://www.w3schools.com/w3images/avatar2.png"
-                                    alt="" width="100" height="100">
-                                <div class="mt-1 text-center">
-                                    <div class="review-font-size">Student Name</div>
-                                    <div class="review-font-size">SSC-CGL</div>
-                                    <div class="review-font-size">City Name</div>
-                                </div>
-                            </div>
-                            <div class="w-75 d-flex justify-content-center align-items-center m-2 text-center">
-                                There are many variations of passages of Lorem Ipsum available, but the majority have
-                                suffered alteration in some form, by injected humour, or randomised words which don't look
-                                even slightly believable.
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @endif
             </div>
         </div>
     </section>
@@ -1436,6 +1412,33 @@
                 $(lastChildren).removeClass('course-hover-box-right')
                 $(lastChildren).addClass('course-hover-box')
             }
+
+            $('.reviews-slider').slick({
+                slidesToShow: 2,
+                arrows: true,
+                dots: false,
+                infinite: true,
+                autoplaySpeed: 2000,
+                autoplay: true,
+                responsive: [
+                    {
+                        breakpoint: 1024,
+                        settings: {
+                            arrows: true,
+                            dots: false,
+                            slidesToShow: 2
+                        }
+                    },
+                    {
+                        breakpoint: 600,
+                        settings: {
+                            arrows: true,
+                            dots: false,
+                            slidesToShow: 1
+                        }
+                    }
+                ]
+            });
         });
     </script>
 @endsection
