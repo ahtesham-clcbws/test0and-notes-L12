@@ -380,16 +380,32 @@
     <h4> Partner Logos</h4>
     <div class="row">
         @if (!empty($slider_footer_image) && count(json_decode($slider_footer_image)))
-            @foreach (json_decode($slider_footer_image) as $list)
+            @foreach (json_decode($slider_footer_image, true) as $item)
+                @php
+                    $image = is_array($item) ? $item['image'] : $item;
+                    $url = is_array($item) ? ($item['url'] ?? '') : '';
+                @endphp
                 <div class="col-md-3 mb-4">
-                    <div class="card relative shadow-sm">
-                        <img src="{{ asset('storage/home/slider/' . $list) }}" alt="Slider Image" class="card-img-top"
+                    <div class="card relative shadow-sm h-100">
+                        <img src="{{ asset('storage/home/slider/' . $image) }}" alt="Slider Image" class="card-img-top"
                             style="height: 150px; object-fit: cover;" />
                         <div class="absolute" style="top: 5px; right: 5px; left: auto;">
-                            <a href="{{ route('administrator.slider_delete', [$list]) }}" class="btn btn-danger btn-sm rounded-circle"
+                            <a href="{{ route('administrator.slider_delete', [$image]) }}" class="btn btn-danger btn-sm rounded-circle"
                                 onclick="return confirm('Are you sure you want to delete this image?');">
                                 <i class="fa fa-times"></i>
                             </a>
+                        </div>
+                        <div class="card-body p-2">
+                            <form action="{{ route('administrator.update_slider_url') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="image" value="{{ $image }}">
+                                <div class="input-group input-group-sm">
+                                    <input type="url" name="url" class="form-control" placeholder="https://example.com" value="{{ $url }}">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i></button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

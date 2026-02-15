@@ -42,8 +42,9 @@ class ImportantLinkForm extends Form
             $this->important_link->url = $this->url;
 
             if ($this->image) {
-                $imageUrl = $this->image->store('important_links', 'public');
-                $this->important_link->image = $imageUrl;
+                // $imageUrl = $this->image->store('important_links', 'public');
+                $fullPath = app(\App\Services\ImageService::class)->handleUpload($this->image, 'important_links', 800);
+                $this->important_link->image = $fullPath;
             }
 
             return $this->important_link->save();
@@ -55,8 +56,9 @@ class ImportantLinkForm extends Form
         $important_link->url = $this->url;
 
         if ($this->image) {
-            $imageUrl = $this->image->store('important_links', 'public');
-            $important_link->image = $imageUrl;
+            // $imageUrl = $this->image->store('important_links', 'public');
+            $fullPath = app(\App\Services\ImageService::class)->handleUpload($this->image, 'important_links', 800);
+            $important_link->image = $fullPath;
         }
 
         return $important_link->save();

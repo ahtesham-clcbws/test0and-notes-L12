@@ -14,34 +14,18 @@
 # Inner page design
 # General Features
 # Blog Designs
-# Education Detail 
+# Education Detail
 # E-Commerce & Product Designs
 # Dashboard Design
-# Footer Start 
+# Footer Start
 # Responsiveness Start
 ------------- List Of Table ----------*/
 
 /* CSS Document */
-@import url(../css/plugins/animation.css);
-@import url(../../bootstrap5/css/bootstrap.min.css);
-@import url(../css/plugins/date-picker.css);
-@import url(../css/plugins/select2.css);
-@import url(../css/plugins/slick.css);
-@import url(../css/plugins/slick-theme.css);
-@import url(../css/plugins/themify.css);
-@import url(../css/plugins/morris.css);
-@import url(../css/plugins/font-awesome.css);
-@import url(../css/plugins/flaticon.css);
-/* @import url(../css/plugins/OverlayScrollbars/OverlayScrollbars.min.css); */
-/* @import url(../css/plugins/summernote.min.css); */
-/* @import url(../css/plugins/summernote.min.css); */
 
 /*------------------------------------
 	Fonts
 ------------------------------------*/
-@import url('https://fonts.googleapis.com/css?family=Quattrocento+Sans:400,400i,700,700i');
-@import url("https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css?family=Muli:300,400,600,700");
 
 /*------------------------------------------------------------
 	Global Settings
@@ -346,9 +330,7 @@ ul.list-style.style-2 li:before {
 .ht-80 {
     height: 80px;
 }
-.ht-80 {
-    height: 80px;
-}
+
 .ht-100 {
     height: 100px;
 }
@@ -1799,7 +1781,7 @@ nav a:hover {
     height: 16px;
     line-height: 16px;
     -ms-transform: scale(1.4);
-    /* transform: scale(1.4); */
+    transform: scale(1.4);
     top: 1px;
     position: relative;
 }
@@ -5452,7 +5434,7 @@ span.tes_quote {
 }
 
 /*==================================================
-	Education Detail 
+	Education Detail
 =================================================*/
 /*--------------- Education Detail ----------------*/
 .ed_detail_head {
@@ -7776,7 +7758,7 @@ th.next.available,
     padding-top: 1rem;
 }
 /*-------------------------------------------------
-  Footer Start   
+  Footer Start
 --------------------------------------------------*/
 /*---------- Call To Action -------------------*/
 .call_action_wrap-wrap {
@@ -8599,12 +8581,13 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type=number] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 /* .custom-form .input-group .input-group-text {
     background: transparent !important;
 } */
 
-/* .custom-form .input-group .form-control, 
+/* .custom-form .input-group .form-control,
 .custom-form .input-group .form-select {
     padding-left: 5px !important;
 } */
@@ -8735,13 +8718,13 @@ input[type=number] {
 }
 .cource-item > .cource-img > img {
     width: 100%;
-     height: 180px; 
+     height: 180px;
     object-fit: cover;
 }
 
 .cource-item > .pdf-img > img {
     width: 100%;
-     height: auto; 
+     height: auto;
     object-fit: cover;
 }
 
@@ -9147,3 +9130,138 @@ span.mini-text {
 }
 .star_mn p{display: inline-block;}
 .star_mn span{ float: right; }
+
+/*------------------------------------------------------------------
+    Custom Inline Styles Moved from frontend.blade.php
+-------------------------------------------------------------------*/
+.nav-submenu {
+    max-height: 80vh;
+    overflow: hidden auto;
+}
+
+.footer {
+    background-color: #000;
+    color: #fff;
+    padding-top: 20px;
+    font-family: 'Arial', sans-serif;
+}
+
+.footer .logo img {
+    max-width: 150px;
+}
+
+.footer h5 {
+    font-weight: bold;
+    font-family: 'Arial Black', Gadget, sans-serif;
+}
+
+.footer p,
+.footer a,
+.footer address {
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 400;
+}
+
+.footer a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+.footer hr {
+    border-color: #555;
+}
+
+.footer .text-center {
+    margin-top: 20px;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.call_action_wrap {
+    height: 2px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#userid_new_error,
+#statusUsername,
+#citiesRegisterDiv {
+    display: none;
+}
+
+#branchRemove,
+#branchcehck {
+    cursor: pointer;
+}
+
+span.select2-selection.select2-selection--single {
+    height: 33px;
+}
+
+.noDisplay {
+    display: none;
+}
+
+.pointerCursor {
+    cursor: pointer;
+}
+
+.login-form .form-control {
+    height: inherit;
+}
+
+#branchRemove,
+#branchcehck {
+    cursor: pointer;
+}
+
+/* Import custom fonts */
+@font-face {
+    font-family: arial_bold;
+    src: url(../../fonts/ARLRDBD.ttf);
+    font-display: swap;
+}
+
+@font-face {
+    font-family: bree_serif;
+    src: url(../../fonts/BreeSerif-Regular.ttf);
+    font-display: swap;
+}
+
+@font-face {
+    font-family: geometric_black_bt;
+    src: url(../../fonts/geometric_415_black_bt.ttf);
+    font-display: swap;
+}
+
+.font-family-arial-bold {
+    font-family: arial_bold;
+}
+
+.font-family-bree-serif {
+    font-family: bree_serif;
+}
+
+.font-family-geometric-black-bt {
+    font-family: geometric_black_bt;
+}
+
+.swal2-container {
+    z-index: 20000 !important;
+}
+
+body.swal2-toast-shown .swal2-container {
+    pointer-events: none;
+}
+
+body.swal2-toast-shown .swal2-popup {
+    pointer-events: auto;
+}

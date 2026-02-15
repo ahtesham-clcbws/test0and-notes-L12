@@ -185,7 +185,8 @@ class StudentRegistrationForm extends Form
                     $userDetailsDb->institute_code =  filter_var($this->institute_code);
                 }
                 if ($this->user_logo) {
-                    $userDetailsDb->photo_url = $this->user_logo->store('student_uploads/' . $user->id, 'public');
+                    $fullPath = app(\App\Services\ImageService::class)->handleUpload($this->user_logo, 'student_uploads/' . $user->id, 400);
+                    $userDetailsDb->photo_url = $fullPath;
                 }
 
                 $userDetailsDb->days = '7';

@@ -34,7 +34,7 @@ class ReviewController extends Controller
             'is_featured' => false,
         ]);
 
-        return redirect()->back()->with('message', 'Thank you! Your institute review has been submitted and is pending approval.');
+        return redirect()->back()->with('message', 'Thank you! Your institute feedback has been submitted and is pending approval.');
     }
 
     public function update(Request $request)
@@ -50,6 +50,6 @@ class ReviewController extends Controller
             'is_approved' => false, // Reset approval status on edit
         ]);
 
-        return redirect()->back()->with('message', 'Your institute review has been updated and is pending re-approval.');
+        return redirect()->back()->with('message', 'Your institute feedback has been updated and is pending re-approval.');
     }
 }

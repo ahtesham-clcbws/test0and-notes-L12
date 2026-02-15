@@ -17,150 +17,28 @@
         <link href="{{ asset('logos/logo-white-square.png') }}" rel="apple-touch-icon">
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <!-- Extracted Imports from styles.css -->
+        <link href="{{ asset('skillup/css/plugins/animation.css') }}" rel="stylesheet">
+        <link href="{{ asset('bootstrap5/css/bootstrap.min.css') }}" rel="stylesheet">
+        <link href="{{ asset('skillup/css/plugins/date-picker.css') }}" rel="stylesheet">
+        <link href="{{ asset('skillup/css/plugins/select2.css') }}" rel="stylesheet">
+        <link href="{{ asset('skillup/css/plugins/slick.css') }}" rel="stylesheet">
+        <link href="{{ asset('skillup/css/plugins/slick-theme.css') }}" rel="stylesheet">
+        <link href="{{ asset('skillup/css/plugins/themify.css') }}" rel="stylesheet">
+        <link href="{{ asset('skillup/css/plugins/morris.css') }}" rel="stylesheet">
+        <link href="{{ asset('skillup/css/plugins/font-awesome.css') }}" rel="stylesheet">
+        <link href="{{ asset('skillup/css/plugins/flaticon.css') }}" rel="stylesheet">
+
+        <!-- Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Quattrocento+Sans:400,400i,700,700i&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Muli:300,400,600,700&display=swap" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Sansita:wght@400;700&display=swap" rel="stylesheet">
 
-        <link href="{{ asset('skillup/css/styles.css') }}" rel=" stylesheet">
-
-        <style>
-            .nav-submenu {
-                max-height: 80vh;
-                overflow: hidden auto;
-            }
-        </style>
-        <style>
-            .footer {
-                background-color: #000;
-                color: #fff;
-                padding-top: 20px;
-                font-family: 'Arial', sans-serif;
-                /* Update this to match the font style */
-            }
-
-            .footer .logo img {
-                max-width: 150px;
-                /* Adjust the size of the logo */
-            }
-
-            .footer h5 {
-                font-weight: bold;
-                font-family: 'Arial Black', Gadget, sans-serif;
-                /* Closely matches the bold and strong font */
-            }
-
-            .footer p,
-            .footer a,
-            .footer address {
-                font-size: 14px;
-                line-height: 24px;
-                font-weight: 400;
-                /* Regular weight for text */
-            }
-
-            .footer a {
-                color: #fff;
-                text-decoration: none;
-                font-weight: 600;
-                /* Slightly bolder for links */
-            }
-
-            .footer a:hover {
-                text-decoration: underline;
-            }
-
-            .footer hr {
-                border-color: #555;
-            }
-
-            .footer .text-center {
-                margin-top: 20px;
-                font-size: 12px;
-                font-weight: 400;
-                /* Regular weight for copyright text */
-            }
-
-            .call_action_wrap {
-                height: 2px;
-                /* Change this value to adjust the height */
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-            }
-
-            #userid_new_error,
-            #statusUsername,
-            #citiesRegisterDiv {
-                display: none;
-            }
-
-            #branchRemove,
-            #branchcehck {
-                cursor: pointer;
-            }
-
-            span.select2-selection.select2-selection--single {
-                height: 33px;
-            }
-
-            .noDisplay {
-                display: none;
-            }
-
-            .pointerCursor {
-                cursor: pointer;
-            }
-
-            .login-form .form-control {
-                height: inherit;
-            }
-
-            #branchRemove,
-            #branchcehck {
-                cursor: pointer;
-            }
-
-            /* Import custom fort */
-            @font-face {
-                font-family: arial_bold;
-                src: url(<?= asset('fonts/ARLRDBD.ttf') ?>);
-            }
-
-            /* Import custom fort */
-            @font-face {
-                font-family: bree_serif;
-                src: url(<?= asset('fonts/BreeSerif-Regular.ttf') ?>);
-            }
-
-            /* Import custom fort */
-            @font-face {
-                font-family: geometric_black_bt;
-                src: url(<?= asset('fonts/geometric_415_black_bt.ttf') ?>);
-            }
-
-            .font-family-arial-bold {
-                font-family: arial_bold;
-            }
-
-            .font-family-bree-serif {
-                font-family: bree_serif;
-            }
-
-            .font-family-geometric-black-bt {
-                font-family: geometric_black_bt;
-            }
-
-            .swal2-container {
-                z-index: 20000 !important;
-            }
-            body.swal2-toast-shown .swal2-container {
-                pointer-events: none;
-            }
-            body.swal2-toast-shown .swal2-popup {
-                pointer-events: auto;
-            }
-        </style>
+        <link href="{{ asset('skillup/css/styles.min.css') }}" rel=" stylesheet">
 
         @yield('css')
 
@@ -293,18 +171,18 @@
         <!-- ALL JS FILES -->
         <script src="{{ asset('frontend/js/jquery-3.2.1.min.js') }}"></script>
         <script src="{{ asset('bootstrap5/js/bootstrap.bundle.min.js') }}"></script>
-        <script src="{{ asset('skillup/js/select2.min.js') }}"></script>
-        <script src="{{ asset('skillup/js/slick.js') }}"></script>
-        <script src="{{ asset('skillup/js/moment.min.js') }}"></script>
-        <script src="{{ asset('skillup/js/daterangepicker.js') }}"></script>
-        <script src="{{ asset('skillup/js/summernote.min.js') }}"></script>
-        <script src="{{ asset('skillup/js/metisMenu.min.js') }}"></script>
+        <script src="{{ asset('skillup/js/select2.min.js') }}" defer></script>
+        <script src="{{ asset('skillup/js/slick.js') }}" defer></script>
+        <script src="{{ asset('skillup/js/moment.min.js') }}" defer></script>
+        <script src="{{ asset('skillup/js/daterangepicker.js') }}" defer></script>
+        <script src="{{ asset('skillup/js/summernote.min.js') }}" defer></script>
+        <script src="{{ asset('skillup/js/metisMenu.min.js') }}" defer></script>
         {{-- <script src="{{ asset('frontend/sweetalert2/sweetalert2.js') }}"></script> --}}
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        <script src="{{ asset('frontend/js/jquery.validate.min.js') }}"></script>
+        <script src="{{ asset('frontend/js/jquery.validate.min.js') }}" defer></script>
         {{-- <script src="{{ asset('frontend/js/sweetalert.min.js') }}"></script> --}}
-        <script src="{{ asset('skillup/js/custom.js') }}"></script>
+        <script src="{{ asset('skillup/js/custom.js') }}" defer></script>
         <script>
             $('.togglePassword').on('click', function() {
                 var passwordInput = $(this).closest('.input-group').find('.form-control');

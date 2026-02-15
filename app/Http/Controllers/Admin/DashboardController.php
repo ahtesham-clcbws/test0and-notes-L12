@@ -11,9 +11,17 @@ use App\Models\BoardAgencyStateModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageService;
 
 class DashboardController extends Controller
 {
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
+
     public function index()
     {
         $counts = [];
@@ -141,25 +149,13 @@ class DashboardController extends Controller
             $course_logo = '';
 
             if ($request->hasFile('notification_file')) {
-                $file = $request->file('notification_file');
-                $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
-                $path = 'uploads/notification_image/' . $fileName;
-                Storage::disk('public')->put($path, file_get_contents($file));
-                $noti_img = $path;
+                $noti_img = $this->imageService->handleUpload($request->file('notification_file'), 'uploads/notification_image', 1000);
             }
             if ($request->hasFile('exam_details_file')) {
-                $file = $request->file('exam_details_file');
-                $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
-                $path = 'uploads/exam_details/' . $fileName;
-                Storage::disk('public')->put($path, file_get_contents($file));
-                $exam_img = $path;
+                $exam_img = $this->imageService->handleUpload($request->file('exam_details_file'), 'uploads/exam_details', 1000);
             }
             if ($request->hasFile('course_logo')) {
-                $file = $request->file('course_logo');
-                $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
-                $path = 'uploads/course_logo/' . $fileName;
-                Storage::disk('public')->put($path, file_get_contents($file));
-                $course_logo = $path;
+                $course_logo = $this->imageService->handleUpload($request->file('course_logo'), 'uploads/course_logo', 500);
             }
 
             $courseDetails = new CourseDetail();
@@ -218,25 +214,13 @@ class DashboardController extends Controller
             $course_logo = $courseDetails->course_image;
 
             if ($request->hasFile('notification_file')) {
-                $file = $request->file('notification_file');
-                $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
-                $path = 'uploads/notification_image/' . $fileName;
-                Storage::disk('public')->put($path, file_get_contents($file));
-                $noti_img = $path;
+                $noti_img = $this->imageService->handleUpload($request->file('notification_file'), 'uploads/notification_image', 1000);
             }
             if ($request->hasFile('exam_details_file')) {
-                $file = $request->file('exam_details_file');
-                $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
-                $path = 'uploads/exam_details/' . $fileName;
-                Storage::disk('public')->put($path, file_get_contents($file));
-                $exam_img = $path;
+                $exam_img = $this->imageService->handleUpload($request->file('exam_details_file'), 'uploads/exam_details', 1000);
             }
             if ($request->hasFile('course_logo')) {
-                $file = $request->file('course_logo');
-                $fileName = rand(11111, 999999) . '-' . $file->getClientOriginalName();
-                $path = 'uploads/course_logo/' . $fileName;
-                Storage::disk('public')->put($path, file_get_contents($file));
-                $course_logo = $path;
+                $course_logo = $this->imageService->handleUpload($request->file('course_logo'), 'uploads/course_logo', 500);
             }
 
             $courseDetails->description = $request->input('overview');

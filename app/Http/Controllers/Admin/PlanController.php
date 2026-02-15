@@ -11,6 +11,7 @@ use App\Models\Gn_PackagePlanTest;
 use App\Models\FranchiseDetails;
 use App\Models\Studymaterial;
 use Yajra\DataTables\DataTables;
+use App\Services\ImageService;
 
 class PlanController extends Controller
 {
@@ -18,8 +19,11 @@ class PlanController extends Controller
     protected $insert_data;
     protected $diff_data;
 
-    public function __construct()
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
     {
+        $this->imageService = $imageService;
         $this->data = array();
         $this->data['educations']       = Educationtype::get();
         $this->data['pagename'] = 'Add Package';
@@ -170,8 +174,9 @@ class PlanController extends Controller
                 $package_plan->student_rating   = $request->student_rating;
                 $package_plan->other_remark       = $request->other_remark;
                 $package_plan->enrol_student_no       = $request->enrol_student_no;
-                if(isset($request->package_image)){
-                    $package_plan->package_image = (isset($request->package_image)) ? $request->package_image->store('package_image', 'public') : 'NA';
+                if($request->hasFile('package_image')){
+                    $fullPath = $this->imageService->handleUpload($request->file('package_image'), 'package_image', 800);
+                    $package_plan->package_image = $fullPath;
                 }
                 $package_plan->expire_date       = $request->expire_date;
                 $package_plan->education_type       = $request->education_type_id;

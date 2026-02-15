@@ -311,11 +311,11 @@
                                 src="{{ asset('storage/home/' . $result['banner_attr_image_1']) }}" alt="" />
                             </div>
                             <div class="banner_attr_thumb thumb_2">
-                                <img
+                                <img loading="lazy"
                                 src="{{ asset('storage/home/' . $result['banner_attr_image_2']) }}" alt="" />
                             </div>
                             <div class="banner_attr_thumb thumb_3">
-                                <img
+                                <img loading="lazy"
                                 src="{{ asset('storage/home/' . $result['banner_attr_image_3']) }}" alt="" />
                             </div>
                         </div>
@@ -425,9 +425,9 @@
                                                 </div>
                                                 <div class="cource-img">
                                                     @if (isset($item->package_image))
-                                                        <img src="/storage/{{ $item->package_image }}" alt="">
+                                                        <img src="/storage/{{ $item->package_image }}" alt="" loading="lazy">
                                                     @else
-                                                        <img src="{{ asset('noimg.png') }}" alt="">
+                                                        <img src="{{ asset('noimg.png') }}" alt="" loading="lazy">
                                                     @endif
                                                 </div>
                                                 <div class="course-body">
@@ -526,9 +526,9 @@
                                             <div class="flip-card-front">
                                                 <div class="cource-img">
                                                     @if (isset($item->package_image))
-                                                        <img src="/storage/{{ $item->package_image }}" alt="">
+                                                        <img src="/storage/{{ $item->package_image }}" alt="" loading="lazy">
                                                     @else
-                                                        <img src="{{ asset('noimg.png') }}" alt="">
+                                                        <img src="{{ asset('noimg.png') }}" alt="" loading="lazy">
                                                     @endif
                                                 </div>
                                                 <div class="course-body">
@@ -651,9 +651,9 @@
                                             </div>
                                             <div class="cource-img">
                                                 @if (isset($item->package_image))
-                                                    <img src="/storage/{{ $item->package_image }}" alt="">
+                                                    <img src="/storage/{{ $item->package_image }}" alt="" loading="lazy">
                                                 @else
-                                                    <img src="{{ asset('noimg.png') }}" alt="">
+                                                    <img src="{{ asset('noimg.png') }}" alt="" loading="lazy">
                                                 @endif
                                             </div>
                                             <div class="course-body">
@@ -738,9 +738,9 @@
                                             </div>
                                             <div class="cource-img">
                                                 @if (isset($item->package_image))
-                                                    <img src="/storage/{{ $item->package_image }}" alt="">
+                                                    <img src="/storage/{{ $item->package_image }}" alt="" loading="lazy">
                                                 @else
-                                                    <img src="{{ asset('noimg.png') }}" alt="">
+                                                    <img src="{{ asset('noimg.png') }}" alt="" loading="lazy">
                                                 @endif
                                             </div>
                                             <div class="course-body">
@@ -1273,8 +1273,8 @@
                 <div class="col-lg-7 col-md-8">
                     <div class="sec-heading center">
                         <h2>What Student Are saying about <span class="theme-cl">Test&Notes.Com</span></h2>
-                        <p>We appreciate the views of each student about our educational system as well as we provide them.
-                            No matter what they are saying about us. We always encourage them to fair reviews about us.
+                        <p>We appreciate the feedback of each student about our educational system as well as we provide them.
+                            No matter what they are saying about us. We always encourage them to fair feedback about us.
                         </p>
                     </div>
                 </div>
@@ -1289,20 +1289,22 @@
                         <div class="px-3">
                             <div class="edu_cat_2 {{ $colors[$loop->index % 3] }} row align-text m-0 mb-4">
                                 <div class="d-flex">
-                                    <div class="w-25 text-center">
+                                    <div class="w-25 text-center px-2">
                                         @if (optional($review->user?->user_details)->photo_url)
-                                            <img class="img-fluid rounded-circle"
+                                            <img class="img-fluid rounded-circle d-block mx-auto"
                                                 src="{{ asset('storage/' . $review->user->user_details->photo_url) }}"
                                                 alt="" width="100" height="100">
                                         @else
-                                            <img class="img-fluid rounded-circle"
+                                            <img class="img-fluid rounded-circle d-block mx-auto"
                                                 src="https://www.w3schools.com/w3images/avatar2.png" alt=""
                                                 width="100" height="100">
                                         @endif
                                         <div class="mt-1 text-center">
-                                            <div class="review-font-size">{{ $review->user->name ?? 'Student' }}</div>
-                                            <div class="review-font-size">
-                                                {{ $review->user?->user_details?->city ?? '' }}</div>
+                                            <div class="review-font-size font-weight-bold">{{ $review->user->name ?? 'Student' }}</div>
+                                            <div class="review-font-size text-muted small">
+                                                {{ $review->user?->user_details?->city_data?->name ?? ($review->user?->user_details?->city ?? '') }},
+                                                {{ $review->user?->user_details?->state?->name ?? '' }}
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="w-75 d-flex justify-content-center align-items-center m-2 text-justify">
@@ -1314,7 +1316,7 @@
                     @endforeach
                 @else
                     <div class="col-12 text-center">
-                        <p>No featured reviews yet.</p>
+                        <p>No feedbacks available.</p>
                     </div>
                 @endif
             </div>
@@ -1338,9 +1340,23 @@
                 <div class="col-xl-12 col-lg-12 col-sm-12">
                     <div class="video-ebooks-pdf space">
                         {{-- {{ $result['slider_footer_image'] }} --}}
-                        @foreach (json_decode($result['slider_footer_image']) as $list)
-                            <img class="mx-3" src="{{ asset('storage/home/slider/' . $list) }}" />
-                        @endforeach
+                        @if (!empty($result['slider_footer_image']))
+                            @foreach (json_decode($result['slider_footer_image'], true) as $item)
+                                @php
+                                    $image = is_array($item) ? $item['image'] : $item;
+                                    $url = is_array($item) ? ($item['url'] ?? null) : null;
+                                @endphp
+                                <div class="mx-3">
+                                    @if ($url)
+                                        <a href="{{ $url }}" target="_blank" class="d-block w-100">
+                                            <img class="img-fluid w-100" src="{{ asset('storage/home/slider/' . $image) }}" />
+                                        </a>
+                                    @else
+                                        <img class="img-fluid w-100" src="{{ asset('storage/home/slider/' . $image) }}" />
+                                    @endif
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
                 </div>
             </div>

@@ -60,6 +60,15 @@
                                 Institute Test
                             </a>
                         </li>
+                        @if(isset($test_cat_sidebar))
+                            @foreach($test_cat_sidebar as $cat)
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('student.dashboard_gyanology_list',['cat'=>$cat->id]) }}">
+                                    {{ $cat->cat_name }}
+                                </a>
+                            </li>
+                            @endforeach
+                        @endif
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('student.test-attempt') }}">
                                 My Test
@@ -140,7 +149,7 @@
                             <img class="box_icon" src="{{ asset('student1/images/test_attempt.png') }}">
                         </div>
                         <div class="col-8" style="margin:auto;">
-                            Review
+                            Feedback
                         </div>
                     </div>
                 </a>

@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-12 p-4">
-            <h3 class="mb-4">Submit Institute Review</h3>
+            <h3 class="mb-4">Submit Institute Feedback</h3>
 
             @if(session('message'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -49,7 +49,7 @@
                 <div id="reviewDisplaySection">
                     <div class="alert alert-info border-info shadow-sm d-flex justify-content-between align-items-center" style="border-radius: 12px;">
                         <div>
-                            <i class="bi bi-info-circle-fill me-2"></i> You have already submitted a review.
+                            <i class="bi bi-info-circle-fill me-2"></i> You have already submitted a feedback.
                         </div>
                         <button class="btn btn-sm btn-outline-primary" onclick="toggleReviewEdit()">
                             <i class="bi bi-pencil-square"></i> Edit Feedback
@@ -66,7 +66,7 @@
                         <p class="mb-0">{{ $review->review_text }}</p>
                         @if($review->is_featured)
                             <div class="mt-2 text-primary">
-                                <i class="bi bi-patch-check-fill"></i> <small>Featured Testimonial</small>
+                                <i class="bi bi-patch-check-fill"></i> <small>Featured Feedback</small>
                             </div>
                         @endif
                     </div>

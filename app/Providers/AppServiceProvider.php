@@ -162,5 +162,15 @@ class AppServiceProvider extends ServiceProvider
             }
             return false;
         });
+
+        // Register Observers
+        \App\Models\Gn_PackagePlan::observe(\App\Observers\GnPackagePlanObserver::class);
+        \App\Models\Studymaterial::observe(\App\Observers\StudymaterialObserver::class);
+        \App\Models\Review::observe(\App\Observers\ReviewObserver::class);
+
+        // View Composer for Student Sidebar
+        View::composer('Dashboard.Student.partials.sidebar', function ($view) {
+            $view->with('test_cat_sidebar', \App\Models\TestCat::get());
+        });
     }
 }

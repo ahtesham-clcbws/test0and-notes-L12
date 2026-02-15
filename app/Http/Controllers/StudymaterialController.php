@@ -15,13 +15,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Facades\DataTables;
+use App\Services\ImageService;
 
 class StudymaterialController extends Controller
 {
     protected $data;
+    protected $imageService;
 
-    public function __construct()
+    public function __construct(ImageService $imageService)
     {
+        $this->imageService = $imageService;
         $this->data = array();
         $this->data['pagename'] = 'Add Study Material';
     }
@@ -420,8 +423,9 @@ class StudymaterialController extends Controller
                 $Studymaterial->select_package = (isset($data['select_package'])) ? $data['select_package'] : NULL;
             }
             $Studymaterial->video_link = (isset($data['video_link'])) ? $data['video_link'] : NULL;
-            if (isset($request->study_material_image)) {
-                $Studymaterial->study_material_image = (isset($request->study_material_image)) ? $request->study_material_image->store('study_material_image', 'public') : 'NA';
+            if ($request->hasFile('study_material_image')) {
+                $fullPath = $this->imageService->handleUpload($request->file('study_material_image'), 'study_material_image', 800);
+                $Studymaterial->study_material_image = $fullPath;
             }
 
             // if ($data['document_type'] != 'YOUTUBE') {

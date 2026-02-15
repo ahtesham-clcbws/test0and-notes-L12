@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 
@@ -25,65 +26,110 @@ class HomeController extends Controller
 
     public function index()
     {
-
         $current_date = date('Y-m-d');
+        $cacheDuration = 60 * 60; // 1 hour
 
+        // Cache Package Plans
+        $Gn_PackagePlanTestAndNotes = Cache::remember('home_package_test_notes', $cacheDuration, function () use ($current_date) {
+            return Gn_PackagePlan::with(['educationType', 'classType'])
+                ->where('is_featured', 1)
+                ->where('education_type', 54)
+                ->where('expire_date', '>=', $current_date)
+                ->orderBy('id', 'desc')
+                ->limit(6)
+                ->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+        });
 
-        //->where('class', 186)
-        $Gn_PackagePlanTestAndNotes = Gn_PackagePlan::with(['educationType', 'classType'])->where('is_featured', 1)->where('education_type', 54)->where('expire_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
-        $Gn_PackagePlanTestAndNotes2 = Gn_PackagePlan::with(['educationType', 'classType'])->where('is_featured', 1)->where('education_type', 52)->where('expire_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+        $Gn_PackagePlanTestAndNotes2 = Cache::remember('home_package_test_notes_2', $cacheDuration, function () use ($current_date) {
+            return Gn_PackagePlan::with(['educationType', 'classType'])
+                ->where('is_featured', 1)
+                ->where('education_type', 52)
+                ->where('expire_date', '>=', $current_date)
+                ->orderBy('id', 'desc')
+                ->limit(6)
+                ->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+        });
 
-        $StudymaterialGovComp = Studymaterial::with(['educationType', 'study_class'])->where('study_material.is_featured', 1)
-            ->whereIn('study_material.education_type', [51, 53, 54])
-            ->whereNotIN('category', ["Static GK & Current Affairs"])
-            ->orderBy('study_material.id', 'desc')
-            ->limit(6)
-            ->get(['study_material.*']);
+        // Cache Study Materials
+        $StudymaterialGovComp = Cache::remember('home_study_gov_comp', $cacheDuration, function () {
+            return Studymaterial::with(['educationType', 'study_class'])
+                ->where('study_material.is_featured', 1)
+                ->whereIn('study_material.education_type', [51, 53, 54])
+                ->whereNotIN('category', ["Static GK & Current Affairs"])
+                ->orderBy('study_material.id', 'desc')
+                ->limit(6)
+                ->get(['study_material.*']);
+        });
 
-        $StudymaterialGovComp2 = Studymaterial::with(['educationType', 'study_class'])->where('study_material.is_featured', 1)
-            ->where('category', "Static GK & Current Affairs")
-            ->get(['study_material.*']);
+        $StudymaterialGovComp2 = Cache::remember('home_study_gov_comp_2', $cacheDuration, function () {
+            return Studymaterial::with(['educationType', 'study_class'])
+                ->where('study_material.is_featured', 1)
+                ->where('category', "Static GK & Current Affairs")
+                ->get(['study_material.*']);
+        });
 
-        $StudymaterialGovComp3 = Studymaterial::with(['educationType', 'study_class'])->where('study_material.is_featured', 1)
-            ->whereIn('study_material.education_type', [52])
-            ->where('category', "Study Notes & E-Books")
-            ->get(['study_material.*']);
+        $StudymaterialGovComp3 = Cache::remember('home_study_gov_comp_3', $cacheDuration, function () {
+            return Studymaterial::with(['educationType', 'study_class'])
+                ->where('study_material.is_featured', 1)
+                ->whereIn('study_material.education_type', [52])
+                ->where('category', "Study Notes & E-Books")
+                ->get(['study_material.*']);
+        });
 
-        $StudymaterialGovComp4 = Studymaterial::join('education_type', 'study_material.education_type', '=', 'education_type.id')
-            ->join('classes_groups_exams', 'classes_groups_exams.id', '=', 'study_material.class')
-            ->where('study_material.is_featured', 1)
-            ->whereNotIN('study_material.education_type', [52])
-            ->where('category', "Live & Video Classes")
-            ->get(['study_material.*', 'education_type.name as education_type_name', 'classes_groups_exams.name as class_name']);
+        $StudymaterialGovComp4 = Cache::remember('home_study_gov_comp_4', $cacheDuration, function () {
+            return Studymaterial::join('education_type', 'study_material.education_type', '=', 'education_type.id')
+                ->join('classes_groups_exams', 'classes_groups_exams.id', '=', 'study_material.class')
+                ->where('study_material.is_featured', 1)
+                ->whereNotIN('study_material.education_type', [52])
+                ->where('category', "Live & Video Classes")
+                ->get(['study_material.*', 'education_type.name as education_type_name', 'classes_groups_exams.name as class_name']);
+        });
 
-        $StudymaterialGovComp5 = Studymaterial::join('education_type', 'study_material.education_type', '=', 'education_type.id')
-            ->join('classes_groups_exams', 'classes_groups_exams.id', '=', 'study_material.class')
-            ->where('study_material.is_featured', 1)
-            ->whereIN('study_material.education_type', [52])
-            ->where('category', "Live & Video Classes")
-            ->get(['study_material.*', 'education_type.name as education_type_name', 'classes_groups_exams.name as class_name']);
+        $StudymaterialGovComp5 = Cache::remember('home_study_gov_comp_5', $cacheDuration, function () {
+            return Studymaterial::join('education_type', 'study_material.education_type', '=', 'education_type.id')
+                ->join('classes_groups_exams', 'classes_groups_exams.id', '=', 'study_material.class')
+                ->where('study_material.is_featured', 1)
+                ->whereIN('study_material.education_type', [52])
+                ->where('category', "Live & Video Classes")
+                ->get(['study_material.*', 'education_type.name as education_type_name', 'classes_groups_exams.name as class_name']);
+        });
 
-        //return $StudymaterialGovComp4;
+        $StudymaterialAffairs = Cache::remember('home_study_affairs', $cacheDuration, function () use ($current_date) {
+            return Studymaterial::with(['educationType', 'study_class'])
+                ->where('status', 1)
+                ->where('education_type', 53)
+                ->where('publish_date', '>=', $current_date)
+                ->orderBy('id', 'desc')
+                ->limit(6)
+                ->get(["study_material.*",]);
+        });
 
-        //return $StudymaterialGovComp;
-        // ->leftJoin('classes_groups_exams', 'classes_groups_exams.id', '=', 'study_material.class')
-        // ->leftJoin('gn__package_plans', 'gn__package_plans.id', '=', 'study_material.select_package')
-        // ->get(['study_material.*', 'gn__package_plans.enrol_student_no']);
+        $Gn_PackagePackagelist = Cache::remember('home_package_list', $cacheDuration, function () {
+            return Gn_PackagePlan::with(['educationType', 'classType'])
+                ->where('status', 1)
+                ->where('education_type', 53)
+                ->orderBy('id', 'desc')
+                ->limit(6)
+                ->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+        });
 
-        $StudymaterialAffairs = Studymaterial::with(['educationType', 'study_class'])->where('status', 1)->where('education_type', 53)->where('publish_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["study_material.*",]);
-
-        //->where('expire_date', '>=' , $current_date)
-        $Gn_PackagePackagelist = Gn_PackagePlan::with(['educationType', 'classType'])->where('status', 1)->where('education_type', 53)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
-        $Gn_PackagePlanInstitute = Gn_PackagePlan::with(['educationType', 'classType'])->where('status', 1)->where('education_type', 51)->where('expire_date', '>=', $current_date)->orderBy('id', 'desc')->limit(6)->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
-
-
-        //    echo"<pre>"; print_r($Gn_PackagePlanTestAndNotes); die;
+        $Gn_PackagePlanInstitute = Cache::remember('home_package_institute', $cacheDuration, function () use ($current_date) {
+            return Gn_PackagePlan::with(['educationType', 'classType'])
+                ->where('status', 1)
+                ->where('education_type', 51)
+                ->where('expire_date', '>=', $current_date)
+                ->orderBy('id', 'desc')
+                ->limit(6)
+                ->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+        });
 
         // Batch fetch landing page data
-        $landingPages = DB::table('landing_page')->whereBetween('id', [1, 9])->get()->keyBy('id');
+        $landingPages = Cache::remember('home_landing_pages', $cacheDuration, function () {
+            return DB::table('landing_page')->whereBetween('id', [1, 9])->get()->keyBy('id');
+        });
 
         // Helper to get landing page data safely
-        $getLandingData = function($id) use ($landingPages) {
+        $getLandingData = function ($id) use ($landingPages) {
             return $landingPages->get($id) ?? (object)[
                 'banner_title_first' => '', 'banner_title_second' => '', 'banner_title_third' => '', 'banner_content' => '',
                 'competitive_courses_status' => 0, 'range_of_courses_status' => 0, 'banner_photo' => '',
@@ -155,7 +201,15 @@ class HomeController extends Controller
         $result['subtitle8_content'] = $data9->banner_content;
 
         $pdf = Pdf::where('type', 'student')->orderBy('id', 'DESC')->first();
-        $reviews = Review::with('user.user_details')->where('is_featured', 1)->where('is_approved', 1)->latest()->take(9)->get();
+        $reviews = Cache::remember('home_reviews', $cacheDuration, function () {
+            return Review::with(['user.user_details.city_data', 'user.user_details.state'])
+                ->where('is_featured', 1)
+                ->where('is_approved', 1)
+                ->latest()
+                ->take(9)
+                ->get();
+        });
+
         return view('Frontend/home', compact('Gn_PackagePlanTestAndNotes', 'Gn_PackagePlanTestAndNotes2', 'StudymaterialGovComp', 'StudymaterialGovComp2', 'StudymaterialGovComp3', 'StudymaterialGovComp4', 'StudymaterialGovComp5', 'Gn_PackagePackagelist', 'Gn_PackagePlanInstitute', 'result', 'pdf', 'reviews'));
     }
 

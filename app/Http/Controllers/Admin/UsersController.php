@@ -15,9 +15,16 @@ use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\ImageService;
 
 class UsersController extends Controller
 {
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
     public function index($type = 'all', $franchise = false)
     {
         $data = array();
@@ -308,8 +315,7 @@ class UsersController extends Controller
                 $user['email'] = $inputs['email'];
             }
             if ($file = request()->file('user_image')) {
-                $name = $file->hashName();
-                $details->photo_url = request()->file('user_image')->storeAs('admin/' . $id, $name, 'public');
+                $details->photo_url = $this->imageService->handleUpload(request()->file('user_image'), 'admin/' . $id, 400);
             }
             if (request()->input('address') && $inputs['address'] !== $details['address']) {
                 $details->address = $inputs['address'];
@@ -439,8 +445,7 @@ class UsersController extends Controller
                 if ($userDb->save()) {
                     $userDetailsDb->user_id =  $userDb->id;
                     if ($file = request()->file('user_logo')) {
-                        $name                       = $file->hashName();
-                        $userDetailsDb->photo_url   = request()->file('user_logo')->storeAs('student_uploads/' . $userDb->id, $name, 'public');
+                        $userDetailsDb->photo_url   = $this->imageService->handleUpload(request()->file('user_logo'), 'student_uploads/' . $userDb->id, 400);
                     }
                     $userDetailsDb->save();
                     User::generateCounts();

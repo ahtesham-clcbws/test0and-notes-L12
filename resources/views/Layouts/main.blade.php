@@ -758,27 +758,27 @@
     <!-- bootstrap js -->
     <script src="{{ asset('js/bootstrap4.min.js') }}"></script>
     <!-- owl.carousel js -->
-    <script src="{{ asset('js/owl.carousel.min.js') }}"></script>
+    <script src="{{ asset('js/owl.carousel.min.js') }}" defer></script>
     <!-- slick.min js -->
-    <script src="{{ asset('js/slick.min.js') }}"></script>
+    <script src="{{ asset('js/slick.min.js') }}" defer></script>
     <!-- isotope.pkgd.min js -->
-    <script src="{{ asset('js/isotope.pkgd.min.js') }}"></script>
+    <script src="{{ asset('js/isotope.pkgd.min.js') }}" defer></script>
     <!-- imagesloaded.pkgd.min js -->
-    <script src="{{ asset('js/imagesloaded.pkgd.min.js') }}"></script>
+    <script src="{{ asset('js/imagesloaded.pkgd.min.js') }}" defer></script>
     <!-- wow js -->
-    <script src="{{ asset('js/wow.min.js') }}"></script>
+    <script src="{{ asset('js/wow.min.js') }}" defer></script>
     <!-- counter top js -->
-    <script src="{{ asset('js/waypoints.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.counterup.min.js') }}"></script>
+    <script src="{{ asset('js/waypoints.min.js') }}" defer></script>
+    <script src="{{ asset('js/jquery.counterup.min.js') }}" defer></script>
     <!-- magnific popup -->
-    <script src="{{ asset('js/jquery.magnific-popup.min.js') }}"></script>
+    <script src="{{ asset('js/jquery.magnific-popup.min.js') }}" defer></script>
     <!-- rsmenu js -->
-    <script src="{{ asset('js/rsmenu-main.js') }}"></script>
+    <script src="{{ asset('js/rsmenu-main.js') }}" defer></script>
     <!-- plugins js -->
-    <script src="{{ asset('js/plugins.js') }}"></script>
+    <script src="{{ asset('js/plugins.js') }}" defer></script>
     <!-- main js -->
-    <script src="{{ asset('js/main.js') }}"></script>
-    <script src="{{ asset('js/jquery.validate.js') }}"></script>
+    <script src="{{ asset('js/main.js') }}" defer></script>
+    <script src="{{ asset('js/jquery.validate.js') }}" defer></script>
 
     <script>
         jQuery(document).ready(function($) {

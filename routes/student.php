@@ -65,7 +65,7 @@ Route::name('student.')->group(function () {
                 Route::any('viewmaterial/{file}', [StudymaterialController::class, 'viewMaterial'])->name('viewmaterial');
             });
 
-            Route::prefix('review')->group(function () {
+            Route::prefix('feedback')->group(function () {
                 Route::get('', [App\Http\Controllers\Student\ReviewController::class, 'index'])->name('review.index');
                 Route::post('store', [App\Http\Controllers\Student\ReviewController::class, 'store'])->name('review.store');
             });

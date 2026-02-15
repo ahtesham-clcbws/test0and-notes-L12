@@ -4,7 +4,7 @@
             <div class="col-md-3">
                 <div class="logo">
                     <img class="img-fluid" src="{{ asset('logos/logo-transparent.png') }}"
-                        alt="Test & Notes Logo" style="max-width:214px">
+                        alt="Test & Notes Logo" style="max-width:214px" loading="lazy">
                 </div>
                 <p class="mt-2" style="font-family: 'Cookie', cursive;">Dedicated Online Test Platform
                     For Institutions</p>

@@ -32,10 +32,10 @@ class UserDetails extends Model
     }
     public function city_data()
     {
-        return $this->belongsTo(City::class);
+        return $this->belongsTo(City::class, 'city');
     }
     public function state()
     {
-        return $this->belongsTo(State::class);
+        return $this->belongsTo(State::class, 'state');
     }
 }

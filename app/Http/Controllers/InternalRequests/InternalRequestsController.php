@@ -43,14 +43,19 @@ use App\Models\Studymaterial;
 use Illuminate\Support\Facades\Log;
 use App\Models\Gn_DisplayClassSubject;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ImageService;
 
 class InternalRequestsController extends Controller
 {
     protected $returnResponse;
-    // public function __construct()
-    // {
-    //     $this->returnResponse = ['success' => false, 'type' => 'server', 'message' => 'Server error, please try after some time.'];
-    // }
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+        // $this->returnResponse = ['success' => false, 'type' => 'server', 'message' => 'Server error, please try after some time.'];
+    }
+
     public function index(Request $request)
     {
 
@@ -307,9 +312,8 @@ class InternalRequestsController extends Controller
                 $corporateDb->branch_code = generateBranchCode($validatedData['institute_name']);
 
                 if ($request->hasFile('corporate_logo')) {
-                    $file = $request->file('corporate_logo');
-                    $name = $file->hashName();
-                    $corporateDb->photoUrl = $file->store('institute/image', 'public');
+                    $fullPath = $this->imageService->handleUpload($request->file('corporate_logo'), 'institute/image', 800);
+                    $corporateDb->photoUrl = $fullPath;
                 }
 
                 if ($request->hasFile('institute_images_pdf')) {
@@ -457,9 +461,9 @@ class InternalRequestsController extends Controller
                     if ($request->input('institute_code')) {
                         $userDetailsDb->institute_code =  filter_var($request->input('institute_code'));
                     }
-                    if ($file = $request->file('user_logo')) {
-                        $name = $file->hashName();
-                        $userDetailsDb->photo_url = $request->file('user_logo')->storeAs('student_uploads/' . $userDb->id, $name, 'public');
+                    if ($request->hasFile('user_logo')) {
+                        $fullPath = $this->imageService->handleUpload($request->file('user_logo'), 'student_uploads/' . $userDb->id, 400);
+                        $userDetailsDb->photo_url = $fullPath;
                     }
 
                     $userDetailsDb->days = '7';
@@ -1350,8 +1354,8 @@ class InternalRequestsController extends Controller
                     if ($userDb->save()) {
                         $userDetailsDb->user_id =  $userDb->id;
                         if ($file = request()->file('user_logo')) {
-                            $name = $file->hashName();
-                            $userDetailsDb->photo_url = request()->file('user_logo')->storeAs('student_uploads/' . $userDb->id, $name, 'public');
+                            $fullPath = $this->imageService->handleUpload(request()->file('user_logo'), 'student_uploads/' . $userDb->id, 400);
+                            $userDetailsDb->photo_url = $fullPath;
                         }
                         $userDetailsDb->save();
                         return response()->json(['status' => true, 'message' => 'User Created Successfully!']);

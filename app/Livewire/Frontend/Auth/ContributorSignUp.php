@@ -196,7 +196,8 @@ class ContributorSignUp extends Component
                 $userDetailsDb->user_id =  $userDb->id;
 
                 if ($this->user_logo) {
-                    $userDetailsDb->photo_url = $this->user_logo->store('contributor_uploads/' . $userDb->id, 'public');
+                    $fullPath = app(\App\Services\ImageService::class)->handleUpload($this->user_logo, 'contributor_uploads/' . $userDb->id, 400);
+                    $userDetailsDb->photo_url = $fullPath;
                 }
 
                 $userDetailsDb->save();

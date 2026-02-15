@@ -134,7 +134,8 @@ Route::name('administrator.')->group(function () {
                 Route::any('manage_home', [SettingsController::class, 'manage_home'])->name('manage_home');
                 Route::post('manage_home_process', [SettingsController::class, 'manage_home_process'])->name('manage_home_process');
                 Route::get('slider_delete/{image}', [SettingsController::class, 'slider_delete'])->name('slider_delete');
-    Route::post('upload_partner_logos', [SettingsController::class, 'upload_partner_logos'])->name('upload_partner_logos');
+                Route::post('update_slider_url', [SettingsController::class, 'update_slider_url'])->name('update_slider_url');
+                Route::post('upload_partner_logos', [SettingsController::class, 'upload_partner_logos'])->name('upload_partner_logos');
                 Route::any('pdf-list', [SettingsController::class, 'pdfList'])->name('dashboard_add_pdf_content');
                 Route::post('pdf-submit', [SettingsController::class, 'pdfSubmit'])->name('pdf_submit');
                 Route::post('pdf-delete', [SettingsController::class, 'pdfDelete'])->name('pdf_delete');

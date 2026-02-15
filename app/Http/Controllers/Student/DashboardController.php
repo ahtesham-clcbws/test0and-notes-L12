@@ -17,10 +17,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendOtpMail;
 
+use App\Services\ImageService;
+
 class DashboardController extends Controller
 {
     public $returnResponse = [];
-    public function __construct(){
+    protected $imageService;
+
+    public function __construct(ImageService $imageService){
+        $this->imageService = $imageService;
         $this->returnResponse = [
             'message' => null,
             'success' => false
@@ -215,9 +220,7 @@ class DashboardController extends Controller
 
         // Handle photo upload
         if ($req->hasfile('photo_url')) {
-            $file = $req->file('photo_url');
-            $name = $file->hashName();
-            $image_name = $req->file('photo_url')->storeAs('student_uploads/' . $user->id, $name, 'public');
+            $image_name = $this->imageService->handleUpload($req->file('photo_url'), 'student_uploads/' . $user->id, 400);
             DB::table('user_details')
                 ->where('user_id', Auth::user()->id)
                 ->update(['photo_url' => $image_name]);

@@ -8,12 +8,20 @@ use App\Models\DefautlOtpNumber;
 use App\Models\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\ImageService;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 
 class SettingsController extends Controller
 {
+    protected $imageService;
+
+    public function __construct(ImageService $imageService)
+    {
+        $this->imageService = $imageService;
+    }
     public function dashboardSettings()
     {
         $data = array();
@@ -146,12 +154,11 @@ class SettingsController extends Controller
                     Storage::disk('public')->delete($old_profile);
                 }
             }
-            $file = $request->file('banner_photo');
-            $name = microtime(true) . time() . rand(1, 100) . '.' . $file->getClientOriginalExtension();
-            $path = 'home/' . $name;
-            Storage::disk('public')->put($path, file_get_contents($file));
-            $banner_photo = $name;
-            // $model->banner_photo=$name == null ? $request->post('banner_photo') : $name;
+
+            // Use ImageService
+            $fullPath = $this->imageService->handleUpload($request->file('banner_photo'), 'home', 2000); // 2000px for banner
+            $banner_photo = basename($fullPath);
+
             $query->update([
                 'banner_photo' => $banner_photo,
             ]);
@@ -171,12 +178,10 @@ class SettingsController extends Controller
                 }
             }
 
-            $file = $request->file('banner_attr_image_1');
-            $name = microtime(true) . time() . rand(1, 100) . '.' . $file->getClientOriginalExtension();
-            $path = 'home/' . $name;
-            Storage::disk('public')->put($path, file_get_contents($file));
-            $banner_attr_image_1 = $name;
-            // $model->banner_photo=$name == null ? $request->post('banner_photo') : $name;
+            // Use ImageService
+            $fullPath = $this->imageService->handleUpload($request->file('banner_attr_image_1'), 'home', 1024);
+            $banner_attr_image_1 = basename($fullPath);
+
             $query->update([
                 'banner_attr_image_1' => $banner_attr_image_1,
             ]);
@@ -193,12 +198,10 @@ class SettingsController extends Controller
                 }
             }
 
-            $file = $request->file('banner_attr_image_2');
-            $name = microtime(true) . time() . rand(1, 100) . '.' . $file->getClientOriginalExtension();
-            $path = 'home/' . $name;
-            Storage::disk('public')->put($path, file_get_contents($file));
-            $banner_attr_image_2 = $name;
-            // $model->banner_photo=$name == null ? $request->post('banner_photo') : $name;
+            // Use ImageService
+            $fullPath = $this->imageService->handleUpload($request->file('banner_attr_image_2'), 'home', 1024);
+            $banner_attr_image_2 = basename($fullPath);
+
             $query->update([
                 'banner_attr_image_2' => $banner_attr_image_2,
             ]);
@@ -215,12 +218,10 @@ class SettingsController extends Controller
                 }
             }
 
-            $file = $request->file('banner_attr_image_3');
-            $name = microtime(true) . time() . rand(1, 100) . '.' . $file->getClientOriginalExtension();
-            $path = 'home/' . $name;
-            Storage::disk('public')->put($path, file_get_contents($file));
-            $banner_attr_image_3 = $name;
-            // $model->banner_photo=$name == null ? $request->post('banner_photo') : $name;
+            // Use ImageService
+            $fullPath = $this->imageService->handleUpload($request->file('banner_attr_image_3'), 'home', 1024);
+            $banner_attr_image_3 = basename($fullPath);
+
             $query->update([
                 'banner_attr_image_3' => $banner_attr_image_3,
             ]);
@@ -303,26 +304,29 @@ class SettingsController extends Controller
         }
 
         $sliderImages = json_decode($landingPage->slider_footer_image, true);
+        $updatedImages = [];
+        $found = false;
 
-        // 2. Check if image exists in the array
-        if (($key = array_search($image, $sliderImages)) !== false) {
-            // 3. Remove from array
-            unset($sliderImages[$key]);
+        foreach ($sliderImages as $key => $item) {
+            $imgName = is_array($item) ? $item['image'] : $item;
 
-            // Re-index array to prevent JSON object conversion if looking for array
-            $sliderImages = array_values($sliderImages);
+            if ($imgName == $image) {
+                $found = true;
+                // Delete file
+                if (Storage::disk('public')->exists('home/slider/' . $image)) {
+                    Storage::disk('public')->delete('home/slider/' . $image);
+                }
+                continue; // Skip adding this to updated array
+            }
+            $updatedImages[] = $item;
+        }
 
-            // 4. Update Database
+        if ($found) {
             DB::table('landing_page')
                 ->where('id', '1')
                 ->update([
-                    'slider_footer_image' => json_encode($sliderImages),
+                    'slider_footer_image' => json_encode(array_values($updatedImages)),
                 ]);
-
-            // 5. Delete file only after successful DB update (or at least valid check)
-            if (Storage::disk('public')->exists('home/slider/' . $image)) {
-                Storage::disk('public')->delete('home/slider/' . $image);
-            }
 
             return redirect()->back()->with('success', 'Image deleted successfully.');
         }
@@ -330,15 +334,46 @@ class SettingsController extends Controller
         return redirect()->back()->with('error', 'Image not found in slider list.');
     }
 
+    public function update_slider_url(Request $request)
+    {
+        $request->validate([
+            'image' => 'required',
+            'url' => 'nullable|url'
+        ]);
+
+        $landingPage = DB::table('landing_page')->find('1');
+        if (!$landingPage) return redirect()->back();
+
+        $sliderImages = json_decode($landingPage->slider_footer_image, true) ?? [];
+        $updatedImages = [];
+
+        foreach ($sliderImages as $item) {
+            if (is_array($item) && $item['image'] == $request->image) {
+                $item['url'] = $request->url;
+            } elseif (!is_array($item) && $item == $request->image) {
+                // Convert string to object if matching
+                $item = ['image' => $item, 'url' => $request->url];
+            }
+            $updatedImages[] = $item;
+        }
+
+        DB::table('landing_page')->where('id', '1')->update([
+            'slider_footer_image' => json_encode($updatedImages),
+        ]);
+        Cache::forget('home_landing_pages');
+        return redirect()->back()->with('success', 'URL updated successfully.');
+    }
+
     public function upload_partner_logos(Request $request)
     {
         if ($request->hasfile('slider_footer_image')) {
             $images = [];
             foreach ($request->file('slider_footer_image') as $image) {
-                $name = microtime(true) . time() . rand(1, 100) . '.' . $image->getClientOriginalExtension();
-                $path = 'home/slider/' . $name;
-                Storage::disk('public')->put($path, file_get_contents($image));
-                $images[] = $name;
+                // Use ImageService for each logo
+                $fullPath = $this->imageService->handleUpload($image, 'home/slider', 1024);
+
+                // Store as object with empty URL initially
+                $images[] = ['image' => basename($fullPath), 'url' => ''];
             }
 
             $currentData = DB::table('landing_page')->find('1')->slider_footer_image;
@@ -354,7 +389,7 @@ class SettingsController extends Controller
             DB::table('landing_page')->where('id', '1')->update([
                 'slider_footer_image' => json_encode($updatedImages),
             ]);
-
+            Cache::forget('home_landing_pages');
             return redirect()->back()->with('success', 'Partner logos uploaded successfully.');
         }
 

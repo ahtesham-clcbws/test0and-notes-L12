@@ -33,6 +33,7 @@ use App\Models\Gn_DisplayClassSubject;
 use Illuminate\Support\Facades\Auth;
 use App\Services\ExamService;
 use Illuminate\Support\Facades\DB;
+use App\Services\ImageService;
 
 class ExamsController extends Controller
 {
@@ -40,10 +41,12 @@ class ExamsController extends Controller
     protected $insert_data;
     protected $diff_data;
     protected $examService;
+    protected $imageService;
 
-    public function __construct(ExamService $examService)
+    public function __construct(ExamService $examService, ImageService $imageService)
     {
         $this->examService = $examService;
+        $this->imageService = $imageService;
         $this->data = array();
 
         $this->data['educations']       = Educationtype::get();
@@ -150,8 +153,9 @@ class ExamsController extends Controller
                 $testMd->negative_marks             = $inputs['negative_marks'];
                 $testMd->sections                   = $inputs['no_of_sections'];
                 $testMd->total_questions            = $inputs['total_questions'];
-                if(isset($req->test_image)){
-                    $testMd->test_image = (isset($req->test_image)) ? $req->file('test_image')->storeAs('test_image', preg_replace('/\s+/', '', $req->file('test_image')->getClientOriginalName()), 'public') : null;
+                if($req->hasFile('test_image')){
+                    $fullPath = $this->imageService->handleUpload($req->file('test_image'), 'test_image', 800);
+                    $testMd->test_image = $fullPath; // Store full path/filename as per service return
                 }
                 $testMd->education_type_id          = $inputs['education_type_id'];
                 $testMd->education_type_child_id    = $inputs['class_group_exam_id'];
@@ -765,8 +769,8 @@ class ExamsController extends Controller
                         $class->summary = $inputs['summary'];
 
                         if ($req->hasFile('image')) {
-                            $path = $req->file('image')->store('classes', 'public');
-                            $class->image = $path;
+                            $fullPath = $this->imageService->handleUpload($req->file('image'), 'classes', 800);
+                            $class->image = $fullPath;
                         }
 
                         $queryMd = $class;
@@ -1918,22 +1922,22 @@ class ExamsController extends Controller
     public function manage_test_cat_process(Request $req){
 
     if ($req->post('id') > 0) {
-    // Update existing record
-    if (isset($req->cat_image)) {
-        $imageUrl = $req->file('cat_image')->storeAs('cat_image', preg_replace('/\s+/', '', $req->file('cat_image')->getClientOriginalName()), 'public');
-        DB::table('test_cat')->where('id', $req->post('id'))->update([
-            'cat_name' => $req->post('cat_name'),
-            'cat_image' => $imageUrl
-        ]);
-    } else {
-        DB::table('test_cat')->where('id', $req->post('id'))->update([
-            'cat_name' => $req->post('cat_name'),
-        ]);
-    }
+        // Update existing record
+        if ($req->hasFile('cat_image')) {
+            $imageUrl = $this->imageService->handleUpload($req->file('cat_image'), 'cat_image', 800);
+            DB::table('test_cat')->where('id', $req->post('id'))->update([
+                'cat_name' => $req->post('cat_name'),
+                'cat_image' => $imageUrl
+            ]);
+        } else {
+            DB::table('test_cat')->where('id', $req->post('id'))->update([
+                'cat_name' => $req->post('cat_name'),
+            ]);
+        }
     } else {
         // Insert new record
-        if (isset($req->cat_image)) {
-            $imageUrl = $req->file('cat_image')->storeAs('cat_image', preg_replace('/\s+/', '', $req->file('cat_image')->getClientOriginalName()), 'public');
+        if ($req->hasFile('cat_image')) {
+            $imageUrl = $this->imageService->handleUpload($req->file('cat_image'), 'cat_image', 800);
             DB::table('test_cat')->insert([
                 'cat_name' => $req->post('cat_name'),
                 'cat_image' => $imageUrl
