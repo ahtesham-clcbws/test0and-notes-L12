@@ -130,13 +130,22 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('student.showgk') }}">
-                                @if (auth()->user()->user_details['education_type'] == 51)
-                                    Static GK & Current Affairs
-                                @endif
-                                @if (auth()->user()->user_details['education_type'] == 52)
-                                    Comprehensive Study Material
-                                @endif
-
+                                Static GK & Current Affairs
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('student.showComprehensive') }}">
+                                Comprehensive Study Material
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('student.showShortNotes') }}">
+                                Short Notes & One Liner
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('student.showPremium') }}">
+                                Premium Study Notes
                             </a>
                         </li>
                     </ul>
