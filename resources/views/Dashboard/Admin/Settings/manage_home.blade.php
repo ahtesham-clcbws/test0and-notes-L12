@@ -360,12 +360,20 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                         <div class="form-group">
                             <label class="control-label" for="slider_footer_image">Upload Partner Logos (Select Multiple)</label>
                             <input class="form-control form-control-sm" id="slider_footer_image" name="slider_footer_image[]"
                                 type="file" multiple accept="image/*" required>
                             <small class="text-muted">Supported formats: JPG, PNG, JPEG</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="control-label" for="partner_url">Partner Link (Optional)</label>
+                            <input class="form-control form-control-sm" id="partner_url" name="url"
+                                type="url" placeholder="https://example.com">
+                            <small class="text-muted">This link will be applied to all uploaded logos.</small>
                         </div>
                     </div>
                     <div class="col-md-3 mt-4">

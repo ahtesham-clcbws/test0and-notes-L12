@@ -185,6 +185,7 @@ class ContributorSignUp extends Component
 
             $userDb->is_staff       =  1;
             $userDb->is_franchise   =  0;
+            $userDb->roles          = 'contributor';
 
             $userDb->in_franchise           =  ($this->institute_code == '') ? 0 : 1;
             $userDb->franchise_code         =  $this->institute_code;

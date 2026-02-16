@@ -368,12 +368,14 @@ class SettingsController extends Controller
     {
         if ($request->hasfile('slider_footer_image')) {
             $images = [];
+            $url = $request->input('url', '');
+
             foreach ($request->file('slider_footer_image') as $image) {
                 // Use ImageService for each logo
                 $fullPath = $this->imageService->handleUpload($image, 'home/slider', 1024);
 
-                // Store as object with empty URL initially
-                $images[] = ['image' => basename($fullPath), 'url' => ''];
+                // Store as object with provided URL
+                $images[] = ['image' => basename($fullPath), 'url' => $url];
             }
 
             $currentData = DB::table('landing_page')->find('1')->slider_footer_image;
