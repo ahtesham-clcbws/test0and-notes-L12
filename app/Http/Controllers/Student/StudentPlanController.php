@@ -16,12 +16,22 @@ class StudentPlanController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
+            $type = $request->get('type');
             $model = Gn_PackagePlan::select('gn__package_plans.id', 'plan_name', 'package_type', 'duration', 'final_fees', 'gn__package_plans.status', 'franchise_details.institute_name as my_institute_name')
                 ->leftJoin('franchise_details', 'gn__package_plans.institute_id', 'franchise_details.id')
-                ->where('franchise_details.branch_code', '=', Auth::user()->franchise_code)
-                ->orWhere('gn__package_plans.package_type', '=', 0)
-                ->where('gn__package_plans.status', '=', 1)
-                ->get();
+                ->where(function ($query) {
+                    $query->where('franchise_details.branch_code', '=', Auth::user()->franchise_code)
+                        ->orWhere('gn__package_plans.package_type', '=', 0);
+                })
+                ->where('gn__package_plans.status', '=', 1);
+
+            if ($type == 'premium') {
+                $model->where('gn__package_plans.final_fees', '>', 0);
+            } elseif ($type == 'free') {
+                $model->where('gn__package_plans.final_fees', '=', 0);
+            }
+
+            $model = $model->get();
 
             return DataTables::of($model)
                 ->addIndexColumn()
@@ -40,7 +50,9 @@ class StudentPlanController extends Controller
                     return $tests;
                 })
                 ->addColumn('duration', '{{ $duration }} days')
-                ->addColumn('final_fees', '{{ $final_fees }}')
+                ->addColumn('final_fees', function ($model) {
+                    return $model->final_fees > 0 ? $model->final_fees : 'Free';
+                })
                 ->addColumn('status', '{{ $status == 1 ? "Active" : "Inactive" }}')
                 ->addColumn('edit', function ($model) {
                     return '<a href="' . route('student.plan-checkout', [$model->id]) . '" class="btn btn-success pull-right">Buy</a>';

@@ -93,15 +93,46 @@
                 <div class="collapse" id="packages-collapse">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.plan') }}">
-                                Packages
+                            <a class="nav-link" href="{{ route('student.plan', ['type' => 'premium']) }}">
+                                Premium Packages
                             </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('student.plan', ['type' => 'free']) }}">
+                                Free Packages
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('student.my-plan') }}">
                                 My Packages
                             </a>
                         </li>
                     </ul>
                 </div>
+            </li>
+            <li class="nav-item" style="border: 1px solid black;border-top: 0;">
+                <a class="nav-link" href="{{ route('student.showvideo') }}" aria-current="page">
+                    <div class="row">
+                        <div class="col-4">
+                            <img class="box_icon" src="{{ asset('student1/images/video_note.png') }}">
+                        </div>
+                        <div class="col-8" style="margin:auto;">
+                            Live Classes
+                        </div>
+                    </div>
+                </a>
+            </li>
+            <li class="nav-item" style="border: 1px solid black;border-top: 0;">
+                <a class="nav-link" href="{{ route('student.showgk') }}" aria-current="page">
+                    <div class="row">
+                        <div class="col-4">
+                            <img class="box_icon" src="{{ asset('student1/images/watch.png') }}">
+                        </div>
+                        <div class="col-8" style="margin:auto;">
+                            Current Affairs
+                        </div>
+                    </div>
+                </a>
             </li>
             <li class="nav-item" style="border: 1px solid black;border-top: 0;">
                 <a class="nav-link btn-toggle collapsed rounded" data-bs-toggle="collapse"
@@ -121,16 +152,6 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('student.show') }}">
                                 Study Notes & E-Books
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.showvideo') }}">
-                                Live & Video Classes
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.showgk') }}">
-                                Static GK & Current Affairs
                             </a>
                         </li>
                         <li class="nav-item">

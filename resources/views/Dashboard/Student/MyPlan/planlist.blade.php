@@ -12,6 +12,17 @@
         @enderror
         <div class="dashboard-container mb-5">
             <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        @if(request()->get('type') == 'premium')
+                            Premium Packages
+                        @elseif(request()->get('type') == 'free')
+                            Free Packages
+                        @else
+                            Packages
+                        @endif
+                    </h5>
+                </div>
                 <div class="card-body">
                     <table class="table" id="student_planstable">
                         <thead>
@@ -42,7 +53,12 @@
         var table = $('#student_planstable').DataTable({
             processing: true,
             serverSide: true,
-            ajax: '{!! route("student.plan") !!}',
+            ajax: {
+                url: '{!! route("student.plan") !!}',
+                data: function(d) {
+                    d.type = '{{ request()->get("type") }}';
+                }
+            },
             lengthMenu: [[10, 15, 30, 50],[10, 15, 30, 50]],
             responsive: {
                 details: true
@@ -86,7 +102,7 @@
 
         window.setTimeout(function() {
                 $(".alert").fadeTo(500, 0).slideUp(500, function(){
-                $(this).remove(); 
+                $(this).remove();
             });
         }, 4000);
 
