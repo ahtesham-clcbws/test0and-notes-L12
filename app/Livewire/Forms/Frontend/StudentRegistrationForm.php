@@ -25,6 +25,8 @@ class StudentRegistrationForm extends Form
     public $education_type_id;
     public $class_group_exam_id;
     public $user_logo;
+    public $state;
+    public $city;
     public $required_check_registration;
 
     public function rules()
@@ -50,6 +52,8 @@ class StudentRegistrationForm extends Form
             ],
             'education_type_id' => 'required',
             'class_group_exam_id' => 'required',
+            'state' => 'required',
+            'city' => 'required',
             'user_logo' => 'nullable|file|mimes:jpeg,png,jpg|max:200',
             // 'user_logo' => 'required|file|mimes:jpeg,png,jpg|max:200',
             'required_check_registration' => 'required|accepted',
@@ -77,7 +81,9 @@ class StudentRegistrationForm extends Form
             // 'institute_code.required' => 'Institute Code is required.',
             'institute_code.exists' => 'Invalid Institute Code or Institute is not active.',
             'education_type_id.required' => 'Please select an Education Type.',
-            'class_group_exam_id.required' => 'Please select a Class/Group/Exam.',
+            'class_group_exam_id' => 'required',
+            'state.required' => 'Please select a State.',
+            'city.required' => 'Please select a City.',
             // 'user_logo.required' => 'Profile Image is required.',
             'user_logo.mimes' => 'Profile Image must be a file of type: jpeg, png, jpg.',
             'user_logo.max' => 'Profile Image must not be greater than 200 kilobytes.',
@@ -192,6 +198,8 @@ class StudentRegistrationForm extends Form
                 $userDetailsDb->days = '7';
                 $userDetailsDb->education_type =  filter_var($this->education_type_id, FILTER_SANITIZE_NUMBER_INT);
                 $userDetailsDb->class =  filter_var($this->class_group_exam_id, FILTER_SANITIZE_NUMBER_INT);
+                $userDetailsDb->state =  $this->state;
+                $userDetailsDb->city =  $this->city;
                 $userDetailsDb->save();
                 // send email here
                 User::generateCounts();

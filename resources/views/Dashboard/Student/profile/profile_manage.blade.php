@@ -36,6 +36,30 @@
                 </div>
 
                 <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">State</label>
+                            <select class="form-control form-control-sm" name="state" id="profile_state" style="border: 1px solid #aaa;" required onchange="loadCities(this.value)">
+                                <option value="">Select State</option>
+                                @foreach($states as $state)
+                                    <option value="{{ $state->id }}" {{ $user->user_details->getAttribute('state') == $state->id ? 'selected' : '' }}>{{ $state->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label">City</label>
+                            <select class="form-control form-control-sm" name="city" id="profile_city" style="border: 1px solid #aaa;" required>
+                                <option value="">Select City</option>
+                                @foreach($cities as $city)
+                                    <option value="{{ $city->id }}" {{ $user->user_details->getAttribute('city') == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
                     <div class="col-md-12">
                         <button class="btn btn-primary float-right" type="submit">Update Profile</button>
                     </div>
@@ -285,6 +309,26 @@
                 output.style.display = 'block';
             }
             reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function loadCities(stateId) {
+            if (!stateId) {
+                $('#profile_city').html('<option value="">Select City</option>').attr('disabled', true);
+                return;
+            }
+
+            $.post("/", {
+                form_name: 'get_cities',
+                state_id: stateId,
+                _token: "{{ csrf_token() }}"
+            }, function(data) {
+                var cities = JSON.parse(data);
+                var options = '<option value="">Select City</option>';
+                cities.forEach(function(city) {
+                    options += '<option value="' + city.id + '">' + city.name + '</option>';
+                });
+                $('#profile_city').html(options).removeAttr('disabled');
+            });
         }
     </script>
 @endsection

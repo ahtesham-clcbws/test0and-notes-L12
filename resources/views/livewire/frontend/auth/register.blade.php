@@ -206,6 +206,45 @@
                                     </div>
                                 </div>
 
+                                <div class="col-6">
+                                    <div class="form-group mb-3">
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fa fa-map-marker" aria-hidden="true"></i>
+                                            </span>
+                                            <select class="form-control" wire:model.live="form.state">
+                                                <option value="" selected>Select State</option>
+                                                @foreach ($states as $s)
+                                                    <option value="{{ $s->id }}">{{ $s->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        @error('form.state')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-6">
+                                    <div class="form-group mb-3">
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fa fa-building" aria-hidden="true"></i>
+                                            </span>
+                                            <select class="form-control" wire:model="form.city"
+                                                {{ !$form->state ? ' disabled ' : '' }}>
+                                                <option value="" selected>Select City</option>
+                                                @foreach ($cities as $ct)
+                                                    <option value="{{ $ct->id }}">{{ $ct->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        @error('form.city')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
                                 <div class="col-12">
                                     <div class="form-group mb-3">
                                         <label>You can attach jpeg / png file (max size: 200 kb)</label>

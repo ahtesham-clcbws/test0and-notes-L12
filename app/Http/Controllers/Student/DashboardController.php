@@ -80,8 +80,12 @@ class DashboardController extends Controller
     {
 
         $result['user'] = User::where('id', Auth::user()->id)->first();
-
-        // return $result['user'];
+        $result['states'] = \App\Models\State::where('country_id', 101)->get();
+        $userDetails = UserDetails::where('user_id', Auth::user()->id)->first();
+        $result['cities'] = [];
+        if ($userDetails && $userDetails->state) {
+            $result['cities'] = \App\Models\City::where('state_id', $userDetails->state)->get();
+        }
 
         return view('Dashboard/Student/profile/profile_manage', $result);
     }
@@ -225,6 +229,14 @@ class DashboardController extends Controller
                 ->where('user_id', Auth::user()->id)
                 ->update(['photo_url' => $image_name]);
         }
+
+        // Update state and city
+        DB::table('user_details')
+            ->where('user_id', Auth::user()->id)
+            ->update([
+                'state' => $req->state,
+                'city' => $req->city
+            ]);
 
         $req->session()->flash('message', 'Profile Updated.');
         return redirect()->back();

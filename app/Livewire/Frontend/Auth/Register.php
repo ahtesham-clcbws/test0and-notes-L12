@@ -12,11 +12,13 @@ use Livewire\WithFileUploads;
 class Register extends Component
 {
     use WithFileUploads;
-    
+
     public StudentRegistrationForm $form;
 
     public $isOtpSend = false;
     public $otpVerificationStatus = false;
+    public $states = [];
+    public $cities = [];
 
     public function testFormInput()
     {
@@ -36,6 +38,21 @@ class Register extends Component
     public function updatedFormEducationTypeId($value)
     {
         $this->form->class_group_exam_id = null;
+    }
+
+    public function updatedFormState($value)
+    {
+        $this->form->city = null;
+        if ($value) {
+            $this->cities = \App\Models\City::where('state_id', $value)->get();
+        } else {
+            $this->cities = [];
+        }
+    }
+
+    public function mount()
+    {
+        $this->states = \App\Models\State::where('country_id', 101)->get(); // 101 is usually India in common datasets
     }
 
     public function render()

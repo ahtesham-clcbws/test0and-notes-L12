@@ -56,6 +56,11 @@
                 <div class="collapse" id="test-quizes-collapse">
                     <ul class="nav flex-column">
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ route('student.test-attempt') }}">
+                                Attempted Test
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ route('student.dashboard_tests_list') }}">
                                 Institute Test
                             </a>
@@ -69,11 +74,6 @@
                             </li>
                             @endforeach
                         @endif
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.test-attempt') }}">
-                                My Test
-                            </a>
-                        </li>
                     </ul>
                 </div>
             </li>
