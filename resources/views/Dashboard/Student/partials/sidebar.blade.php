@@ -15,7 +15,7 @@
         </div>
         <ul class="nav flex-column">
             <li class="nav-item" style="border: 1px solid black;">
-                <a class="nav-link active" href="{{ route('home_page') }}" aria-current="page">
+                <a class="nav-link active btn-toggle collapsed rounded" href="{{ route('home_page') }}" aria-current="page">
                     <div class="row">
                         <div class="col-4">
                             <img class="box_icon" src="{{ asset('student1/images/menu-home.jpeg') }}">
@@ -28,7 +28,7 @@
                 </a>
             </li>
             <li class="nav-item" style="border: 1px solid black;border-top: 0;">
-                <a class="nav-link" href="{{ route('student.dashboard') }}" aria-current="page">
+                <a class="nav-link btn-toggle collapsed rounded" href="{{ route('student.dashboard') }}" aria-current="page">
                     <div class="row">
                         <div class="col-4">
                             <img class="box_icon" src="{{ asset('student1/images/test_attempt.png') }}">
@@ -78,40 +78,7 @@
                 </div>
             </li>
             <li class="nav-item" style="border: 1px solid black;border-top: 0;">
-                <a class="nav-link btn-toggle collapsed rounded" data-bs-toggle="collapse"
-                    data-bs-target="#packages-collapse" aria-expanded="false">
-                    <div class="row">
-                        <div class="col-4">
-                            <img class="box_icon" src="{{ asset('student1/images/menu-package.jpeg') }}">
-                        </div>
-                        <div class="col-8" style="margin:auto;">
-                            Packages
-                        </div>
-                    </div>
-
-                </a>
-                <div class="collapse" id="packages-collapse">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.plan', ['type' => 'premium']) }}">
-                                Premium Packages
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.plan', ['type' => 'free']) }}">
-                                Free Packages
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.my-plan') }}">
-                                My Packages
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-            <li class="nav-item" style="border: 1px solid black;border-top: 0;">
-                <a class="nav-link" href="{{ route('student.showvideo') }}" aria-current="page">
+                <a class="nav-link btn-toggle collapsed rounded" href="{{ route('student.showvideo') }}" aria-current="page">
                     <div class="row">
                         <div class="col-4">
                             <img class="box_icon" src="{{ asset('student1/images/video_note.png') }}">
@@ -123,7 +90,7 @@
                 </a>
             </li>
             <li class="nav-item" style="border: 1px solid black;border-top: 0;">
-                <a class="nav-link" href="{{ route('student.showgk') }}" aria-current="page">
+                <a class="nav-link btn-toggle collapsed rounded" href="{{ route('student.showgk') }}" aria-current="page">
                     <div class="row">
                         <div class="col-4">
                             <img class="box_icon" src="{{ asset('student1/images/watch.png') }}">
@@ -173,7 +140,40 @@
                 </div>
             </li>
             <li class="nav-item" style="border: 1px solid black;border-top: 0;">
-                <a class="nav-link" href="{{ route('student.review.index') }}" aria-current="page">
+                <a class="nav-link btn-toggle collapsed rounded" data-bs-toggle="collapse"
+                    data-bs-target="#packages-collapse" aria-expanded="false">
+                    <div class="row">
+                        <div class="col-4">
+                            <img class="box_icon" src="{{ asset('student1/images/menu-package.jpeg') }}">
+                        </div>
+                        <div class="col-8" style="margin:auto;">
+                            Packages
+                        </div>
+                    </div>
+
+                </a>
+                <div class="collapse" id="packages-collapse">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('student.plan', ['type' => 'premium']) }}">
+                                Premium Packages
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('student.plan', ['type' => 'free']) }}">
+                                Free Packages
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('student.my-plan') }}">
+                                My Packages
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item" style="border: 1px solid black;border-top: 0;">
+                <a class="nav-link btn-toggle collapsed rounded" href="{{ route('student.review.index') }}" aria-current="page">
                     <div class="row">
                         <div class="col-4">
                             <img class="box_icon" src="{{ asset('student1/images/test_attempt.png') }}">

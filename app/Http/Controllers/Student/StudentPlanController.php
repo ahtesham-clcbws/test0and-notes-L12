@@ -25,10 +25,19 @@ class StudentPlanController extends Controller
                 })
                 ->where('gn__package_plans.status', '=', 1);
 
+            $active_plans = Gn_PackageTransaction::where('student_id', Auth::user()->id)
+                ->where('plan_status', 1)
+                ->pluck('plan_id')
+                ->toArray();
+
             if ($type == 'premium') {
-                $model->where('gn__package_plans.final_fees', '>', 0);
+                $model->where('gn__package_plans.final_fees', '>', 0)
+                    ->whereNotIn('gn__package_plans.id', $active_plans);
             } elseif ($type == 'free') {
                 $model->where('gn__package_plans.final_fees', '=', 0);
+            } elseif ($type == 'purchased') {
+                $model->whereIn('gn__package_plans.id', $active_plans)
+                    ->where('gn__package_plans.final_fees', '>', 0);
             }
 
             $model = $model->get();
@@ -54,7 +63,13 @@ class StudentPlanController extends Controller
                     return $model->final_fees > 0 ? $model->final_fees : 'Free';
                 })
                 ->addColumn('status', '{{ $status == 1 ? "Active" : "Inactive" }}')
-                ->addColumn('edit', function ($model) {
+                ->addColumn('edit', function ($model) use ($active_plans) {
+                    if (in_array($model->id, $active_plans)) {
+                        return '<a href="' . route('student.package_manage', [$model->id]) . '" class="btn btn-sm btn-info">View</a>';
+                    }
+                    if ($model->final_fees == 0) {
+                        return '<a href="' . route('student.plan-checkout', [$model->id]) . '" class="btn btn-sm btn-info">View</a>';
+                    }
                     return '<a href="' . route('student.plan-checkout', [$model->id]) . '" class="btn btn-success pull-right">Buy</a>';
                 })
                 ->rawColumns(['edit'])
@@ -74,9 +89,10 @@ class StudentPlanController extends Controller
             // get();
 
             $model = Gn_PackageTransaction::select('gn__package_transactions.id', 'gn__package_transactions.plan_name', 'gn__package_plans.package_type', 'gn__package_transactions.plan_start_date', 'gn__package_transactions.plan_end_date',
-                    'gn__package_plans.duration', 'gn__package_plans.final_fees', 'gn__package_transactions.plan_status')
+                    'gn__package_plans.duration', 'gn__package_plans.final_fees', 'gn__package_transactions.plan_status', 'gn__package_transactions.plan_id')
                 ->leftJoin('gn__package_plans', 'gn__package_transactions.plan_id', 'gn__package_plans.id')
                 ->where('gn__package_transactions.student_id', Auth::user()->id)
+                ->where('gn__package_plans.final_fees', '>', 0)
                 ->get();
 
             return Datatables::of($model)
@@ -124,10 +140,13 @@ class StudentPlanController extends Controller
                             break;
                     }
                 })
-                // ->addColumn('edit',function($model){
-                //     return '<a href="'. route('student.plan-checkout',[$model->id]) .'" class="btn btn-success pull-right">Buy</a>';
-                // })
-                ->rawColumns(['edit'])
+                ->addColumn('actions', function ($model) {
+                    if ($model->plan_status == 1) {
+                        return '<a href="' . route('student.package_manage', [$model->plan_id]) . '" class="btn btn-sm btn-info">View</a>';
+                    }
+                    return '-';
+                })
+                ->rawColumns(['actions'])
                 ->make(true);
         }
         return view('Dashboard/Student/MyPlan/myplanlist');
@@ -139,11 +158,43 @@ class StudentPlanController extends Controller
         if ($package_plan == null || $package_plan->status != 1) {
             return redirect()->route('student.plan');
         }
+
+        // Handle Free Plan Acquisition
+        if($package_plan->final_fees == 0) {
+            $already_active = Gn_PackageTransaction::where('student_id', Auth::user()->id)
+                ->where('plan_id', $plan_id)
+                ->where('plan_status', 1)
+                ->exists();
+
+            if($already_active) {
+                return redirect()->route('student.package_manage', [$plan_id]);
+            }
+
+            $transaction_id = 'gyn-free-' . uniqid();
+            $package_checkout = new Gn_PackageTransaction();
+            $package_checkout->student_id = Auth::user()->id;
+            $package_checkout->plan_id = $package_plan->id;
+            $package_checkout->plan_amount = 0;
+            $package_checkout->plan_name = $package_plan->plan_name;
+            $package_checkout->plan_duration = $package_plan->duration;
+            $package_checkout->transaction_id = $transaction_id;
+            $package_checkout->transaction_date = strtotime(date('m/d/Y'));
+            $package_checkout->plan_start_date = strtotime(date('m/d/Y'));
+            $package_checkout->plan_end_date = strtotime(date('m/d/Y', strtotime('+' . $package_plan->duration . ' days')));
+            $package_checkout->plan_status = 1;
+            $package_checkout->save();
+
+            return redirect()->route('student.package_manage', [$package_checkout->plan_id]);
+        }
+
         $transaction_id = 'gyn-' . uniqid();
         $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
         $response = $api->order->create(array('amount' => intval($package_plan->final_fees * 100), 'currency' => 'INR'));
         $order_id = $response['id'];
         $already_plan = Gn_PackageTransaction::select('id')->where('student_id', Auth::user()->id)->where('plan_id', $plan_id)->get();
+        if ($already_plan->count() > 0) {
+             // If user already has a pending or previous transaction for this plan, we might want to queue it or just continue
+        }
         if ($response) {
             $package_checkout = new Gn_PackageTransaction();
             $package_checkout->student_id = Auth::user()->id;
@@ -157,18 +208,6 @@ class StudentPlanController extends Controller
             if (count($already_plan) > 0) {
                 $package_checkout->plan_in_queue = 1;
             }
-            // if(Auth::user()->is_active_package == 0) {
-            //     $profile_plan->plan_start_date  = null;
-            //     $profile_plan->plan_end_date    = null;
-            //     $profile_plan->plan_status      = 0;
-            // }
-            // else {
-            //     $profile_plan->plan_start_date      = strtotime(date('m/d/Y'));
-            //     $profile_plan->plan_end_date        = strtotime(date('m/d/Y', strtotime("+". $package_plan->duration ." days")));
-            //     $profile_plan->plan_status          = 1;
-            //     Auth::user()->is_active_package   = 1;
-            //     Auth::user()->package_expiry_date = strtotime(date('m/d/Y', strtotime("+". $package_plan->duration ." days")));
-            // }
             $package_checkout->save();
         } else {
             return redirect()->route('student.plan');
@@ -199,7 +238,7 @@ class StudentPlanController extends Controller
             }
             $package_plan->save();
 
-            return response()->json(['data' => 'success']);
+            return response()->json(['data' => 'success', 'plan_id' => $package_plan->plan_id]);
         }
 
         if ($payment['status'] == 'failed') {

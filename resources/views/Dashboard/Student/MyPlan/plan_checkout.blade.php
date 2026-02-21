@@ -149,7 +149,9 @@
                             var data_false = "/student/plan";
                             window.location.replace(data_false);
                         } else if (response.data == 'success') {
-                            var success = "{{ route('student.payment-success')}}";
+                            var plan_id = response.plan_id;
+                            var success = "{{ route('student.package_manage', ['id' => ':id']) }}";
+                            success = success.replace(':id', plan_id);
                             window.location.replace(success);
                         } else if (response.data == 'failed') {
                             var failed = "{{ route('student.payment-failed')}}";

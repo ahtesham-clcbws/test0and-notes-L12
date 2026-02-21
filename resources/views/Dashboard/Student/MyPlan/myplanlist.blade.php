@@ -24,7 +24,7 @@
                                 <th scope="col">Duration</th>
                                 <th scope="col">Fees</th>
                                 <th scope="col">Status</th>
-                                <!-- <th class="text-end">Actions</th> -->
+                                <th class="text-end">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -63,8 +63,8 @@
                 {data: 'duration'},
                 {data: 'final_fees'},
                 {data: 'plan_status'},
-                // {data: 'edit',orderable: false},
-                
+                {data: 'actions', orderable: false, searchable: false},
+
             ],
 
         });
@@ -87,7 +87,7 @@
 
         window.setTimeout(function() {
                 $(".alert").fadeTo(500, 0).slideUp(500, function(){
-                $(this).remove(); 
+                $(this).remove();
             });
         }, 4000);
 
