@@ -21,6 +21,7 @@
         <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
         <link href="{{ asset('css/dashboard.css') }}" rel="stylesheet">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @livewireStyles
         @yield('css')
 
         <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
@@ -609,6 +610,7 @@
                 });
             }
         </script>
+        @livewireScripts
         @yield('javascript')
 
         @stack('scripts')

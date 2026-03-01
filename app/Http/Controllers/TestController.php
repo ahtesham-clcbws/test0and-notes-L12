@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\TestModal;
+use App\Models\Gn_StudentTestAttempt;
 use App\Models\Gn_Test_Response;
 use App\Models\QuestionBankModel;
-use App\Models\Gn_StudentTestAttempt;
+use App\Models\TestModal;
 use App\Models\User;
 use App\Models\UserDetails;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class TestController extends Controller
 {
-
     protected $data;
+
     public function onlineTest()
     {
         return view('Frontend/online-test');
@@ -24,8 +24,8 @@ class TestController extends Controller
     public function getTest(Request $request, $name)
     {
         $id = Auth::id();
-        $test               = TestModal::find($name);
-        if (empty($test) || !empty($test->institude)) {
+        $test = TestModal::find($name);
+        if (empty($test) || ! empty($test->institude)) {
             return redirect('/');
         }
 
@@ -63,16 +63,17 @@ class TestController extends Controller
     public function startTest($name)
     {
         $test = TestModal::find($name);
-        if (empty($test) || !empty($test->institude)) {
+        if (empty($test) || ! empty($test->institude)) {
             if (Auth::user()->myInstitute->id == $test->institude->id) {
                 return redirect()->route('student.start-test', [$name]);
             }
+
             return redirect('/');
         }
 
         $this->data['test_start'] = $test;
         // $this->data['questions']  = $test->getQuestions()->wherePivot('deleted_at','=',NULL);
-        $this->data['questions']  = $test->getQuestions()->wherePivot('deleted_at', '=', NULL)->get()->groupBy('pivot.section_id');
+        $this->data['questions'] = $test->getQuestions()->wherePivot('deleted_at', '=', null)->get()->groupBy('pivot.section_id');
         // dd($test->getQuestions()->wherePivot('deleted_at','=',NULL)->get()->groupBy('pivot.section_id'));
         // dd($test->getQuestions()->get()->pluck('pivot')->toArray()); subject
         // dd($this->data['test_start']->getSection);
@@ -82,6 +83,7 @@ class TestController extends Controller
             $time[$key] = $section['number_of_questions'] * $section['duration'];
         }
         $this->data['test_duration'] = array_sum($time);
+
         return view('Frontend/start-test')->with('data', $this->data);
     }
 
@@ -93,38 +95,38 @@ class TestController extends Controller
         }
         $old_test_response = Gn_Test_Response::where('student_id', Auth::user()->id)->where('test_id', $name);
 
-        if (!empty($old_test_response->get())) {
+        if (! empty($old_test_response->get())) {
             $old_test_response->delete();
         }
 
         foreach ($request->attemted_questions as $key => $value) {
-            $test_response              = new Gn_Test_Response();
-            $test_response->student_id  = Auth::user()->id;
-            $test_response->test_id     = $name;
+            $test_response = new Gn_Test_Response;
+            $test_response->student_id = Auth::user()->id;
+            $test_response->test_id = $name;
             if ($value == 1) {
                 $test_response->question_id = $key;
-                $test_response->answer      = $request->question[$key];
+                $test_response->answer = $request->question[$key];
             } else {
                 $test_response->question_id = $key;
             }
             $test_response->save();
         }
 
-        $old_student_test = Gn_StudentTestAttempt::where('student_id', Auth::user()->id)->where('test_id', $name);
+        $old_student_test = Gn_StudentTestAttempt::where('student_id', Auth::user()->id)->where('test_id', $name)->first();
 
-        if (!empty($old_student_test->get())) {
-            $old_student_test->delete();
+        if ($old_student_test) {
+            return redirect('show-result/'.Auth::user()->id.'/'.$name)->withErrors(['testError' => 'You have already submitted this test.']);
         }
 
-        $student_test               = new Gn_StudentTestAttempt();
-        $student_test->student_id   = Auth::user()->id;
-        $student_test->test_id      = $name;
+        $student_test = new Gn_StudentTestAttempt;
+        $student_test->student_id = Auth::user()->id;
+        $student_test->test_id = $name;
         $student_test->test_attempt = 1;
         $student_test->save();
 
         $this->data['test'] = $test;
         if ($request->show_result == 1) {
-            return redirect('show-result/' . $test_response->student_id . '/' . $test_response->test_id);
+            return redirect('show-result/'.$test_response->student_id.'/'.$test_response->test_id);
         } else {
             return redirect('/');
         }
@@ -132,14 +134,16 @@ class TestController extends Controller
 
     public function questionPaper($name)
     {
-        $test                                           = TestModal::find($name);
-        if (empty($test) || !empty($test->institude)) {
-            if (Auth::user()->myInstitute->id == $test->institude->id) {
+        $test = TestModal::find($name);
+        if (empty($test) || ! empty($test->institude)) {
+            if (! empty($test->institude) && Auth::user()->myInstitute && Auth::user()->myInstitute->id == $test->institude->id) {
                 return redirect()->route('student.question-paper', [$name]);
             }
+
             return redirect('/');
         }
-        $this->data['test_question_paper']              = $test;
+        $this->data['test_question_paper'] = $test;
+
         return view('Frontend/question-paper')->with('data', $this->data);
     }
 
@@ -150,21 +154,26 @@ class TestController extends Controller
         $classes_groups_exams = DB::table('classes_groups_exams')->get();
         $test = TestModal::find($test_id);
 
-        if (empty($test) || !empty($test->institude)) {
-            if (Auth::user()->myInstitute->id == $test->institude->id) {
+        if (empty($test) || ! empty($test->institude)) {
+            if (! empty($test->institude) && Auth::user()->myInstitute && Auth::user()->myInstitute->id == $test->institude->id) {
                 return redirect()->route('student.show-result', [$name, $test_id]);
             }
-            return redirect('/',compact('education_types','classes_groups_exams'));
-        }
-        $test_response      = Gn_Test_Response::where('student_id', $name)->where('test_id', $test_id)->orderBy('question_id', 'asc')->get();
-        $questions          = QuestionBankModel::whereIn('id', $test_response->pluck('question_id')->toArray())->orderBy('id', 'asc')->get();
-        $correct_answer     = 0;
-        $incorrect_answer   = 0;
-        $not_attempted      = 0;
 
-        $answer['correct_answer']     = collect([]);
-        $answer['incorrect_answer']   = collect([]);
-        $answer['not_attempted']      = collect([]);
+            return redirect('/', compact('education_types', 'classes_groups_exams'));
+        }
+
+        if ($name != Auth::user()->id) {
+            abort(403, 'Unauthorized access to test result.');
+        }
+        $test_response = Gn_Test_Response::where('student_id', $name)->where('test_id', $test_id)->orderBy('question_id', 'asc')->get();
+        $questions = QuestionBankModel::whereIn('id', $test_response->pluck('question_id')->toArray())->orderBy('id', 'asc')->get();
+        $correct_answer = 0;
+        $incorrect_answer = 0;
+        $not_attempted = 0;
+
+        $answer['correct_answer'] = collect([]);
+        $answer['incorrect_answer'] = collect([]);
+        $answer['not_attempted'] = collect([]);
         foreach ($questions as $key => $question) {
             if ($question->id == $test_response[$key]->question_id) {
                 if ($test_response[$key]->answer == null) {
@@ -182,23 +191,23 @@ class TestController extends Controller
             }
         }
         $negativeMarks = ($test->negative_marks * $test->gn_marks_per_questions);
-        $this->data['not_attempted']    = $not_attempted;
-        $this->data['total_question']   = count($test_response);
-        $this->data['total_marks']      = count($test_response)*$test->gn_marks_per_questions;
-        $this->data['negative_marks']   = $incorrect_answer* $negativeMarks;
-        $this->data['out_of_marks']     = $correct_answer*$test->gn_marks_per_questions;
-        $this->data['final_marks']      = $this->data['out_of_marks'] - ($incorrect_answer* $negativeMarks);
-        $this->data['correct_answer']   = $correct_answer;
+        $this->data['not_attempted'] = $not_attempted;
+        $this->data['total_question'] = count($test_response);
+        $this->data['total_marks'] = count($test_response) * $test->gn_marks_per_questions;
+        $this->data['negative_marks'] = $incorrect_answer * $negativeMarks;
+        $this->data['out_of_marks'] = $correct_answer * $test->gn_marks_per_questions;
+        $this->data['final_marks'] = $this->data['out_of_marks'] - ($incorrect_answer * $negativeMarks);
+        $this->data['correct_answer'] = $correct_answer;
         $this->data['incorrect_answer'] = $incorrect_answer;
-        $this->data['test']             = $test;
-        $this->data['student_id']       = $name;
-        $this->data['answer']           = $answer;
+        $this->data['test'] = $test;
+        $this->data['student_id'] = $name;
+        $this->data['answer'] = $answer;
 
         if ($test->show_result == 1) {
-            return view('Frontend/show-result',compact('education_types','classes_groups_exams'))->with('data', $this->data);
+            return view('Frontend/show-result', compact('education_types', 'classes_groups_exams'))->with('data', $this->data);
         } else {
 
-            return redirect('/',compact('education_types','classes_groups_exams'));
+            return redirect('/', compact('education_types', 'classes_groups_exams'));
         }
     }
 

@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Mail\sendFranchiseEmail;
 use App\Models\CorporateEnquiry;
-use App\Models\Studymaterial;
 use App\Models\FranchiseDetails;
+use App\Models\Studymaterial;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -16,7 +16,7 @@ class FranchiseController extends Controller
 {
     public function index($type = 'all', $franchise = false)
     {
-        $data = array();
+        $data = [];
         $matchThis = ['in_franchise' => '0', 'isAdminAllowed' => '0'];
         if ($franchise) {
             $matchThis = ['in_franchise' => '1', 'isAdminAllowed' => '0'];
@@ -29,25 +29,25 @@ class FranchiseController extends Controller
         if ($type == 'students') {
             $data = $data->where('status', 'active')->where('roles', 'student')->get();
         }
-        if ($type == 'managers' && !$franchise) {
+        if ($type == 'managers' && ! $franchise) {
             $data = $data->where('status', 'active')->where('roles', 'manager')->get();
         }
         if ($type == 'managers' && $franchise) {
             $data = $data->where('status', 'active')->where('franchise_roles', 'manager')->get();
         }
-        if ($type == 'creators' && !$franchise) {
+        if ($type == 'creators' && ! $franchise) {
             $data = $data->where('status', 'active')->where('roles', 'creator')->get();
         }
         if ($type == 'creators' && $franchise) {
             $data = $data->where('status', 'active')->where('franchise_roles', 'creator')->get();
         }
-        if ($type == 'publishers' && !$franchise) {
+        if ($type == 'publishers' && ! $franchise) {
             $data = $data->where('status', 'active')->where('roles', 'publisher')->get();
         }
         if ($type == 'publishers' && $franchise) {
             $data = $data->where('status', 'active')->where('franchise_roles', 'publisher')->get();
         }
-        if ($type == 'multi' && !$franchise) {
+        if ($type == 'multi' && ! $franchise) {
             $data = $data->where('status', 'active')->where('roles', 'publisher')->get();
         }
         if ($type == 'multi' && $franchise) {
@@ -56,10 +56,11 @@ class FranchiseController extends Controller
 
         return view('Dashboard/Admin/Dashboard/users')->with('data', $data);
     }
+
     public function byType($type)
     {
-        $data = array();
-        $users = array();
+        $data = [];
+        $users = [];
 
         if ($type == 'compitition') {
             $data = FranchiseDetails::where('franchise_types', 'like', '%compitition_franchise%')->where('is_multiple', 0)->get();
@@ -81,11 +82,12 @@ class FranchiseController extends Controller
         //     $users = User::find($franchise['user_id']);
         //     $users[] = $user;
         // }
-            $users = User::wherein('id',$data->pluck('user_id'))->get();
-            // return $users;
+        $users = User::wherein('id', $data->pluck('user_id'))->get();
+        // return $users;
 
         return view('Dashboard/Admin/Dashboard/franchises')->with('data', $users);
     }
+
     public function show($userID)
     {
         $franchiseUserData = FranchiseDetails::where('user_id', $userID)->first();
@@ -95,15 +97,15 @@ class FranchiseController extends Controller
             ->select(['corporate_enquiries.*', 'states.name as state_name', 'cities.name as city_name'])
             ->find($id);
 
-        $data['user']       = array();
-        $data['details']    = array();
+        $data['user'] = [];
+        $data['details'] = [];
         if ($data['status'] == 'converted' || $data['status'] == 'activated' || $data['status'] == 'expired' || $data['status'] == 'banned') {
-            $data['user']                   = User::where('email', $data['email'])->where('mobile', $data['mobile'])->first();
-            $data['details']                = FranchiseDetails::where('enquiry_id', $id)->first();
-            $data['compitition_franchise']  = false;
-            $data['academics_franchise']    = false;
-            $data['school_franchise']       = false;
-            $data['other_franchise']        = false;
+            $data['user'] = User::where('email', $data['email'])->where('mobile', $data['mobile'])->first();
+            $data['details'] = FranchiseDetails::where('enquiry_id', $id)->first();
+            $data['compitition_franchise'] = false;
+            $data['academics_franchise'] = false;
+            $data['school_franchise'] = false;
+            $data['other_franchise'] = false;
             if ($data['details']->franchise_types) {
                 // $franchise_types = json_decode($data['details']->franchise_types);
                 $franchise_types = explode(',', $data['details']->franchise_types);
@@ -131,11 +133,11 @@ class FranchiseController extends Controller
                     $data['other_franchise'] = false;
                 }
             }
-            $data['franchise_manager']      = true;
-            $data['franchise_creator']      = true;
-            $data['franchise_publisher']    = true;
-            $data['franchise_verifier']     = false;
-            $data['franchise_reviewer']     = false;
+            $data['franchise_manager'] = true;
+            $data['franchise_creator'] = true;
+            $data['franchise_publisher'] = true;
+            $data['franchise_verifier'] = false;
+            $data['franchise_reviewer'] = false;
             if (isset($data['user']) && $data['user']->franchise_roles) {
                 $roles = $data['user']->franchise_roles;
                 // $roles = json_decode($data['user']->roles);
@@ -169,7 +171,7 @@ class FranchiseController extends Controller
             $data['remainingSubscription'] = 'No Subscription';
             if ($data['details']->days) {
                 $data['selectedDays'] = intval($data['details']->days);
-                $data['remainingSubscription'] = 'Expires at ' . date('d-M-Y', strtotime($data['started_at'] . ' + ' . $data['selectedDays'] . ' days'));
+                $data['remainingSubscription'] = 'Expires at '.date('d-M-Y', strtotime($data['started_at'].' + '.$data['selectedDays'].' days'));
             }
 
         }
@@ -186,23 +188,23 @@ class FranchiseController extends Controller
                 // $franchiseTypes = implode(',', $requestData['type']);
                 $userRoles = $requestData['role'];
 
-                $franchiseDetailsSave->franchise_types  = implode(',', $franchiseTypes);
-                $franchiseSave->franchise_roles         = json_encode($userRoles);
-                $franchiseSave->roles                   = 'franchise';
+                $franchiseDetailsSave->franchise_types = implode(',', $franchiseTypes);
+                $franchiseSave->franchise_roles = json_encode($userRoles);
+                $franchiseSave->roles = 'franchise';
 
                 $today = date('Y-m-d');
                 if ($requestData['status'] !== $franchiseSave['status']) {
                     $franchiseSave->status = $requestData['status'];
                 }
                 if ($requestData['days'] !== $franchiseDetailsSave['days'] || intval($requestData['days']) > 0 && $today < $franchiseDetailsSave['inactive_at']) {
-                    $franchiseDetailsSave->days         = $requestData['days'];
-                    $days                               = intval($requestData['days'] + 1);
-                    $endDate                            = date('Y-m-d', strtotime('+' . $days . ' days'));
-                    $franchiseDetailsSave->started_at   = $today;
-                    $franchiseDetailsSave->inactive_at  = $endDate;
-                    $enquirySave->status                = 'activated';
+                    $franchiseDetailsSave->days = $requestData['days'];
+                    $days = intval($requestData['days'] + 1);
+                    $endDate = date('Y-m-d', strtotime('+'.$days.' days'));
+                    $franchiseDetailsSave->started_at = $today;
+                    $franchiseDetailsSave->inactive_at = $endDate;
+                    $enquirySave->status = 'activated';
                     $enquirySave->save();
-                    $franchiseSave->status              = $requestData['status']; //'active';
+                    $franchiseSave->status = $requestData['status']; // 'active';
                 }
                 if ($requestData['institute_name'] !== $franchiseDetailsSave['institute_name']) {
                     $franchiseDetailsSave->institute_name = $requestData['institute_name'];
@@ -237,7 +239,6 @@ class FranchiseController extends Controller
                 $franchiseDetailsSave->submit_content = $requestData['submit_content'];
                 $franchiseDetailsSave->add_package = $requestData['add_package'];
                 $franchiseDetailsSave->allowed_to_package = $requestData['allowed_to_package'];
-
 
                 if (count($franchiseTypes) > 1) {
                     $franchiseDetailsSave->is_multiple = 1;
@@ -277,6 +278,7 @@ class FranchiseController extends Controller
                 } else {
                     $returnResponse['message'] = 'Details not saved, please try again later';
                 }
+
                 return json_encode($returnResponse);
             }
             // if (request()->input('form_name') == 'set_franchise') {
@@ -368,9 +370,11 @@ class FranchiseController extends Controller
             //     return json_encode($returnResponse);
             // }
         }
+
         // return print_r($data);
         return view('Dashboard/Admin/Dashboard/franchise_update')->with('data', $data);
     }
+
     public function delete($id)
     {
         $franchiseUser = User::find($id);
@@ -385,75 +389,101 @@ class FranchiseController extends Controller
             User::generateCounts();
             CorporateEnquiry::generateCounts();
         }
+
         return redirect()->back();
     }
 
-    public function viewusers($id){
+    public function viewusers($id)
+    {
 
-       $data = array();
+        $data = [];
         // $id = auth()->id();
         $myDetails = FranchiseDetails::where('user_id', $id)->first();
         $branchCode = $myDetails->branch_code;
 
         $matchThis = ['in_franchise' => '1', 'franchise_code' => $branchCode, 'isAdminAllowed' => '0'];
 
-        $data['new'] = User::where($matchThis)->where('status', 'unread')->orWhere('status','inactive')->get();
+        $data['new'] = User::where($matchThis)->where('status', 'unread')->orWhere('status', 'inactive')->get();
         $data['students'] = User::where($matchThis)->where('status', 'active')->where('roles', 'student')->get();
         $data['managers'] = User::where($matchThis)->where('status', 'active')->where('roles', 'manager')->get();
         $data['creators'] = User::where($matchThis)->where('status', 'active')->where('roles', 'creator')->get();
         $data['publishers'] = User::where($matchThis)->where('status', 'active')->where('roles', 'publisher')->get();
-        $data['multi'] = User::where($matchThis)->where('status', 'active')->where('roles','like','%,%')->get();
+        $data['multi'] = User::where($matchThis)->where('status', 'active')->where('roles', 'like', '%,%')->get();
 
         // return $data['new'];
 
-        return view('Dashboard/Admin/Dashboard/institute_user_view',$data);
+        return view('Dashboard/Admin/Dashboard/institute_user_view', $data);
     }
 
-    public function viewstudentusers($id){
+    public function viewstudentusers($id)
+    {
 
-    //   return $type;
-       $data = array();
+        //   return $type;
+        $data = [];
         // $id = auth()->id();
         $myDetails = FranchiseDetails::where('user_id', $id)->first();
         $branchCode = $myDetails->branch_code;
 
         $matchThis = ['in_franchise' => '1', 'franchise_code' => $branchCode, 'isAdminAllowed' => '0'];
         $data['students'] =
-        User::leftjoin('user_details','users.id','=','user_details.user_id')
-        ->leftjoin('education_type','user_details.education_type','=','education_type.id')
-        ->leftjoin('classes_groups_exams','user_details.class','=','classes_groups_exams.id')
-        ->leftjoin('franchise_details','user_details.institute_code','=','franchise_details.branch_code')
-        ->select('users.*','education_type.name as education_type_name','classes_groups_exams.name as class_name','user_details.institute_code','franchise_details.institute_name' )
-        ->where($matchThis)
-        ->where('status', 'active')
-        ->where('roles', 'student')
-        ->get();
+        User::leftjoin('user_details', 'users.id', '=', 'user_details.user_id')
+            ->leftjoin('education_type', function ($join) {
+                $join->on('user_details.education_type', '=', 'education_type.id')
+                    ->whereNull('education_type.deleted_at');
+            })
+            ->leftjoin('classes_groups_exams', function ($join) {
+                $join->on('user_details.class', '=', 'classes_groups_exams.id')
+                    ->whereNull('classes_groups_exams.deleted_at');
+            })
+            ->leftjoin('franchise_details', function ($join) {
+                $join->on('user_details.institute_code', '=', 'franchise_details.branch_code')
+                    ->whereNull('franchise_details.deleted_at');
+            })
+            ->select('users.*', 'education_type.name as education_type_name', 'classes_groups_exams.name as class_name', 'user_details.institute_code', 'franchise_details.institute_name')
+            ->where($matchThis)
+            ->where('status', 'active')
+            ->where('roles', 'student')
+            ->get();
 
         // return $data['students'];
 
-        return view('Dashboard/Admin/Dashboard/institute_studentuser_view',$data);
+        return view('Dashboard/Admin/Dashboard/institute_studentuser_view', $data);
     }
 
-    public function viewmaterial($id){
+    public function viewmaterial($id)
+    {
 
-         $is_admin=$is_franchies=$is_staff='';
-        if(Auth::user()->roles == 'superadmin')
+        $is_admin = $is_franchies = $is_staff = '';
+        if (Auth::user()->roles == 'superadmin') {
             $is_admin = Auth::user()->isAdminAllowed;
-        if(Auth::user()->roles == 'franchise')
+        }
+        if (Auth::user()->roles == 'franchise') {
             $is_franchies = Auth::user()->is_franchise;
-        if(Auth::user()->roles == 'creator' || Auth::user()->roles == 'publisher')
+        }
+        if (Auth::user()->roles == 'creator' || Auth::user()->roles == 'publisher') {
             $is_staff = Auth::user()->is_staff;
+        }
 
         // return auth()->user()->id;
-            $data['study_material']      = Studymaterial::select("study_material.id","title","sub_title","is_featured","institute_id","publish_status","publish_date","document_type","created_by","file","video_link","category","users.name as name","classes_groups_exams.name as class_group")
-                        ->leftJoin("users","users.id","study_material.created_by")
-                        ->leftJoin("classes_groups_exams","classes_groups_exams.id","study_material.class")
-                        ->leftJoin("franchise_details","franchise_details.id","study_material.institute_id")
-                        ->where("study_material.publish_by",$id)
-                        ->where("study_material.status",1)
-                        ->orderBy('study_material.id', 'desc')
-                        ->get();
-                        // return $model;
-             return view('Dashboard/Admin/Dashboard/institute_view_material',$data);
+        $data['study_material'] = Studymaterial::select('study_material.id', 'title', 'sub_title', 'is_featured', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'category', 'users.name as name', 'classes_groups_exams.name as class_group')
+            ->leftJoin('users', function ($join) {
+                $join->on('users.id', 'study_material.created_by')
+                    ->whereNull('users.deleted_at');
+            })
+            ->leftJoin('classes_groups_exams', function ($join) {
+                $join->on('classes_groups_exams.id', 'study_material.class')
+                    ->whereNull('classes_groups_exams.deleted_at');
+            })
+            ->leftJoin('franchise_details', function ($join) {
+                $join->on('franchise_details.id', 'study_material.institute_id')
+                    ->whereNull('franchise_details.deleted_at');
+            })
+            ->where('study_material.publish_by', $id)
+            ->where('study_material.status', 1)
+            ->orderBy('study_material.id', 'desc')
+            ->get();
+
+        // return $model;
+        return view('Dashboard/Admin/Dashboard/institute_view_material',$data);
     }
 }

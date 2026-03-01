@@ -1,29 +1,26 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Admin\AjaxController;
 use App\Http\Controllers\Admin\BooksController;
 use App\Http\Controllers\Admin\CorporateEnquiry;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExamsController;
 use App\Http\Controllers\Admin\FranchiseController;
-use App\Http\Controllers\Admin\QuestionBankController;
-use App\Http\Controllers\Admin\UsersController;
-use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\StudymaterialController;
-
 use App\Http\Controllers\Admin\PlanController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\StudymaterialController;
 use App\Livewire\Admin\Contact\ContactList;
 use App\Livewire\Admin\Contact\ContactListReply;
 use App\Livewire\Admin\Contact\ContactRepliesList;
-use App\Livewire\Admin\Pages\PagesList;
 use App\Livewire\Admin\ManageFaq;
 use App\Livewire\Admin\ManageImportantLinks;
+use App\Livewire\Admin\Pages\PagesList;
 use App\Livewire\Admin\Pages\PagesView;
+use Illuminate\Support\Facades\Route;
 
-//Raj@KNP78  careerwithoutbarrier@gmail.com
+// Raj@KNP78  careerwithoutbarrier@gmail.com
 Route::post('gettestpackage', [ExamsController::class, 'gettestpackage'])->name('gettestpackage');
 
 Route::name('administrator.')->group(function () {
@@ -117,12 +114,10 @@ Route::name('administrator.')->group(function () {
                 Route::any('subjects', [ExamsController::class, 'subjects'])->name('dashboard_subjects');
             });
             Route::prefix('questions-bank')->group(function () {
-                Route::any('list/{type?}', [QuestionBankController::class, 'index'])->name('dashboard_question_list');
-                Route::any('show/{id}', [QuestionBankController::class, 'show'])->name('dashboard_question_show');
-                Route::any('add', [QuestionBankController::class, 'add_update'])->name('dashboard_question_add');
-                Route::any('import', [QuestionBankController::class, 'importView'])->name('dashboard_question_import');
-                Route::post('import', [QuestionBankController::class, 'import'])->name('dashboard_question_import_store');
-                Route::any('update/{id}', [QuestionBankController::class, 'add_update'])->name('dashboard_question_update');
+                Route::get('list/{type?}', \App\Livewire\Admin\Questions\QuestionTable::class)->name('dashboard_question_list');
+                Route::get('add', \App\Livewire\Admin\Questions\QuestionForm::class)->name('dashboard_question_add');
+                Route::get('import', \App\Livewire\Admin\Questions\QuestionImport::class)->name('dashboard_question_import');
+                Route::get('update/{questionId}', \App\Livewire\Admin\Questions\QuestionForm::class)->name('dashboard_question_update');
             });
             Route::prefix('profile')->group(function () {
                 Route::any('', [UsersController::class, 'myPofile'])->name('admin_panel_profile');
@@ -145,7 +140,6 @@ Route::name('administrator.')->group(function () {
 
                 Route::any('faq', ManageFaq::class)->name('manage.faq');
                 Route::any('important-links', ManageImportantLinks::class)->name('manage.important_links');
-
 
                 Route::get('/contact_enquiry', ContactList::class)->name('manage.contactEnquiry');
                 Route::get('/contact_enquiry/{id}', ContactListReply::class)->name('manage.contactEnquiryReply');

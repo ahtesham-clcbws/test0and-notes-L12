@@ -11,6 +11,6 @@ class Gn_Test_Response extends Model
 
     public function questions()
     {
-        $this->belongsTo(QuestionBankModel::class,'question_id');
+        return $this->belongsTo(QuestionBankModel::class, 'question_id');
     }
 }

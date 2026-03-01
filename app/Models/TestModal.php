@@ -12,11 +12,15 @@ class TestModal extends Model
     use SoftDeletes;
 
     protected $table = 'test';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
         'user_id',
         'title',
+        'sub_title',
+        'test_cat',
+        'test_image',
         'test_type',
         'test_fee',
         'test_attempts',
@@ -27,6 +31,7 @@ class TestModal extends Model
         'show_answer',
         'show_solution',
         'marks',
+        'gn_marks_per_questions',
         'negative_marks',
         'time_to_complete',
         'extra_requirements',
@@ -38,6 +43,11 @@ class TestModal extends Model
         'question_mcq_options_default',
         'total_questions',
         'sections',
+        'package',
+        'price',
+        'special_remark_1',
+        'special_remark_2',
+        'rating',
         'reviewer_id',
         'manager_id',
         'publisher_id',
@@ -50,10 +60,10 @@ class TestModal extends Model
         'published_status',
         'published_message',
     ];
-    
+
     public function creater()
     {
-        return $this->belongsTo(User::class, 'id', 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     // public function institute()
@@ -63,34 +73,34 @@ class TestModal extends Model
 
     public function Manager()
     {
-        return $this->belongsTo(User::class, 'id', 'manager_id');
+        return $this->belongsTo(User::class, 'manager_id', 'id');
     }
-    
+
     public function Reviewer()
     {
-        return $this->belongsTo(User::class, 'id', 'reviewer_id');
+        return $this->belongsTo(User::class, 'reviewer_id', 'id');
     }
-    
+
     public function Publisher()
     {
-        return $this->belongsTo(User::class, 'id', 'publisher_id');
+        return $this->belongsTo(User::class, 'publisher_id', 'id');
     }
-    
+
     public function Educationtype()
     {
         return $this->hasOne(Educationtype::class, 'id', 'education_type_id');
     }
-    
+
     public function EducationClass()
     {
         return $this->hasOne(ClassGoupExamModel::class, 'id', 'education_type_child_id');
     }
-    
+
     public function EducationBoard()
     {
         return $this->hasOne(BoardAgencyStateModel::class, 'id', 'board_state_agency');
     }
-    
+
     public function OtherCategoryClass()
     {
         return $this->hasOne(OtherCategoryClass::class, 'id', 'other_category_class_id');
@@ -103,12 +113,14 @@ class TestModal extends Model
 
     public function getQuestions()
     {
-        return $this->belongsToMany(QuestionBankModel::class, 'test_questions','test_id','question_id')->withPivot('section_id', 'creator_id');
+        return $this->belongsToMany(QuestionBankModel::class, 'test_questions', 'test_id', 'question_id')
+            ->withPivot('section_id', 'creator_id')
+            ->wherePivotNull('deleted_at');
     }
 
-    public function getSection()
+    public function testSections()
     {
-        return $this->hasMany(TestSections::class,'test_id');
+        return $this->hasMany(TestSections::class, 'test_id');
     }
 
     public function institude()
@@ -116,8 +128,14 @@ class TestModal extends Model
         return $this->belongsTo(FranchiseDetails::class, 'user_id', 'user_id');
     }
 
-    public function getTestCat(){
+    public function getTestCat()
+    {
         return $this->hasOne(TestCat::class, 'id', 'test_cat');
+    }
+
+    public function testAttempts()
+    {
+        return $this->hasMany(Gn_StudentTestAttempt::class, 'test_id', 'id');
     }
     // public function Reviewer()
     // {
@@ -137,11 +155,15 @@ class TestModal extends Model
     // }
 
     public $timestamps = true;
+
     const CREATED_AT = 'created_at';
+
     const UPDATED_AT = 'updated_at';
+
     const DELETED_AT = 'deleted_at';
 
-    public static function sectionsCount(){
+    public static function sectionsCount()
+    {
         // $allTests = TestModal::get();
         // foreach ($allTests as $key => $test) {
         //     $totalSections = TestSections::select(['number_of_questions'])->where('test_id', $test['id'])->get();

@@ -1,29 +1,22 @@
 <?php
 
-
-
 namespace App\Http\Controllers\Frontend;
 
-
-
 use App\Http\Controllers\Controller;
-
 use App\Models\Gn_PackagePlan;
-
 use App\Models\Pdf;
-
-use App\Models\{Studymaterial, User, Review};
+use App\Models\Review;
+use App\Models\Studymaterial;
+use App\Models\User;
 use App\Notifications\ContactFormAdminNotify;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
-
 {
-
     public function index()
     {
         $current_date = date('Y-m-d');
@@ -37,7 +30,7 @@ class HomeController extends Controller
                 ->where('expire_date', '>=', $current_date)
                 ->orderBy('id', 'desc')
                 ->limit(6)
-                ->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+                ->get(['gn__package_plans.*', DB::raw('(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration')]);
         });
 
         $Gn_PackagePlanTestAndNotes2 = Cache::remember('home_package_test_notes_2', $cacheDuration, function () use ($current_date) {
@@ -47,7 +40,7 @@ class HomeController extends Controller
                 ->where('expire_date', '>=', $current_date)
                 ->orderBy('id', 'desc')
                 ->limit(6)
-                ->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+                ->get(['gn__package_plans.*', DB::raw('(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration')]);
         });
 
         // Cache Study Materials
@@ -55,7 +48,7 @@ class HomeController extends Controller
             return Studymaterial::with(['educationType', 'study_class'])
                 ->where('study_material.is_featured', 1)
                 ->whereIn('study_material.education_type', [51, 53, 54])
-                ->whereNotIN('category', ["Static GK & Current Affairs"])
+                ->whereNotIN('category', ['Static GK & Current Affairs'])
                 ->orderBy('study_material.id', 'desc')
                 ->limit(6)
                 ->get(['study_material.*']);
@@ -64,7 +57,7 @@ class HomeController extends Controller
         $StudymaterialGovComp2 = Cache::remember('home_study_gov_comp_2', $cacheDuration, function () {
             return Studymaterial::with(['educationType', 'study_class'])
                 ->where('study_material.is_featured', 1)
-                ->where('category', "Static GK & Current Affairs")
+                ->where('category', 'Static GK & Current Affairs')
                 ->get(['study_material.*']);
         });
 
@@ -72,25 +65,37 @@ class HomeController extends Controller
             return Studymaterial::with(['educationType', 'study_class'])
                 ->where('study_material.is_featured', 1)
                 ->whereIn('study_material.education_type', [52])
-                ->where('category', "Study Notes & E-Books")
+                ->where('category', 'Study Notes & E-Books')
                 ->get(['study_material.*']);
         });
 
         $StudymaterialGovComp4 = Cache::remember('home_study_gov_comp_4', $cacheDuration, function () {
-            return Studymaterial::join('education_type', 'study_material.education_type', '=', 'education_type.id')
-                ->join('classes_groups_exams', 'classes_groups_exams.id', '=', 'study_material.class')
+            return Studymaterial::join('education_type', function ($join) {
+                $join->on('study_material.education_type', '=', 'education_type.id')
+                    ->whereNull('education_type.deleted_at');
+            })
+                ->join('classes_groups_exams', function ($join) {
+                    $join->on('classes_groups_exams.id', '=', 'study_material.class')
+                        ->whereNull('classes_groups_exams.deleted_at');
+                })
                 ->where('study_material.is_featured', 1)
                 ->whereNotIN('study_material.education_type', [52])
-                ->where('category', "Live & Video Classes")
+                ->where('category', 'Live & Video Classes')
                 ->get(['study_material.*', 'education_type.name as education_type_name', 'classes_groups_exams.name as class_name']);
         });
 
         $StudymaterialGovComp5 = Cache::remember('home_study_gov_comp_5', $cacheDuration, function () {
-            return Studymaterial::join('education_type', 'study_material.education_type', '=', 'education_type.id')
-                ->join('classes_groups_exams', 'classes_groups_exams.id', '=', 'study_material.class')
+            return Studymaterial::join('education_type', function ($join) {
+                $join->on('study_material.education_type', '=', 'education_type.id')
+                    ->whereNull('education_type.deleted_at');
+            })
+                ->join('classes_groups_exams', function ($join) {
+                    $join->on('classes_groups_exams.id', '=', 'study_material.class')
+                        ->whereNull('classes_groups_exams.deleted_at');
+                })
                 ->where('study_material.is_featured', 1)
                 ->whereIN('study_material.education_type', [52])
-                ->where('category', "Live & Video Classes")
+                ->where('category', 'Live & Video Classes')
                 ->get(['study_material.*', 'education_type.name as education_type_name', 'classes_groups_exams.name as class_name']);
         });
 
@@ -101,7 +106,7 @@ class HomeController extends Controller
                 ->where('publish_date', '>=', $current_date)
                 ->orderBy('id', 'desc')
                 ->limit(6)
-                ->get(["study_material.*",]);
+                ->get(['study_material.*']);
         });
 
         $Gn_PackagePackagelist = Cache::remember('home_package_list', $cacheDuration, function () {
@@ -110,7 +115,7 @@ class HomeController extends Controller
                 ->where('education_type', 53)
                 ->orderBy('id', 'desc')
                 ->limit(6)
-                ->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+                ->get(['gn__package_plans.*', DB::raw('(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration')]);
         });
 
         $Gn_PackagePlanInstitute = Cache::remember('home_package_institute', $cacheDuration, function () use ($current_date) {
@@ -120,7 +125,7 @@ class HomeController extends Controller
                 ->where('expire_date', '>=', $current_date)
                 ->orderBy('id', 'desc')
                 ->limit(6)
-                ->get(["gn__package_plans.*", DB::raw("(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration")]);
+                ->get(['gn__package_plans.*', DB::raw('(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration')]);
         });
 
         // Batch fetch landing page data
@@ -130,10 +135,10 @@ class HomeController extends Controller
 
         // Helper to get landing page data safely
         $getLandingData = function ($id) use ($landingPages) {
-            return $landingPages->get($id) ?? (object)[
+            return $landingPages->get($id) ?? (object) [
                 'banner_title_first' => '', 'banner_title_second' => '', 'banner_title_third' => '', 'banner_content' => '',
                 'competitive_courses_status' => 0, 'range_of_courses_status' => 0, 'banner_photo' => '',
-                'banner_attr_image_1' => '', 'banner_attr_image_2' => '', 'banner_attr_image_3' => '', 'slider_footer_image' => ''
+                'banner_attr_image_1' => '', 'banner_attr_image_2' => '', 'banner_attr_image_3' => '', 'slider_footer_image' => '',
             ];
         };
 
@@ -217,38 +222,29 @@ class HomeController extends Controller
     {
         $pdf = Pdf::where('type', 'student')->orderBy('id', 'DESC')->first();
         $education_types = DB::table('education_type')->get();
+
         return view('Frontend/page', compact('education_types', 'pdf'));
     }
 
     public function onlineTest()
-
     {
 
         return view('Frontend/online-test');
     }
 
-
-
     public function startTest()
-
     {
-
-
 
         return view('Frontend/start-test');
     }
 
     public function aboutUs()
-
     {
-
-
 
         return view('Frontend/about');
     }
 
     public function contactUs(Request $request)
-
     {
         $education_types = DB::table('education_type')->get();
         $classes_groups_exams = DB::table('classes_groups_exams')->get();
@@ -256,19 +252,20 @@ class HomeController extends Controller
         if ($request->input('contactSubmition')) {
             try {
                 $admins = User::where('roles', 'superadmin')->get();
-                Notification::send($admins, new ContactFormAdminNotify((object)$request->all()));
+                Notification::send($admins, new ContactFormAdminNotify((object) $request->all()));
+
                 // $notifyAdmins = $admins->notify(new ContactFormAdminNotify((object)$request->all()));
                 return \response()->json([
-                    "message" => "Your message has been sent successfully.",
-                    "status" => "success",
-                    "success" => true
+                    'message' => 'Your message has been sent successfully.',
+                    'status' => 'success',
+                    'success' => true,
                 ]);
             } catch (\Throwable $th) {
-                //throw $th;
+                // throw $th;
                 return \response()->json([
-                    "message" => $th->getMessage(),
-                    "status" => "failed",
-                    "success" => false
+                    'message' => $th->getMessage(),
+                    'status' => 'failed',
+                    'success' => false,
                 ]);
             }
         }
@@ -277,28 +274,25 @@ class HomeController extends Controller
     }
 
     public function allTests()
-
     {
 
         return view('Frontend/test-list');
     }
 
     public function subscribePlan()
-
     {
 
-        $gn_PackagePlan      = Gn_PackagePlan::select("gn__package_plans.id", "plan_name", "package_type", "duration", "final_fees", "gn__package_plans.status")->where("gn__package_plans.package_type", "=", 0)->where("gn__package_plans.status", "=", 1)->get();
+        $gn_PackagePlan = Gn_PackagePlan::select('gn__package_plans.id', 'plan_name', 'package_type', 'duration', 'final_fees', 'gn__package_plans.status')->where('gn__package_plans.package_type', '=', 0)->where('gn__package_plans.status', '=', 1)->get();
 
         return view('Frontend/plans', compact('gn_PackagePlan'));
     }
 
     public function questionPaper()
-
     {
-
 
         return view('Frontend/question-paper');
     }
+
     public function pdfSubmit(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -310,7 +304,7 @@ class HomeController extends Controller
             // Return the first validation error message
             return response()->json([
                 'status' => false,
-                'message' => $validator->errors()->first()
+                'message' => $validator->errors()->first(),
             ], 400);
         }
         $title = $request->title;
@@ -319,24 +313,25 @@ class HomeController extends Controller
 
         if ($request->hasFile('pdf_file')) {
             $file = $request->file('pdf_file');
-            $fileName = $title . rand(111, 999) . '-' . $file->getClientOriginalName();
+            $fileName = $title.rand(111, 999).'-'.$file->getClientOriginalName();
             $path = $file->storeAs('settingPdf', $fileName, 'public');
         }
-        $storePdf = new Pdf();
-        $storePdf->title = $title ?? "";
-        $storePdf->type = $type ?? "";
-        $storePdf->url = $path ?? "";
+        $storePdf = new Pdf;
+        $storePdf->title = $title ?? '';
+        $storePdf->type = $type ?? '';
+        $storePdf->url = $path ?? '';
         if ($storePdf->save()) {
             return response()->json(['status' => true, 'message' => 'File uploaded successfully', 'path' => $path, 'data' => $storePdf]);
         } else {
             return response()->json(['status' => false, 'message' => 'something went wrong']);
         }
     }
+
     public function pdfDelete(Request $request)
     {
 
         if ($request->id) {
-            $data =  Pdf::find($request->id);
+            $data = Pdf::find($request->id);
 
             if ($data->delete()) {
                 return response()->json(['status' => true, 'message' => 'file deleted success']);

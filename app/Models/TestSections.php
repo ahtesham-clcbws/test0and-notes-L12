@@ -12,6 +12,7 @@ class TestSections extends Model
     use SoftDeletes;
 
     protected $table = 'test_section';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
@@ -27,33 +28,49 @@ class TestSections extends Model
         'difficulty_level',
         'creator_id',
         'date_of_completion',
+        'duration',
+        'publisher_id',
+        'publishing_date',
+        'section_instruction',
+        'gn_subject_part_lesson',
     ];
+
     public function Belongto()
     {
         return $this->belongsTo(TestModal::class, 'id', 'test_id');
     }
 
-    public function sectionSubject() {
+    public function sectionSubject()
+    {
         return $this->hasOne(Subject::class, 'id', 'subject');
     }
-    
-    public function sectionSubjectPart() {
+
+    public function sectionSubjectPart()
+    {
         return $this->hasOne(SubjectPart::class, 'id', 'subject_part');
     }
-   
-    public function sectionSubjectLesson() {
+
+    public function sectionSubjectLesson()
+    {
         return $this->hasOne(SubjectPartLesson::class, 'id', 'subject_part_lesson');
     }
 
-    public function getQuestions(){
-        return $this->belongsToMany(QuestionBankModel::class, 'test_questions','section_id','question_id');
+    public function getQuestions()
+    {
+        return $this->belongsToMany(QuestionBankModel::class, 'test_questions', 'section_id', 'question_id')
+            ->wherePivotNull('deleted_at');
     }
 
-    public function relatedSubject() {
+    public function relatedSubject()
+    {
         return $this->hasMany(Subject::class, 'id', 'subject');
     }
+
     public $timestamps = true;
+
     const CREATED_AT = 'created_at';
+
     const UPDATED_AT = 'updated_at';
+
     const DELETED_AT = 'deleted_at';
 }

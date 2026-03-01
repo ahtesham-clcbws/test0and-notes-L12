@@ -5,10 +5,24 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AssignClassBoardModel;
 use App\Models\AssignClassSubjectsModel;
-use App\Models\Educationtype;
-use App\Models\ClassGoupExamModel;
 use App\Models\BoardAgencyStateModel;
+use App\Models\ClassGoupExamModel;
+use App\Models\Educationtype;
+use App\Models\Gn_AssignClassGroupExamName;
+use App\Models\Gn_ClassSubject;
+use App\Models\Gn_DisplayClassGroupExamName;
+use App\Models\Gn_DisplayClassSubject;
+use App\Models\Gn_DisplayExamAgencyBoardUniversity;
+use App\Models\Gn_DisplayOtherExamClassDetail;
+use App\Models\Gn_DisplaySubjectPart;
+use App\Models\Gn_DisplaySubjectPartChapter;
+use App\Models\Gn_EducationClassExamAgencyBoardUniversity;
+use App\Models\Gn_OtherExamClassDetailModel;
+use App\Models\Gn_PackagePlanTest;
+use App\Models\Gn_StudentTestAttempt;
+use App\Models\Gn_SubjectPartLessionNew;
 use App\Models\OtherCategoryClass;
+use App\Models\QuestionBankModel;
 use App\Models\Subject;
 use App\Models\SubjectPart;
 use App\Models\SubjectPartLesson;
@@ -16,40 +30,31 @@ use App\Models\TestModal;
 use App\Models\TestQuestions;
 use App\Models\TestSections;
 use App\Models\User;
-use App\Models\Gn_SubjectPartLessionNew;
-use App\Models\Gn_OtherExamClassDetailModel;
-use App\Models\Gn_EducationClassExamAgencyBoardUniversity;
-use App\Models\Gn_AssignClassGroupExamName;
-use App\Models\Gn_DisplayClassGroupExamName;
-use App\Models\Gn_DisplayExamAgencyBoardUniversity;
-use App\Models\Gn_DisplayOtherExamClassDetail;
-use App\Models\Gn_DisplaySubjectPart;
-use App\Models\Gn_DisplaySubjectPartChapter;
-use App\Models\QuestionBankModel;
-use Illuminate\Http\Request;
-use App\Models\Gn_StudentTestAttempt;
-use App\Models\Gn_ClassSubject;
-use App\Models\Gn_DisplayClassSubject;
-use Illuminate\Support\Facades\Auth;
 use App\Services\ExamService;
-use Illuminate\Support\Facades\DB;
 use App\Services\ImageService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ExamsController extends Controller
 {
     protected $data;
+
     protected $insert_data;
+
     protected $diff_data;
+
     protected $examService;
+
     protected $imageService;
 
     public function __construct(ExamService $examService, ImageService $imageService)
     {
         $this->examService = $examService;
         $this->imageService = $imageService;
-        $this->data = array();
+        $this->data = [];
 
-        $this->data['educations']       = Educationtype::get();
+        $this->data['educations'] = Educationtype::get();
 
         // $this->data['others'] = OtherCategoryClass::get();
         $this->data['pagename'] = 'Add Questions';
@@ -63,6 +68,7 @@ class ExamsController extends Controller
 
         if ($req->isMethod('post')) {
             $result = $this->examService->getPaginatedTests($req->all());
+
             return json_encode($result);
         }
 
@@ -73,9 +79,9 @@ class ExamsController extends Controller
     {
         $id = $request->input('id');
         $result = DB::table('gn__package_plans')
-                    ->select('*')
-                    ->where('package_type', '=', '$id')
-                    ->get();
+            ->select('*')
+            ->where('package_type', '=', $id)
+            ->get();
 
         $options = ''; // Initialize an empty string to store the HTML options
 
@@ -90,6 +96,7 @@ class ExamsController extends Controller
 
     public function saveTest(Request $req, $test_id = 0)
     {
+        \Illuminate\Support\Facades\Log::info('saveTest reached with ID: '.$test_id);
 
         $this->data['marks'] = ['1', '2', '3', '4'];
         $this->data['negative_marks'] = [
@@ -129,73 +136,82 @@ class ExamsController extends Controller
             $test = TestModal::find($test_id);
             $this->data['show_section'] = 1;
         } else {
-            $test = new TestModal();
+            $test = new TestModal;
             $this->data['show_section'] = 0;
         }
         $this->data['test'] = $test;
-        $this->data['test_cat']    = DB::table('test_cat')->get();
-        $this->data['group_classes']    = ClassGoupExamModel::where('education_type_id',$this->data['test']->education_type_id)->get();
-        $this->data['agency_boards']    = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id',$this->data['test']->education_type_id)->where('classes_group_exams_id',$this->data['test']->education_type_child_id)->get();
-        $this->data['other_exams']      = Gn_OtherExamClassDetailModel::where('education_type_id',$this->data['test']->education_type_id)->where('classes_group_exams_id',$this->data['test']->education_type_child_id)->where('agency_board_university_id',$this->data['test']->board_state_agency)->get();
+        $this->data['test_cat'] = DB::table('test_cat')->get();
+        $this->data['group_classes'] = ClassGoupExamModel::where('education_type_id', $this->data['test']->education_type_id)->get();
+        $this->data['agency_boards'] = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id', $this->data['test']->education_type_id)->where('classes_group_exams_id', $this->data['test']->education_type_child_id)->get();
+        $this->data['other_exams'] = Gn_OtherExamClassDetailModel::where('education_type_id', $this->data['test']->education_type_id)->where('classes_group_exams_id', $this->data['test']->education_type_child_id)->where('agency_board_university_id', $this->data['test']->board_state_agency)->get();
 
         if ($req->isMethod('post')) {
             $inputs = $req->all();
 
             if ($inputs['form_name'] == 'test_form') {
-                $testMd = new TestModal();
+                $testMd = new TestModal;
                 if (isset($inputs['id']) && $inputs['id'] > 0) {
                     $testMd = TestModal::find($inputs['id']);
                 }
-                $testMd->title                      = $inputs['title'];
-                $testMd->sub_title                      = $inputs['sub_title'];
-                $testMd->test_cat                      = isset($inputs['id']) && $inputs['id'] > 0 ? $testMd->test_cat : NULL;
-                $testMd->gn_marks_per_questions     = $inputs['marks_per_questions'];
-                $testMd->negative_marks             = $inputs['negative_marks'];
-                $testMd->sections                   = $inputs['no_of_sections'];
-                $testMd->total_questions            = $inputs['total_questions'];
-                if($req->hasFile('test_image')){
+                $testMd->title = $inputs['title'];
+                $testMd->sub_title = $inputs['sub_title'];
+                $testMd->test_cat = isset($inputs['id']) && $inputs['id'] > 0 ? $testMd->test_cat : null;
+                $testMd->gn_marks_per_questions = $inputs['marks_per_questions'];
+                $testMd->negative_marks = $inputs['negative_marks'];
+                $testMd->sections = $inputs['no_of_sections'];
+                $testMd->total_questions = $inputs['total_questions'];
+                if ($req->hasFile('test_image')) {
                     $fullPath = $this->imageService->handleUpload($req->file('test_image'), 'test_image', 800);
                     $testMd->test_image = $fullPath; // Store full path/filename as per service return
                 }
-                $testMd->education_type_id          = $inputs['education_type_id'];
-                $testMd->education_type_child_id    = $inputs['class_group_exam_id'];
-                $testMd->board_state_agency         = $inputs['exam_agency_board_university_id'];
-                $testMd->other_category_class_id    = $inputs['other_exam_class_detail_id'];
-                $testMd->test_type                  = isset($inputs['test_type']) ? $inputs['test_type'] : 1;
-                $testMd->package                  = isset($inputs['package']) ? implode(',',$inputs['package']) : NULL;
-                $testMd->price                  =       isset($inputs['price']) ? $inputs['price'] : null;;
-                $testMd->special_remark_1                  = $inputs['special_remark_1'];
-                $testMd->special_remark_2                  = $inputs['special_remark_2'];
-                $testMd->rating                  = $inputs['rating'];
+                $testMd->education_type_id = $inputs['education_type_id'];
+                $testMd->education_type_child_id = $inputs['class_group_exam_id'];
+                $testMd->board_state_agency = $inputs['exam_agency_board_university_id'];
+                $testMd->other_category_class_id = $inputs['other_exam_class_detail_id'];
+                $testMd->test_type = isset($inputs['test_type']) ? $inputs['test_type'] : 1;
+                $testMd->package = isset($inputs['package']) ? implode(',', $inputs['package']) : null;
+                $testMd->price = isset($inputs['price']) ? $inputs['price'] : null;
+                $testMd->special_remark_1 = $inputs['special_remark_1'];
+                $testMd->special_remark_2 = $inputs['special_remark_2'];
+                $testMd->rating = $inputs['rating'];
                 $query = $testMd->save();
+
+                if (isset($inputs['package']) && ! empty($inputs['package'])) {
+                    Gn_PackagePlanTest::where('test_id', $testMd->id)->delete();
+                    foreach ($inputs['package'] as $packageId) {
+                        Gn_PackagePlanTest::create([
+                            'gn_package_plan_id' => $packageId,
+                            'test_id' => $testMd->id,
+                        ]);
+                    }
+                }
 
                 if (isset($inputs['id']) && $inputs['id'] > 0) {
                     $section_change = $testMd->getChanges();
                     if (isset($section_change['sections'])) {
-                        $sections_delete = TestSections::where('test_id',$testMd->id);
+                        $sections_delete = TestSections::where('test_id', $testMd->id);
                         $sections_delete->delete();
-                        for ($i=0; $i < $testMd->sections ; $i++) {
-                            $sectionMd = new TestSections();
+                        for ($i = 0; $i < $testMd->sections; $i++) {
+                            $sectionMd = new TestSections;
                             $sectionMd->test_id = $testMd->id;
                             $sectionMd->save();
                         }
                     }
-                }
-                else{
-                    for ($i=0; $i < $testMd->sections ; $i++) {
-                        $sectionMd = new TestSections();
+                } else {
+                    for ($i = 0; $i < $testMd->sections; $i++) {
+                        $sectionMd = new TestSections;
                         $sectionMd->test_id = $testMd->id;
                         $sectionMd->save();
                     }
                 }
 
                 if (isset($inputs['id']) && $inputs['id'] > 0) {
-                    $this->data['auth_id']  = Auth::user()->id;
-                    $testId                 = $inputs['id'];
+                    $this->data['auth_id'] = Auth::user()->id;
+                    $testId = $inputs['id'];
 
-                    $test                       = TestModal::find($testId);
-                    $this->data['subjects']     = Subject::get();
-                    $this->data['test']         = $test;
+                    $test = TestModal::find($testId);
+                    $this->data['subjects'] = Subject::get();
+                    $this->data['test'] = $test;
 
                     $matchThis = ['in_franchise' => '0', 'isAdminAllowed' => '1'];
                     $creators = User::where($matchThis)->where('roles', 'like', '%"creator"%')->orWhere('roles', 'like', '%"manager"%')->orWhere('roles', 'superadmin')->get();
@@ -206,70 +222,72 @@ class ExamsController extends Controller
                         }
                     }
 
-                    $sections               = TestSections::where('test_id', $testId)->get();
+                    $sections = TestSections::where('test_id', $testId)->get();
                     $this->data['sections'] = $sections;
                     $this->data['creators'] = $creators;
                     $this->data['pagename'] = 'Test Sections';
                 }
                 if ($query) {
                     $testId = $testMd->id;
+
                     return redirect()->route('administrator.dashboard_update_test_exam', [$testId])->withErrors(['testSuccess' => 'Test succesfully added.']);
                     // return redirect()->route('administrator.dashboard_test_sections', [$testId])->withErrors(['testSuccess' => 'Test succesfully added.']);
                 } else {
                     return back()->withErrors(['testError' => 'Server Error, please try again.']);
                 }
+
                 return print_r($inputs);
             }
 
             if ($req->input('form_name') && $req->input('form_name') == 'notify_creator') {
-                return json_encode($req->all());
+                // send email here to the creator, also check changes if new mail send by the manager
             }
             if ($inputs['form_name'] == 'sections_form') {
 
-                $errors         = array();
-                $sectionsSaved  = array();
-                $inputs         = $req->all();
-                $sections       = $inputs['section'];
+                $errors = [];
+                $sectionsSaved = [];
+                $inputs = $req->all();
+                $sections = $inputs['section'];
                 foreach ($sections as $key => $section) {
-                    $sectionMd      = new TestSections();
+                    $sectionMd = new TestSections;
                     if ($section['id'] > 0) {
-                        $sectionMd  = TestSections::find($section['id']);
+                        $sectionMd = TestSections::find($section['id']);
                     }
-                    $sectionMd->test_id                 = $test_id;
-                    $sectionMd->subject                 = $section['subject'];
-                    $sectionMd->subject_part            = isset($section['subject_part']) ? $section['subject_part'] : 0;
-                    $sectionMd->subject_part_lesson     = isset($section['subject_part_lesson']) ? $section['subject_part_lesson'] : 0;
-                    $sectionMd->gn_subject_part_lesson  = isset($section['gn_subject_part_lesson']) ? $section['gn_subject_part_lesson'] : 0;
-                    $sectionMd->number_of_questions     = $section['number_of_questions'];
-                    $sectionMd->question_type           = $section['question_type'];
-                    $sectionMd->mcq_options             = isset($section['mcq_options']) ? $section['mcq_options'] : 0;
-                    $sectionMd->difficulty_level        = $section['difficulty_level'];
-                    $sectionMd->creator_id              = $section['creator_id'];
-                    $sectionMd->creator_id              = $section['creator_id'];
-                    $sectionMd->date_of_completion      = $section['date_of_completion'];
-                    $sectionMd->duration                = $section['duration'];
-                    $sectionMd->publisher_id            = $section['publisher_id'];
-                    $sectionMd->publishing_date         = $section['publishing_date'];
-                    $sectionMd->section_instruction     = $section['section_instruction'];
-                    $query                              = $sectionMd->save();
-                    $sectionKey                         = $key + 1;
+                    $sectionMd->test_id = $test_id;
+                    $sectionMd->subject = $section['subject'];
+                    $sectionMd->subject_part = isset($section['subject_part']) ? $section['subject_part'] : 0;
+                    $sectionMd->subject_part_lesson = isset($section['subject_part_lesson']) ? $section['subject_part_lesson'] : 0;
+                    $sectionMd->gn_subject_part_lesson = isset($section['gn_subject_part_lesson']) ? $section['gn_subject_part_lesson'] : 0;
+                    $sectionMd->number_of_questions = $section['number_of_questions'];
+                    $sectionMd->question_type = $section['question_type'];
+                    $sectionMd->mcq_options = isset($section['mcq_options']) ? $section['mcq_options'] : 0;
+                    $sectionMd->difficulty_level = $section['difficulty_level'];
+                    $sectionMd->creator_id = $section['creator_id'];
+                    $sectionMd->creator_id = $section['creator_id'];
+                    $sectionMd->date_of_completion = $section['date_of_completion'];
+                    $sectionMd->duration = $section['duration'];
+                    $sectionMd->publisher_id = $section['publisher_id'];
+                    $sectionMd->publishing_date = $section['publishing_date'];
+                    $sectionMd->section_instruction = $section['section_instruction'];
+                    $query = $sectionMd->save();
+                    $sectionKey = $key + 1;
                     if ($query) {
                         array_push($sectionsSaved, $sectionKey);
                     } else {
                         array_push($errors, $sectionKey);
                     }
                 }
-                $alertClass     = 'success';
-                $errorMessage   = '';
+                $alertClass = 'success';
+                $errorMessage = '';
                 $successMessage = '';
                 if (count($errors)) {
-                    $errorSections  = implode(',', $errors);
-                    $errorMessage   = 'Sections <b>(' . $errorSections . ')</b> not saved.<br>';
-                    $alertClass     = 'warning';
+                    $errorSections = implode(',', $errors);
+                    $errorMessage = 'Sections <b>('.$errorSections.')</b> not saved.<br>';
+                    $alertClass = 'warning';
                 }
                 if (count($sectionsSaved)) {
-                    $savedSections  = implode(',', $sectionsSaved);
-                    $successMessage = 'Sections <b>(' . $savedSections . ')</b> successfully saved.';
+                    $savedSections = implode(',', $sectionsSaved);
+                    $successMessage = 'Sections <b>('.$savedSections.')</b> successfully saved.';
                 }
                 TestModal::sectionsCount();
                 // $totalSections = count($sections);
@@ -277,10 +295,12 @@ class ExamsController extends Controller
                 // $test->sections = $totalSections;
                 // $test->save();
 
-                $alertMessage   = $errorMessage . $successMessage;
+                $alertMessage = $errorMessage.$successMessage;
                 $returnResponse = ['class' => $alertClass, 'message' => $alertMessage];
+
                 // return redirect()->route('administrator.dashboard_tests_list', [$test_id])->withErrors(['sectionsError' => $returnResponse]);
                 return redirect()->route('administrator.dashboard_tests_list')->withErrors(['sectionsError' => $returnResponse]);
+
                 return print_r($sections);
             }
 
@@ -290,11 +310,10 @@ class ExamsController extends Controller
         $this->data['auth_id'] = Auth::user()->id;
         // $test = TestModal::find($this->data['test_id']);
 
-
-        $this->data['education_types']  = Educationtype::get();
-        $this->data['subject']          = Subject::get();
+        $this->data['education_types'] = Educationtype::get();
+        $this->data['subject'] = Subject::get();
         // $this->data['subjects']         = Subject::get();
-        $this->data['subjects']         = Gn_ClassSubject::get();
+        $this->data['subjects'] = Gn_ClassSubject::get();
         // $this->data['test']     = $test;
         // $this->data['subjects'] = Subject::get();
 
@@ -309,11 +328,12 @@ class ExamsController extends Controller
         $sections = TestSections::where('test_id', $test_id)->get();
         $this->data['sections'] = $sections;
         $this->data['creators'] = $creators;
+
         // $this->data['pagename'] = 'Test Sections';
         return view('Dashboard/Admin/Exam/savetest')->with('data', $this->data);
     }
 
-    public function publishTest(Request $req,$test_id)
+    public function publishTest(Request $req, $test_id)
     {
         $test = TestModal::find($test_id);
         $this->data['marks'] = ['1', '2', '3', '4'];
@@ -353,18 +373,16 @@ class ExamsController extends Controller
             $inputs = $req->all();
             if ($inputs['form_name'] == 'publish_test') {
                 $publish_test = TestModal::find($test_id);
-                $publish_test->show_result      = isset($inputs['show_result']) ? $inputs['show_result'] == 'on' ? 1 : 0 : 0 ;
-                $publish_test->show_rank        = isset($inputs['show_rank']) ? $inputs['show_rank'] == 'on'? 1 : 0 : 0;
-                $publish_test->show_answer      = isset($inputs['show_answer']) ? $inputs['show_answer'] == 'on'? 1 : 0 : 0;
-                $publish_test->show_solution    = isset($inputs['show_solution']) ? $inputs['show_solution'] == 'on'? 1 : 0 : 0;
-                $publish_test->test_type    = isset($inputs['test_type']) ? $inputs['test_type'] : NULL;
-                $publish_test->package                  = isset($inputs['package']) ? implode(',',$inputs['package']) : NULL;
-                $publish_test->test_cat    = isset($inputs['test_cat']) ? $inputs['test_cat'] : NULL;
-                $publish_test->price    = isset($inputs['price']) ? $inputs['price'] : NULL;
+                $publish_test->show_result = isset($inputs['show_result']) ? $inputs['show_result'] == 'on' ? 1 : 0 : 0;
+                $publish_test->show_rank = isset($inputs['show_rank']) ? $inputs['show_rank'] == 'on' ? 1 : 0 : 0;
+                $publish_test->show_answer = isset($inputs['show_answer']) ? $inputs['show_answer'] == 'on' ? 1 : 0 : 0;
+                $publish_test->show_solution = isset($inputs['show_solution']) ? $inputs['show_solution'] == 'on' ? 1 : 0 : 0;
+                $publish_test->test_type = isset($inputs['test_type']) ? $inputs['test_type'] : null;
+                $publish_test->package = isset($inputs['package']) ? implode(',', $inputs['package']) : null;
+                $publish_test->test_cat = isset($inputs['test_cat']) ? $inputs['test_cat'] : null;
+                $publish_test->price = isset($inputs['price']) ? $inputs['price'] : null;
 
-
-
-                $publish_test->published        = 1;
+                $publish_test->published = 1;
                 $publish_test->save();
 
                 return redirect()->route('administrator.dashboard_tests_list')->withErrors(['testSuccess' => 'Test succesfully added.']);
@@ -373,201 +391,126 @@ class ExamsController extends Controller
         }
         $this->data['test'] = $test;
         $this->data['test_category'] = DB::table('test_cat')->get();
-        $this->data['group_classes']    = ClassGoupExamModel::where('education_type_id',$this->data['test']->education_type_id)->get();
-        $this->data['agency_boards']    = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id',$this->data['test']->education_type_id)->where('classes_group_exams_id',$this->data['test']->education_type_child_id)->get();
-        $this->data['other_exams']      = Gn_OtherExamClassDetailModel::where('education_type_id',$this->data['test']->education_type_id)->where('classes_group_exams_id',$this->data['test']->education_type_child_id)->where('agency_board_university_id',$this->data['test']->board_state_agency)->get();
+        $this->data['group_classes'] = ClassGoupExamModel::where('education_type_id', $this->data['test']->education_type_id)->get();
+        $this->data['agency_boards'] = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id', $this->data['test']->education_type_id)->where('classes_group_exams_id', $this->data['test']->education_type_child_id)->get();
+        $this->data['other_exams'] = Gn_OtherExamClassDetailModel::where('education_type_id', $this->data['test']->education_type_id)->where('classes_group_exams_id', $this->data['test']->education_type_child_id)->where('agency_board_university_id', $this->data['test']->board_state_agency)->get();
 
         return view('Dashboard/Admin/Exam/publish_test')->with('data', $this->data);
 
     }
+
     public function testSections(Request $req, $test_id)
     {
-        $this->data['auth_id'] = Auth::user()->id;
-        $test = TestModal::find($test_id);
-        if ($req->isMethod('post')) {
-            if ($req->input('form_name') && $req->input('form_name') == 'notify_creator') {
-                return json_encode($req->all());
-                // send email here to the creator, also check changes if new mail send by the manager
-            }
-            dd($req->all());
-            $errors         = array();
-            $sectionsSaved  = array();
-            $inputs         = $req->all();
-            $sections       = $inputs['section'];
-            foreach ($sections as $key => $section) {
-                $sectionMd      = new TestSections();
-                if ($section['id'] > 0) {
-                    $sectionMd  = TestSections::find($section['id']);
-                }
-                $sectionMd->test_id                 = $test_id;
-                $sectionMd->subject                 = $section['subject'];
-                $sectionMd->subject_part            = isset($section['subject_part']) ? $section['subject_part'] : 0;
-                $sectionMd->subject_part_lesson     = isset($section['subject_part_lesson']) ? $section['subject_part_lesson'] : 0;
-                $sectionMd->gn_subject_part_lesson  = isset($section['gn_subject_part_lesson']) ? $section['gn_subject_part_lesson'] : 0;
-                $sectionMd->number_of_questions     = $section['number_of_questions'];
-                $sectionMd->question_type           = $section['question_type'];
-                $sectionMd->mcq_options             = isset($section['mcq_options']) ? $section['mcq_options'] : 0;
-                $sectionMd->difficulty_level        = $section['difficulty_level'];
-                $sectionMd->creator_id              = $section['creator_id'];
-                $sectionMd->date_of_completion      = $section['date_of_completion'];
-                $sectionMd->publisher_id            = $section['publisher_id'];
-                $sectionMd->publishing_date         = $section['publishing_date'];
-                $query                              = $sectionMd->save();
-                $sectionKey                         = $key + 1;
-                if ($query) {
-                    array_push($sectionsSaved, $sectionKey);
-                } else {
-                    array_push($errors, $sectionKey);
-                }
-            }
-            $alertClass     = 'success';
-            $errorMessage   = '';
-            $successMessage = '';
-            if (count($errors)) {
-                $errorSections  = implode(',', $errors);
-                $errorMessage   = 'Sections <b>(' . $errorSections . ')</b> not saved.<br>';
-                $alertClass     = 'warning';
-            }
-            if (count($sectionsSaved)) {
-                $savedSections  = implode(',', $sectionsSaved);
-                $successMessage = 'Sections <b>(' . $savedSections . ')</b> successfully saved.';
-            }
-            TestModal::sectionsCount();
-            // $totalSections = count($sections);
-
-            // $test->sections = $totalSections;
-            // $test->save();
-
-            $alertMessage   = $errorMessage . $successMessage;
-            $returnResponse = ['class' => $alertClass, 'message' => $alertMessage];
-            return redirect()->route('administrator.dashboard_test_sections', [$test_id])->withErrors(['sectionsError' => $returnResponse]);
-            return print_r($sections);
-        }
-        $this->data['test']     = $test;
-        $this->data['subjects'] = Subject::get();
-
-        $matchThis = ['in_franchise' => '0', 'isAdminAllowed' => '1'];
-        $creators = User::where($matchThis)->where('roles', 'like', '%"creator"%')->orWhere('roles', 'like', '%"manager"%')->orWhere('roles', 'superadmin')->get();
-
-        foreach ($creators as $key => $creator) {
-            if ($creator['id'] == $this->data['auth_id']) {
-                $creators[$key]['name'] = 'Admin';
-            }
-        }
-
-        $sections = TestSections::where('test_id', $test_id)->get();
-        $this->data['sections'] = $sections;
-        $this->data['creators'] = $creators;
-        $this->data['pagename'] = 'Test Sections';
-        return view('Dashboard/Admin/Exam/sections')->with('data', $this->data);
+        return view('Dashboard/Admin/Exam/sections', ['test_id' => $test_id]);
     }
+
     public function eductaion_type(Request $req)
     {
         if ($req->isMethod('post')) {
             $inputs = $req->all();
 
-            $query          = false;
-            $requestName    = '';
-            $requestType    = '';
-            $queryMd        = false;
+            $query = false;
+            $requestName = '';
+            $requestType = '';
+            $queryMd = false;
 
             if ($inputs['form_name'] == 'class_form') {
                 $requestName = 'Class / Group / Exam';
                 $requestType = 'class';
 
-                if (!empty($inputs['education_type_id']) && !empty($inputs['class_group_exam'])) {
-                    $classMd = ClassGoupExamModel::where('education_type_id',$inputs['education_type_id'])->get()->pluck('id')->toArray();
-                    $class_group_exam_data = array_diff($inputs['class_group_exam'],$classMd);
-                    if (!empty($class_group_exam_data)) {
+                if (! empty($inputs['education_type_id']) && ! empty($inputs['class_group_exam'])) {
+                    $classMd = ClassGoupExamModel::where('education_type_id', $inputs['education_type_id'])->get()->pluck('id')->toArray();
+                    $class_group_exam_data = array_diff($inputs['class_group_exam'], $classMd);
+                    if (! empty($class_group_exam_data)) {
                         foreach ($class_group_exam_data as $key => $data) {
-                            $examMd                    = new ClassGoupExamModel();
+                            $examMd = new ClassGoupExamModel;
                             $examMd->education_type_id = $inputs['education_type_id'];
-                            $examMd->name              = $data;
+                            $examMd->name = $data;
                             $queryMd = $examMd;
                             $query = $queryMd->save();
-                            $this->insert_data['class_group_exam'][$key] =  $examMd->id;
+                            $this->insert_data['class_group_exam'][$key] = $examMd->id;
                         }
                     }
                 }
-                if (!empty($inputs['education_type_id']) && !empty($inputs['class_group_exam']) && !empty($inputs['boards'])) {
-                    if (!empty($this->insert_data['class_group_exam'])) {
+                if (! empty($inputs['education_type_id']) && ! empty($inputs['class_group_exam']) && ! empty($inputs['boards'])) {
+                    if (! empty($this->insert_data['class_group_exam'])) {
                         $board_ids = BoardAgencyStateModel::get()->pluck('id')->toArray();
-                        $get_diff_board_name = array_diff($inputs['boards'],$board_ids);
-                        $get_diff_board_ids  = array_diff($inputs['boards'],$get_diff_board_name);
+                        $get_diff_board_name = array_diff($inputs['boards'], $board_ids);
+                        $get_diff_board_ids = array_diff($inputs['boards'], $get_diff_board_name);
 
-                        if (!empty($get_diff_board_ids)) {
+                        if (! empty($get_diff_board_ids)) {
                             foreach ($this->insert_data['class_group_exam'] as $class_group_exam) {
                                 foreach ($get_diff_board_ids as $value) {
-                                    $insert_board = new Gn_EducationClassExamAgencyBoardUniversity();
-                                    $insert_board->education_type_id        = $inputs['education_type_id'];
-                                    $insert_board->classes_group_exams_id   = $class_group_exam;
-                                    $insert_board->board_agency_exam_id     = $value;
-                                    $queryMd  = $insert_board;
-                                    $query    = $queryMd->save();
+                                    $insert_board = new Gn_EducationClassExamAgencyBoardUniversity;
+                                    $insert_board->education_type_id = $inputs['education_type_id'];
+                                    $insert_board->classes_group_exams_id = $class_group_exam;
+                                    $insert_board->board_agency_exam_id = $value;
+                                    $queryMd = $insert_board;
+                                    $query = $queryMd->save();
                                 }
                             }
                         }
 
-                        if (!empty($get_diff_board_name)) {
+                        if (! empty($get_diff_board_name)) {
                             foreach ($get_diff_board_name as $value) {
-                                $boardMd         = new BoardAgencyStateModel();
-                                $boardMd->name   = $value;
+                                $boardMd = new BoardAgencyStateModel;
+                                $boardMd->name = $value;
                                 $boardMd->save();
                                 foreach ($this->insert_data['class_group_exam'] as $class_group_exam) {
-                                    $insert_board = new Gn_EducationClassExamAgencyBoardUniversity();
-                                    $insert_board->education_type_id        = $inputs['education_type_id'];
-                                    $insert_board->classes_group_exams_id   = $class_group_exam;
-                                    $insert_board->board_agency_exam_id     = $boardMd->id;
-                                    $queryMd  = $insert_board;
-                                    $query    = $queryMd->save();
+                                    $insert_board = new Gn_EducationClassExamAgencyBoardUniversity;
+                                    $insert_board->education_type_id = $inputs['education_type_id'];
+                                    $insert_board->classes_group_exams_id = $class_group_exam;
+                                    $insert_board->board_agency_exam_id = $boardMd->id;
+                                    $queryMd = $insert_board;
+                                    $query = $queryMd->save();
                                 }
                             }
                         }
 
                     }
                     $class_ids = ClassGoupExamModel::get()->pluck('id')->toArray();
-                    $get_diff_class_name = array_diff($inputs['class_group_exam'],$class_ids);
-                    $get_diff_class_ids  = array_diff($inputs['class_group_exam'],$get_diff_class_name);
+                    $get_diff_class_name = array_diff($inputs['class_group_exam'], $class_ids);
+                    $get_diff_class_ids = array_diff($inputs['class_group_exam'], $get_diff_class_name);
 
                     $board_ids = BoardAgencyStateModel::get()->pluck('id')->toArray();
-                    $get_diff_board_name = array_diff($inputs['boards'],$board_ids);
-                    $get_diff_board_ids  = array_diff($inputs['boards'],$get_diff_board_name);
-                    if (!empty($get_diff_board_ids )) {
+                    $get_diff_board_name = array_diff($inputs['boards'], $board_ids);
+                    $get_diff_board_ids = array_diff($inputs['boards'], $get_diff_board_name);
+                    if (! empty($get_diff_board_ids)) {
                         foreach ($get_diff_class_ids as $value) {
-                            $get_boards_id = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id',$inputs['education_type_id'])->where('classes_group_exams_id','=',$value)->get()->pluck('board_agency_exam_id')->toArray();
-                            $insert_ids = array_diff($get_diff_board_ids,$get_boards_id);
-                            if (!empty($insert_ids)) {
+                            $get_boards_id = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id', $inputs['education_type_id'])->where('classes_group_exams_id', '=', $value)->get()->pluck('board_agency_exam_id')->toArray();
+                            $insert_ids = array_diff($get_diff_board_ids, $get_boards_id);
+                            if (! empty($insert_ids)) {
                                 foreach ($insert_ids as $insert_id) {
-                                    $insert_board = new Gn_EducationClassExamAgencyBoardUniversity();
-                                    $insert_board->education_type_id        = $inputs['education_type_id'];
-                                    $insert_board->classes_group_exams_id   = $value;
-                                    $insert_board->board_agency_exam_id     = $insert_id;
-                                    $queryMd  = $insert_board;
-                                    $query    = $queryMd->save();
+                                    $insert_board = new Gn_EducationClassExamAgencyBoardUniversity;
+                                    $insert_board->education_type_id = $inputs['education_type_id'];
+                                    $insert_board->classes_group_exams_id = $value;
+                                    $insert_board->board_agency_exam_id = $insert_id;
+                                    $queryMd = $insert_board;
+                                    $query = $queryMd->save();
                                 }
                             }
                         }
                     }
-                    if(!empty($get_diff_board_name)) {
+                    if (! empty($get_diff_board_name)) {
                         foreach ($get_diff_board_name as $value) {
-                            $boardMd         = new BoardAgencyStateModel();
-                            $boardMd->name   = $value;
+                            $boardMd = new BoardAgencyStateModel;
+                            $boardMd->name = $value;
                             $boardMd->save();
                             foreach ($get_diff_class_ids as $class_group_exam) {
-                                $insert_board = new Gn_EducationClassExamAgencyBoardUniversity();
-                                $insert_board->education_type_id        = $inputs['education_type_id'];
-                                $insert_board->classes_group_exams_id   = $class_group_exam;
-                                $insert_board->board_agency_exam_id     = $boardMd->id;
-                                $queryMd  = $insert_board;
-                                $query    = $queryMd->save();
+                                $insert_board = new Gn_EducationClassExamAgencyBoardUniversity;
+                                $insert_board->education_type_id = $inputs['education_type_id'];
+                                $insert_board->classes_group_exams_id = $class_group_exam;
+                                $insert_board->board_agency_exam_id = $boardMd->id;
+                                $queryMd = $insert_board;
+                                $query = $queryMd->save();
                             }
                         }
                     }
 
                 }
 
-                if (!empty($inputs['education_type_id']) && !empty($inputs['class_group_exam']) && !empty($inputs['boards']) && !empty($inputs['class_other_exam_detail'])) {
-                    # code...
+                if (! empty($inputs['education_type_id']) && ! empty($inputs['class_group_exam']) && ! empty($inputs['boards']) && ! empty($inputs['class_other_exam_detail'])) {
+                    // code...
                     print_r('class_other_exam_detail not empty');
 
                 }
@@ -610,107 +553,104 @@ class ExamsController extends Controller
                 if ($inputs['id'] > 0) {
                     foreach ($inputs['name'] as $key => $value) {
                         $education_type = Educationtype::find($inputs['id']);
-                        if (!empty($education_type)) {
-                            $education_type->name   = $value;
-                            $education_type->slug   = $inputs['slug'] ?? \Illuminate\Support\Str::slug($value);
-                            $queryMd                = $education_type;
-                            $query                  = $queryMd->save();
+                        if (! empty($education_type)) {
+                            $education_type->name = $value;
+                            $education_type->slug = $inputs['slug'] ?? \Illuminate\Support\Str::slug($value);
+                            $queryMd = $education_type;
+                            $query = $queryMd->save();
                         }
                     }
 
-                }
-                else {
+                } else {
                     foreach ($inputs['name'] as $data) {
-                        $educationMd        = new Educationtype();
-                        $educationMd->name  = $data;
-                        $educationMd->slug  = \Illuminate\Support\Str::slug($data);
-                        $queryMd            = $educationMd;
-                        $query              = $queryMd->save();
+                        $educationMd = new Educationtype;
+                        $educationMd->name = $data;
+                        $educationMd->slug = \Illuminate\Support\Str::slug($data);
+                        $queryMd = $educationMd;
+                        $query = $queryMd->save();
                     }
                 }
             }
             if ($inputs['form_name'] == 'exam_form') {
-                $requestName = "Class / Group / Exam Name";
+                $requestName = 'Class / Group / Exam Name';
                 $requestType = 'exam';
                 if ($inputs['id'] > 0) {
                     $all_class_id = ClassGoupExamModel::get()->pluck('id')->toArray();
-                    $class_id     = Gn_AssignClassGroupExamName::where('education_type_id',$inputs['exam_education_type_id'])->get()->pluck('classes_group_exams_id')->toArray();
+                    $class_id = Gn_AssignClassGroupExamName::where('education_type_id', $inputs['exam_education_type_id'])->get()->pluck('classes_group_exams_id')->toArray();
 
-                    $new_insert_data             = array_diff($inputs['name'],$all_class_id);
-                    $new_insert_data_diff_id     = array_diff($new_insert_data,$class_id);
-                    $new_insert_data_diff_name   = array_diff($new_insert_data,$new_insert_data_diff_id);
+                    $new_insert_data = array_diff($inputs['name'], $all_class_id);
+                    $new_insert_data_diff_id = array_diff($new_insert_data, $class_id);
+                    $new_insert_data_diff_name = array_diff($new_insert_data, $new_insert_data_diff_id);
 
-                    $delete_data_diff_id        = array_diff($class_id,$inputs['name']);
+                    $delete_data_diff_id = array_diff($class_id, $inputs['name']);
 
-                    if (!empty($new_insert_data_diff_id)) {
+                    if (! empty($new_insert_data_diff_id)) {
 
                         foreach ($new_insert_data_diff_id as $key => $value) {
-                            $examMd                    = new ClassGoupExamModel();
+                            $examMd = new ClassGoupExamModel;
                             $examMd->education_type_id = $inputs['exam_education_type_id'];
-                            $examMd->name              = $value;
+                            $examMd->name = $value;
                             $examMd->save();
 
-                            $assign_class_group                         = new Gn_AssignClassGroupExamName();
-                            $assign_class_group->education_type_id      = $inputs['exam_education_type_id'];
+                            $assign_class_group = new Gn_AssignClassGroupExamName;
+                            $assign_class_group->education_type_id = $inputs['exam_education_type_id'];
                             $assign_class_group->classes_group_exams_id = $examMd->id;
                             $assign_class_group->save();
 
                             $this->data['classes_group_exams_id'][$key] = $examMd->id;
                         }
-                        $verify_education_type = Gn_DisplayClassGroupExamName::where('education_type_id','=',$inputs['exam_education_type_id'])->first();
-                        if (!empty($verify_education_type)) {
+                        $verify_education_type = Gn_DisplayClassGroupExamName::where('education_type_id', '=', $inputs['exam_education_type_id'])->first();
+                        if (! empty($verify_education_type)) {
                             $class_id = json_decode($verify_education_type->class_group_exam_name);
-                            $class_id = array_merge($class_id,$this->data['classes_group_exams_id']);
+                            $class_id = array_merge($class_id, $this->data['classes_group_exams_id']);
                             $verify_education_type->class_group_exam_name = json_encode($class_id);
-                            $queryMd    = $verify_education_type;
-                            $query      = $queryMd->save();
-                        }
-                        else{
-                            $gn_DisplayClassGroupExamName = new Gn_DisplayClassGroupExamName();
-                            $gn_DisplayClassGroupExamName->education_type_id     = $inputs['exam_education_type_id'];
+                            $queryMd = $verify_education_type;
+                            $query = $queryMd->save();
+                        } else {
+                            $gn_DisplayClassGroupExamName = new Gn_DisplayClassGroupExamName;
+                            $gn_DisplayClassGroupExamName->education_type_id = $inputs['exam_education_type_id'];
                             $gn_DisplayClassGroupExamName->class_group_exam_name = json_encode($this->data['classes_group_exams_id']);
-                            $queryMd    = $gn_DisplayClassGroupExamName;
-                            $query      = $queryMd->save();
+                            $queryMd = $gn_DisplayClassGroupExamName;
+                            $query = $queryMd->save();
                         }
 
                     }
 
-                    if (!empty($new_insert_data_diff_name)) {
+                    if (! empty($new_insert_data_diff_name)) {
                         foreach ($new_insert_data_diff_name as $value) {
-                            $assign_class_group                         = new Gn_AssignClassGroupExamName();
-                            $assign_class_group->education_type_id      = $inputs['exam_education_type_id'];
+                            $assign_class_group = new Gn_AssignClassGroupExamName;
+                            $assign_class_group->education_type_id = $inputs['exam_education_type_id'];
                             $assign_class_group->classes_group_exams_id = $examMd->id;
                             $assign_class_group->save();
                         }
 
-                        $verify_education_type = Gn_DisplayClassGroupExamName::where('education_type_id','=',$inputs['exam_education_type_id'])->first();
-                        if (!empty($verify_education_type)) {
+                        $verify_education_type = Gn_DisplayClassGroupExamName::where('education_type_id', '=', $inputs['exam_education_type_id'])->first();
+                        if (! empty($verify_education_type)) {
                             $class_id = json_decode($verify_education_type->class_group_exam_name);
-                            $class_id = array_merge($class_id,$new_insert_data_diff_name);
+                            $class_id = array_merge($class_id, $new_insert_data_diff_name);
                             $verify_education_type->class_group_exam_name = json_encode($class_id);
-                            $queryMd    = $verify_education_type;
-                            $query      = $queryMd->save();
-                        }
-                        else{
-                            $gn_DisplayClassGroupExamName = new Gn_DisplayClassGroupExamName();
-                            $gn_DisplayClassGroupExamName->education_type_id     = $inputs['exam_education_type_id'];
+                            $queryMd = $verify_education_type;
+                            $query = $queryMd->save();
+                        } else {
+                            $gn_DisplayClassGroupExamName = new Gn_DisplayClassGroupExamName;
+                            $gn_DisplayClassGroupExamName->education_type_id = $inputs['exam_education_type_id'];
                             $gn_DisplayClassGroupExamName->class_group_exam_name = json_encode($new_insert_data_diff_name);
-                            $queryMd    = $gn_DisplayClassGroupExamName;
-                            $query      = $queryMd->save();
+                            $queryMd = $gn_DisplayClassGroupExamName;
+                            $query = $queryMd->save();
                         }
                     }
 
-                    if (!empty($delete_data_diff_id)) {
+                    if (! empty($delete_data_diff_id)) {
                         foreach ($delete_data_diff_id as $key => $value) {
-                            $delete_data = Gn_AssignClassGroupExamName::where('education_type_id','=',$inputs['exam_education_type_id'])->where('classes_group_exams_id',$value);
+                            $delete_data = Gn_AssignClassGroupExamName::where('education_type_id', '=', $inputs['exam_education_type_id'])->where('classes_group_exams_id', $value);
                             $delete_data->delete();
                         }
 
-                        $class_education                        = ClassGoupExamModel::whereIn('id',$delete_data_diff_id);
-                        $board_education                        = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id','=',$inputs['exam_education_type_id'])->whereIn('classes_group_exams_id',$delete_data_diff_id);
-                        $other_exam_education                   = Gn_OtherExamClassDetailModel::where('education_type_id','=',$inputs['exam_education_type_id'])->whereIn('classes_group_exams_id',$delete_data_diff_id);
-                        $gn_DisplayExamAgencyBoardUniversity    = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id','=',$inputs['exam_education_type_id'])->whereIn('classes_group_exams_id',$delete_data_diff_id);
-                        $gn_ohter_exam_display                  = Gn_DisplayOtherExamClassDetail::where('education_type_id','=',$inputs['exam_education_type_id'])->whereIn('classes_group_exams_id',$delete_data_diff_id);
+                        $class_education = ClassGoupExamModel::whereIn('id', $delete_data_diff_id);
+                        $board_education = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id', '=', $inputs['exam_education_type_id'])->whereIn('classes_group_exams_id', $delete_data_diff_id);
+                        $other_exam_education = Gn_OtherExamClassDetailModel::where('education_type_id', '=', $inputs['exam_education_type_id'])->whereIn('classes_group_exams_id', $delete_data_diff_id);
+                        $gn_DisplayExamAgencyBoardUniversity = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id', '=', $inputs['exam_education_type_id'])->whereIn('classes_group_exams_id', $delete_data_diff_id);
+                        $gn_ohter_exam_display = Gn_DisplayOtherExamClassDetail::where('education_type_id', '=', $inputs['exam_education_type_id'])->whereIn('classes_group_exams_id', $delete_data_diff_id);
 
                         $class_education->delete();
                         $board_education->delete();
@@ -718,43 +658,41 @@ class ExamsController extends Controller
                         $gn_DisplayExamAgencyBoardUniversity->delete();
                         $gn_ohter_exam_display->delete();
 
-                        $update_class = Gn_DisplayClassGroupExamName::where('education_type_id','=',$inputs['exam_education_type_id'])->first();
+                        $update_class = Gn_DisplayClassGroupExamName::where('education_type_id', '=', $inputs['exam_education_type_id'])->first();
                         $class_id = json_decode($update_class->class_group_exam_name);
-                        $class_id = array_merge($class_id,$delete_data_diff_id);
+                        $class_id = array_merge($class_id, $delete_data_diff_id);
                         $update_class->education_type_id = $inputs['exam_education_type_id'];
                         $update_class->class_group_exam_name = $class_id;
                         $update_class->save();
                     }
-                }
-                else {
+                } else {
                     foreach ($inputs['name'] as $key => $data) {
-                        $examMd                     = new ClassGoupExamModel();
-                        $examMd->education_type_id  = $inputs['exam_education_type_id'];
-                        $examMd->name               = $data;
+                        $examMd = new ClassGoupExamModel;
+                        $examMd->education_type_id = $inputs['exam_education_type_id'];
+                        $examMd->name = $data;
                         $examMd->save();
 
-                        $assign_class_group                         = new Gn_AssignClassGroupExamName();
-                        $assign_class_group->education_type_id      = $inputs['exam_education_type_id'];
+                        $assign_class_group = new Gn_AssignClassGroupExamName;
+                        $assign_class_group->education_type_id = $inputs['exam_education_type_id'];
                         $assign_class_group->classes_group_exams_id = $examMd->id;
                         $assign_class_group->save();
 
                         $this->data['classes_group_exams_id'][$key] = $examMd->id;
                     }
 
-                    $verify_education_type = Gn_DisplayClassGroupExamName::where('education_type_id','=',$inputs['exam_education_type_id'])->first();
-                    if (!empty($verify_education_type)) {
+                    $verify_education_type = Gn_DisplayClassGroupExamName::where('education_type_id', '=', $inputs['exam_education_type_id'])->first();
+                    if (! empty($verify_education_type)) {
                         $class_id = json_decode($verify_education_type->class_group_exam_name);
-                        $class_id = array_merge($class_id,$this->data['classes_group_exams_id']);
+                        $class_id = array_merge($class_id, $this->data['classes_group_exams_id']);
                         $verify_education_type->class_group_exam_name = json_encode($class_id);
-                        $queryMd    = $verify_education_type;
-                        $query      = $queryMd->save();
-                    }
-                    else{
-                        $gn_DisplayClassGroupExamName = new Gn_DisplayClassGroupExamName();
-                        $gn_DisplayClassGroupExamName->education_type_id     = $inputs['exam_education_type_id'];
+                        $queryMd = $verify_education_type;
+                        $query = $queryMd->save();
+                    } else {
+                        $gn_DisplayClassGroupExamName = new Gn_DisplayClassGroupExamName;
+                        $gn_DisplayClassGroupExamName->education_type_id = $inputs['exam_education_type_id'];
                         $gn_DisplayClassGroupExamName->class_group_exam_name = json_encode($this->data['classes_group_exams_id']);
-                        $queryMd    = $gn_DisplayClassGroupExamName;
-                        $query      = $queryMd->save();
+                        $queryMd = $gn_DisplayClassGroupExamName;
+                        $query = $queryMd->save();
                     }
                 }
             }
@@ -796,251 +734,240 @@ class ExamsController extends Controller
                 $requestType = 'board';
 
                 if ($inputs['id'] > 0) {
-                    $boardMd        = BoardAgencyStateModel::find($inputs['id']);
-                    $data1          = BoardAgencyStateModel::whereNotIn('id',$inputs['name'])->get();
-                    $empty_data     = BoardAgencyStateModel::get();
-                    if (!$data1->isEmpty()) {
+                    $boardMd = BoardAgencyStateModel::find($inputs['id']);
+                    $data1 = BoardAgencyStateModel::whereNotIn('id', $inputs['name'])->get();
+                    $empty_data = BoardAgencyStateModel::get();
+                    if (! $data1->isEmpty()) {
                         $board_data = BoardAgencyStateModel::get()->pluck('id')->toArray();
-                        $data_board = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id',$inputs['education_type_id'])->where('classes_group_exams_id',$inputs['classes_group_exams_id'])->get()->pluck('board_agency_exam_id')->toArray();
-                        $new_insert_data = array_diff($inputs['name'],$data_board);
+                        $data_board = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id', $inputs['education_type_id'])->where('classes_group_exams_id', $inputs['classes_group_exams_id'])->get()->pluck('board_agency_exam_id')->toArray();
+                        $new_insert_data = array_diff($inputs['name'], $data_board);
 
-                        $new_insert_data_diff_id     = array_diff($new_insert_data,$board_data);
-                        $new_insert_data_diff_name   = array_diff($new_insert_data,$new_insert_data_diff_id);
-                        $delete_data_diff_id        = array_diff($data_board,$inputs['name']);
+                        $new_insert_data_diff_id = array_diff($new_insert_data, $board_data);
+                        $new_insert_data_diff_name = array_diff($new_insert_data, $new_insert_data_diff_id);
+                        $delete_data_diff_id = array_diff($data_board, $inputs['name']);
 
-                        if (!empty($delete_data_diff_id)) {
+                        if (! empty($delete_data_diff_id)) {
                             foreach ($delete_data_diff_id as $value) {
-                                $delete_board = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id',$inputs['education_type_id'])->where('classes_group_exams_id',$inputs['classes_group_exams_id'])->where('board_agency_exam_id',$value);
+                                $delete_board = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id', $inputs['education_type_id'])->where('classes_group_exams_id', $inputs['classes_group_exams_id'])->where('board_agency_exam_id', $value);
                                 $delete_board->delete();
                             }
-                            $other_exam_education                   = Gn_OtherExamClassDetailModel::where('education_type_id',$inputs['education_type_id'])->where('classes_group_exams_id',$inputs['classes_group_exams_id'])->whereIn('agency_board_university_id',$delete_data_diff_id);
-                            $gn_ohter_exam_display                  = Gn_DisplayOtherExamClassDetail::where('education_type_id',$inputs['education_type_id'])->where('classes_group_exams_id',$inputs['classes_group_exams_id'])->whereIn('agency_board_university_id',$delete_data_diff_id);
+                            $other_exam_education = Gn_OtherExamClassDetailModel::where('education_type_id', $inputs['education_type_id'])->where('classes_group_exams_id', $inputs['classes_group_exams_id'])->whereIn('agency_board_university_id', $delete_data_diff_id);
+                            $gn_ohter_exam_display = Gn_DisplayOtherExamClassDetail::where('education_type_id', $inputs['education_type_id'])->where('classes_group_exams_id', $inputs['classes_group_exams_id'])->whereIn('agency_board_university_id', $delete_data_diff_id);
 
                             $other_exam_education->delete();
                             $gn_ohter_exam_display->delete();
 
-                            $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id','=',$inputs['education_type_id'])->where('classes_group_exams_id','=',$inputs['classes_group_exams_id'])->first();
+                            $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id', '=', $inputs['education_type_id'])->where('classes_group_exams_id', '=', $inputs['classes_group_exams_id'])->first();
                             $board_id = json_decode($gn_display_exam->board_id);
-                            $board_id = array_diff($board_id,$delete_data_diff_id);
+                            $board_id = array_diff($board_id, $delete_data_diff_id);
                             $gn_display_exam->board_id = $board_id;
                             $gn_display_exam->save();
                         }
 
-                        if (!empty($new_insert_data_diff_name)) {
+                        if (! empty($new_insert_data_diff_name)) {
                             foreach ($new_insert_data_diff_name as $value) {
-                                $board_multipleMd                         = new Gn_EducationClassExamAgencyBoardUniversity();
-                                $board_multipleMd->education_type_id      = $inputs['education_type_id'];
+                                $board_multipleMd = new Gn_EducationClassExamAgencyBoardUniversity;
+                                $board_multipleMd->education_type_id = $inputs['education_type_id'];
                                 $board_multipleMd->classes_group_exams_id = $inputs['classes_group_exams_id'];
-                                $board_multipleMd->board_agency_exam_id   = $value;
-                                $queryMd                                  = $board_multipleMd;
-                                $query                                    = $queryMd->save();
+                                $board_multipleMd->board_agency_exam_id = $value;
+                                $queryMd = $board_multipleMd;
+                                $query = $queryMd->save();
                             }
-                            $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id','=',$inputs['education_type_id'])->where('classes_group_exams_id','=',$inputs['classes_group_exams_id'])->first();
-                            if (!empty($gn_display_exam)) {
+                            $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id', '=', $inputs['education_type_id'])->where('classes_group_exams_id', '=', $inputs['classes_group_exams_id'])->first();
+                            if (! empty($gn_display_exam)) {
                                 $board_ids = json_decode($gn_display_exam->board_id);
-                                $board_ids = array_merge($board_ids,$new_insert_data_diff_name);
+                                $board_ids = array_merge($board_ids, $new_insert_data_diff_name);
                                 $gn_display_exam->board_id = json_encode($board_ids);
                                 $gn_display_exam->save();
-                            }
-                            else{
-                                $gn_diaplay_exam =  new Gn_DisplayExamAgencyBoardUniversity();
-                                $gn_diaplay_exam->education_type_id      = $inputs['education_type_id'];
+                            } else {
+                                $gn_diaplay_exam = new Gn_DisplayExamAgencyBoardUniversity;
+                                $gn_diaplay_exam->education_type_id = $inputs['education_type_id'];
                                 $gn_diaplay_exam->classes_group_exams_id = $inputs['classes_group_exams_id'];
-                                $gn_diaplay_exam->board_id               = json_encode($new_insert_data_diff_name);
+                                $gn_diaplay_exam->board_id = json_encode($new_insert_data_diff_name);
                                 $gn_diaplay_exam->save();
                             }
 
                         }
 
-                        if (!empty($new_insert_data_diff_id)) {
+                        if (! empty($new_insert_data_diff_id)) {
                             foreach ($new_insert_data_diff_id as $key => $value) {
-                                $boardMd         = new BoardAgencyStateModel();
-                                $boardMd->name   = $value;
+                                $boardMd = new BoardAgencyStateModel;
+                                $boardMd->name = $value;
                                 $boardMd->save();
 
-                                $board_multipleMd                          = new Gn_EducationClassExamAgencyBoardUniversity();
-                                $board_multipleMd->education_type_id       = $inputs['education_type_id'];
-                                $board_multipleMd->classes_group_exams_id  = $inputs['classes_group_exams_id'];
-                                $board_multipleMd->board_agency_exam_id    = $boardMd->id;
+                                $board_multipleMd = new Gn_EducationClassExamAgencyBoardUniversity;
+                                $board_multipleMd->education_type_id = $inputs['education_type_id'];
+                                $board_multipleMd->classes_group_exams_id = $inputs['classes_group_exams_id'];
+                                $board_multipleMd->board_agency_exam_id = $boardMd->id;
                                 $board_multipleMd->save();
                                 $this->data['board_multipleMd_name'][$key] = $boardMd->id;
                             }
-                            $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id','=',$inputs['education_type_id'])->where('classes_group_exams_id','=',$inputs['classes_group_exams_id'])->first();
-                            if (!empty($gn_display_exam)) {
+                            $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id', '=', $inputs['education_type_id'])->where('classes_group_exams_id', '=', $inputs['classes_group_exams_id'])->first();
+                            if (! empty($gn_display_exam)) {
                                 $board_ids = json_decode($gn_display_exam->board_id);
-                                $board_ids = array_merge($board_ids,$this->data['board_multipleMd_name']);
+                                $board_ids = array_merge($board_ids, $this->data['board_multipleMd_name']);
                                 $gn_display_exam->board_id = json_encode($board_ids);
                                 $gn_display_exam->save();
-                            }
-                            else {
-                                $gn_diaplay_exam =  new Gn_DisplayExamAgencyBoardUniversity();
-                                $gn_diaplay_exam->education_type_id      = $inputs['education_type_id'];
+                            } else {
+                                $gn_diaplay_exam = new Gn_DisplayExamAgencyBoardUniversity;
+                                $gn_diaplay_exam->education_type_id = $inputs['education_type_id'];
                                 $gn_diaplay_exam->classes_group_exams_id = $inputs['classes_group_exams_id'];
-                                $gn_diaplay_exam->board_id               = json_encode($this->data['board_multipleMd_name']);
-                                $queryMd                                 = $gn_diaplay_exam;
-                                $query                                   = $queryMd->save();
+                                $gn_diaplay_exam->board_id = json_encode($this->data['board_multipleMd_name']);
+                                $queryMd = $gn_diaplay_exam;
+                                $query = $queryMd->save();
                             }
                         }
-                    }
-                    else {
+                    } else {
 
                         foreach ($inputs['name'] as $key => $value) {
-                            $board_multipleMd                         = new Gn_EducationClassExamAgencyBoardUniversity();
-                            $board_multipleMd->education_type_id      = $inputs['education_type_id'];
+                            $board_multipleMd = new Gn_EducationClassExamAgencyBoardUniversity;
+                            $board_multipleMd->education_type_id = $inputs['education_type_id'];
                             $board_multipleMd->classes_group_exams_id = $inputs['classes_group_exams_id'];
-                            $board_multipleMd->board_agency_exam_id   = $value;
+                            $board_multipleMd->board_agency_exam_id = $value;
                             $board_multipleMd->save();
-                            $this->data['board_multipleMd_id'][$key]  = $value;
+                            $this->data['board_multipleMd_id'][$key] = $value;
                         }
-                        $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id','=',$inputs['education_type_id'])->where('classes_group_exams_id','=',$inputs['classes_group_exams_id'])->first();
-                        if (!empty($gn_display_exam)) {
+                        $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id', '=', $inputs['education_type_id'])->where('classes_group_exams_id', '=', $inputs['classes_group_exams_id'])->first();
+                        if (! empty($gn_display_exam)) {
                             $board_ids = json_decode($gn_display_exam->board_id);
-                            $board_ids = array_merge($board_ids,$this->data['board_multipleMd_id']);
+                            $board_ids = array_merge($board_ids, $this->data['board_multipleMd_id']);
                             $gn_display_exam->board_id = json_encode($board_ids);
                             $gn_display_exam->save();
-                        }
-                        else {
-                            $gn_diaplay_exam =  new Gn_DisplayExamAgencyBoardUniversity();
-                            $gn_diaplay_exam->education_type_id      = $inputs['education_type_id'];
+                        } else {
+                            $gn_diaplay_exam = new Gn_DisplayExamAgencyBoardUniversity;
+                            $gn_diaplay_exam->education_type_id = $inputs['education_type_id'];
                             $gn_diaplay_exam->classes_group_exams_id = $inputs['classes_group_exams_id'];
-                            $gn_diaplay_exam->board_id               = json_encode($this->data['board_multipleMd_id']);
-                            $queryMd                                 = $gn_diaplay_exam;
-                            $query                                   = $queryMd->save();
+                            $gn_diaplay_exam->board_id = json_encode($this->data['board_multipleMd_id']);
+                            $queryMd = $gn_diaplay_exam;
+                            $query = $queryMd->save();
                         }
                     }
-                }
-                else {
-                    $data = BoardAgencyStateModel::whereNotIn('id',$inputs['name'])->get();
+                } else {
+                    $data = BoardAgencyStateModel::whereNotIn('id', $inputs['name'])->get();
                     $empty_data = BoardAgencyStateModel::get();
                     if ($empty_data->isEmpty()) {
                         foreach ($inputs['name'] as $key => $value) {
-                            $boardMd         = new BoardAgencyStateModel();
-                            $boardMd->name   = $value;
+                            $boardMd = new BoardAgencyStateModel;
+                            $boardMd->name = $value;
                             $boardMd->save();
 
-                            $board_multipleMd                         = new Gn_EducationClassExamAgencyBoardUniversity();
-                            $board_multipleMd->education_type_id      = $inputs['education_type_id'];
+                            $board_multipleMd = new Gn_EducationClassExamAgencyBoardUniversity;
+                            $board_multipleMd->education_type_id = $inputs['education_type_id'];
                             $board_multipleMd->classes_group_exams_id = $inputs['classes_group_exams_id'];
-                            $board_multipleMd->board_agency_exam_id   = $boardMd->id;
+                            $board_multipleMd->board_agency_exam_id = $boardMd->id;
                             $board_multipleMd->save();
-                            $this->data['new_insert_data_diff_name'][$key] =  $boardMd->id;
+                            $this->data['new_insert_data_diff_name'][$key] = $boardMd->id;
                         }
 
-                        $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id','=',$inputs['education_type_id'])->where('classes_group_exams_id','=',$inputs['classes_group_exams_id'])->first();
-                        if (!empty($gn_display_exam)) {
+                        $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id', '=', $inputs['education_type_id'])->where('classes_group_exams_id', '=', $inputs['classes_group_exams_id'])->first();
+                        if (! empty($gn_display_exam)) {
                             $board_ids = json_decode($gn_display_exam->board_id);
-                            $board_ids = array_merge($board_ids,$this->data['new_insert_data_diff_name']);
+                            $board_ids = array_merge($board_ids, $this->data['new_insert_data_diff_name']);
                             $gn_display_exam->board_id = json_encode($board_ids);
-                            $gn_display_exam->education_type_id      = $inputs['education_type_id'];
+                            $gn_display_exam->education_type_id = $inputs['education_type_id'];
                             $gn_display_exam->classes_group_exams_id = $inputs['classes_group_exams_id'];
                             $gn_display_exam->save();
-                            $queryMd                                  = $gn_display_exam;
-                            $query                                    = $queryMd->save();
-                        }
-                        else{
-                            $gn_diaplay_exam =  new Gn_DisplayExamAgencyBoardUniversity();
-                            $gn_diaplay_exam->education_type_id      = $inputs['education_type_id'];
+                            $queryMd = $gn_display_exam;
+                            $query = $queryMd->save();
+                        } else {
+                            $gn_diaplay_exam = new Gn_DisplayExamAgencyBoardUniversity;
+                            $gn_diaplay_exam->education_type_id = $inputs['education_type_id'];
                             $gn_diaplay_exam->classes_group_exams_id = $inputs['classes_group_exams_id'];
-                            $gn_diaplay_exam->board_id               = json_encode($this->data['new_insert_data_diff_name']);
+                            $gn_diaplay_exam->board_id = json_encode($this->data['new_insert_data_diff_name']);
                             $gn_diaplay_exam->save();
-                            $queryMd                                  = $gn_diaplay_exam;
-                            $query                                    = $queryMd->save();
+                            $queryMd = $gn_diaplay_exam;
+                            $query = $queryMd->save();
                         }
 
-                    }
-                    else {
-                        if (!$data->isEmpty()) {
+                    } else {
+                        if (! $data->isEmpty()) {
                             $board_data = BoardAgencyStateModel::get()->pluck('id')->toArray();
-                            $data_board = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id',$inputs['education_type_id'])->where('classes_group_exams_id',$inputs['classes_group_exams_id'])->get()->pluck('board_agency_exam_id')->toArray();
-                            $new_insert_data = array_diff($inputs['name'],$data_board);
+                            $data_board = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id', $inputs['education_type_id'])->where('classes_group_exams_id', $inputs['classes_group_exams_id'])->get()->pluck('board_agency_exam_id')->toArray();
+                            $new_insert_data = array_diff($inputs['name'], $data_board);
 
-                            $new_insert_data_diff_id     = array_diff($new_insert_data,$board_data);
-                            $new_insert_data_diff_name   = array_diff($new_insert_data,$new_insert_data_diff_id);
+                            $new_insert_data_diff_id = array_diff($new_insert_data, $board_data);
+                            $new_insert_data_diff_name = array_diff($new_insert_data, $new_insert_data_diff_id);
 
-                            if (!empty($new_insert_data_diff_name)) {
+                            if (! empty($new_insert_data_diff_name)) {
                                 foreach ($new_insert_data_diff_name as $value) {
-                                    $board_multipleMd                         = new Gn_EducationClassExamAgencyBoardUniversity();
-                                    $board_multipleMd->education_type_id      = $inputs['education_type_id'];
+                                    $board_multipleMd = new Gn_EducationClassExamAgencyBoardUniversity;
+                                    $board_multipleMd->education_type_id = $inputs['education_type_id'];
                                     $board_multipleMd->classes_group_exams_id = $inputs['classes_group_exams_id'];
-                                    $board_multipleMd->board_agency_exam_id   = $value;
-                                    $queryMd                                  = $board_multipleMd;
-                                    $query                                    = $queryMd->save();
+                                    $board_multipleMd->board_agency_exam_id = $value;
+                                    $queryMd = $board_multipleMd;
+                                    $query = $queryMd->save();
                                 }
-                                $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id','=',$inputs['education_type_id'])->where('classes_group_exams_id','=',$inputs['classes_group_exams_id'])->first();
-                                if (!empty($gn_display_exam)) {
+                                $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id', '=', $inputs['education_type_id'])->where('classes_group_exams_id', '=', $inputs['classes_group_exams_id'])->first();
+                                if (! empty($gn_display_exam)) {
                                     $board_ids = json_decode($gn_display_exam->board_id);
-                                    $board_ids = array_merge($board_ids,$new_insert_data_diff_name);
+                                    $board_ids = array_merge($board_ids, $new_insert_data_diff_name);
                                     $gn_display_exam->board_id = json_encode($board_ids);
                                     $gn_display_exam->save();
-                                }
-                                else{
-                                    $gn_diaplay_exam =  new Gn_DisplayExamAgencyBoardUniversity();
-                                    $gn_diaplay_exam->education_type_id      = $inputs['education_type_id'];
+                                } else {
+                                    $gn_diaplay_exam = new Gn_DisplayExamAgencyBoardUniversity;
+                                    $gn_diaplay_exam->education_type_id = $inputs['education_type_id'];
                                     $gn_diaplay_exam->classes_group_exams_id = $inputs['classes_group_exams_id'];
-                                    $gn_diaplay_exam->board_id               = json_encode($new_insert_data_diff_name);
+                                    $gn_diaplay_exam->board_id = json_encode($new_insert_data_diff_name);
                                     $gn_diaplay_exam->save();
                                 }
 
                             }
 
-                            if (!empty($new_insert_data_diff_id)) {
+                            if (! empty($new_insert_data_diff_id)) {
                                 foreach ($new_insert_data_diff_id as $key => $value) {
-                                    $boardMd         = new BoardAgencyStateModel();
-                                    $boardMd->name   = $value;
+                                    $boardMd = new BoardAgencyStateModel;
+                                    $boardMd->name = $value;
                                     $boardMd->save();
 
-                                    $board_multipleMd                          = new Gn_EducationClassExamAgencyBoardUniversity();
-                                    $board_multipleMd->education_type_id       = $inputs['education_type_id'];
-                                    $board_multipleMd->classes_group_exams_id  = $inputs['classes_group_exams_id'];
-                                    $board_multipleMd->board_agency_exam_id    = $boardMd->id;
+                                    $board_multipleMd = new Gn_EducationClassExamAgencyBoardUniversity;
+                                    $board_multipleMd->education_type_id = $inputs['education_type_id'];
+                                    $board_multipleMd->classes_group_exams_id = $inputs['classes_group_exams_id'];
+                                    $board_multipleMd->board_agency_exam_id = $boardMd->id;
                                     $board_multipleMd->save();
                                     $this->data['board_multipleMd_name'][$key] = $boardMd->id;
                                 }
-                                $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id','=',$inputs['education_type_id'])->where('classes_group_exams_id','=',$inputs['classes_group_exams_id'])->first();
-                                if (!empty($gn_display_exam)) {
+                                $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id', '=', $inputs['education_type_id'])->where('classes_group_exams_id', '=', $inputs['classes_group_exams_id'])->first();
+                                if (! empty($gn_display_exam)) {
                                     $board_ids = json_decode($gn_display_exam->board_id);
-                                    $board_ids = array_merge($board_ids,$this->data['board_multipleMd_name']);
-                                    $gn_display_exam->education_type_id      = $inputs['education_type_id'];
+                                    $board_ids = array_merge($board_ids, $this->data['board_multipleMd_name']);
+                                    $gn_display_exam->education_type_id = $inputs['education_type_id'];
                                     $gn_display_exam->classes_group_exams_id = $inputs['classes_group_exams_id'];
                                     $gn_display_exam->board_id = json_encode($board_ids);
                                     $gn_display_exam->save();
-                                }
-                                else {
-                                    $gn_diaplay_exam =  new Gn_DisplayExamAgencyBoardUniversity();
-                                    $gn_diaplay_exam->education_type_id      = $inputs['education_type_id'];
+                                } else {
+                                    $gn_diaplay_exam = new Gn_DisplayExamAgencyBoardUniversity;
+                                    $gn_diaplay_exam->education_type_id = $inputs['education_type_id'];
                                     $gn_diaplay_exam->classes_group_exams_id = $inputs['classes_group_exams_id'];
-                                    $gn_diaplay_exam->board_id               = json_encode($this->data['board_multipleMd_name']);
-                                    $queryMd                                 = $gn_diaplay_exam;
-                                    $query                                   = $queryMd->save();
+                                    $gn_diaplay_exam->board_id = json_encode($this->data['board_multipleMd_name']);
+                                    $queryMd = $gn_diaplay_exam;
+                                    $query = $queryMd->save();
                                 }
 
                             }
-                        }
-                        else {
+                        } else {
                             foreach ($inputs['name'] as $key => $value) {
-                                $board_multipleMd                         = new Gn_EducationClassExamAgencyBoardUniversity();
-                                $board_multipleMd->education_type_id      = $inputs['education_type_id'];
+                                $board_multipleMd = new Gn_EducationClassExamAgencyBoardUniversity;
+                                $board_multipleMd->education_type_id = $inputs['education_type_id'];
                                 $board_multipleMd->classes_group_exams_id = $inputs['classes_group_exams_id'];
-                                $board_multipleMd->board_agency_exam_id   = $value;
+                                $board_multipleMd->board_agency_exam_id = $value;
                                 $board_multipleMd->save();
-                                $this->data['board_multipleMd_id'][$key]  = $value;
+                                $this->data['board_multipleMd_id'][$key] = $value;
                             }
-                            $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id','=',$inputs['education_type_id'])->where('classes_group_exams_id','=',$inputs['classes_group_exams_id'])->first();
-                            if (!empty($gn_display_exam)) {
+                            $gn_display_exam = Gn_DisplayExamAgencyBoardUniversity::where('education_type_id', '=', $inputs['education_type_id'])->where('classes_group_exams_id', '=', $inputs['classes_group_exams_id'])->first();
+                            if (! empty($gn_display_exam)) {
                                 $board_ids = json_decode($gn_display_exam->board_id);
-                                $board_ids = array_merge($board_ids,$this->data['board_multipleMd_id']);
-                                $gn_display_exam->education_type_id      = $inputs['education_type_id'];
+                                $board_ids = array_merge($board_ids, $this->data['board_multipleMd_id']);
+                                $gn_display_exam->education_type_id = $inputs['education_type_id'];
                                 $gn_display_exam->classes_group_exams_id = $inputs['classes_group_exams_id'];
                                 $gn_display_exam->board_id = json_encode($board_ids);
                                 $gn_display_exam->save();
-                            }
-                            else {
-                                $gn_diaplay_exam =  new Gn_DisplayExamAgencyBoardUniversity();
-                                $gn_diaplay_exam->education_type_id      = $inputs['education_type_id'];
+                            } else {
+                                $gn_diaplay_exam = new Gn_DisplayExamAgencyBoardUniversity;
+                                $gn_diaplay_exam->education_type_id = $inputs['education_type_id'];
                                 $gn_diaplay_exam->classes_group_exams_id = $inputs['classes_group_exams_id'];
-                                $gn_diaplay_exam->board_id               = json_encode($this->data['board_multipleMd_id']);
-                                $queryMd                                 = $gn_diaplay_exam;
-                                $query                                   = $queryMd->save();
+                                $gn_diaplay_exam->board_id = json_encode($this->data['board_multipleMd_id']);
+                                $queryMd = $gn_diaplay_exam;
+                                $query = $queryMd->save();
                             }
                         }
                     }
@@ -1053,117 +980,112 @@ class ExamsController extends Controller
                 if ($inputs['id'] > 0) {
 
                     $all_other_exam_id = Gn_OtherExamClassDetailModel::get()->pluck('id')->toArray();
-                    $other_exam_id     = Gn_OtherExamClassDetailModel::where('education_type_id','=',$inputs['education_type_id'])->where('classes_group_exams_id','=',$inputs['classes_group_exams_id'])->where('agency_board_university_id','=',$inputs['agency_board_university_id'])->get()->pluck('id')->toArray();
+                    $other_exam_id = Gn_OtherExamClassDetailModel::where('education_type_id', '=', $inputs['education_type_id'])->where('classes_group_exams_id', '=', $inputs['classes_group_exams_id'])->where('agency_board_university_id', '=', $inputs['agency_board_university_id'])->get()->pluck('id')->toArray();
 
-                    $new_insert_data             = array_diff($inputs['name'],$all_other_exam_id);
-                    $new_insert_data_diff_name   = array_diff($new_insert_data,$all_other_exam_id);
-                    $new_insert_data_diff_id     = array_diff($inputs['name'],$other_exam_id);
-                    $new_insert_data_diff_id        = array_diff($new_insert_data_diff_id,$new_insert_data_diff_name);
-                    $delete_data_diff_id         = array_diff($other_exam_id,$inputs['name']);
+                    $new_insert_data = array_diff($inputs['name'], $all_other_exam_id);
+                    $new_insert_data_diff_name = array_diff($new_insert_data, $all_other_exam_id);
+                    $new_insert_data_diff_id = array_diff($inputs['name'], $other_exam_id);
+                    $new_insert_data_diff_id = array_diff($new_insert_data_diff_id, $new_insert_data_diff_name);
+                    $delete_data_diff_id = array_diff($other_exam_id, $inputs['name']);
 
-
-                    if (!empty($new_insert_data_diff_name)) {
+                    if (! empty($new_insert_data_diff_name)) {
                         foreach ($new_insert_data_diff_name as $key => $data) {
-                            $otherExamMd = new Gn_OtherExamClassDetailModel();
-                            $otherExamMd->education_type_id             = $inputs['education_type_id'];
-                            $otherExamMd->classes_group_exams_id        = $inputs['classes_group_exams_id'];
-                            $otherExamMd->agency_board_university_id    = $inputs['agency_board_university_id'];
-                            $otherExamMd->name                          = $data;
+                            $otherExamMd = new Gn_OtherExamClassDetailModel;
+                            $otherExamMd->education_type_id = $inputs['education_type_id'];
+                            $otherExamMd->classes_group_exams_id = $inputs['classes_group_exams_id'];
+                            $otherExamMd->agency_board_university_id = $inputs['agency_board_university_id'];
+                            $otherExamMd->name = $data;
                             $otherExamMd->save();
                             $this->data['other_exams_id1'][$key] = $otherExamMd->id;
                         }
-                        $gn_display_exam = Gn_DisplayOtherExamClassDetail::where('education_type_id','=',$inputs['education_type_id'])->where('classes_group_exams_id','=',$inputs['classes_group_exams_id'])->where('agency_board_university_id','=',$inputs['agency_board_university_id'])->first();
+                        $gn_display_exam = Gn_DisplayOtherExamClassDetail::where('education_type_id', '=', $inputs['education_type_id'])->where('classes_group_exams_id', '=', $inputs['classes_group_exams_id'])->where('agency_board_university_id', '=', $inputs['agency_board_university_id'])->first();
 
-                        if (!empty($gn_display_exam)) {
+                        if (! empty($gn_display_exam)) {
                             $other_exam_id = json_decode($gn_display_exam->other_exam_id);
-                            $other_exam_id = array_merge($other_exam_id,$this->data['other_exams_id1']);
+                            $other_exam_id = array_merge($other_exam_id, $this->data['other_exams_id1']);
                             $gn_display_exam->other_exam_id = json_encode($other_exam_id);
-                            $queryMd                                    = $gn_display_exam;
-                            $query                                      = $queryMd->save();
-                        }
-                        else {
-                            $gn_DisplayOtherExamClassDetail = new Gn_DisplayOtherExamClassDetail();
-                            $gn_DisplayOtherExamClassDetail->education_type_id             = $inputs['education_type_id'];
-                            $gn_DisplayOtherExamClassDetail->classes_group_exams_id        = $inputs['classes_group_exams_id'];
-                            $gn_DisplayOtherExamClassDetail->agency_board_university_id    = $inputs['agency_board_university_id'];
-                            $gn_DisplayOtherExamClassDetail->other_exam_id                 = json_encode($this->data['other_exams_id1']);
-                            $queryMd                                    = $gn_DisplayOtherExamClassDetail;
-                            $query                                      = $queryMd->save();
+                            $queryMd = $gn_display_exam;
+                            $query = $queryMd->save();
+                        } else {
+                            $gn_DisplayOtherExamClassDetail = new Gn_DisplayOtherExamClassDetail;
+                            $gn_DisplayOtherExamClassDetail->education_type_id = $inputs['education_type_id'];
+                            $gn_DisplayOtherExamClassDetail->classes_group_exams_id = $inputs['classes_group_exams_id'];
+                            $gn_DisplayOtherExamClassDetail->agency_board_university_id = $inputs['agency_board_university_id'];
+                            $gn_DisplayOtherExamClassDetail->other_exam_id = json_encode($this->data['other_exams_id1']);
+                            $queryMd = $gn_DisplayOtherExamClassDetail;
+                            $query = $queryMd->save();
                         }
                     }
 
-                    if (!empty($new_insert_data_diff_id)) {
-                        $insert_other_exam_id = Gn_OtherExamClassDetailModel::whereIn('id',$new_insert_data_diff_id)->get()->pluck('name')->toArray();
+                    if (! empty($new_insert_data_diff_id)) {
+                        $insert_other_exam_id = Gn_OtherExamClassDetailModel::whereIn('id', $new_insert_data_diff_id)->get()->pluck('name')->toArray();
                         foreach ($insert_other_exam_id as $key => $data) {
-                            $otherExamMd = new Gn_OtherExamClassDetailModel();
-                            $otherExamMd->education_type_id             = $inputs['education_type_id'];
-                            $otherExamMd->classes_group_exams_id        = $inputs['classes_group_exams_id'];
-                            $otherExamMd->agency_board_university_id    = $inputs['agency_board_university_id'];
-                            $otherExamMd->name                          = $data;
+                            $otherExamMd = new Gn_OtherExamClassDetailModel;
+                            $otherExamMd->education_type_id = $inputs['education_type_id'];
+                            $otherExamMd->classes_group_exams_id = $inputs['classes_group_exams_id'];
+                            $otherExamMd->agency_board_university_id = $inputs['agency_board_university_id'];
+                            $otherExamMd->name = $data;
                             $otherExamMd->save();
                             $this->data['other_exams_id2'][$key] = $otherExamMd->id;
                         }
-                        $gn_display_exam = Gn_DisplayOtherExamClassDetail::where('education_type_id','=',$inputs['education_type_id'])->where('classes_group_exams_id','=',$inputs['classes_group_exams_id'])->where('agency_board_university_id','=',$inputs['agency_board_university_id'])->first();
+                        $gn_display_exam = Gn_DisplayOtherExamClassDetail::where('education_type_id', '=', $inputs['education_type_id'])->where('classes_group_exams_id', '=', $inputs['classes_group_exams_id'])->where('agency_board_university_id', '=', $inputs['agency_board_university_id'])->first();
 
-                        if (!empty($gn_display_exam)) {
+                        if (! empty($gn_display_exam)) {
                             $other_exam_id = json_decode($gn_display_exam->other_exam_id);
-                            $other_exam_id = array_merge($other_exam_id,$this->data['other_exams_id2']);
+                            $other_exam_id = array_merge($other_exam_id, $this->data['other_exams_id2']);
                             $gn_display_exam->other_exam_id = json_encode($other_exam_id);
-                            $queryMd                                    = $gn_display_exam;
-                            $query                                      = $queryMd->save();
-                        }
-                        else {
-                            $gn_DisplayOtherExamClassDetail = new Gn_DisplayOtherExamClassDetail();
-                            $gn_DisplayOtherExamClassDetail->education_type_id             = $inputs['education_type_id'];
-                            $gn_DisplayOtherExamClassDetail->classes_group_exams_id        = $inputs['classes_group_exams_id'];
-                            $gn_DisplayOtherExamClassDetail->agency_board_university_id    = $inputs['agency_board_university_id'];
-                            $gn_DisplayOtherExamClassDetail->other_exam_id                 = json_encode($this->data['other_exams_id2']);
-                            $queryMd                                    = $gn_DisplayOtherExamClassDetail;
-                            $query                                      = $queryMd->save();
+                            $queryMd = $gn_display_exam;
+                            $query = $queryMd->save();
+                        } else {
+                            $gn_DisplayOtherExamClassDetail = new Gn_DisplayOtherExamClassDetail;
+                            $gn_DisplayOtherExamClassDetail->education_type_id = $inputs['education_type_id'];
+                            $gn_DisplayOtherExamClassDetail->classes_group_exams_id = $inputs['classes_group_exams_id'];
+                            $gn_DisplayOtherExamClassDetail->agency_board_university_id = $inputs['agency_board_university_id'];
+                            $gn_DisplayOtherExamClassDetail->other_exam_id = json_encode($this->data['other_exams_id2']);
+                            $queryMd = $gn_DisplayOtherExamClassDetail;
+                            $query = $queryMd->save();
                         }
                     }
 
-                    if (!empty($delete_data_diff_id)) {
-                        $delete_other_exam = Gn_OtherExamClassDetailModel::whereIn('id',$delete_data_diff_id);
+                    if (! empty($delete_data_diff_id)) {
+                        $delete_other_exam = Gn_OtherExamClassDetailModel::whereIn('id', $delete_data_diff_id);
                         $delete_other_exam->delete();
 
-                        $gn_display_exam1  = Gn_DisplayOtherExamClassDetail::where('education_type_id','=',$inputs['education_type_id'])->where('classes_group_exams_id','=',$inputs['classes_group_exams_id'])->where('agency_board_university_id','=',$inputs['agency_board_university_id'])->first();
-                        if (!empty($gn_display_exam1)) {
+                        $gn_display_exam1 = Gn_DisplayOtherExamClassDetail::where('education_type_id', '=', $inputs['education_type_id'])->where('classes_group_exams_id', '=', $inputs['classes_group_exams_id'])->where('agency_board_university_id', '=', $inputs['agency_board_university_id'])->first();
+                        if (! empty($gn_display_exam1)) {
                             $other_exam_id = json_decode($gn_display_exam1->other_exam_id);
-                            $other_exam_id = array_diff($other_exam_id,$delete_data_diff_id);
+                            $other_exam_id = array_diff($other_exam_id, $delete_data_diff_id);
                             $gn_display_exam1->other_exam_id = json_encode($other_exam_id);
-                            $queryMd                                    = $gn_display_exam1;
-                            $query                                      = $queryMd->save();
+                            $queryMd = $gn_display_exam1;
+                            $query = $queryMd->save();
                         }
                     }
-                }
-                else {
+                } else {
                     foreach ($inputs['name'] as $key => $data) {
-                        $otherExamMd = new Gn_OtherExamClassDetailModel();
-                        $otherExamMd->education_type_id             = $inputs['education_type_id'];
-                        $otherExamMd->classes_group_exams_id        = $inputs['classes_group_exams_id'];
-                        $otherExamMd->agency_board_university_id    = $inputs['agency_board_university_id'];
-                        $otherExamMd->name                          = $data;
+                        $otherExamMd = new Gn_OtherExamClassDetailModel;
+                        $otherExamMd->education_type_id = $inputs['education_type_id'];
+                        $otherExamMd->classes_group_exams_id = $inputs['classes_group_exams_id'];
+                        $otherExamMd->agency_board_university_id = $inputs['agency_board_university_id'];
+                        $otherExamMd->name = $data;
                         $otherExamMd->save();
                         $this->data['other_exams_id'][$key] = $otherExamMd->id;
                     }
-                    $gn_display_exam = Gn_DisplayOtherExamClassDetail::where('education_type_id','=',$inputs['education_type_id'])->where('classes_group_exams_id','=',$inputs['classes_group_exams_id'])->where('agency_board_university_id','=',$inputs['agency_board_university_id'])->first();
+                    $gn_display_exam = Gn_DisplayOtherExamClassDetail::where('education_type_id', '=', $inputs['education_type_id'])->where('classes_group_exams_id', '=', $inputs['classes_group_exams_id'])->where('agency_board_university_id', '=', $inputs['agency_board_university_id'])->first();
 
-                    if (!empty($gn_display_exam)) {
+                    if (! empty($gn_display_exam)) {
                         $other_exam_id = json_decode($gn_display_exam->other_exam_id);
-                        $other_exam_id = array_merge($other_exam_id,$this->data['other_exams_id']);
+                        $other_exam_id = array_merge($other_exam_id, $this->data['other_exams_id']);
                         $gn_display_exam->other_exam_id = json_encode($other_exam_id);
-                        $queryMd                                    = $gn_display_exam;
-                        $query                                      = $queryMd->save();
-                    }
-                    else {
-                        $gn_DisplayOtherExamClassDetail = new Gn_DisplayOtherExamClassDetail();
-                        $gn_DisplayOtherExamClassDetail->education_type_id             = $inputs['education_type_id'];
-                        $gn_DisplayOtherExamClassDetail->classes_group_exams_id        = $inputs['classes_group_exams_id'];
-                        $gn_DisplayOtherExamClassDetail->agency_board_university_id    = $inputs['agency_board_university_id'];
-                        $gn_DisplayOtherExamClassDetail->other_exam_id                 = json_encode($this->data['other_exams_id']);
-                        $queryMd                                    = $gn_DisplayOtherExamClassDetail;
-                        $query                                      = $queryMd->save();
+                        $queryMd = $gn_display_exam;
+                        $query = $queryMd->save();
+                    } else {
+                        $gn_DisplayOtherExamClassDetail = new Gn_DisplayOtherExamClassDetail;
+                        $gn_DisplayOtherExamClassDetail->education_type_id = $inputs['education_type_id'];
+                        $gn_DisplayOtherExamClassDetail->classes_group_exams_id = $inputs['classes_group_exams_id'];
+                        $gn_DisplayOtherExamClassDetail->agency_board_university_id = $inputs['agency_board_university_id'];
+                        $gn_DisplayOtherExamClassDetail->other_exam_id = json_encode($this->data['other_exams_id']);
+                        $queryMd = $gn_DisplayOtherExamClassDetail;
+                        $query = $queryMd->save();
                     }
                 }
             }
@@ -1172,7 +1094,7 @@ class ExamsController extends Controller
                 $requestName = 'Other Category / Class';
                 $requestType = 'other';
 
-                $otherMd = new OtherCategoryClass();
+                $otherMd = new OtherCategoryClass;
                 if ($inputs['id'] > 0) {
                     $otherMd = OtherCategoryClass::find($inputs['id']);
                 }
@@ -1184,16 +1106,16 @@ class ExamsController extends Controller
             // $studentMd->name = $inputs['name'];
 
             if ($query) {
-                return redirect()->route('administrator.dashboard_eductaion_type')->withErrors([$requestType . 'Success' => $requestName . ' succesfully added.']);
+                return redirect()->route('administrator.dashboard_eductaion_type')->withErrors([$requestType.'Success' => $requestName.' succesfully added.']);
             } else {
-                return back()->withErrors([$requestType . 'Error' => 'Server Error, please try again.']);
+                return back()->withErrors([$requestType.'Error' => 'Server Error, please try again.']);
             }
         }
 
         $this->data['classes'] = ClassGoupExamModel::get();
         $this->data['subjects'] = Subject::get();
 
-        $this->data['exams']    =   Gn_AssignClassGroupExamName::all()->groupBy('education_type_id');
+        $this->data['exams'] = Gn_AssignClassGroupExamName::all()->groupBy('education_type_id');
         $educations = Educationtype::get();
         foreach ($educations as $key => $education) {
             $educations[$key]['classes'] = ClassGoupExamModel::where('education_type_id', $education['id'])->count();
@@ -1226,16 +1148,17 @@ class ExamsController extends Controller
 
         return view('Dashboard/Admin/Exam/educationtypes')->with('data', $this->data);
     }
+
     public function subjects(Request $req)
     {
         $this->data['pagename'] = 'Subjects';
         if ($req->isMethod('post')) {
             $inputs = $req->all();
             // return print_r($inputs);
-            $query          = false;
-            $requestName    = '';
-            $requestType    = '';
-            $queryMd        = false;
+            $query = false;
+            $requestName = '';
+            $requestType = '';
+            $queryMd = false;
 
             if ($inputs['form_name'] == 'subject_form') {
                 $requestName = 'Subject';
@@ -1243,111 +1166,107 @@ class ExamsController extends Controller
 
                 if ($inputs['id'] > 0) {
                     $all_class_id = Subject::get()->pluck('id')->toArray();
-                    $class_id     = Gn_ClassSubject::where('classes_group_exams_id',$inputs['class_id'])->get()->pluck('subject_id')->toArray();
-                    $new_insert_data                = array_diff($inputs['name'],$class_id);
-                    $new_insert_data_diff_id        = array_diff($new_insert_data,$all_class_id);
-                    $new_insert_data_diff_name      = array_diff($new_insert_data,$new_insert_data_diff_id);
+                    $class_id = Gn_ClassSubject::where('classes_group_exams_id', $inputs['class_id'])->get()->pluck('subject_id')->toArray();
+                    $new_insert_data = array_diff($inputs['name'], $class_id);
+                    $new_insert_data_diff_id = array_diff($new_insert_data, $all_class_id);
+                    $new_insert_data_diff_name = array_diff($new_insert_data, $new_insert_data_diff_id);
 
-                    $delete_data_diff_id            = array_diff($class_id,$inputs['name']);
-                    if (!empty($delete_data_diff_id)) {
+                    $delete_data_diff_id = array_diff($class_id, $inputs['name']);
+                    if (! empty($delete_data_diff_id)) {
                         foreach ($delete_data_diff_id as $value) {
-                            $delete_board = Gn_ClassSubject::where('classes_group_exams_id',$inputs['class_id'])->where('subject_id',$value);
+                            $delete_board = Gn_ClassSubject::where('classes_group_exams_id', $inputs['class_id'])->where('subject_id', $value);
                             $delete_board->delete();
                         }
 
-                        $gn_display_exam                            = Gn_DisplayClassSubject::where('classes_group_exams_id','=',$inputs['class_id'])->first();
-                        $subject_id                                 = json_decode($gn_display_exam->subject_id);
-                        $subject_id                                 = array_diff($subject_id,$delete_data_diff_id);
-                        $gn_display_exam->classes_group_exams_id    = $inputs['class_id'];
-                        $gn_display_exam->subject_id                = $subject_id;
+                        $gn_display_exam = Gn_DisplayClassSubject::where('classes_group_exams_id', '=', $inputs['class_id'])->first();
+                        $subject_id = json_decode($gn_display_exam->subject_id);
+                        $subject_id = array_diff($subject_id, $delete_data_diff_id);
+                        $gn_display_exam->classes_group_exams_id = $inputs['class_id'];
+                        $gn_display_exam->subject_id = $subject_id;
                         $gn_display_exam->save();
 
-                        SubjectPart::where('classes_group_exams_id','=',$inputs['class_id'])->whereIn('subject_id',$delete_data_diff_id)->delete();
-                        Gn_DisplaySubjectPart::where('classes_group_exams_id','=',$inputs['class_id'])->whereIn('subject_id',$delete_data_diff_id)->delete();
-                        SubjectPartLesson::where('classes_group_exams_id','=',$inputs['class_id'])->whereIn('subject_id',$delete_data_diff_id)->delete();
-                        Gn_DisplaySubjectPartChapter::where('classes_group_exams_id','=',$inputs['class_id'])->whereIn('subject_id',$delete_data_diff_id)->delete();
+                        SubjectPart::where('classes_group_exams_id', '=', $inputs['class_id'])->whereIn('subject_id', $delete_data_diff_id)->delete();
+                        Gn_DisplaySubjectPart::where('classes_group_exams_id', '=', $inputs['class_id'])->whereIn('subject_id', $delete_data_diff_id)->delete();
+                        SubjectPartLesson::where('classes_group_exams_id', '=', $inputs['class_id'])->whereIn('subject_id', $delete_data_diff_id)->delete();
+                        Gn_DisplaySubjectPartChapter::where('classes_group_exams_id', '=', $inputs['class_id'])->whereIn('subject_id', $delete_data_diff_id)->delete();
                     }
 
-                    if (!empty($new_insert_data_diff_name)) {
+                    if (! empty($new_insert_data_diff_name)) {
                         foreach ($new_insert_data_diff_name as $value) {
-                            $gn_ClassSubject                         = new Gn_ClassSubject();
+                            $gn_ClassSubject = new Gn_ClassSubject;
                             $gn_ClassSubject->classes_group_exams_id = $inputs['class_id'];
-                            $gn_ClassSubject->subject_id             = $value;
-                            $queryMd                                 = $gn_ClassSubject;
-                            $query                                   = $queryMd->save();
+                            $gn_ClassSubject->subject_id = $value;
+                            $queryMd = $gn_ClassSubject;
+                            $query = $queryMd->save();
                         }
 
-                        $gn_display_class_subject = Gn_DisplayClassSubject::where('classes_group_exams_id','=',$inputs['class_id'])->first();
-                        if (!empty($gn_display_class_subject)) {
+                        $gn_display_class_subject = Gn_DisplayClassSubject::where('classes_group_exams_id', '=', $inputs['class_id'])->first();
+                        if (! empty($gn_display_class_subject)) {
                             $board_ids = json_decode($gn_display_class_subject->subject_id);
-                            $board_ids = array_merge($board_ids,$new_insert_data_diff_name);
+                            $board_ids = array_merge($board_ids, $new_insert_data_diff_name);
                             $gn_display_class_subject->subject_id = json_encode($board_ids);
                             $gn_display_class_subject->save();
-                        }
-                        else{
-                            $gn_display_class =  new Gn_DisplayClassSubject();
+                        } else {
+                            $gn_display_class = new Gn_DisplayClassSubject;
                             $gn_display_class->classes_group_exams_id = $inputs['class_id'];
-                            $gn_display_class->subject_id             = json_encode($new_insert_data_diff_name);
+                            $gn_display_class->subject_id = json_encode($new_insert_data_diff_name);
                             $gn_display_class->save();
                         }
                     }
 
-                    if (!empty($new_insert_data_diff_id)) {
+                    if (! empty($new_insert_data_diff_id)) {
                         foreach ($new_insert_data_diff_id as $key => $value) {
-                            $classSubjectMd         = new Subject();
-                            $classSubjectMd->name   = $value;
+                            $classSubjectMd = new Subject;
+                            $classSubjectMd->name = $value;
                             $classSubjectMd->save();
 
-                            $classSubjectMd_multipleMd                          = new Gn_ClassSubject();
-                            $classSubjectMd_multipleMd->classes_group_exams_id  = $inputs['class_id'];
-                            $classSubjectMd_multipleMd->subject_id              = $classSubjectMd->id;
+                            $classSubjectMd_multipleMd = new Gn_ClassSubject;
+                            $classSubjectMd_multipleMd->classes_group_exams_id = $inputs['class_id'];
+                            $classSubjectMd_multipleMd->subject_id = $classSubjectMd->id;
                             $classSubjectMd_multipleMd->save();
                             $this->data['classSubjectMd_multipleMd_name'][$key] = $classSubjectMd->id;
                         }
 
-                        $gn_display_class_subject = Gn_DisplayClassSubject::where('classes_group_exams_id','=',$inputs['class_id'])->first();
-                        if (!empty($gn_display_class_subject)) {
+                        $gn_display_class_subject = Gn_DisplayClassSubject::where('classes_group_exams_id', '=', $inputs['class_id'])->first();
+                        if (! empty($gn_display_class_subject)) {
                             $board_ids = json_decode($gn_display_class_subject->subject_id);
-                            $board_ids = array_merge($board_ids,$this->data['classSubjectMd_multipleMd_name']);
+                            $board_ids = array_merge($board_ids, $this->data['classSubjectMd_multipleMd_name']);
                             $gn_display_class_subject->subject_id = json_encode($board_ids);
                             $gn_display_class_subject->save();
-                        }
-                        else{
-                            $gn_display_class =  new Gn_DisplayClassSubject();
+                        } else {
+                            $gn_display_class = new Gn_DisplayClassSubject;
                             $gn_display_class->classes_group_exams_id = $inputs['class_id'];
-                            $gn_display_class->subject_id             = json_encode($this->data['classSubjectMd_multipleMd_name']);
-                            $queryMd                                  = $gn_display_class;
-                            $query                                    = $queryMd->save();
+                            $gn_display_class->subject_id = json_encode($this->data['classSubjectMd_multipleMd_name']);
+                            $queryMd = $gn_display_class;
+                            $query = $queryMd->save();
                         }
                     }
 
-                }
-                else {
+                } else {
                     foreach ($inputs['name'] as $key => $value) {
-                        $subjectMd       = new Subject();
+                        $subjectMd = new Subject;
                         $subjectMd->name = $value;
                         $subjectMd->save();
 
                         $this->data['temp_subject_id'][$key] = $subjectMd->id;
 
-                        $gn_ClassSubject                         = new Gn_ClassSubject();
+                        $gn_ClassSubject = new Gn_ClassSubject;
                         $gn_ClassSubject->classes_group_exams_id = $inputs['class_id'];
-                        $gn_ClassSubject->subject_id             = $subjectMd->id;
-                        $queryMd                                 = $gn_ClassSubject;
-                        $query                                   = $queryMd->save();
+                        $gn_ClassSubject->subject_id = $subjectMd->id;
+                        $queryMd = $gn_ClassSubject;
+                        $query = $queryMd->save();
                     }
 
-                    $gn_display_class_subject = Gn_DisplayClassSubject::where('classes_group_exams_id','=',$inputs['class_id'])->first();
-                    if (!empty($gn_display_class_subject)) {
+                    $gn_display_class_subject = Gn_DisplayClassSubject::where('classes_group_exams_id', '=', $inputs['class_id'])->first();
+                    if (! empty($gn_display_class_subject)) {
                         $board_ids = json_decode($gn_display_class_subject->subject_id);
-                        $board_ids = array_merge($board_ids,$this->data['temp_subject_id']);
+                        $board_ids = array_merge($board_ids, $this->data['temp_subject_id']);
                         $gn_display_class_subject->subject_id = $board_ids;
                         $gn_display_class_subject->save();
-                    }
-                    else {
-                        $gn_DisplayClassSubject                         = new Gn_DisplayClassSubject();
+                    } else {
+                        $gn_DisplayClassSubject = new Gn_DisplayClassSubject;
                         $gn_DisplayClassSubject->classes_group_exams_id = $inputs['class_id'];
-                        $gn_DisplayClassSubject->subject_id             = json_encode($this->data['temp_subject_id']);
+                        $gn_DisplayClassSubject->subject_id = json_encode($this->data['temp_subject_id']);
                         $gn_DisplayClassSubject->save();
                     }
                 }
@@ -1358,76 +1277,74 @@ class ExamsController extends Controller
                 $requestType = 'part';
 
                 if ($inputs['id'] > 0) {
-                    $all_subject_part_id    = SubjectPart::get()->pluck('id')->toArray();
-                    $subject_part_id_data   = SubjectPart::where("classes_group_exams_id",$inputs['class_id'])->where('subject_id',$inputs['subject_id'])->get()->pluck('id')->toArray();
+                    $all_subject_part_id = SubjectPart::get()->pluck('id')->toArray();
+                    $subject_part_id_data = SubjectPart::where('classes_group_exams_id', $inputs['class_id'])->where('subject_id', $inputs['subject_id'])->get()->pluck('id')->toArray();
 
-                    $get_subject_part_name      = array_diff($inputs['name'],$all_subject_part_id);
-                    $get_subject_part_id        = array_diff($inputs['name'],$subject_part_id_data);
-                    $get_subject_part_id        = array_diff($get_subject_part_id,$get_subject_part_name);
-                    $delete_subject_part_id     = array_diff($subject_part_id_data,$inputs['name']);
+                    $get_subject_part_name = array_diff($inputs['name'], $all_subject_part_id);
+                    $get_subject_part_id = array_diff($inputs['name'], $subject_part_id_data);
+                    $get_subject_part_id = array_diff($get_subject_part_id, $get_subject_part_name);
+                    $delete_subject_part_id = array_diff($subject_part_id_data, $inputs['name']);
 
-                    if (!empty($get_subject_part_name)) {
+                    if (! empty($get_subject_part_name)) {
                         foreach ($get_subject_part_name as $key => $value) {
-                            $subjectPartMd                          = new SubjectPart();
-                            $subjectPartMd->name                    = $value;
-                            $subjectPartMd->subject_id              = $inputs['subject_id'];
+                            $subjectPartMd = new SubjectPart;
+                            $subjectPartMd->name = $value;
+                            $subjectPartMd->subject_id = $inputs['subject_id'];
                             $subjectPartMd->save();
-                            $this->data['subjectPartMd_ids'][$key]  = $subjectPartMd->id;
+                            $this->data['subjectPartMd_ids'][$key] = $subjectPartMd->id;
                         }
-                        $gn_subject_part = Gn_DisplaySubjectPart::where("classes_group_exams_id",$inputs['class_id'])->where('subject_id',$inputs['subject_id'])->first();
-                        if (!empty($gn_subject_part)) {
-                            $subject_part_id                    = json_decode($gn_subject_part->subject_part_id);
-                            $subject_part_id                    = array_merge($subject_part_id,$this->data['subjectPartMd_ids']);
-                            $gn_subject_part->subject_id        = $inputs['subject_id'];
-                            $gn_subject_part->subject_part_id   = json_encode($subject_part_id);
-                            $queryMd                            = $gn_subject_part;
-                            $query                              = $queryMd->save();
-                        }
-                        else {
-                            $gn_DisplaySubjectPart                      = new Gn_DisplaySubjectPart();
-                            $gn_DisplaySubjectPart->subject_id          = $inputs['subject_id'];
-                            $gn_DisplaySubjectPart->subject_part_id     = json_encode($this->data['subjectPartMd_ids']);
-                            $queryMd                                    = $gn_DisplaySubjectPart;
-                            $query                                      = $queryMd->save();
+                        $gn_subject_part = Gn_DisplaySubjectPart::where('classes_group_exams_id', $inputs['class_id'])->where('subject_id', $inputs['subject_id'])->first();
+                        if (! empty($gn_subject_part)) {
+                            $subject_part_id = json_decode($gn_subject_part->subject_part_id);
+                            $subject_part_id = array_merge($subject_part_id, $this->data['subjectPartMd_ids']);
+                            $gn_subject_part->subject_id = $inputs['subject_id'];
+                            $gn_subject_part->subject_part_id = json_encode($subject_part_id);
+                            $queryMd = $gn_subject_part;
+                            $query = $queryMd->save();
+                        } else {
+                            $gn_DisplaySubjectPart = new Gn_DisplaySubjectPart;
+                            $gn_DisplaySubjectPart->subject_id = $inputs['subject_id'];
+                            $gn_DisplaySubjectPart->subject_part_id = json_encode($this->data['subjectPartMd_ids']);
+                            $queryMd = $gn_DisplaySubjectPart;
+                            $query = $queryMd->save();
                         }
                     }
 
-                    if (!empty($get_subject_part_id)) {
-                        $subject_part_name = SubjectPart::where("classes_group_exams_id",$inputs['class_id'])->whereIn('id',$get_subject_part_id)->get()->pluck('name')->toArray();
+                    if (! empty($get_subject_part_id)) {
+                        $subject_part_name = SubjectPart::where('classes_group_exams_id', $inputs['class_id'])->whereIn('id', $get_subject_part_id)->get()->pluck('name')->toArray();
                         foreach ($subject_part_name as $key => $value) {
-                            $subjectPartMd                          = new SubjectPart();
-                            $subjectPartMd->name                    = $value;
-                            $subjectPartMd->subject_id              = $inputs['subject_id'];
+                            $subjectPartMd = new SubjectPart;
+                            $subjectPartMd->name = $value;
+                            $subjectPartMd->subject_id = $inputs['subject_id'];
                             $subjectPartMd->save();
                             $this->data['subjectPartMd_ids1'][$key] = $subjectPartMd->id;
                         }
-                        $gn_subject_part = Gn_DisplaySubjectPart::where("classes_group_exams_id",$inputs['class_id'])->where('subject_id',$inputs['subject_id'])->first();
-                        if (!empty($gn_subject_part)) {
-                            $subject_part_id                    = json_decode($gn_subject_part->subject_part_id);
-                            $subject_part_id                    = array_merge($subject_part_id,$this->data['subjectPartMd_ids1']);
-                            $gn_subject_part->subject_id        = $inputs['subject_id'];
-                            $gn_subject_part->subject_part_id   = json_encode($subject_part_id);
-                            $queryMd                            = $gn_subject_part;
-                            $query                              = $queryMd->save();
-                        }
-                        else {
-                            $gn_DisplaySubjectPart                      = new Gn_DisplaySubjectPart();
-                            $gn_DisplaySubjectPart->subject_id          = $inputs['subject_id'];
-                            $gn_DisplaySubjectPart->subject_part_id     = json_encode($this->data['subjectPartMd_ids1']);
-                            $queryMd                                    = $gn_DisplaySubjectPart;
-                            $query                                      = $queryMd->save();
+                        $gn_subject_part = Gn_DisplaySubjectPart::where('classes_group_exams_id', $inputs['class_id'])->where('subject_id', $inputs['subject_id'])->first();
+                        if (! empty($gn_subject_part)) {
+                            $subject_part_id = json_decode($gn_subject_part->subject_part_id);
+                            $subject_part_id = array_merge($subject_part_id, $this->data['subjectPartMd_ids1']);
+                            $gn_subject_part->subject_id = $inputs['subject_id'];
+                            $gn_subject_part->subject_part_id = json_encode($subject_part_id);
+                            $queryMd = $gn_subject_part;
+                            $query = $queryMd->save();
+                        } else {
+                            $gn_DisplaySubjectPart = new Gn_DisplaySubjectPart;
+                            $gn_DisplaySubjectPart->subject_id = $inputs['subject_id'];
+                            $gn_DisplaySubjectPart->subject_part_id = json_encode($this->data['subjectPartMd_ids1']);
+                            $queryMd = $gn_DisplaySubjectPart;
+                            $query = $queryMd->save();
                         }
                     }
-                    if (!empty($delete_subject_part_id )) {
-                        $gn_delete_display_subject_part                     = Gn_DisplaySubjectPart::where("classes_group_exams_id",$inputs['class_id'])->where('subject_id',$inputs['subject_id'])->first();
-                        $update_subject_id                                  = json_decode($gn_delete_display_subject_part->subject_part_id);
-                        $update_subject_id                                  = array_diff($update_subject_id,$delete_subject_part_id);
-                        $gn_delete_display_subject_part->subject_part_id    = json_encode($update_subject_id);
+                    if (! empty($delete_subject_part_id)) {
+                        $gn_delete_display_subject_part = Gn_DisplaySubjectPart::where('classes_group_exams_id', $inputs['class_id'])->where('subject_id', $inputs['subject_id'])->first();
+                        $update_subject_id = json_decode($gn_delete_display_subject_part->subject_part_id);
+                        $update_subject_id = array_diff($update_subject_id, $delete_subject_part_id);
+                        $gn_delete_display_subject_part->subject_part_id = json_encode($update_subject_id);
                         $gn_delete_display_subject_part->save();
 
-                        $gn_delete_subject_part     = SubjectPart::where("classes_group_exams_id",$inputs['class_id'])->whereIn('id',$delete_subject_part_id);
-                        $gn_delete_subject_chapter  = SubjectPartLesson::where("classes_group_exams_id",$inputs['class_id'])->where('subject_id',$inputs['subject_id'])->whereIn('subject_part_id',$delete_subject_part_id);
-                        $gn_delete_display_chapter  = Gn_DisplaySubjectPartChapter::where("classes_group_exams_id",$inputs['class_id'])->where('subject_id',$inputs['subject_id'])->whereIn('subject_part_id',$delete_subject_part_id);
+                        $gn_delete_subject_part = SubjectPart::where('classes_group_exams_id', $inputs['class_id'])->whereIn('id', $delete_subject_part_id);
+                        $gn_delete_subject_chapter = SubjectPartLesson::where('classes_group_exams_id', $inputs['class_id'])->where('subject_id', $inputs['subject_id'])->whereIn('subject_part_id', $delete_subject_part_id);
+                        $gn_delete_display_chapter = Gn_DisplaySubjectPartChapter::where('classes_group_exams_id', $inputs['class_id'])->where('subject_id', $inputs['subject_id'])->whereIn('subject_part_id', $delete_subject_part_id);
 
                         $gn_delete_subject_part->delete();
                         $gn_delete_subject_chapter->delete();
@@ -1438,32 +1355,30 @@ class ExamsController extends Controller
                     // $subjectPartMd->subject_id  = $inputs['subject_id'];
                     // $queryMd                    = $subjectPartMd;
                     // $query                      = $queryMd->save();
-                }
-                else {
+                } else {
                     foreach ($inputs['name'] as $key => $value) {
-                        $subjectPartMd                          = new SubjectPart();
-                        $subjectPartMd->classes_group_exams_id  = $inputs['class_id'];
-                        $subjectPartMd->name                    = $value;
-                        $subjectPartMd->subject_id              = $inputs['subject_id'];
+                        $subjectPartMd = new SubjectPart;
+                        $subjectPartMd->classes_group_exams_id = $inputs['class_id'];
+                        $subjectPartMd->name = $value;
+                        $subjectPartMd->subject_id = $inputs['subject_id'];
                         $subjectPartMd->save();
-                        $this->data['subjectPartMd_ids'][$key]  = $subjectPartMd->id;
+                        $this->data['subjectPartMd_ids'][$key] = $subjectPartMd->id;
                     }
-                    $gn_subject_part = Gn_DisplaySubjectPart::where('classes_group_exams_id',$inputs['class_id'])->where('subject_id',$inputs['subject_id'])->first();
-                    if (!empty($gn_subject_part)) {
-                        $subject_part_id                    = json_decode($gn_subject_part->subject_part_id);
-                        $subject_part_id                    = array_merge($subject_part_id,$this->data['subjectPartMd_ids']);
-                        $gn_subject_part->subject_id        = $inputs['subject_id'];
-                        $gn_subject_part->subject_part_id   = json_encode($subject_part_id);
-                        $queryMd                            = $gn_subject_part;
-                        $query                              = $queryMd->save();
-                    }
-                    else {
-                        $gn_DisplaySubjectPart                          = new Gn_DisplaySubjectPart();
-                        $gn_DisplaySubjectPart->classes_group_exams_id  = $inputs['class_id'];
-                        $gn_DisplaySubjectPart->subject_id              = $inputs['subject_id'];
-                        $gn_DisplaySubjectPart->subject_part_id         = json_encode($this->data['subjectPartMd_ids']);
-                        $queryMd                                        = $gn_DisplaySubjectPart;
-                        $query                                          = $queryMd->save();
+                    $gn_subject_part = Gn_DisplaySubjectPart::where('classes_group_exams_id', $inputs['class_id'])->where('subject_id', $inputs['subject_id'])->first();
+                    if (! empty($gn_subject_part)) {
+                        $subject_part_id = json_decode($gn_subject_part->subject_part_id);
+                        $subject_part_id = array_merge($subject_part_id, $this->data['subjectPartMd_ids']);
+                        $gn_subject_part->subject_id = $inputs['subject_id'];
+                        $gn_subject_part->subject_part_id = json_encode($subject_part_id);
+                        $queryMd = $gn_subject_part;
+                        $query = $queryMd->save();
+                    } else {
+                        $gn_DisplaySubjectPart = new Gn_DisplaySubjectPart;
+                        $gn_DisplaySubjectPart->classes_group_exams_id = $inputs['class_id'];
+                        $gn_DisplaySubjectPart->subject_id = $inputs['subject_id'];
+                        $gn_DisplaySubjectPart->subject_part_id = json_encode($this->data['subjectPartMd_ids']);
+                        $queryMd = $gn_DisplaySubjectPart;
+                        $query = $queryMd->save();
                     }
 
                 }
@@ -1474,114 +1389,110 @@ class ExamsController extends Controller
 
                 if ($inputs['id'] > 0) {
                     $subject_part_chapter_id_all = SubjectPartLesson::get()->pluck('id')->toArray();
-                    $subject_part_chapter_id     = SubjectPartLesson::where('classes_group_exams_id',$inputs['class_id'])->where('subject_id',$inputs['subject_id'])->where('subject_part_id',$inputs['subject_part_id'])->get()->pluck('id')->toArray();
+                    $subject_part_chapter_id = SubjectPartLesson::where('classes_group_exams_id', $inputs['class_id'])->where('subject_id', $inputs['subject_id'])->where('subject_part_id', $inputs['subject_part_id'])->get()->pluck('id')->toArray();
 
-                    $get_subject_part_chapter_name      = array_diff($inputs['name'],$subject_part_chapter_id_all);
-                    $get_subject_part_chapter_id        = array_diff($inputs['name'],$subject_part_chapter_id);
-                    $get_subject_part_chapter_id        = array_diff($get_subject_part_chapter_id,$get_subject_part_chapter_name);
-                    $delete_subject_part_chapter_id     = array_diff($subject_part_chapter_id,$inputs['name']);
+                    $get_subject_part_chapter_name = array_diff($inputs['name'], $subject_part_chapter_id_all);
+                    $get_subject_part_chapter_id = array_diff($inputs['name'], $subject_part_chapter_id);
+                    $get_subject_part_chapter_id = array_diff($get_subject_part_chapter_id, $get_subject_part_chapter_name);
+                    $delete_subject_part_chapter_id = array_diff($subject_part_chapter_id, $inputs['name']);
 
-                    if (!empty($get_subject_part_chapter_name)) {
+                    if (! empty($get_subject_part_chapter_name)) {
                         foreach ($get_subject_part_chapter_name as $key => $value) {
-                            $subjectPartLessonMd                            = new SubjectPartLesson();
-                            $subjectPartLessonMd->name                      = $value;
-                            $subjectPartLessonMd->subject_id                = $inputs['subject_id'];
-                            $subjectPartLessonMd->subject_part_id           = $inputs['subject_part_id'];
+                            $subjectPartLessonMd = new SubjectPartLesson;
+                            $subjectPartLessonMd->name = $value;
+                            $subjectPartLessonMd->subject_id = $inputs['subject_id'];
+                            $subjectPartLessonMd->subject_part_id = $inputs['subject_part_id'];
                             $subjectPartLessonMd->save();
-                            $this->data['subjectPartLessonMd_ids'][$key]    =  $subjectPartLessonMd->id;
+                            $this->data['subjectPartLessonMd_ids'][$key] = $subjectPartLessonMd->id;
                         }
-                        $update_chapter_display = Gn_DisplaySubjectPartChapter::where('classes_group_exams_id',$inputs['class_id'])->where('subject_id',$inputs['subject_id'])->where('subject_part_id',$inputs['subject_part_id'])->first();
-                        if (!empty($update_chapter_display)){
-                            $chapter_id                                 = json_decode($update_chapter_display->chapter_id);
-                            $chapter_id                                 = array_merge($chapter_id,$this->data['subjectPartLessonMd_ids']);
-                            $update_chapter_display->subject_id         = $inputs['subject_id'];
-                            $update_chapter_display->subject_part_id    = $inputs['subject_part_id'];
-                            $update_chapter_display->chapter_id         = json_encode($chapter_id);
-                            $queryMd                                    = $update_chapter_display;
-                            $query                                      = $queryMd->save();
-                        }
-                        else {
-                            $gn_DisplaySubjectPartChapter       = new Gn_DisplaySubjectPartChapter();
-                            $gn_DisplaySubjectPartChapter->subject_id       = $inputs['subject_id'];
-                            $gn_DisplaySubjectPartChapter->subject_part_id  = $inputs['subject_part_id'];
-                            $gn_DisplaySubjectPartChapter->chapter_id       = json_encode($this->data['subjectPartLessonMd_ids']);
-                            $queryMd    = $gn_DisplaySubjectPartChapter;
-                            $query      = $queryMd->save();
+                        $update_chapter_display = Gn_DisplaySubjectPartChapter::where('classes_group_exams_id', $inputs['class_id'])->where('subject_id', $inputs['subject_id'])->where('subject_part_id', $inputs['subject_part_id'])->first();
+                        if (! empty($update_chapter_display)) {
+                            $chapter_id = json_decode($update_chapter_display->chapter_id);
+                            $chapter_id = array_merge($chapter_id, $this->data['subjectPartLessonMd_ids']);
+                            $update_chapter_display->subject_id = $inputs['subject_id'];
+                            $update_chapter_display->subject_part_id = $inputs['subject_part_id'];
+                            $update_chapter_display->chapter_id = json_encode($chapter_id);
+                            $queryMd = $update_chapter_display;
+                            $query = $queryMd->save();
+                        } else {
+                            $gn_DisplaySubjectPartChapter = new Gn_DisplaySubjectPartChapter;
+                            $gn_DisplaySubjectPartChapter->subject_id = $inputs['subject_id'];
+                            $gn_DisplaySubjectPartChapter->subject_part_id = $inputs['subject_part_id'];
+                            $gn_DisplaySubjectPartChapter->chapter_id = json_encode($this->data['subjectPartLessonMd_ids']);
+                            $queryMd = $gn_DisplaySubjectPartChapter;
+                            $query = $queryMd->save();
                         }
                     }
 
-                    if (!empty($get_subject_part_chapter_id)) {
-                        $subject_chapter_name     = SubjectPartLesson::where('classes_group_exams_id',$inputs['class_id'])->where('subject_id',$inputs['subject_id'])->where('subject_part_id',$inputs['subject_part_id'])->get()->pluck('name')->toArray();
+                    if (! empty($get_subject_part_chapter_id)) {
+                        $subject_chapter_name = SubjectPartLesson::where('classes_group_exams_id', $inputs['class_id'])->where('subject_id', $inputs['subject_id'])->where('subject_part_id', $inputs['subject_part_id'])->get()->pluck('name')->toArray();
                         foreach ($subject_chapter_name as $key => $value) {
-                            $subjectPartLessonMd                    = new SubjectPartLesson();
-                            $subjectPartLessonMd->name              = $value;
-                            $subjectPartLessonMd->subject_id        = $inputs['subject_id'];
-                            $subjectPartLessonMd->subject_part_id   = $inputs['subject_part_id'];
+                            $subjectPartLessonMd = new SubjectPartLesson;
+                            $subjectPartLessonMd->name = $value;
+                            $subjectPartLessonMd->subject_id = $inputs['subject_id'];
+                            $subjectPartLessonMd->subject_part_id = $inputs['subject_part_id'];
                             $subjectPartLessonMd->save();
-                            $this->data['subjectPartLessonMd_ids1'][$key]  =  $subjectPartLessonMd->id;
+                            $this->data['subjectPartLessonMd_ids1'][$key] = $subjectPartLessonMd->id;
                         }
-                        $update_chapter_display = Gn_DisplaySubjectPartChapter::where("classes_group_exams_id",$inputs['class_id'])->where('subject_id',$inputs['subject_id'])->where('subject_part_id',$inputs['subject_part_id'])->first();
-                        if (!empty($update_chapter_display)){
-                            $chapter_id                                 = json_decode($update_chapter_display->chapter_id);
-                            $chapter_id                                 = array_merge($chapter_id,$this->data['subjectPartLessonMd_ids1']);
-                            $update_chapter_display->subject_id         = $inputs['subject_id'];
-                            $update_chapter_display->subject_part_id    = $inputs['subject_part_id'];
-                            $update_chapter_display->chapter_id         = json_encode($chapter_id);
-                            $queryMd                                    = $update_chapter_display;
-                            $query                                      = $queryMd->save();
-                        }
-                        else {
-                            $gn_DisplaySubjectPartChapter                   = new Gn_DisplaySubjectPartChapter();
-                            $gn_DisplaySubjectPartChapter->subject_id       = $inputs['subject_id'];
-                            $gn_DisplaySubjectPartChapter->subject_part_id  = $inputs['subject_part_id'];
-                            $gn_DisplaySubjectPartChapter->chapter_id       = json_encode($this->data['subjectPartLessonMd_ids1']);
-                            $queryMd                                        = $gn_DisplaySubjectPartChapter;
-                            $query                                          = $queryMd->save();
+                        $update_chapter_display = Gn_DisplaySubjectPartChapter::where('classes_group_exams_id', $inputs['class_id'])->where('subject_id', $inputs['subject_id'])->where('subject_part_id', $inputs['subject_part_id'])->first();
+                        if (! empty($update_chapter_display)) {
+                            $chapter_id = json_decode($update_chapter_display->chapter_id);
+                            $chapter_id = array_merge($chapter_id, $this->data['subjectPartLessonMd_ids1']);
+                            $update_chapter_display->subject_id = $inputs['subject_id'];
+                            $update_chapter_display->subject_part_id = $inputs['subject_part_id'];
+                            $update_chapter_display->chapter_id = json_encode($chapter_id);
+                            $queryMd = $update_chapter_display;
+                            $query = $queryMd->save();
+                        } else {
+                            $gn_DisplaySubjectPartChapter = new Gn_DisplaySubjectPartChapter;
+                            $gn_DisplaySubjectPartChapter->subject_id = $inputs['subject_id'];
+                            $gn_DisplaySubjectPartChapter->subject_part_id = $inputs['subject_part_id'];
+                            $gn_DisplaySubjectPartChapter->chapter_id = json_encode($this->data['subjectPartLessonMd_ids1']);
+                            $queryMd = $gn_DisplaySubjectPartChapter;
+                            $query = $queryMd->save();
                         }
                     }
 
-                    if (!empty($delete_subject_part_chapter_id)) {
-                        $delete_chapter = SubjectPartLesson::whereIn('id',$delete_subject_part_chapter_id);
+                    if (! empty($delete_subject_part_chapter_id)) {
+                        $delete_chapter = SubjectPartLesson::whereIn('id', $delete_subject_part_chapter_id);
                         $delete_chapter->delete();
 
-                        $delete_display_chapter             = Gn_DisplaySubjectPartChapter::where('classes_group_exams_id',$inputs['class_id'])->where('subject_id',$inputs['subject_id'])->where('subject_part_id',$inputs['subject_part_id'])->first();
-                        $update_chapter_id                  = json_decode($delete_display_chapter->chapter_id);
-                        $update_chapter_id                  = array_diff($update_chapter_id,$delete_subject_part_chapter_id);
+                        $delete_display_chapter = Gn_DisplaySubjectPartChapter::where('classes_group_exams_id', $inputs['class_id'])->where('subject_id', $inputs['subject_id'])->where('subject_part_id', $inputs['subject_part_id'])->first();
+                        $update_chapter_id = json_decode($delete_display_chapter->chapter_id);
+                        $update_chapter_id = array_diff($update_chapter_id, $delete_subject_part_chapter_id);
                         $delete_display_chapter->chapter_id = json_encode($update_chapter_id);
-                        $queryMd                            = $delete_display_chapter;
-                        $query                              = $queryMd->save();
+                        $queryMd = $delete_display_chapter;
+                        $query = $queryMd->save();
                     }
-                }
-                else {
+                } else {
                     foreach ($inputs['name'] as $key => $value) {
-                        $subjectPartLessonMd                            = new SubjectPartLesson();
-                        $subjectPartLessonMd->name                      = $value;
+                        $subjectPartLessonMd = new SubjectPartLesson;
+                        $subjectPartLessonMd->name = $value;
 
-                        $subjectPartLessonMd->classes_group_exams_id    = $inputs['class_id'];
-                        $subjectPartLessonMd->subject_id                = $inputs['subject_id'];
-                        $subjectPartLessonMd->subject_part_id           = $inputs['subject_part_id'];
+                        $subjectPartLessonMd->classes_group_exams_id = $inputs['class_id'];
+                        $subjectPartLessonMd->subject_id = $inputs['subject_id'];
+                        $subjectPartLessonMd->subject_part_id = $inputs['subject_part_id'];
                         $subjectPartLessonMd->save();
-                        $this->data['subjectPartLessonMd_ids'][$key]    =  $subjectPartLessonMd->id;
+                        $this->data['subjectPartLessonMd_ids'][$key] = $subjectPartLessonMd->id;
                     }
-                    $update_chapter_display = Gn_DisplaySubjectPartChapter::where('classes_group_exams_id',$inputs['class_id'])->where('subject_id',$inputs['subject_id'])->where('subject_part_id',$inputs['subject_part_id'])->first();
-                    if (!empty($update_chapter_display)){
-                        $chapter_id                                         = json_decode($update_chapter_display->chapter_id);
-                        $chapter_id                                         = array_merge($chapter_id,$this->data['subjectPartLessonMd_ids']);
-                        $update_chapter_display->classes_group_exams_id     = $inputs['class_id'];
-                        $update_chapter_display->subject_id                 = $inputs['subject_id'];
-                        $update_chapter_display->subject_part_id            = $inputs['subject_part_id'];
-                        $update_chapter_display->chapter_id                 = json_encode($chapter_id);
-                        $queryMd                                            = $update_chapter_display;
-                        $query                                              = $queryMd->save();
-                    }
-                    else {
-                        $gn_DisplaySubjectPartChapter                           = new Gn_DisplaySubjectPartChapter();
-                        $gn_DisplaySubjectPartChapter->subject_id               = $inputs['subject_id'];
-                        $gn_DisplaySubjectPartChapter->classes_group_exams_id   = $inputs['class_id'];
-                        $gn_DisplaySubjectPartChapter->subject_part_id          = $inputs['subject_part_id'];
-                        $gn_DisplaySubjectPartChapter->chapter_id               = json_encode($this->data['subjectPartLessonMd_ids']);
-                        $queryMd                                                = $gn_DisplaySubjectPartChapter;
-                        $query                                                  = $queryMd->save();
+                    $update_chapter_display = Gn_DisplaySubjectPartChapter::where('classes_group_exams_id', $inputs['class_id'])->where('subject_id', $inputs['subject_id'])->where('subject_part_id', $inputs['subject_part_id'])->first();
+                    if (! empty($update_chapter_display)) {
+                        $chapter_id = json_decode($update_chapter_display->chapter_id);
+                        $chapter_id = array_merge($chapter_id, $this->data['subjectPartLessonMd_ids']);
+                        $update_chapter_display->classes_group_exams_id = $inputs['class_id'];
+                        $update_chapter_display->subject_id = $inputs['subject_id'];
+                        $update_chapter_display->subject_part_id = $inputs['subject_part_id'];
+                        $update_chapter_display->chapter_id = json_encode($chapter_id);
+                        $queryMd = $update_chapter_display;
+                        $query = $queryMd->save();
+                    } else {
+                        $gn_DisplaySubjectPartChapter = new Gn_DisplaySubjectPartChapter;
+                        $gn_DisplaySubjectPartChapter->subject_id = $inputs['subject_id'];
+                        $gn_DisplaySubjectPartChapter->classes_group_exams_id = $inputs['class_id'];
+                        $gn_DisplaySubjectPartChapter->subject_part_id = $inputs['subject_part_id'];
+                        $gn_DisplaySubjectPartChapter->chapter_id = json_encode($this->data['subjectPartLessonMd_ids']);
+                        $queryMd = $gn_DisplaySubjectPartChapter;
+                        $query = $queryMd->save();
                     }
                 }
             }
@@ -1590,30 +1501,29 @@ class ExamsController extends Controller
                 $requestType = 'gn_lesson';
 
                 if ($inputs['id'] > 0) {
-                    $subject_lession_new                        = SubjectPartLesson::find($inputs['id']);
-                    $subject_lession_new->name                  = $inputs['name'];
-                    $subject_lession_new->subject_id            = $inputs['subject_id'];
-                    $subject_lession_new->subject_part_id       = $inputs['subject_part_id'];
-                    $subject_lession_new->subject_chapter_id    = $inputs['lesson_chapter_id'];
+                    $subject_lession_new = SubjectPartLesson::find($inputs['id']);
+                    $subject_lession_new->name = $inputs['name'];
+                    $subject_lession_new->subject_id = $inputs['subject_id'];
+                    $subject_lession_new->subject_part_id = $inputs['subject_part_id'];
+                    $subject_lession_new->subject_chapter_id = $inputs['lesson_chapter_id'];
                     $queryMd = $subject_lession_new;
-                    $query   = $queryMd->save();
-                }
-                else {
+                    $query = $queryMd->save();
+                } else {
                     foreach ($inputs['name'] as $value) {
-                        $subject_lession_new                        = new Gn_SubjectPartLessionNew();
-                        $subject_lession_new->name                  = $value;
-                        $subject_lession_new->subject_id            = $inputs['subject_id'];
-                        $subject_lession_new->subject_part_id       = $inputs['subject_part_id'];
-                        $subject_lession_new->subject_chapter_id    = $inputs['lesson_chapter_id'];
+                        $subject_lession_new = new Gn_SubjectPartLessionNew;
+                        $subject_lession_new->name = $value;
+                        $subject_lession_new->subject_id = $inputs['subject_id'];
+                        $subject_lession_new->subject_part_id = $inputs['subject_part_id'];
+                        $subject_lession_new->subject_chapter_id = $inputs['lesson_chapter_id'];
                         $queryMd = $subject_lession_new;
-                        $query   = $queryMd->save();
+                        $query = $queryMd->save();
                     }
                 }
             }
             if ($query) {
-                return redirect()->route('administrator.dashboard_subjects')->withErrors([$requestType . 'Success' => $requestName . ' succesfully added.']);
+                return redirect()->route('administrator.dashboard_subjects')->withErrors([$requestType.'Success' => $requestName.' succesfully added.']);
             } else {
-                return back()->withErrors([$requestType . 'Error' => 'Server Error, please try again.']);
+                return back()->withErrors([$requestType.'Error' => 'Server Error, please try again.']);
             }
 
             // if ($query) {
@@ -1623,16 +1533,16 @@ class ExamsController extends Controller
             // }
             // return print_r($req->all());
         }
-        $this->data['subjects']                 = Subject::get();
-        $this->data['subject_data_display']     = Gn_DisplayClassSubject::get();
+        $this->data['subjects'] = Subject::get();
+        $this->data['subject_data_display'] = Gn_DisplayClassSubject::get();
 
-        $this->data['gn_subject_parts']         = SubjectPart::get();
-        $this->data['subject_parts']            = Gn_DisplaySubjectPart::get();
+        $this->data['gn_subject_parts'] = SubjectPart::get();
+        $this->data['subject_parts'] = Gn_DisplaySubjectPart::get();
 
-        $this->data['gn_subject_part_lessons']  = SubjectPartLesson::get();
-        $this->data['subject_part_lessons']     = Gn_DisplaySubjectPartChapter::get();
+        $this->data['gn_subject_part_lessons'] = SubjectPartLesson::get();
+        $this->data['subject_part_lessons'] = Gn_DisplaySubjectPartChapter::get();
 
-        $this->data['class_data']               = ClassGoupExamModel::get();
+        $this->data['class_data'] = ClassGoupExamModel::get();
         $this->data['subject_part_lessons_new'] = Gn_SubjectPartLessionNew::get();
 
         // $this->data['subject_data_display']     = Gn_ClassSubject::get()->groupBy('classes_group_exams_id');
@@ -1643,34 +1553,37 @@ class ExamsController extends Controller
         // ->get();
         return view('Dashboard/Admin/Exam/subjects')->with('data', $this->data);
     }
+
     public function section(Request $req, $test_id = 0)
     {
         // $this->data['test'] = TestModal::find($test_id);
         $sections = TestSections::where('test_id', $test_id)->get();
 
         print_r($sections);
-        return;
+
     }
+
     public function section_questions(Request $req, $test_id, $section_id)
     {
-        $this->data['auth_id']          = Auth::user()->id;
-        $this->data['test']             = TestModal::find($test_id);
-        $thisSection                    = TestSections::find($section_id);
-        $this->data['section']          = $thisSection;
-        $questions                      = TestQuestions::where(['test_id' => $test_id, 'section_id' => $section_id])->get();
-        $this->data['questions']        = $questions;
-        $this->data['total_questions']  = count($questions);
+        $this->data['auth_id'] = Auth::user()->id;
+        $this->data['test'] = TestModal::find($test_id);
+        $thisSection = TestSections::find($section_id);
+        $this->data['section'] = $thisSection;
+        $questions = TestQuestions::where(['test_id' => $test_id, 'section_id' => $section_id])->get();
+        $this->data['questions'] = $questions;
+        $this->data['total_questions'] = count($questions);
 
-        $used_questions                 = $questions->pluck('question_id')->toArray();
-        $unused_questions               = QuestionBankModel::where('subject',$thisSection->subject)->whereOr('subject_part',$thisSection->subject_part)->whereOr('subject_lesson_chapter',$thisSection->subject_part_lesson)->get()->pluck('id')->toArray();
-        $unused_questions               = array_diff($unused_questions,$used_questions);
+        $used_questions = $questions->pluck('question_id')->toArray();
+        $unused_questions = QuestionBankModel::where('subject', $thisSection->subject)->whereOr('subject_part', $thisSection->subject_part)->whereOr('subject_lesson_chapter', $thisSection->subject_part_lesson)->get()->pluck('id')->toArray();
+        $unused_questions = array_diff($unused_questions, $used_questions);
 
-        $this->data['unused_questions']   = QuestionBankModel::findOrFail($unused_questions);
+        $this->data['unused_questions'] = QuestionBankModel::findOrFail($unused_questions);
 
         // return;
 
         return view('Dashboard/Admin/Exam/section_questions')->with('data', $this->data);
     }
+
     public function section_question_add(Request $req, $test_id, $section_id)
     {
         $this->data['test'] = TestModal::find($test_id);
@@ -1700,7 +1613,7 @@ class ExamsController extends Controller
             $start = $_REQUEST['start'];
             $length = $_REQUEST['length'];
             /* If we pass any extra data in request from ajax */
-            //$value1 = isset($_REQUEST['key1'])?$_REQUEST['key1']:"";
+            // $value1 = isset($_REQUEST['key1'])?$_REQUEST['key1']:"";
 
             /* Value we will get from typing in search */
             $search_value = $_REQUEST['search']['value'];
@@ -1715,22 +1628,34 @@ class ExamsController extends Controller
             //     $count = TestModal::count();
             // }
 
-            if (!empty($search_value)) {
-                $testTableData = TestModal::selectselect(['test.id as id', 'test.user_id','title', 'sections', 'total_questions', 'questions_submitted',
-                'questions_approved', 'reviewed', 'reviewed_status', 'published','test.created_at as created_at','education_type_child_id','published_status',
-                'users.name as username','franchise_details.institute_name as institute_name'])
-                ->leftJoin('users','users.id','test.user_id')
-                ->leftJoin('franchise_details','franchise_details.user_id','users.id')
-                ->where("title", "like", "%" . $search_value . "%")
-                ->orderBy('id', 'desc')->skip($start)->take($length)->get();
-                $count = TestModal::where("title", "like", "%" . $search_value . "%")->count();
+            if (! empty($search_value)) {
+                $testTableData = TestModal::select(['test.id as id', 'test.user_id', 'title', 'sections', 'total_questions', 'questions_submitted',
+                    'questions_approved', 'reviewed', 'reviewed_status', 'published', 'test.created_at as created_at', 'education_type_child_id', 'published_status',
+                    'users.name as username', 'franchise_details.institute_name as institute_name'])
+                    ->leftJoin('users', function ($join) {
+                        $join->on('users.id', 'test.user_id')
+                            ->whereNull('users.deleted_at');
+                    })
+                    ->leftJoin('franchise_details', function ($join) {
+                        $join->on('franchise_details.user_id', 'users.id')
+                            ->whereNull('franchise_details.deleted_at');
+                    })
+                    ->where('title', 'like', '%'.$search_value.'%')
+                    ->orderBy('id', 'desc')->skip($start)->take($length)->get();
+                $count = TestModal::where('title', 'like', '%'.$search_value.'%')->count();
             } else {
-                $testTableData = TestModal::select(['test.id as id', 'test.user_id','title', 'sections', 'total_questions', 'questions_submitted',
-                'questions_approved', 'reviewed', 'reviewed_status', 'published','test.created_at as created_at','education_type_child_id','published_status',
-                'users.name as username','franchise_details.institute_name as institute_name'])
-                ->leftJoin('users','users.id','test.user_id')
-                ->leftJoin('franchise_details','franchise_details.user_id','users.id')
-                ->orderBy('id', 'desc')->skip($start)->take($length)->get();
+                $testTableData = TestModal::select(['test.id as id', 'test.user_id', 'title', 'sections', 'total_questions', 'questions_submitted',
+                    'questions_approved', 'reviewed', 'reviewed_status', 'published', 'test.created_at as created_at', 'education_type_child_id', 'published_status',
+                    'users.name as username', 'franchise_details.institute_name as institute_name'])
+                    ->leftJoin('users', function ($join) {
+                        $join->on('users.id', 'test.user_id')
+                            ->whereNull('users.deleted_at');
+                    })
+                    ->leftJoin('franchise_details', function ($join) {
+                        $join->on('franchise_details.user_id', 'users.id')
+                            ->whereNull('franchise_details.deleted_at');
+                    })
+                    ->orderBy('id', 'desc')->skip($start)->take($length)->get();
                 $count = TestModal::count();
             }
 
@@ -1746,7 +1671,7 @@ class ExamsController extends Controller
                 // }
                 $total_questions = $testData['total_questions'];
 
-                $testTableData[$key]['total_questions'] = $testData['total_questions'] . ' / ' . $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count();
+                $testTableData[$key]['total_questions'] = $testData['total_questions'].' / '.$testData->getQuestions()->wherePivot('deleted_at', '=', null)->count();
                 $status = '';
 
                 // == 'true' ? $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count()  : '0'
@@ -1757,7 +1682,7 @@ class ExamsController extends Controller
                 } else {
                     // $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count()
                     // if ($testData['total_questions'] !== $testData['questions_submitted'] || $testData['total_questions'] < $testData['questions_submitted']) {
-                    if ($total_questions != $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count() || $total_questions < $testData->getQuestions()->wherePivot('deleted_at','=',NULL)->count()) {
+                    if ($total_questions != $testData->getQuestions()->wherePivot('deleted_at', '=', null)->count() || $total_questions < $testData->getQuestions()->wherePivot('deleted_at', '=', null)->count()) {
                         $status = '<span class="badge bg-warning text-dark">Awaiting Questions</span>';
                         // $questionButton = '<a href="' . route('administrator.dashboard_test_section', [$testData['id']]) . '" title="Test Questions"><i class="bi bi-journal-text text-primary me-2"></i></a>';
                         // $questionButton = $sectionButtons;
@@ -1793,20 +1718,20 @@ class ExamsController extends Controller
                     $sectionButtons = '';
                     foreach ($sectionsX as $keyX => $sectionX) {
                         $sectionUrl = route('administrator.dashboard_test_section_question', [$testData['id'], $sectionX['id']]);
-                        $sectionButtons .= '<a href="' . $sectionUrl . '" title="Section ' . ($keyX + 1) . ' Questions"><i class="bi bi-journal-text text-primary me-2"></i></a>';
+                        $sectionButtons .= '<a href="'.$sectionUrl.'" title="Section '.($keyX + 1).' Questions"><i class="bi bi-journal-text text-primary me-2"></i></a>';
                     }
                 } else {
                     $sectionButtons = '0 Sections';
                 }
                 $testData['sections'] = $sectionButtons;
 
-                $testTableData[$key]['status']          = $status;
-                $testTableData[$key]['created_by']      = $testData['institute_name'] != NULL ? $testData['institute_name'] : Auth::user()->name;
-                $testTableData[$key]['created_date']    = date('d-m-Y',strtotime($testData->created_at));
-                $testTableData[$key]['class_name']      = $testData->EducationClass->name;
+                $testTableData[$key]['status'] = $status;
+                $testTableData[$key]['created_by'] = $testData['institute_name'] != null ? $testData['institute_name'] : Auth::user()->name;
+                $testTableData[$key]['created_date'] = date('d-m-Y', strtotime($testData->created_at));
+                $testTableData[$key]['class_name'] = $testData->EducationClass->name;
 
                 // <a href="' . route('administrator.dashboard_test_sections', [$testData['id']]) . '" title="Test Sections"><i class="bi bi-columns-gap text-primary me-2"></i></a>
-                $actionsHtml = '<a href="' . route('administrator.dashboard_student_list', [$testData['id']]) . '" title="Student List"><span class="badge bg-warning text-dark">Student List</span></a>';
+                $actionsHtml = '<a href="'.route('administrator.dashboard_student_list', [$testData['id']]).'" title="Student List"><span class="badge bg-warning text-dark">Student List</span></a>';
 
                 // <a href="' . route('administrator.dashboard_update_test_exam', [$testData['id']]) . '" title="Edit Test"><i class="bi bi-pencil-square text-success me-2"></i></a>
                 // <a href="javascript:void(0);" title="Delete Test"><i class="bi bi-trash2-fill text-danger me-2" onclick="deleteTest('.$testData['id'].')"></i></a>
@@ -1816,19 +1741,20 @@ class ExamsController extends Controller
                 $testTableData[$key]['actions'] = $actionsHtml;
             }
 
-            $json_data = array(
-                "draw"              => intval($params['draw']),
-                "recordsTotal"      => $count,
-                "recordsFiltered"   => $count,
-                "data"              => $testTableData   // total data array
-            );
+            $json_data = [
+                'draw' => intval($params['draw']),
+                'recordsTotal' => $count,
+                'recordsFiltered' => $count,
+                'data' => $testTableData,   // total data array
+            ];
 
             return json_encode($json_data);
         }
+
         return view('Dashboard/Admin/Exam/teststable')->with('data', $this->data);
     }
 
-    public function studentList(Request $req,$test_id)
+    public function studentList(Request $req, $test_id)
     {
         $this->data['pagename'] = 'Student List';
         // $studentListData = Gn_StudentTestAttempt::select(['gn__student_test_attempts.id','users.name as username','test.title'])
@@ -1837,138 +1763,156 @@ class ExamsController extends Controller
         //         ->orderBy('gn__student_test_attempts.id', 'desc')->get();
         if ($req->isMethod('post')) {
             $params['draw'] = $_REQUEST['draw'];
-            $start          = $_REQUEST['start'];
-            $length         = $_REQUEST['length'];
+            $start = $_REQUEST['start'];
+            $length = $_REQUEST['length'];
             /* If we pass any extra data in request from ajax */
-            //$value1 = isset($_REQUEST['key1'])?$_REQUEST['key1']:"";
+            // $value1 = isset($_REQUEST['key1'])?$_REQUEST['key1']:"";
 
             /* Value we will get from typing in search */
             $search_value = $_REQUEST['search']['value'];
 
-            if (!empty($search_value)) {
+            if (! empty($search_value)) {
 
-                $studentListData = Gn_StudentTestAttempt::select(['gn__student_test_attempts.id','users.name as username','test.title as title','gn__student_test_attempts.created_at as created_at','test.created_at as test_create'])
-                ->leftJoin('users','users.id','gn__student_test_attempts.student_id')
-                ->leftJoin('test','test.id','gn__student_test_attempts.test_id')
-                ->where('test.id','=',$test_id)
-                ->orderBy('gn__student_test_attempts.id', 'desc')->skip($start)->take($length)->get();
+                $studentListData = Gn_StudentTestAttempt::select(['gn__student_test_attempts.id', 'users.name as username', 'test.title as title', 'gn__student_test_attempts.created_at as created_at', 'test.created_at as test_create'])
+                    ->leftJoin('users', function ($join) {
+                        $join->on('users.id', 'gn__student_test_attempts.student_id')
+                            ->whereNull('users.deleted_at');
+                    })
+                    ->leftJoin('test', function ($join) {
+                        $join->on('test.id', 'gn__student_test_attempts.test_id')
+                            ->whereNull('test.deleted_at');
+                    })
+                    ->where('test.id', '=', $test_id)
+                    ->orderBy('gn__student_test_attempts.id', 'desc')->skip($start)->take($length)->get();
                 // $testTableData = TestModal::select(['id', 'title', 'sections', 'total_questions', 'questions_submitted', 'questions_approved', 'reviewed', 'reviewed_status', 'published','created_at','education_type_child_id','published_status'])
                 //     ->where('user_id',Auth::user()->id)->orderBy('id', 'desc')
                 //     ->where("title", "like", "%" . $search_value . "%")
                 //     ->orderBy('id', 'desc')->skip($start)->take($length)->get();
                 $count = Gn_StudentTestAttempt::get()->count();
             } else {
-                $studentListData = Gn_StudentTestAttempt::select(['gn__student_test_attempts.id','users.name as username','test.title as title','gn__student_test_attempts.created_at as test_attempt','test.created_at as test_create'])
-                ->leftJoin('users','users.id','gn__student_test_attempts.student_id')
-                ->leftJoin('test','test.id','gn__student_test_attempts.test_id')
-                ->where('test.id','=',$test_id)
-                ->orderBy('gn__student_test_attempts.id', 'desc')->skip($start)->take($length)->get();
+                $studentListData = Gn_StudentTestAttempt::select(['gn__student_test_attempts.id', 'users.name as username', 'test.title as title', 'gn__student_test_attempts.created_at as test_attempt', 'test.created_at as test_create'])
+                    ->leftJoin('users', function ($join) {
+                        $join->on('users.id', 'gn__student_test_attempts.student_id')
+                            ->whereNull('users.deleted_at');
+                    })
+                    ->leftJoin('test', function ($join) {
+                        $join->on('test.id', 'gn__student_test_attempts.test_id')
+                            ->whereNull('test.deleted_at');
+                    })
+                    ->where('test.id', '=', $test_id)
+                    ->orderBy('gn__student_test_attempts.id', 'desc')->skip($start)->take($length)->get();
                 $count = Gn_StudentTestAttempt::count();
             }
 
             foreach ($studentListData as $key => $testData) {
 
-                $studentListData[$key]['username']                = $testData->username;
-                $studentListData[$key]['title']                   = $testData->title;
-                $studentListData[$key]['test_attempt_date']       = date('d-m-Y',strtotime($testData->test_attempt));
-                $studentListData[$key]['class_name']              = date('d-m-Y',strtotime($testData->test_create));
+                $studentListData[$key]['username'] = $testData->username;
+                $studentListData[$key]['title'] = $testData->title;
+                $studentListData[$key]['test_attempt_date'] = date('d-m-Y', strtotime($testData->test_attempt));
+                $studentListData[$key]['class_name'] = date('d-m-Y', strtotime($testData->test_create));
 
             }
 
-            $json_data = array(
-                "draw"              => intval($params['draw']),
-                "recordsTotal"      => $count,
-                "recordsFiltered"   => $count,
-                "data"              => $studentListData   // total data array
-            );
+            $json_data = [
+                'draw' => intval($params['draw']),
+                'recordsTotal' => $count,
+                'recordsFiltered' => $count,
+                'data' => $studentListData,   // total data array
+            ];
 
             return json_encode($json_data);
         }
+
         return view('/Dashboard/Admin/Exam/student_list')->with('data', $this->data);
     }
 
-    public function getpackage(Request $req,$education_type_id,$class_group_exam_id,$value){
+    public function getpackage(Request $req, $education_type_id, $class_group_exam_id, $value)
+    {
 
-        $arr = DB::table('gn__package_plans')->where('education_type',$education_type_id)->where('class',$class_group_exam_id)->where('package_category',$value)->get();
+        $arr = DB::table('gn__package_plans')->where('education_type', $education_type_id)->where('class', $class_group_exam_id)->where('package_category', $value)->get();
 
-        foreach($arr as $list){
-        echo "<option value=".$list->id.">$list->plan_name</option>";
+        foreach ($arr as $list) {
+            echo '<option value='.$list->id.">$list->plan_name</option>";
         }
     }
 
-    public function test_category(Request $req){
+    public function test_category(Request $req)
+    {
 
         $result['test_cat'] = DB::table('test_cat')->get();
 
-        return view('/Dashboard/Admin/Exam/test_category_list',$result);
+        return view('/Dashboard/Admin/Exam/test_category_list', $result);
     }
 
-    public function manage_test_category(Request $req,$id=""){
+    public function manage_test_category(Request $req, $id = '')
+    {
         // return $id;
-        if($id > 0){
-            $test_cat = DB::table('test_cat')->where('id',$id)->first();
+        if ($id > 0) {
+            $test_cat = DB::table('test_cat')->where('id', $id)->first();
             $result['cat_name'] = $test_cat->cat_name;
             $result['cat_image'] = $test_cat->cat_image;
             $result['id'] = $test_cat->id;
-        }else{
+        } else {
             $result['cat_name'] = '';
             $result['cat_image'] = '';
             $result['id'] = '';
         }
 
-        return view('/Dashboard/Admin/Exam/test_category_add',$result);
+        return view('/Dashboard/Admin/Exam/test_category_add', $result);
     }
 
-    public function manage_test_cat_process(Request $req){
+    public function manage_test_cat_process(Request $req)
+    {
 
-    if ($req->post('id') > 0) {
-        // Update existing record
-        if ($req->hasFile('cat_image')) {
-            $imageUrl = $this->imageService->handleUpload($req->file('cat_image'), 'cat_image', 800);
-            DB::table('test_cat')->where('id', $req->post('id'))->update([
-                'cat_name' => $req->post('cat_name'),
-                'cat_image' => $imageUrl
-            ]);
+        if ($req->post('id') > 0) {
+            // Update existing record
+            if ($req->hasFile('cat_image')) {
+                $imageUrl = $this->imageService->handleUpload($req->file('cat_image'), 'cat_image', 800);
+                DB::table('test_cat')->where('id', $req->post('id'))->update([
+                    'cat_name' => $req->post('cat_name'),
+                    'cat_image' => $imageUrl,
+                ]);
+            } else {
+                DB::table('test_cat')->where('id', $req->post('id'))->update([
+                    'cat_name' => $req->post('cat_name'),
+                ]);
+            }
         } else {
-            DB::table('test_cat')->where('id', $req->post('id'))->update([
-                'cat_name' => $req->post('cat_name'),
-            ]);
+            // Insert new record
+            if ($req->hasFile('cat_image')) {
+                $imageUrl = $this->imageService->handleUpload($req->file('cat_image'), 'cat_image', 800);
+                DB::table('test_cat')->insert([
+                    'cat_name' => $req->post('cat_name'),
+                    'cat_image' => $imageUrl,
+                ]);
+            } else {
+                DB::table('test_cat')->insert([
+                    'cat_name' => $req->post('cat_name'),
+                ]);
+            }
         }
-    } else {
-        // Insert new record
-        if ($req->hasFile('cat_image')) {
-            $imageUrl = $this->imageService->handleUpload($req->file('cat_image'), 'cat_image', 800);
-            DB::table('test_cat')->insert([
-                'cat_name' => $req->post('cat_name'),
-                'cat_image' => $imageUrl
-            ]);
-        } else {
-            DB::table('test_cat')->insert([
-                'cat_name' => $req->post('cat_name'),
-            ]);
-        }
-    }
-
 
         return redirect()->route('administrator.dashboard_add_test_category');
 
     }
 
-    public function delete_category(Request $req,$id){
+    public function delete_category(Request $req,$id)
+    {
 
         DB::table('test_cat')->where('id', $id)->delete();
 
         return redirect()->back();
     }
 
-    public function test_feature_update(Request $request, $id){
+    public function test_feature_update(Request $request, $id)
+    {
 
         $test = TestModal::where('id', $id)->first();
-        if($test){
-            if($test->featured == 0){
+        if ($test) {
+            if ($test->featured == 0) {
                 $test->featured = 1;
                 $test->save();
-            }else{
+            } else {
                 $test->featured = 0;
                 $test->save();
             }
@@ -1977,6 +1921,7 @@ class ExamsController extends Controller
                 'status' => 'success',
                 'message' => 'Record updated',
             ];
+
             return response($response);
         }
 
@@ -1984,7 +1929,7 @@ class ExamsController extends Controller
             'status' => 'failed',
             'message' => 'No record found',
         ];
+
         return response($response);
     }
-
 }

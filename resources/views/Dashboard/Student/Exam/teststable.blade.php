@@ -4,32 +4,9 @@
 @endsection
 @section('main')
     <div class="container p-0">
-        <div class="dashboard-container mb-5">
-            <div class="card">
-                <div class="card-body">
-                    <table class="table" id="teststable">
-                        <thead>
-                            <tr>
-                                <th scope="col">Test</th>
-                                <!-- <th scope="col">Type</th> -->
-                                <th scope="col">Class Name</th>
-                                <!-- <th scope="col">Created By</th> -->
-                                <th scope="col">Created Date</th>
-                                <!-- <th scope="col">Sections</th> -->
-                                <th scope="col">Questions</th>
-                                <!-- <th scope="col">Status</th> -->
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+        <livewire:student.tests.student-test-list :type="$data['type']" :cat="$data['cat']" />
     </div>
 @endsection
 
 @section('javascript')
-    <script type="text/javascript" src="{{ asset('js/student/studentteststable.js') }}"></script>
 @endsection

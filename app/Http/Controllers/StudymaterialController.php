@@ -2,33 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Route;
-use App\Models\Studymaterial;
-use App\Models\Educationtype;
-use App\Models\UserDetails;
-use App\Models\FranchiseDetails;
-use App\Http\Requests\StoreStudymaterialRequest;
 use App\Http\Requests\UpdateStudymaterialRequest;
+use App\Models\Educationtype;
+use App\Models\FranchiseDetails;
+use App\Models\Studymaterial;
+use App\Models\UserDetails;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Facades\DataTables;
-use App\Services\ImageService;
 
 class StudymaterialController extends Controller
 {
     protected $data;
+
     protected $imageService;
 
     public function __construct(ImageService $imageService)
     {
         $this->imageService = $imageService;
-        $this->data = array();
+        $this->data = [];
         $this->data['pagename'] = 'Add Study Material';
     }
-
 
     /**
      * Display a listing of the resource.
@@ -38,39 +36,41 @@ class StudymaterialController extends Controller
     public function index(Request $request)
     {
         $is_admin = $is_franchies = $is_staff = '';
-        if (Auth::user()->roles == 'superadmin')
+        if (Auth::user()->roles == 'superadmin') {
             $is_admin = Auth::user()->isAdminAllowed;
-        if (Auth::user()->roles == 'franchise')
+        }
+        if (Auth::user()->roles == 'franchise') {
             $is_franchies = Auth::user()->is_franchise;
-        if (Auth::user()->roles == 'creator' || Auth::user()->roles == 'publisher')
+        }
+        if (Auth::user()->roles == 'creator' || Auth::user()->roles == 'publisher') {
             $is_staff = Auth::user()->is_staff;
-
+        }
 
         if ($request->ajax()) {
             $published = isset($request->published) ? $request->published : '';
             $study_material_cat = isset($request->study_material_cat) ? $request->study_material_cat : '';
 
             $model = Studymaterial::query()
-                ->select("study_material.id", "title", "sub_title", "is_featured", "institute_id", "publish_status", "publish_date", "document_type", "created_by", "file", "video_link", "category", "users.name as name", "classes_groups_exams.name as class_group")
+                ->select('study_material.id', 'title', 'sub_title', 'is_featured', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'category', 'users.name as name', 'classes_groups_exams.name as class_group')
                 ->withRelations();
 
             if ($is_franchies == 1) {
-                $model = $model->where("franchise_details.id", Auth::user()->institute->id);
+                $model = $model->where('franchise_details.id', Auth::user()->institute->id);
             }
             if ($is_staff == 1) {
-                $model = $model->where("franchise_details.id", Auth::user()->myInstitute->id);
-                $model = $model->where("users.id", Auth::user()->id);
+                $model = $model->where('franchise_details.id', Auth::user()->myInstitute->id);
+                $model = $model->where('users.id', Auth::user()->id);
             }
 
-            if (!empty($published)) {
+            if (! empty($published)) {
                 $model = $model->where('publish_status', $published);
             }
 
-            if (!empty($study_material_cat)) {
+            if (! empty($study_material_cat)) {
                 $model = $model->byCategory($study_material_cat);
             }
 
-            $model = $model->where("study_material.status", 1)
+            $model = $model->where('study_material.status', 1)
                 ->orderBy('study_material.id', 'desc');
             $model->get();
 
@@ -83,130 +83,155 @@ class StudymaterialController extends Controller
                 ->addColumn('sub_title', '{{ $sub_title }}')
                 ->addColumn('is_featured', function ($model) {
                     if ($model['is_featured']) {
-                        $test_data = '<a href="' . 'material/is_featured/' . $model['id'] . '/0' . '" class="btn btn-sm btn-warning">UnFeatured</a>';
+                        $test_data = '<a href="'.'material/is_featured/'.$model['id'].'/0'.'" class="btn btn-sm btn-warning">UnFeatured</a>';
                     } else {
-                        $test_data = '<a href="' . 'material/is_featured/' . $model['id'] . '/1' . '" class="btn btn-sm btn-primary" >Featured</a>';
+                        $test_data = '<a href="'.'material/is_featured/'.$model['id'].'/1'.'" class="btn btn-sm btn-primary" >Featured</a>';
                     }
+
                     return $test_data;
                 })
                 ->addColumn('availability', function ($model) {
                     $type = '';
-                    if ($model['document_type'] == 'PDF')
+                    if ($model['document_type'] == 'PDF') {
                         $type = '<i class="bi bi-file-pdf"></i>';
-                    if ($model['document_type'] == 'WORD')
+                    }
+                    if ($model['document_type'] == 'WORD') {
                         $type = '<i class="bi bi-file-word"></i>';
-                    if ($model['document_type'] == 'EXCEL')
+                    }
+                    if ($model['document_type'] == 'EXCEL') {
                         $type = '<i class="bi bi-file-excel"></i>';
-                    if ($model['document_type'] == 'VIDEO')
+                    }
+                    if ($model['document_type'] == 'VIDEO') {
                         $type = '<i class="bi bi-camera-video"></i>';
-                    if ($model['document_type'] == 'AUDIO')
+                    }
+                    if ($model['document_type'] == 'AUDIO') {
                         $type = '<i class="bi bi-file-music"></i>';
-                    if ($model['document_type'] == 'YOUTUBE')
+                    }
+                    if ($model['document_type'] == 'YOUTUBE') {
                         $type = '<i class="bi bi-youtube"></i>';
+                    }
 
-                    if ($model['publish_status'] == 'Submit')
-                        return $type . ' <label style="color:#AA336A;">' . $model['publish_status'] . '</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
-                    else
-                        return $type . ' <label style="color: #00A300;">' . $model['publish_status'] . '</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
+                    if ($model['publish_status'] == 'Submit') {
+                        return $type.' <label style="color:#AA336A;">'.$model['publish_status'].'</label>'.'</br>'.date('d-m-Y', strtotime($model['publish_date']));
+                    } else {
+                        return $type.' <label style="color: #00A300;">'.$model['publish_status'].'</label>'.'</br>'.date('d-m-Y', strtotime($model['publish_date']));
+                    }
                 })
                 ->addColumn('created_by', function ($model) {
                     $is_admin = $is_franchies = $is_staff = '';
-                    if (Auth::user()->roles == 'superadmin')
+                    if (Auth::user()->roles == 'superadmin') {
                         $is_admin = Auth::user()->isAdminAllowed;
-                    if (Auth::user()->roles == 'franchise')
+                    }
+                    if (Auth::user()->roles == 'franchise') {
                         $is_franchies = Auth::user()->is_franchise;
-                    if (Auth::user()->roles == 'creator' || Auth::user()->roles == 'publisher')
+                    }
+                    if (Auth::user()->roles == 'creator' || Auth::user()->roles == 'publisher') {
                         $is_staff = Auth::user()->is_staff;
+                    }
                     if ($is_admin == 1) {
                         return $model['name'];
                     }
                     if ($is_franchies == 1) {
-                        return $model['name'] . ' (' . Auth::user()->institute['institute_name'] . ')';
+                        return $model['name'].' ('.Auth::user()->institute['institute_name'].')';
                     }
                     if ($is_staff == 1) {
-                        return $model['name'] . ' (' . Auth::user()->myInstitute->institute_name . ')';
+                        return $model['name'].' ('.Auth::user()->myInstitute->institute_name.')';
                     }
                 })
                 ->addColumn('category', '{{ $category }}')
                 ->addColumn('view', function ($model) {
                     $is_admin = $is_franchies = $is_staff = '';
-                    if (Auth::user()->roles == 'superadmin')
+                    if (Auth::user()->roles == 'superadmin') {
                         $is_admin = Auth::user()->isAdminAllowed;
-                    if (Auth::user()->roles == 'franchise')
+                    }
+                    if (Auth::user()->roles == 'franchise') {
                         $is_franchies = Auth::user()->is_franchise;
-                    if (Auth::user()->roles == 'creator' || Auth::user()->roles == 'publisher')
+                    }
+                    if (Auth::user()->roles == 'creator' || Auth::user()->roles == 'publisher') {
                         $is_staff = Auth::user()->is_staff;
+                    }
                     if ($is_admin == 1) {
-                        return $viewHtml = '<a href="' . route('administrator.edit', [$model['id']]) . '" class="btn btn-info btn-sm" title="View Study Material!">View</a>';
+                        return $viewHtml = '<a href="'.route('administrator.edit', [$model['id']]).'" class="btn btn-info btn-sm" title="View Study Material!">View</a>';
                     }
                     if ($is_franchies == 1) {
-                        return $viewHtml = '<a href="' . route('franchise.management.edit', [$model['id']]) . '" class="btn btn-info btn-sm" title="View Study Material!">View</a>';
+                        return $viewHtml = '<a href="'.route('franchise.management.edit', [$model['id']]).'" class="btn btn-info btn-sm" title="View Study Material!">View</a>';
                     }
                     if ($is_staff == 1 && Auth::user()->roles == 'publisher') {
-                        return $viewHtml = '<a href="' . route('franchise.management.publisher.edit', [$model['id']]) . '" class="btn btn-info btn-sm" title="View Study Material!">View</a>';
+                        return $viewHtml = '<a href="'.route('franchise.management.publisher.edit', [$model['id']]).'" class="btn btn-info btn-sm" title="View Study Material!">View</a>';
                     }
                     if ($is_staff == 1 && Auth::user()->roles == 'creator') {
-                        return $viewHtml = '<a href="' . route('franchise.management.creater.edit', [$model['id']]) . '" class="btn btn-info btn-sm" title="View Study Material!">View</a>';
+                        return $viewHtml = '<a href="'.route('franchise.management.creater.edit', [$model['id']]).'" class="btn btn-info btn-sm" title="View Study Material!">View</a>';
                     }
                 })
                 ->addColumn('status', function ($model) {
-                    if ($model['publish_status'] == 'Submit')
-                        return '<label class="btn btn-sm btn-primary">' . $model['publish_status'] . '</label>';
-                    if ($model['publish_status'] == 'Published')
-                        return '<label class="btn btn-sm btn-success">' . $model['publish_status'] . '</label>';
-                    if ($model['publish_status'] == 'Paused')
-                        return '<label class="btn btn-sm btn-danger">' . $model['publish_status'] . '</label>';
-                    if ($model['publish_status'] == 'Paused & Send Back')
-                        return '<label class="btn btn-sm btn-danger">' . $model['publish_status'] . '</label>';
+                    if ($model['publish_status'] == 'Submit') {
+                        return '<label class="btn btn-sm btn-primary">'.$model['publish_status'].'</label>';
+                    }
+                    if ($model['publish_status'] == 'Published') {
+                        return '<label class="btn btn-sm btn-success">'.$model['publish_status'].'</label>';
+                    }
+                    if ($model['publish_status'] == 'Paused') {
+                        return '<label class="btn btn-sm btn-danger">'.$model['publish_status'].'</label>';
+                    }
+                    if ($model['publish_status'] == 'Paused & Send Back') {
+                        return '<label class="btn btn-sm btn-danger">'.$model['publish_status'].'</label>';
+                    }
                 })
                 ->addColumn('edit', function ($model) {
                     $is_admin = $is_franchies = $is_staff = '';
-                    if (Auth::user()->roles == 'superadmin')
+                    if (Auth::user()->roles == 'superadmin') {
                         $is_admin = Auth::user()->isAdminAllowed;
-                    if (Auth::user()->roles == 'franchise')
+                    }
+                    if (Auth::user()->roles == 'franchise') {
                         $is_franchies = Auth::user()->is_franchise;
-                    if (Auth::user()->roles == 'creator' || Auth::user()->roles == 'publisher')
+                    }
+                    if (Auth::user()->roles == 'creator' || Auth::user()->roles == 'publisher') {
                         $is_staff = Auth::user()->is_staff;
+                    }
                     if ($is_admin == 1) {
-                        return $actionsHtml = '<a href="' . route('administrator.edit', [$model['id']]) . '" title="Edit Study Material!"><i class="bi bi-pencil-square text-success me-2"></i></a>
-                    <a href="javascript:void(0);" class="delete_material" id=' . $model['id'] . ' data=' . $model['file'] . ' title="Delete Study Material!"><i class="bi bi-trash2-fill text-danger me-2"></i></a>';
+                        return $actionsHtml = '<a href="'.route('administrator.edit', [$model['id']]).'" title="Edit Study Material!"><i class="bi bi-pencil-square text-success me-2"></i></a>
+                    <a href="javascript:void(0);" class="delete_material" id='.$model['id'].' data='.$model['file'].' title="Delete Study Material!"><i class="bi bi-trash2-fill text-danger me-2"></i></a>';
                     }
                     if ($is_franchies == 1) {
-                        return $actionsHtml = '<a href="' . route('franchise.management.edit', [$model['id']]) . '" title="Edit Study Material!"><i class="bi bi-pencil-square text-success me-2"></i></a>';
+                        return $actionsHtml = '<a href="'.route('franchise.management.edit', [$model['id']]).'" title="Edit Study Material!"><i class="bi bi-pencil-square text-success me-2"></i></a>';
                     }
                     if ($is_staff == 1 && Auth::user()->roles == 'publisher') {
-                        return $actionsHtml = '<a href="' . route('franchise.management.publisher.edit', [$model['id']]) . '" title="Edit Study Material!"><i class="bi bi-pencil-square text-success me-2"></i></a>';
+                        return $actionsHtml = '<a href="'.route('franchise.management.publisher.edit', [$model['id']]).'" title="Edit Study Material!"><i class="bi bi-pencil-square text-success me-2"></i></a>';
                     }
                     if ($is_staff == 1 && Auth::user()->roles == 'creator') {
-                        return $actionsHtml = '<a href="' . route('franchise.management.creater.edit', [$model['id']]) . '" title="Edit Study Material!"><i class="bi bi-pencil-square text-success me-2"></i></a>';
+                        return $actionsHtml = '<a href="'.route('franchise.management.creater.edit', [$model['id']]).'" title="Edit Study Material!"><i class="bi bi-pencil-square text-success me-2"></i></a>';
                     }
                 })
                 ->rawColumns(['is_featured', 'availability', 'status', 'view', 'edit'])
                 ->make(true);
         }
 
-        if ($is_admin == 1)
-            return view("Dashboard/Admin/Material/materialtable", compact('is_admin', 'is_franchies', 'is_staff'));
+        if ($is_admin == 1) {
+            return view('Dashboard/Admin/Material/materialtable', compact('is_admin', 'is_franchies', 'is_staff'));
+        }
 
         if ($is_franchies == 1) {
             $FranchiseDetails = FranchiseDetails::get()->where('user_id', Auth::user()->id)->first();
             $submit_content = $FranchiseDetails->submit_content;
             $publish_content = $FranchiseDetails->allowed_to_upload;
-            return view("Dashboard/Franchise/Material/materialtable", compact('is_franchies', 'submit_content', 'publish_content'));
+
+            return view('Dashboard/Franchise/Material/materialtable', compact('is_franchies', 'submit_content', 'publish_content'));
         }
         if ($is_staff == 1 && Auth::user()->roles == 'publisher') {
 
             $UserDetails = UserDetails::get()->where('user_id', Auth::user()->id)->first();
             $submit_content = $UserDetails->submit_content;
             $publish_content = $UserDetails->allowed_to_upload;
-            return view("Dashboard/Franchise/Management/Publisher/Material/materialtable", compact('is_staff', 'submit_content', 'publish_content'));
+
+            return view('Dashboard/Franchise/Management/Publisher/Material/materialtable', compact('is_staff', 'submit_content', 'publish_content'));
         }
         if ($is_staff == 1 && Auth::user()->roles == 'creator') {
 
             $UserDetails = UserDetails::get()->where('user_id', Auth::user()->id)->first();
             $submit_content = $UserDetails->submit_content;
             $publish_content = $UserDetails->allowed_to_upload;
-            return view("Dashboard/Franchise/Management/Creater/Material/materialtable", compact('is_staff', 'submit_content', 'publish_content'));
+
+            return view('Dashboard/Franchise/Management/Creater/Material/materialtable', compact('is_staff', 'submit_content', 'publish_content'));
         }
     }
 
@@ -215,42 +240,42 @@ class StudymaterialController extends Controller
         $published = isset($request->published) ? $request->published : '';
         $study_material_cat = isset($request->study_material_cat) ? $request->study_material_cat : '';
 
-        $query = Studymaterial::select("id", "title", "sub_title", "is_featured", "institute_id", "publish_status", "publish_date", "document_type", "created_by", "file", "video_link", "category", "class")
+        $query = Studymaterial::select('id', 'title', 'sub_title', 'is_featured', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'category', 'class')
             ->with('created_by_user:id,name', 'study_class:id,name', 'institute');
 
-        if (!empty($published)) {
-            $query =  $query->where('publish_status', $published);
+        if (! empty($published)) {
+            $query = $query->where('publish_status', $published);
             $count = $query->count();
         }
-        if (!empty($study_material_cat)) {
+        if (! empty($study_material_cat)) {
             if ($study_material_cat == 1) {
-                $query =  $query->where('category', 'Study Notes & E-Books');
+                $query = $query->where('category', 'Study Notes & E-Books');
             }
             if ($study_material_cat == 2) {
-                $query =  $query->where('category', 'Live & Video Classes');
+                $query = $query->where('category', 'Live & Video Classes');
             }
             if ($study_material_cat == 3) {
-                $query =  $query->where('category', 'Static GK & Current Affairs');
+                $query = $query->where('category', 'Static GK & Current Affairs');
             }
             if ($study_material_cat == 4) {
-                $query =  $query->where('category', 'Comprehensive Study Material');
+                $query = $query->where('category', 'Comprehensive Study Material');
             }
             if ($study_material_cat == 5) {
-                $query =  $query->where('category', 'Short Notes & One Liner');
+                $query = $query->where('category', 'Short Notes & One Liner');
             }
             if ($study_material_cat == 6) {
-                $query =  $query->where('category', 'Premium Study Notes');
+                $query = $query->where('category', 'Premium Study Notes');
             }
             $count = $query->count();
         }
 
-        $query = $query->where("status", 1);
+        $query = $query->where('status', 1);
         $query = $query->orderBy('id', 'desc');
 
         $model = $query->get();
         // return print_r($model->toArray());
 
-        return view("Dashboard/Admin/Material/materialtable_admin", compact('model'));
+        return view('Dashboard/Admin/Material/materialtable_admin', compact('model'));
     }
 
     /**
@@ -260,23 +285,27 @@ class StudymaterialController extends Controller
      */
     public function create()
     {
-        $gn_EduTypes      = Educationtype::get();
+        $gn_EduTypes = Educationtype::get();
         $is_admin = $is_franchies = $is_staff = '';
-        if (Auth::user()->roles == 'superadmin')
-            return view("Dashboard/Admin/Material/add_edit_material", compact('gn_EduTypes'));
-        if (Auth::user()->roles == 'franchise')
-            return view("Dashboard/Franchise/Material/add_edit_material", compact('gn_EduTypes'));
+        if (Auth::user()->roles == 'superadmin') {
+            return view('Dashboard/Admin/Material/add_edit_material', compact('gn_EduTypes'));
+        }
+        if (Auth::user()->roles == 'franchise') {
+            return view('Dashboard/Franchise/Material/add_edit_material', compact('gn_EduTypes'));
+        }
         if (Auth::user()->roles == 'publisher') {
             $UserDetails = UserDetails::get()->where('user_id', Auth::user()->id)->first();
             $submit_content = $UserDetails->submit_content;
             $publish_content = $UserDetails->allowed_to_upload;
-            return view("Dashboard/Franchise/Management/Publisher/Material/add_edit_material", compact('gn_EduTypes', 'submit_content', 'publish_content'));
+
+            return view('Dashboard/Franchise/Management/Publisher/Material/add_edit_material', compact('gn_EduTypes', 'submit_content', 'publish_content'));
         }
         if (Auth::user()->roles == 'creator') {
             $UserDetails = UserDetails::get()->where('user_id', Auth::user()->id)->first();
             $submit_content = $UserDetails->submit_content;
             $publish_content = $UserDetails->allowed_to_upload;
-            return view("Dashboard/Franchise/Management/Creater/Material/add_edit_material", compact('gn_EduTypes', 'submit_content', 'publish_content'));
+
+            return view('Dashboard/Franchise/Management/Creater/Material/add_edit_material', compact('gn_EduTypes', 'submit_content', 'publish_content'));
         }
     }
 
@@ -289,7 +318,7 @@ class StudymaterialController extends Controller
     public function store(Request $request)
     {
         try {
-            //code...
+            // code...
             // return "test";
             $data = $request->all();
 
@@ -310,13 +339,13 @@ class StudymaterialController extends Controller
                 if ($is_franchies == 1) {
                     $institute = Auth::user()->institute->id;
                     $FranchiseDetails = FranchiseDetails::get()->where('user_id', Auth::user()->id)->first();
-                    if ($FranchiseDetails->allowed_to_upload == 1)
+                    if ($FranchiseDetails->allowed_to_upload == 1) {
                         $publish_by = Auth::user()->id;
-                    else
-                if (isset($Studymaterial->publish_by) != 0)
+                    } elseif (isset($Studymaterial->publish_by) != 0) {
                         $publish_by = $Studymaterial->publish_by;
-                    else
+                    } else {
                         $publish_by = 0;
+                    }
                 }
             }
 
@@ -325,41 +354,41 @@ class StudymaterialController extends Controller
                 if ($is_staff == 1) {
                     $institute = Auth::user()->myInstitute->id;
                     $UserDetails = UserDetails::get()->where('user_id', Auth::user()->id)->first();
-                    if ($UserDetails->allowed_to_upload == 1)
+                    if ($UserDetails->allowed_to_upload == 1) {
                         $publish_by = Auth::user()->id;
-                    else
-                    if (isset($Studymaterial->publish_by) != 0)
+                    } elseif (isset($Studymaterial->publish_by) != 0) {
                         $publish_by = $Studymaterial->publish_by;
-                    else
+                    } else {
                         $publish_by = 0;
+                    }
                 }
             }
 
-            if ($data['publish_date'] == date("Y-m-d")) {
-                if (Auth::user()->allowed_to_upload == 1)
+            if ($data['publish_date'] == date('Y-m-d')) {
+                if (Auth::user()->allowed_to_upload == 1) {
                     $publish_status = 'Published';
-                else
-                if ($is_admin == 1)
+                } elseif ($is_admin == 1) {
                     $publish_status = 'Published';
-                elseif ($is_franchies == 1) {
+                } elseif ($is_franchies == 1) {
                     $FranchiseDetails = FranchiseDetails::get()->where('user_id', Auth::user()->id)->first();
-                    if ($FranchiseDetails->allowed_to_upload == 1)
+                    if ($FranchiseDetails->allowed_to_upload == 1) {
                         $publish_status = 'Published';
-                    else
-                        if (isset($Studymaterial->publish_by) != 0)
+                    } elseif (isset($Studymaterial->publish_by) != 0) {
                         $publish_status = $Studymaterial->publish_status;
-                    else
+                    } else {
                         $publish_status = 'Submit';
+                    }
                 } elseif ($is_staff == 1) {
                     $UserDetails = UserDetails::get()->where('user_id', Auth::user()->id)->first();
                     if ($UserDetails->allowed_to_upload == 1) {
                         $publish_status = 'Published';
                     } else {
                         if (isset($Studymaterial->publish_by) != 0) {
-                            if ($Studymaterial->publish_by == 'Paused & Send Back')
+                            if ($Studymaterial->publish_by == 'Paused & Send Back') {
                                 $publish_status = $Studymaterial->publish_status;
-                            else
+                            } else {
                                 $publish_status = 'Submit';
+                            }
                         } else {
                             $publish_status = 'Submit';
                         }
@@ -373,23 +402,24 @@ class StudymaterialController extends Controller
                     $publish_status = 'Published';
                 } elseif ($is_franchies == 1) {
                     $FranchiseDetails = FranchiseDetails::get()->where('user_id', Auth::user()->id)->first();
-                    if ($FranchiseDetails->allowed_to_upload == 1)
+                    if ($FranchiseDetails->allowed_to_upload == 1) {
                         $publish_status = 'Published';
-                    else
-                        if (isset($Studymaterial->publish_by) != 0)
+                    } elseif (isset($Studymaterial->publish_by) != 0) {
                         $publish_status = $Studymaterial->publish_status;
-                    else
+                    } else {
                         $publish_status = 'Submit';
+                    }
                 } elseif ($is_staff == 1) {
                     $UserDetails = UserDetails::get()->where('user_id', Auth::user()->id)->first();
                     if ($UserDetails->allowed_to_upload == 1) {
                         $publish_status = 'Published';
                     } else {
                         if (isset($Studymaterial->publish_by) != 0) {
-                            if ($Studymaterial->publish_by == 'Paused & Send Back')
+                            if ($Studymaterial->publish_by == 'Paused & Send Back') {
                                 $publish_status = $Studymaterial->publish_status;
-                            else
+                            } else {
                                 $publish_status = 'Submit';
+                            }
                         } else {
                             $publish_status = 'Submit';
                         }
@@ -399,10 +429,10 @@ class StudymaterialController extends Controller
                 }
             }
 
-            $Studymaterial = new Studymaterial();
+            $Studymaterial = new Studymaterial;
             if ($data['material_id'] != 0) {
                 $Studymaterial->exists = true;
-                $Studymaterial->id = $data['material_id']; //already exists in database.
+                $Studymaterial->id = $data['material_id']; // already exists in database.
             }
             $Studymaterial->title = $data['title'];
             $Studymaterial->sub_title = $data['sub_title'];
@@ -417,12 +447,12 @@ class StudymaterialController extends Controller
             $Studymaterial->publish_date = $data['publish_date'];
             $Studymaterial->student_rating = $data['student_rating'];
             $Studymaterial->total_student = $data['total_student'];
-            $Studymaterial->price = (isset($data['price'])) ? $data['price'] : NULL;
+            $Studymaterial->price = (isset($data['price'])) ? $data['price'] : null;
             if ($is_franchies != 1) {
                 $Studymaterial->study_material_type = $data['study_material_type'];
-                $Studymaterial->select_package = (isset($data['select_package'])) ? $data['select_package'] : NULL;
+                $Studymaterial->select_package = (isset($data['select_package'])) ? $data['select_package'] : null;
             }
-            $Studymaterial->video_link = (isset($data['video_link'])) ? $data['video_link'] : NULL;
+            $Studymaterial->video_link = (isset($data['video_link'])) ? $data['video_link'] : null;
             if ($request->hasFile('study_material_image')) {
                 $fullPath = $this->imageService->handleUpload($request->file('study_material_image'), 'study_material_image', 800);
                 $Studymaterial->study_material_image = $fullPath;
@@ -448,18 +478,19 @@ class StudymaterialController extends Controller
             if ($data['material_id'] != 0) {
                 $Studymaterial->material_seen = 1;
             }
-            $Studymaterial->remarks = (isset($data['remarks'])) ? $data['remarks'] : NULL;
-            $Studymaterial->other_remark = (isset($data['other_remark'])) ? $data['other_remark'] : NULL;
-            $Studymaterial->category = (isset($data['category'])) ? $data['category'] : NULL;
+            $Studymaterial->remarks = (isset($data['remarks'])) ? $data['remarks'] : null;
+            $Studymaterial->other_remark = (isset($data['other_remark'])) ? $data['other_remark'] : null;
+            $Studymaterial->category = (isset($data['category'])) ? $data['category'] : null;
 
             // if(isset($data['pause_material']) && $data['pause_material'] == 'Pause Material')
             //     $Studymaterial->material_seen = (isset($data['pause_val']) && $data['pause_val'] == 1) ? 0 : 1;
 
             if ($Studymaterial->save()) {
-                if ($data['material_id'] == 0)
+                if ($data['material_id'] == 0) {
                     return response()->json(['status' => 200, 'message' => 'Study Material Saved Successfully!'], 200);
-                else
+                } else {
                     return response()->json(['status' => 200, 'message' => 'Study Material Updated Successfully!'], 200);
+                }
             } else {
                 return response()->json(['status' => 500, 'message' => 'Problem In Save Data!'], 500);
             }
@@ -481,14 +512,20 @@ class StudymaterialController extends Controller
 
         $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
         if ($request->ajax()) {
-            $model = Studymaterial::select("study_material.id", "title", "sub_title", "institute_id", "publish_status", "publish_date", "document_type", "created_by", "file", "video_link", "permission_to_download", "users.name as name", "classes_groups_exams.name as class_group")
-                ->leftJoin("users", "users.id", "study_material.created_by")
-                ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
-                ->where("study_material.status", 1)
-                ->where("study_material.material_seen", 1)
-                ->where("study_material.education_type", $student->education_type)
+            $model = Studymaterial::select('study_material.id', 'title', 'sub_title', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'permission_to_download', 'users.name as name', 'classes_groups_exams.name as class_group')
+                ->leftJoin('users', function ($join) {
+                    $join->on('users.id', 'study_material.created_by')
+                        ->whereNull('users.deleted_at');
+                })
+                ->leftJoin('classes_groups_exams', function ($join) {
+                    $join->on('classes_groups_exams.id', 'study_material.class')
+                        ->whereNull('classes_groups_exams.deleted_at');
+                })
+                ->where('study_material.status', 1)
+                ->where('study_material.material_seen', 1)
+                ->where('study_material.education_type', $student->education_type)
                 // ->whereIn("study_material.institute_id", array(Auth::user()->myInstitute->id, 0))
-                ->where("study_material.category", 'Study Notes & E-Books');
+                ->where('study_material.category', 'Study Notes & E-Books');
             $model = $model->orderBy('study_material.id', 'desc');
             $model->get();
 
@@ -499,62 +536,70 @@ class StudymaterialController extends Controller
                 ->addColumn('sub_title', '{{ $sub_title }}')
                 ->addColumn('availability', function ($model) {
                     $type = '';
-                    if ($model['document_type'] == 'PDF')
+                    if ($model['document_type'] == 'PDF') {
                         $type = '<i class="bi bi-file-pdf"></i>';
-                    if ($model['document_type'] == 'WORD')
+                    }
+                    if ($model['document_type'] == 'WORD') {
                         $type = '<i class="bi bi-file-word"></i>';
-                    if ($model['document_type'] == 'EXCEL')
+                    }
+                    if ($model['document_type'] == 'EXCEL') {
                         $type = '<i class="bi bi-file-excel"></i>';
-                    if ($model['document_type'] == 'VIDEO')
+                    }
+                    if ($model['document_type'] == 'VIDEO') {
                         $type = '<i class="bi bi-camera-video"></i>';
-                    if ($model['document_type'] == 'AUDIO')
+                    }
+                    if ($model['document_type'] == 'AUDIO') {
                         $type = '<i class="bi bi-file-music"></i>';
-                    if ($model['document_type'] == 'YOUTUBE')
+                    }
+                    if ($model['document_type'] == 'YOUTUBE') {
                         $type = '<i class="bi bi-youtube"></i>';
+                    }
 
-                    if ($model['publish_status'] == 'Submit')
-                        return $type . ' <label style="color:#AA336A;">Scheduled</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
-                    else
-                        return $type . ' <label style="color: #00A300;">' . $model['publish_status'] . '</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
+                    if ($model['publish_status'] == 'Submit') {
+                        return $type.' <label style="color:#AA336A;">Scheduled</label>'.'</br>'.date('d-m-Y', strtotime($model['publish_date']));
+                    } else {
+                        return $type.' <label style="color: #00A300;">'.$model['publish_status'].'</label>'.'</br>'.date('d-m-Y', strtotime($model['publish_date']));
+                    }
                 })
                 ->addColumn('created_by', function ($model) {
-                    if ($model['institute_id'] == 0)
+                    if ($model['institute_id'] == 0) {
                         return 'Test and Notes';
-                    else
+                    } else {
                         return Auth::user()->myInstitute ? Auth::user()->myInstitute->institute_name : 'Test and Notes';
+                    }
                 })
                 ->addColumn('view', function ($model) {
                     $style = '';
                     $href = '';
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
-                        $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                        $href = "#";
+                        $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                        $href = '#';
                     } else {
-                        if ($model['file'] != "NA" && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
-                            $href = url('storage/' . $model['file']);
+                        if ($model['file'] != 'NA' && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
+                            $href = url('storage/'.$model['file']);
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                         } else {
-                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                            $href = "#";
+                            $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                            $href = '#';
                         }
                     }
 
-                    return '<a href=' . $href . ' target="_blank" class="view" ' . $style . ' title="View File">View</a>';
+                    return '<a href='.$href.' target="_blank" class="view" '.$style.' title="View File">View</a>';
                 })
                 ->addColumn('download', function ($model) {
                     $style = '';
                     $href = '';
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
-                        $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                        $href = "#";
+                        $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                        $href = '#';
                     } else {
                         $style = 'style=margin:0 auto;display:block;text-align: center;';
                         if ($model['document_type'] != 'YOUTUBE') {
-                            if ($model['file'] != "NA") {
-                                $href = url('storage/' . $model['file']);
+                            if ($model['file'] != 'NA') {
+                                $href = url('storage/'.$model['file']);
                             } else {
-                                $href = "#";
-                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                                $href = '#';
+                                $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
                             }
                         } else {
                             $href = $model['video_link'];
@@ -562,21 +607,25 @@ class StudymaterialController extends Controller
                     }
 
                     if ($model['document_type'] == 'YOUTUBE') {
-                        return '<a href="' . $href . '" target="_blank" class="download" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href="'.$href.'" target="_blank" class="download" '.$style.' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
                     } else {
-                        return '<a href=' . $href . ' class="download" ' . $style . ' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href='.$href.' class="download" '.$style.' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
                     }
                 })
                 ->rawColumns(['availability', 'view', 'download'])
                 ->make(true);
         }
-        if ($name == 'student.show')
+        if ($name == 'student.show') {
             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp; <b class="text-primary">Study Notes & E-Books</b>';
-        if ($name == 'student.showvideo')
+        }
+        if ($name == 'student.showvideo') {
             $title = '<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Live & Video Classes</b>';
-        if ($name == 'student.showgk')
+        }
+        if ($name == 'student.showgk') {
             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Static GK & Current Affairs</b>';
-        return view("Dashboard/Student/Material/materialtable", compact('title'));
+        }
+
+        return view('Dashboard/Student/Material/materialtable', compact('title'));
     }
 
     public function showvideo(Request $request)
@@ -585,14 +634,20 @@ class StudymaterialController extends Controller
 
         $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
         if ($request->ajax()) {
-            $model      = Studymaterial::select("study_material.id", "title", "sub_title", "institute_id", "publish_status", "publish_date", "document_type", "created_by", "file", "video_link", "permission_to_download", "users.name as name", "classes_groups_exams.name as class_group")
-                ->leftJoin("users", "users.id", "study_material.created_by")
-                ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
-                ->where("study_material.status", 1)
-                ->where("study_material.material_seen", 1)
-                ->where("study_material.education_type", $student->education_type)
-                ->whereIn("study_material.institute_id", array(Auth::user()->myInstitute->id, 0))
-                ->where("study_material.category", 'Live & Video Classes');
+            $model = Studymaterial::select('study_material.id', 'title', 'sub_title', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'permission_to_download', 'users.name as name', 'classes_groups_exams.name as class_group')
+                ->leftJoin('users', function ($join) {
+                    $join->on('users.id', 'study_material.created_by')
+                        ->whereNull('users.deleted_at');
+                })
+                ->leftJoin('classes_groups_exams', function ($join) {
+                    $join->on('classes_groups_exams.id', 'study_material.class')
+                        ->whereNull('classes_groups_exams.deleted_at');
+                })
+                ->where('study_material.status', 1)
+                ->where('study_material.material_seen', 1)
+                ->where('study_material.education_type', $student->education_type)
+                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute->id, 0])
+                ->where('study_material.category', 'Live & Video Classes');
             $model = $model->orderBy('study_material.id', 'desc');
             $model->get();
 
@@ -603,47 +658,55 @@ class StudymaterialController extends Controller
                 ->addColumn('sub_title', '{{ $sub_title }}')
                 ->addColumn('availability', function ($model) {
                     $type = '';
-                    if ($model['document_type'] == 'PDF')
+                    if ($model['document_type'] == 'PDF') {
                         $type = '<i class="bi bi-file-pdf"></i>';
-                    if ($model['document_type'] == 'WORD')
+                    }
+                    if ($model['document_type'] == 'WORD') {
                         $type = '<i class="bi bi-file-word"></i>';
-                    if ($model['document_type'] == 'EXCEL')
+                    }
+                    if ($model['document_type'] == 'EXCEL') {
                         $type = '<i class="bi bi-file-excel"></i>';
-                    if ($model['document_type'] == 'VIDEO')
+                    }
+                    if ($model['document_type'] == 'VIDEO') {
                         $type = '<i class="bi bi-camera-video"></i>';
-                    if ($model['document_type'] == 'AUDIO')
+                    }
+                    if ($model['document_type'] == 'AUDIO') {
                         $type = '<i class="bi bi-file-music"></i>';
-                    if ($model['document_type'] == 'YOUTUBE')
+                    }
+                    if ($model['document_type'] == 'YOUTUBE') {
                         $type = '<i class="bi bi-youtube"></i>';
+                    }
 
-                    if ($model['publish_status'] == 'Submit')
-                        return $type . ' <label style="color:#AA336A;">Scheduled</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
-                    else
-                        return $type . ' <label style="color: #00A300;">' . $model['publish_status'] . '</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
+                    if ($model['publish_status'] == 'Submit') {
+                        return $type.' <label style="color:#AA336A;">Scheduled</label>'.'</br>'.date('d-m-Y', strtotime($model['publish_date']));
+                    } else {
+                        return $type.' <label style="color: #00A300;">'.$model['publish_status'].'</label>'.'</br>'.date('d-m-Y', strtotime($model['publish_date']));
+                    }
                 })
                 ->addColumn('created_by', function ($model) {
-                    if ($model['institute_id'] == 0)
+                    if ($model['institute_id'] == 0) {
                         return 'Test and Notes';
-                    else
+                    } else {
                         return Auth::user()->myInstitute->institute_name;
+                    }
                 })
                 ->addColumn('view', function ($model) {
                     $style = '';
                     $href = '';
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
-                        $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                        $href = "#";
+                        $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                        $href = '#';
                     } else {
-                        if ($model['file'] != "NA" && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
-                            $href = url('storage/' . $model['file']);
+                        if ($model['file'] != 'NA' && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
+                            $href = url('storage/'.$model['file']);
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                         } else {
-                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                            $href = "#";
+                            $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                            $href = '#';
                         }
                     }
 
-                    return '<a href=' . $href . ' target="_blank" class="view" ' . $style . ' title="View File">View</a>';
+                    return '<a href='.$href.' target="_blank" class="view" '.$style.' title="View File">View</a>';
                 })
                 ->addColumn('download', function ($model) {
                     $style = '';
@@ -651,27 +714,27 @@ class StudymaterialController extends Controller
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         if ($model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
-                            if ($model['file'] != "NA") {
-                                $href = url('storage/' . $model['file']);
+                            if ($model['file'] != 'NA') {
+                                $href = url('storage/'.$model['file']);
                             } else {
-                                $href = "#";
-                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                                $href = '#';
+                                $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
                             }
                         } elseif ($model['document_type'] == 'YOUTUBE') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                             $href = $model['video_link'];
                         } else {
-                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                            $href = "#";
+                            $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                            $href = '#';
                         }
                     } else {
                         $style = 'style=margin:0 auto;display:block;text-align: center;';
                         if ($model['document_type'] != 'YOUTUBE') {
-                            if ($model['file'] != "NA") {
-                                $href = url('storage/' . $model['file']);
+                            if ($model['file'] != 'NA') {
+                                $href = url('storage/'.$model['file']);
                             } else {
-                                $href = "#";
-                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                                $href = '#';
+                                $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
                             }
                         } else {
                             $href = $model['video_link'];
@@ -679,21 +742,25 @@ class StudymaterialController extends Controller
                     }
 
                     if ($model['document_type'] == 'YOUTUBE') {
-                        return '<a href="' . $href . '" target="_blank" class="download" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href="'.$href.'" target="_blank" class="download" '.$style.' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
                     } else {
-                        return '<a href=' . $href . ' class="download" ' . $style . ' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href='.$href.' class="download" '.$style.' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
                     }
                 })
                 ->rawColumns(['availability', 'view', 'download'])
                 ->make(true);
         }
-        if ($name == 'student.show')
+        if ($name == 'student.show') {
             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp; <b class="text-primary">Study Notes & E-Books</b>';
-        if ($name == 'student.showvideo')
+        }
+        if ($name == 'student.showvideo') {
             $title = '<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Live & Video Classes</b>';
-        if ($name == 'student.showgk')
+        }
+        if ($name == 'student.showgk') {
             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Static GK & Current Affairs</b>';
-        return view("Dashboard/Student/Material/materialtable", compact('title'));
+        }
+
+        return view('Dashboard/Student/Material/materialtable', compact('title'));
     }
 
     public function showgk(Request $request)
@@ -702,14 +769,20 @@ class StudymaterialController extends Controller
 
         $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
         if ($request->ajax()) {
-            $model      = Studymaterial::select("study_material.id", "title", "sub_title", "institute_id", "publish_status", "publish_date", "document_type", "created_by", "file", "video_link", "permission_to_download", "users.name as name", "classes_groups_exams.name as class_group")
-                ->leftJoin("users", "users.id", "study_material.created_by")
-                ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
-                ->where("study_material.status", 1)
-                ->where("study_material.material_seen", 1)
-                ->where("study_material.education_type", $student->education_type)
-                ->whereIn("study_material.institute_id", array(Auth::user()->myInstitute->id, 0));
-            $model->where("study_material.category", 'Static GK & Current Affairs');
+            $model = Studymaterial::select('study_material.id', 'title', 'sub_title', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'permission_to_download', 'users.name as name', 'classes_groups_exams.name as class_group')
+                ->leftJoin('users', function ($join) {
+                    $join->on('users.id', 'study_material.created_by')
+                        ->whereNull('users.deleted_at');
+                })
+                ->leftJoin('classes_groups_exams', function ($join) {
+                    $join->on('classes_groups_exams.id', 'study_material.class')
+                        ->whereNull('classes_groups_exams.deleted_at');
+                })
+                ->where('study_material.status', 1)
+                ->where('study_material.material_seen', 1)
+                ->where('study_material.education_type', $student->education_type)
+                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute->id, 0]);
+            $model->where('study_material.category', 'Static GK & Current Affairs');
 
             $model = $model->orderBy('study_material.id', 'desc');
             $model->get();
@@ -721,47 +794,55 @@ class StudymaterialController extends Controller
                 ->addColumn('sub_title', '{{ $sub_title }}')
                 ->addColumn('availability', function ($model) {
                     $type = '';
-                    if ($model['document_type'] == 'PDF')
+                    if ($model['document_type'] == 'PDF') {
                         $type = '<i class="bi bi-file-pdf"></i>';
-                    if ($model['document_type'] == 'WORD')
+                    }
+                    if ($model['document_type'] == 'WORD') {
                         $type = '<i class="bi bi-file-word"></i>';
-                    if ($model['document_type'] == 'EXCEL')
+                    }
+                    if ($model['document_type'] == 'EXCEL') {
                         $type = '<i class="bi bi-file-excel"></i>';
-                    if ($model['document_type'] == 'VIDEO')
+                    }
+                    if ($model['document_type'] == 'VIDEO') {
                         $type = '<i class="bi bi-camera-video"></i>';
-                    if ($model['document_type'] == 'AUDIO')
+                    }
+                    if ($model['document_type'] == 'AUDIO') {
                         $type = '<i class="bi bi-file-music"></i>';
-                    if ($model['document_type'] == 'YOUTUBE')
+                    }
+                    if ($model['document_type'] == 'YOUTUBE') {
                         $type = '<i class="bi bi-youtube"></i>';
+                    }
 
-                    if ($model['publish_status'] == 'Submit')
-                        return $type . ' <label style="color:#AA336A;">Scheduled</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
-                    else
-                        return $type . ' <label style="color: #00A300;">' . $model['publish_status'] . '</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
+                    if ($model['publish_status'] == 'Submit') {
+                        return $type.' <label style="color:#AA336A;">Scheduled</label>'.'</br>'.date('d-m-Y', strtotime($model['publish_date']));
+                    } else {
+                        return $type.' <label style="color: #00A300;">'.$model['publish_status'].'</label>'.'</br>'.date('d-m-Y', strtotime($model['publish_date']));
+                    }
                 })
                 ->addColumn('created_by', function ($model) {
-                    if ($model['institute_id'] == 0)
+                    if ($model['institute_id'] == 0) {
                         return 'Test and Notes';
-                    else
+                    } else {
                         return Auth::user()->myInstitute->institute_name;
+                    }
                 })
                 ->addColumn('view', function ($model) {
                     $style = '';
                     $href = '';
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
-                        $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                        $href = "#";
+                        $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                        $href = '#';
                     } else {
-                        if ($model['file'] != "NA" && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
-                            $href = url('storage/' . $model['file']);
+                        if ($model['file'] != 'NA' && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
+                            $href = url('storage/'.$model['file']);
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                         } else {
-                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                            $href = "#";
+                            $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                            $href = '#';
                         }
                     }
 
-                    return '<a href=' . $href . ' target="_blank" class="view" ' . $style . ' title="View File">View</a>';
+                    return '<a href='.$href.' target="_blank" class="view" '.$style.' title="View File">View</a>';
                 })
                 ->addColumn('download', function ($model) {
                     $style = '';
@@ -769,27 +850,27 @@ class StudymaterialController extends Controller
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         if ($model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
-                            if ($model['file'] != "NA") {
-                                $href = url('storage/' . $model['file']);
+                            if ($model['file'] != 'NA') {
+                                $href = url('storage/'.$model['file']);
                             } else {
-                                $href = "#";
-                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                                $href = '#';
+                                $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
                             }
                         } elseif ($model['document_type'] == 'YOUTUBE') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                             $href = $model['video_link'];
                         } else {
-                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                            $href = "#";
+                            $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                            $href = '#';
                         }
                     } else {
                         $style = 'style=margin:0 auto;display:block;text-align: center;';
                         if ($model['document_type'] != 'YOUTUBE') {
-                            if ($model['file'] != "NA") {
-                                $href = url('storage/' . $model['file']);
+                            if ($model['file'] != 'NA') {
+                                $href = url('storage/'.$model['file']);
                             } else {
-                                $href = "#";
-                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                                $href = '#';
+                                $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
                             }
                         } else {
                             $href = $model['video_link'];
@@ -797,9 +878,9 @@ class StudymaterialController extends Controller
                     }
 
                     if ($model['document_type'] == 'YOUTUBE') {
-                        return '<a href="' . $href . '" target="_blank" class="download" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href="'.$href.'" target="_blank" class="download" '.$style.' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
                     } else {
-                        return '<a href=' . $href . ' class="download" ' . $style . ' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href='.$href.' class="download" '.$style.' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
                     }
                 })
                 ->rawColumns(['availability', 'view', 'download'])
@@ -808,7 +889,8 @@ class StudymaterialController extends Controller
         if ($name == 'student.showgk') {
             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Static GK & Current Affairs</b>';
         }
-        return view("Dashboard/Student/Material/materialtable", compact('title'));
+
+        return view('Dashboard/Student/Material/materialtable', compact('title'));
     }
 
     public function showComprehensive(Request $request)
@@ -817,14 +899,20 @@ class StudymaterialController extends Controller
 
         $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
         if ($request->ajax()) {
-            $model      = Studymaterial::select("study_material.id", "title", "sub_title", "institute_id", "publish_status", "publish_date", "document_type", "created_by", "file", "video_link", "permission_to_download", "users.name as name", "classes_groups_exams.name as class_group")
-                ->leftJoin("users", "users.id", "study_material.created_by")
-                ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
-                ->where("study_material.status", 1)
-                ->where("study_material.material_seen", 1)
-                ->where("study_material.class", $student->class)
-                ->whereIn("study_material.institute_id", array(Auth::user()->myInstitute->id, 0))
-                ->where("study_material.category", 'Comprehensive Study Material');
+            $model = Studymaterial::select('study_material.id', 'title', 'sub_title', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'permission_to_download', 'users.name as name', 'classes_groups_exams.name as class_group')
+                ->leftJoin('users', function ($join) {
+                    $join->on('users.id', 'study_material.created_by')
+                        ->whereNull('users.deleted_at');
+                })
+                ->leftJoin('classes_groups_exams', function ($join) {
+                    $join->on('classes_groups_exams.id', 'study_material.class')
+                        ->whereNull('classes_groups_exams.deleted_at');
+                })
+                ->where('study_material.status', 1)
+                ->where('study_material.material_seen', 1)
+                ->where('study_material.class', $student->class)
+                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute->id, 0])
+                ->where('study_material.category', 'Comprehensive Study Material');
 
             $model = $model->orderBy('study_material.id', 'desc');
             $model->get();
@@ -836,47 +924,55 @@ class StudymaterialController extends Controller
                 ->addColumn('sub_title', '{{ $sub_title }}')
                 ->addColumn('availability', function ($model) {
                     $type = '';
-                    if ($model['document_type'] == 'PDF')
+                    if ($model['document_type'] == 'PDF') {
                         $type = '<i class="bi bi-file-pdf"></i>';
-                    if ($model['document_type'] == 'WORD')
+                    }
+                    if ($model['document_type'] == 'WORD') {
                         $type = '<i class="bi bi-file-word"></i>';
-                    if ($model['document_type'] == 'EXCEL')
+                    }
+                    if ($model['document_type'] == 'EXCEL') {
                         $type = '<i class="bi bi-file-excel"></i>';
-                    if ($model['document_type'] == 'VIDEO')
+                    }
+                    if ($model['document_type'] == 'VIDEO') {
                         $type = '<i class="bi bi-camera-video"></i>';
-                    if ($model['document_type'] == 'AUDIO')
+                    }
+                    if ($model['document_type'] == 'AUDIO') {
                         $type = '<i class="bi bi-file-music"></i>';
-                    if ($model['document_type'] == 'YOUTUBE')
+                    }
+                    if ($model['document_type'] == 'YOUTUBE') {
                         $type = '<i class="bi bi-youtube"></i>';
+                    }
 
-                    if ($model['publish_status'] == 'Submit')
-                        return $type . ' <label style="color:#AA336A;">Scheduled</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
-                    else
-                        return $type . ' <label style="color: #00A300;">' . $model['publish_status'] . '</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
+                    if ($model['publish_status'] == 'Submit') {
+                        return $type.' <label style="color:#AA336A;">Scheduled</label>'.'</br>'.date('d-m-Y', strtotime($model['publish_date']));
+                    } else {
+                        return $type.' <label style="color: #00A300;">'.$model['publish_status'].'</label>'.'</br>'.date('d-m-Y', strtotime($model['publish_date']));
+                    }
                 })
                 ->addColumn('created_by', function ($model) {
-                    if ($model['institute_id'] == 0)
+                    if ($model['institute_id'] == 0) {
                         return 'Test and Notes';
-                    else
+                    } else {
                         return Auth::user()->myInstitute->institute_name;
+                    }
                 })
                 ->addColumn('view', function ($model) {
                     $style = '';
                     $href = '';
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
-                        $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                        $href = "#";
+                        $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                        $href = '#';
                     } else {
-                        if ($model['file'] != "NA" && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
-                            $href = url('storage/' . $model['file']);
+                        if ($model['file'] != 'NA' && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
+                            $href = url('storage/'.$model['file']);
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                         } else {
-                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                            $href = "#";
+                            $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                            $href = '#';
                         }
                     }
 
-                    return '<a href=' . $href . ' target="_blank" class="view" ' . $style . ' title="View File">View</a>';
+                    return '<a href='.$href.' target="_blank" class="view" '.$style.' title="View File">View</a>';
                 })
                 ->addColumn('download', function ($model) {
                     $style = '';
@@ -884,27 +980,27 @@ class StudymaterialController extends Controller
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         if ($model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
-                            if ($model['file'] != "NA") {
-                                $href = url('storage/' . $model['file']);
+                            if ($model['file'] != 'NA') {
+                                $href = url('storage/'.$model['file']);
                             } else {
-                                $href = "#";
-                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                                $href = '#';
+                                $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
                             }
                         } elseif ($model['document_type'] == 'YOUTUBE') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                             $href = $model['video_link'];
                         } else {
-                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                            $href = "#";
+                            $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                            $href = '#';
                         }
                     } else {
                         $style = 'style=margin:0 auto;display:block;text-align: center;';
                         if ($model['document_type'] != 'YOUTUBE') {
-                            if ($model['file'] != "NA") {
-                                $href = url('storage/' . $model['file']);
+                            if ($model['file'] != 'NA') {
+                                $href = url('storage/'.$model['file']);
                             } else {
-                                $href = "#";
-                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                                $href = '#';
+                                $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
                             }
                         } else {
                             $href = $model['video_link'];
@@ -912,19 +1008,20 @@ class StudymaterialController extends Controller
                     }
 
                     if ($model['document_type'] == 'YOUTUBE') {
-                        return '<a href="' . $href . '" target="_blank" class="download" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href="'.$href.'" target="_blank" class="download" '.$style.' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
                     } else {
-                        return '<a href=' . $href . ' class="download" ' . $style . ' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href='.$href.' class="download" '.$style.' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
                     }
                 })
                 ->rawColumns(['availability', 'view', 'download'])
                 ->make(true);
         }
 
-        if ($name == 'student.showComprehensive')
-             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Comprehensive Study Material</b>';
+        if ($name == 'student.showComprehensive') {
+            $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Comprehensive Study Material</b>';
+        }
 
-        return view("Dashboard/Student/Material/materialtable", compact('title'));
+        return view('Dashboard/Student/Material/materialtable', compact('title'));
     }
 
     public function showShortNotes(Request $request)
@@ -933,14 +1030,14 @@ class StudymaterialController extends Controller
 
         $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
         if ($request->ajax()) {
-            $model      = Studymaterial::select("study_material.id", "title", "sub_title", "institute_id", "publish_status", "publish_date", "document_type", "created_by", "file", "video_link", "permission_to_download", "users.name as name", "classes_groups_exams.name as class_group")
-                ->leftJoin("users", "users.id", "study_material.created_by")
-                ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
-                ->where("study_material.status", 1)
-                ->where("study_material.material_seen", 1)
-                ->where("study_material.class", $student->class)
-                ->whereIn("study_material.institute_id", array(Auth::user()->myInstitute->id, 0))
-                ->where("study_material.category", 'Short Notes & One Liner');
+            $model = Studymaterial::select('study_material.id', 'title', 'sub_title', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'permission_to_download', 'users.name as name', 'classes_groups_exams.name as class_group')
+                ->leftJoin('users', 'users.id', 'study_material.created_by')
+                ->leftJoin('classes_groups_exams', 'classes_groups_exams.id', 'study_material.class')
+                ->where('study_material.status', 1)
+                ->where('study_material.material_seen', 1)
+                ->where('study_material.class', $student->class)
+                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute->id, 0])
+                ->where('study_material.category', 'Short Notes & One Liner');
 
             $model = $model->orderBy('study_material.id', 'desc');
             $model->get();
@@ -952,47 +1049,55 @@ class StudymaterialController extends Controller
                 ->addColumn('sub_title', '{{ $sub_title }}')
                 ->addColumn('availability', function ($model) {
                     $type = '';
-                    if ($model['document_type'] == 'PDF')
+                    if ($model['document_type'] == 'PDF') {
                         $type = '<i class="bi bi-file-pdf"></i>';
-                    if ($model['document_type'] == 'WORD')
+                    }
+                    if ($model['document_type'] == 'WORD') {
                         $type = '<i class="bi bi-file-word"></i>';
-                    if ($model['document_type'] == 'EXCEL')
+                    }
+                    if ($model['document_type'] == 'EXCEL') {
                         $type = '<i class="bi bi-file-excel"></i>';
-                    if ($model['document_type'] == 'VIDEO')
+                    }
+                    if ($model['document_type'] == 'VIDEO') {
                         $type = '<i class="bi bi-camera-video"></i>';
-                    if ($model['document_type'] == 'AUDIO')
+                    }
+                    if ($model['document_type'] == 'AUDIO') {
                         $type = '<i class="bi bi-file-music"></i>';
-                    if ($model['document_type'] == 'YOUTUBE')
+                    }
+                    if ($model['document_type'] == 'YOUTUBE') {
                         $type = '<i class="bi bi-youtube"></i>';
+                    }
 
-                    if ($model['publish_status'] == 'Submit')
-                        return $type . ' <label style="color:#AA336A;">Scheduled</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
-                    else
-                        return $type . ' <label style="color: #00A300;">' . $model['publish_status'] . '</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
+                    if ($model['publish_status'] == 'Submit') {
+                        return $type.' <label style="color:#AA336A;">Scheduled</label>'.'</br>'.date('d-m-Y', strtotime($model['publish_date']));
+                    } else {
+                        return $type.' <label style="color: #00A300;">'.$model['publish_status'].'</label>'.'</br>'.date('d-m-Y', strtotime($model['publish_date']));
+                    }
                 })
                 ->addColumn('created_by', function ($model) {
-                    if ($model['institute_id'] == 0)
+                    if ($model['institute_id'] == 0) {
                         return 'Test and Notes';
-                    else
+                    } else {
                         return Auth::user()->myInstitute->institute_name;
+                    }
                 })
                 ->addColumn('view', function ($model) {
                     $style = '';
                     $href = '';
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
-                        $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                        $href = "#";
+                        $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                        $href = '#';
                     } else {
-                        if ($model['file'] != "NA" && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
-                            $href = url('storage/' . $model['file']);
+                        if ($model['file'] != 'NA' && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
+                            $href = url('storage/'.$model['file']);
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                         } else {
-                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                            $href = "#";
+                            $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                            $href = '#';
                         }
                     }
 
-                    return '<a href=' . $href . ' target="_blank" class="view" ' . $style . ' title="View File">View</a>';
+                    return '<a href='.$href.' target="_blank" class="view" '.$style.' title="View File">View</a>';
                 })
                 ->addColumn('download', function ($model) {
                     $style = '';
@@ -1000,27 +1105,27 @@ class StudymaterialController extends Controller
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         if ($model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
-                            if ($model['file'] != "NA") {
-                                $href = url('storage/' . $model['file']);
+                            if ($model['file'] != 'NA') {
+                                $href = url('storage/'.$model['file']);
                             } else {
-                                $href = "#";
-                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                                $href = '#';
+                                $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
                             }
                         } elseif ($model['document_type'] == 'YOUTUBE') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                             $href = $model['video_link'];
                         } else {
-                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                            $href = "#";
+                            $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                            $href = '#';
                         }
                     } else {
                         $style = 'style=margin:0 auto;display:block;text-align: center;';
                         if ($model['document_type'] != 'YOUTUBE') {
-                            if ($model['file'] != "NA") {
-                                $href = url('storage/' . $model['file']);
+                            if ($model['file'] != 'NA') {
+                                $href = url('storage/'.$model['file']);
                             } else {
-                                $href = "#";
-                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                                $href = '#';
+                                $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
                             }
                         } else {
                             $href = $model['video_link'];
@@ -1028,19 +1133,20 @@ class StudymaterialController extends Controller
                     }
 
                     if ($model['document_type'] == 'YOUTUBE') {
-                        return '<a href="' . $href . '" target="_blank" class="download" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href="'.$href.'" target="_blank" class="download" '.$style.' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
                     } else {
-                        return '<a href=' . $href . ' class="download" ' . $style . ' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href='.$href.' class="download" '.$style.' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
                     }
                 })
                 ->rawColumns(['availability', 'view', 'download'])
                 ->make(true);
         }
 
-        if ($name == 'student.showShortNotes')
-             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Short Notes & One Liner</b>';
+        if ($name == 'student.showShortNotes') {
+            $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Short Notes & One Liner</b>';
+        }
 
-        return view("Dashboard/Student/Material/materialtable", compact('title'));
+        return view('Dashboard/Student/Material/materialtable', compact('title'));
     }
 
     public function showPremium(Request $request)
@@ -1049,14 +1155,14 @@ class StudymaterialController extends Controller
 
         $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
         if ($request->ajax()) {
-            $model      = Studymaterial::select("study_material.id", "title", "sub_title", "institute_id", "publish_status", "publish_date", "document_type", "created_by", "file", "video_link", "permission_to_download", "users.name as name", "classes_groups_exams.name as class_group")
-                ->leftJoin("users", "users.id", "study_material.created_by")
-                ->leftJoin("classes_groups_exams", "classes_groups_exams.id", "study_material.class")
-                ->where("study_material.status", 1)
-                ->where("study_material.material_seen", 1)
-                ->where("study_material.class", $student->class)
-                ->whereIn("study_material.institute_id", array(Auth::user()->myInstitute->id, 0))
-                ->where("study_material.category", 'Premium Study Notes');
+            $model = Studymaterial::select('study_material.id', 'title', 'sub_title', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'permission_to_download', 'users.name as name', 'classes_groups_exams.name as class_group')
+                ->leftJoin('users', 'users.id', 'study_material.created_by')
+                ->leftJoin('classes_groups_exams', 'classes_groups_exams.id', 'study_material.class')
+                ->where('study_material.status', 1)
+                ->where('study_material.material_seen', 1)
+                ->where('study_material.class', $student->class)
+                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute->id, 0])
+                ->where('study_material.category', 'Premium Study Notes');
 
             $model = $model->orderBy('study_material.id', 'desc');
             $model->get();
@@ -1068,47 +1174,55 @@ class StudymaterialController extends Controller
                 ->addColumn('sub_title', '{{ $sub_title }}')
                 ->addColumn('availability', function ($model) {
                     $type = '';
-                    if ($model['document_type'] == 'PDF')
+                    if ($model['document_type'] == 'PDF') {
                         $type = '<i class="bi bi-file-pdf"></i>';
-                    if ($model['document_type'] == 'WORD')
+                    }
+                    if ($model['document_type'] == 'WORD') {
                         $type = '<i class="bi bi-file-word"></i>';
-                    if ($model['document_type'] == 'EXCEL')
+                    }
+                    if ($model['document_type'] == 'EXCEL') {
                         $type = '<i class="bi bi-file-excel"></i>';
-                    if ($model['document_type'] == 'VIDEO')
+                    }
+                    if ($model['document_type'] == 'VIDEO') {
                         $type = '<i class="bi bi-camera-video"></i>';
-                    if ($model['document_type'] == 'AUDIO')
+                    }
+                    if ($model['document_type'] == 'AUDIO') {
                         $type = '<i class="bi bi-file-music"></i>';
-                    if ($model['document_type'] == 'YOUTUBE')
+                    }
+                    if ($model['document_type'] == 'YOUTUBE') {
                         $type = '<i class="bi bi-youtube"></i>';
+                    }
 
-                    if ($model['publish_status'] == 'Submit')
-                        return $type . ' <label style="color:#AA336A;">Scheduled</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
-                    else
-                        return $type . ' <label style="color: #00A300;">' . $model['publish_status'] . '</label>' . '</br>' . date('d-m-Y', strtotime($model['publish_date']));
+                    if ($model['publish_status'] == 'Submit') {
+                        return $type.' <label style="color:#AA336A;">Scheduled</label>'.'</br>'.date('d-m-Y', strtotime($model['publish_date']));
+                    } else {
+                        return $type.' <label style="color: #00A300;">'.$model['publish_status'].'</label>'.'</br>'.date('d-m-Y', strtotime($model['publish_date']));
+                    }
                 })
                 ->addColumn('created_by', function ($model) {
-                    if ($model['institute_id'] == 0)
+                    if ($model['institute_id'] == 0) {
                         return 'Test and Notes';
-                    else
+                    } else {
                         return Auth::user()->myInstitute->institute_name;
+                    }
                 })
                 ->addColumn('view', function ($model) {
                     $style = '';
                     $href = '';
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
-                        $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                        $href = "#";
+                        $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                        $href = '#';
                     } else {
-                        if ($model['file'] != "NA" && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
-                            $href = url('storage/' . $model['file']);
+                        if ($model['file'] != 'NA' && ($model['document_type'] == 'PDF' || $model['document_type'] == 'WORD' || $model['document_type'] == 'EXCEL')) {
+                            $href = url('storage/'.$model['file']);
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                         } else {
-                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                            $href = "#";
+                            $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                            $href = '#';
                         }
                     }
 
-                    return '<a href=' . $href . ' target="_blank" class="view" ' . $style . ' title="View File">View</a>';
+                    return '<a href='.$href.' target="_blank" class="view" '.$style.' title="View File">View</a>';
                 })
                 ->addColumn('download', function ($model) {
                     $style = '';
@@ -1116,27 +1230,27 @@ class StudymaterialController extends Controller
                     if ($model['publish_status'] == 'Submit' || $model['permission_to_download'] == 'Free View' || $model['permission_to_download'] == 'Paid View' || $model['permission_to_download'] == 'Paid View & Download' || $model['permission_to_download'] == 'Premium View' || $model['permission_to_download'] == 'Premium View & Download') {
                         if ($model['document_type'] == 'AUDIO' || $model['document_type'] == 'VIDEO') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
-                            if ($model['file'] != "NA") {
-                                $href = url('storage/' . $model['file']);
+                            if ($model['file'] != 'NA') {
+                                $href = url('storage/'.$model['file']);
                             } else {
-                                $href = "#";
-                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                                $href = '#';
+                                $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
                             }
                         } elseif ($model['document_type'] == 'YOUTUBE') {
                             $style = 'style=margin:0 auto;display:block;text-align: center;';
                             $href = $model['video_link'];
                         } else {
-                            $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
-                            $href = "#";
+                            $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
+                            $href = '#';
                         }
                     } else {
                         $style = 'style=margin:0 auto;display:block;text-align: center;';
                         if ($model['document_type'] != 'YOUTUBE') {
-                            if ($model['file'] != "NA") {
-                                $href = url('storage/' . $model['file']);
+                            if ($model['file'] != 'NA') {
+                                $href = url('storage/'.$model['file']);
                             } else {
-                                $href = "#";
-                                $style = "style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;";
+                                $href = '#';
+                                $style = 'style=color:currentColor;cursor:not-allowed;opacity:0.5;text-decoration:none;margin:0 auto;display:block;text-align: center;';
                             }
                         } else {
                             $href = $model['video_link'];
@@ -1144,19 +1258,20 @@ class StudymaterialController extends Controller
                     }
 
                     if ($model['document_type'] == 'YOUTUBE') {
-                        return '<a href="' . $href . '" target="_blank" class="download" ' . $style . ' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href="'.$href.'" target="_blank" class="download" '.$style.' title="View Video"><i class="bi bi-play text-danger me-2" aria-hidden="true"></i></a>';
                     } else {
-                        return '<a href=' . $href . ' class="download" ' . $style . ' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
+                        return '<a href='.$href.' class="download" '.$style.' title="Download File" download><i class="bi bi-download text-danger me-2" aria-hidden="true"></i></a>';
                     }
                 })
                 ->rawColumns(['availability', 'view', 'download'])
                 ->make(true);
         }
 
-        if ($name == 'student.showPremium')
-             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Premium Study Notes</b>';
+        if ($name == 'student.showPremium') {
+            $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Premium Study Notes</b>';
+        }
 
-        return view("Dashboard/Student/Material/materialtable", compact('title'));
+        return view('Dashboard/Student/Material/materialtable', compact('title'));
     }
 
     /**
@@ -1175,35 +1290,37 @@ class StudymaterialController extends Controller
             $publish_content = $FranchiseDetails->allowed_to_upload;
         }
         $is_staff = Auth::user()->is_staff;
-        $gn_EduTypes      = Educationtype::get();
+        $gn_EduTypes = Educationtype::get();
 
         $UserDetails = Studymaterial::get()->where('id', $id)->first();
-        //return $UserDetails;
+        // return $UserDetails;
 
-        if ($is_admin == 1)
-            //return "test";
-            return view("Dashboard/Admin/Material/add_edit_material", compact('UserDetails', 'gn_EduTypes'));
-        if ($is_franchies == 1)
-            return view("Dashboard/Franchise/Material/add_edit_material", compact('UserDetails', 'gn_EduTypes', 'publish_content'));
+        if ($is_admin == 1) {
+            // return "test";
+            return view('Dashboard/Admin/Material/add_edit_material', compact('UserDetails', 'gn_EduTypes'));
+        }
+        if ($is_franchies == 1) {
+            return view('Dashboard/Franchise/Material/add_edit_material', compact('UserDetails', 'gn_EduTypes', 'publish_content'));
+        }
         if ($is_staff == 1 && Auth::user()->roles == 'publisher') {
             $User = UserDetails::get()->where('user_id', Auth::user()->id)->first();
             $submit_content = $User->submit_content;
             $publish_content = $User->allowed_to_upload;
-            return view("Dashboard/Franchise/Management/Publisher/Material/add_edit_material", compact('UserDetails', 'gn_EduTypes', 'submit_content', 'publish_content'));
+
+            return view('Dashboard/Franchise/Management/Publisher/Material/add_edit_material', compact('UserDetails', 'gn_EduTypes', 'submit_content', 'publish_content'));
         }
         if ($is_staff == 1 && Auth::user()->roles == 'creator') {
             $User = UserDetails::get()->where('user_id', Auth::user()->id)->first();
             $submit_content = $User->submit_content;
             $publish_content = $User->allowed_to_upload;
-            return view("Dashboard/Franchise/Management/Creater/Material/add_edit_material", compact('UserDetails', 'gn_EduTypes', 'submit_content', 'publish_content'));
+
+            return view('Dashboard/Franchise/Management/Creater/Material/add_edit_material', compact('UserDetails', 'gn_EduTypes', 'submit_content', 'publish_content'));
         }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateStudymaterialRequest  $request
-     * @param  \App\Models\Studymaterial  $studymaterial
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateStudymaterialRequest $request, Studymaterial $studymaterial)
@@ -1220,16 +1337,18 @@ class StudymaterialController extends Controller
     public function destroy(Request $request)
     {
         // $res=Studymaterial::where('id',$request->study_material_id)->delete();
-        $Studymaterial = new Studymaterial();
+        $Studymaterial = new Studymaterial;
         if ($request->study_material_id != 0) {
             $Studymaterial->exists = true;
-            $Studymaterial->id = $request->study_material_id; //already exists in database.
+            $Studymaterial->id = $request->study_material_id; // already exists in database.
         }
         $Studymaterial->status = 0;
 
         if ($Studymaterial->save()) {
-            if ($request->file != 'NA')
-                unlink(storage_path('app/' . $request->file));
+            if ($request->file != 'NA') {
+                unlink(storage_path('app/'.$request->file));
+            }
+
             return response()->json(['status' => 200, 'message' => 'Study Material Deleted Successfully!']);
         } else {
             return response()->json(['status' => 500, 'message' => 'Problem In Study Material Delete!']);
@@ -1238,10 +1357,10 @@ class StudymaterialController extends Controller
 
     public function pauseMaterial(Request $request)
     {
-        $Studymaterial = new Studymaterial();
+        $Studymaterial = new Studymaterial;
         if ($request->material_id != 0) {
             $Studymaterial->exists = true;
-            $Studymaterial->id = $request->material_id; //already exists in database.
+            $Studymaterial->id = $request->material_id; // already exists in database.
         }
 
         $Studymaterial = Studymaterial::get()->where('id', $request->material_id)->first();
@@ -1274,10 +1393,11 @@ class StudymaterialController extends Controller
         $Studymaterial->publish_status = $publish_status;
 
         if ($Studymaterial->save()) {
-            if ($request->pause_value == 1)
+            if ($request->pause_value == 1) {
                 return response()->json(['status' => 200, 'message' => 'Study Material Pause Successfully!']);
-            else
+            } else {
                 return response()->json(['status' => 200, 'message' => 'Study Material Active Successfully!']);
+            }
         } else {
             return response()->json(['status' => 500, 'message' => 'Problem In Study Material Pause/Active!']);
         }
@@ -1285,10 +1405,10 @@ class StudymaterialController extends Controller
 
     public function sendbackMaterial(Request $request)
     {
-        $Studymaterial = new Studymaterial();
+        $Studymaterial = new Studymaterial;
         if ($request->material_id != 0) {
             $Studymaterial->exists = true;
-            $Studymaterial->id = $request->material_id; //already exists in database.
+            $Studymaterial->id = $request->material_id; // already exists in database.
         }
 
         $Studymaterial->material_seen = 0;
@@ -1304,16 +1424,18 @@ class StudymaterialController extends Controller
 
     public function download($file)
     {
-        $path = storage_path('app/study_material/' . $file);
+        $path = storage_path('app/study_material/'.$file);
+
         // dd($path);
         return response()->download($path);
     }
 
     public function viewMaterial($file)
     {
-        $filename = url('/storage/study_material/' . $file);
+        $filename = url('/storage/study_material/'.$file);
         $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp; <b class="text-primary">View Study Material</b>';
-        return view("Dashboard/Student/Material/viewmaterial", compact('filename', 'title'));
+
+        return view('Dashboard/Student/Material/viewmaterial', compact('filename', 'title'));
     }
 
     public function getpackage(Request $req, $education_type_id, $class_group_exam_id, $value)
@@ -1322,7 +1444,7 @@ class StudymaterialController extends Controller
         $arr = DB::table('gn__package_plans')->where('education_type', $education_type_id)->where('class', $class_group_exam_id)->where('package_category', $value)->get();
 
         foreach ($arr as $list) {
-            echo "<option value=" . $list->id . ">$list->plan_name</option>";
+            echo '<option value='.$list->id.">$list->plan_name</option>";
         }
     }
 
@@ -1333,6 +1455,7 @@ class StudymaterialController extends Controller
         $model->is_featured = $status;
         $model->save();
         $request->session()->flash('message', 'blog status updated');
+
         return redirect()->back();
     }
 }

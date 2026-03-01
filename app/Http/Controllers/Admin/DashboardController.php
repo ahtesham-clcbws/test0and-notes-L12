@@ -3,15 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Count;
-use App\Models\User;
+use App\Models\BoardAgencyStateModel;
 use App\Models\CourseDetail;
 use App\Models\Educationtype;
-use App\Models\BoardAgencyStateModel;
+use App\Models\User;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use App\Services\ImageService;
 
 class DashboardController extends Controller
 {
@@ -53,36 +51,51 @@ class DashboardController extends Controller
         // 8. Competition Franchise
         // Column is 'franchise_types' (plural) and value suffix is '_franchise'
         // Join with users to ensure user exists (handling soft deletes or orphans)
-        $counts['competition_franchise'] = \App\Models\FranchiseDetails::join('users', 'franchise_details.user_id', '=', 'users.id')
+        $counts['competition_franchise'] = \App\Models\FranchiseDetails::join('users', function ($join) {
+            $join->on('franchise_details.user_id', '=', 'users.id')
+                ->whereNull('users.deleted_at');
+        })
             ->where('franchise_types', 'like', '%compitition_franchise%')
             ->where('is_multiple', 0)
             ->count();
 
         // 9. Academics Franchise
-        $counts['academics_franchise'] = \App\Models\FranchiseDetails::join('users', 'franchise_details.user_id', '=', 'users.id')
+        $counts['academics_franchise'] = \App\Models\FranchiseDetails::join('users', function ($join) {
+            $join->on('franchise_details.user_id', '=', 'users.id')
+                ->whereNull('users.deleted_at');
+        })
             ->where('franchise_types', 'like', '%academics_franchise%')
             ->where('is_multiple', 0)
             ->count();
 
         // 10. School Franchise
-        $counts['school_franchise'] = \App\Models\FranchiseDetails::join('users', 'franchise_details.user_id', '=', 'users.id')
+        $counts['school_franchise'] = \App\Models\FranchiseDetails::join('users', function ($join) {
+            $join->on('franchise_details.user_id', '=', 'users.id')
+                ->whereNull('users.deleted_at');
+        })
             ->where('franchise_types', 'like', '%school_franchise%')
             ->where('is_multiple', 0)
             ->count();
 
         // 11. Other Franchise
-        $counts['other_franchise'] = \App\Models\FranchiseDetails::join('users', 'franchise_details.user_id', '=', 'users.id')
+        $counts['other_franchise'] = \App\Models\FranchiseDetails::join('users', function ($join) {
+            $join->on('franchise_details.user_id', '=', 'users.id')
+                ->whereNull('users.deleted_at');
+        })
             ->where('franchise_types', 'like', '%other_franchise%')
             ->where('is_multiple', 0)
             ->count();
 
         // 12. Multi Franchise
-        $counts['multi_franchise'] = \App\Models\FranchiseDetails::join('users', 'franchise_details.user_id', '=', 'users.id')
+        $counts['multi_franchise'] = \App\Models\FranchiseDetails::join('users', function ($join) {
+            $join->on('franchise_details.user_id', '=', 'users.id')
+                ->whereNull('users.deleted_at');
+        })
             ->where('is_multiple', 1)
             ->count();
 
         // 13. New User Sign Up (Franchise)
-        $counts['new_user_signup_franchise'] = \App\Models\User::where(function($q) {
+        $counts['new_user_signup_franchise'] = \App\Models\User::where(function ($q) {
             $q->where('status', 'inactive')->orWhere('status', 'unread');
         })->where('in_franchise', 1)->where('isAdminAllowed', 0)->count();
 
@@ -102,7 +115,7 @@ class DashboardController extends Controller
         $counts['multi_role_franchise'] = \App\Models\User::where('roles', 'like', '%,%')->where('in_franchise', 1)->where('is_staff', 1)->where('isAdminAllowed', 0)->count();
 
         // 19. New User Sign Up (Direct)
-        $counts['new_user_signup_direct'] = \App\Models\User::where(function($q) {
+        $counts['new_user_signup_direct'] = \App\Models\User::where(function ($q) {
             $q->where('status', 'inactive')->orWhere('status', 'unread');
         })->where('in_franchise', 0)->count();
 
@@ -125,16 +138,18 @@ class DashboardController extends Controller
 
         return view('Dashboard/Admin/Dashboard/index')->with('data', $data);
     }
+
     public function courseDetail()
     {
 
-        $course_data= DB::table('classes_groups_exams')->get();
-        $education_type= Educationtype::get();
+        $course_data = DB::table('classes_groups_exams')->get();
+        $education_type = Educationtype::get();
         $board = BoardAgencyStateModel::get();
 
-        return view('Dashboard.Admin.Dashboard.course-detail-add',compact('course_data','education_type','board'));
+        return view('Dashboard.Admin.Dashboard.course-detail-add', compact('course_data', 'education_type', 'board'));
 
     }
+
     public function courseDetailStore(Request $request)
     {
         if ($request->isMethod('POST')) {
@@ -158,12 +173,11 @@ class DashboardController extends Controller
                 $course_logo = $this->imageService->handleUpload($request->file('course_logo'), 'uploads/course_logo', 500);
             }
 
-            $courseDetails = new CourseDetail();
+            $courseDetails = new CourseDetail;
             $courseDetails->description = $request->input('overview');
             $courseDetails->class_group_examp_id = $request->input('course_name');
             $courseDetails->course_short_name = $request->input('course_name');
             $courseDetails->course_full_name = $request->input('course_full_name');
-
 
             $courseDetails->registration = $request->input('registration');
             $courseDetails->exam_date = $request->input('exam_Date');
@@ -188,9 +202,11 @@ class DashboardController extends Controller
         }
 
     }
+
     public function courseMasterList()
     {
         $courses = CourseDetail::all();
+
         return view('Dashboard.Admin.Dashboard.course-master-list', compact('courses'));
     }
 
