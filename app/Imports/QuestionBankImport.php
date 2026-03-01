@@ -11,6 +11,7 @@ use App\Models\SubjectPart;
 use App\Models\SubjectPartLesson;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -30,10 +31,13 @@ class QuestionBankImport implements ToCollection, WithHeadingRow
     // }
 
     protected $filePath;
+    protected $importData;
+    public $parsedData = [];
 
-    public function __construct($filePath = null)
+    public function __construct($filePath = null, $importData = [])
     {
         $this->filePath = $filePath ?? request()->file('question');
+        $this->importData = $importData;
     }
 
     public function collection(Collection $rows)
@@ -86,33 +90,30 @@ class QuestionBankImport implements ToCollection, WithHeadingRow
         // dd($images);
         foreach ($rows as $key => $row) {
             // dd($row->getDrawingCollection());
-            QuestionBankModel::create(
-                [
-                    'education_type_id' => Educationtype::where('name', 'like', '%'.$row['education_type_id'].'%')->orWhere('id', $row['education_type_id'])->first()->id ?? null,
-                    'class_group_exam_id' => ClassGoupExamModel::where('name', 'like', '%'.$row['class_group_exam_id'].'%')->orWhere('id', $row['class_group_exam_id'])->first()->id ?? null,
-                    'board_agency_state_id' => BoardAgencyStateModel::where('name', 'like', '%'.$row['board_agency_state_id'].'%')->orWhere('id', $row['board_agency_state_id'])->first()->id ?? null,
-                    'subject' => Subject::where('name', 'like', '%'.$row['subject'].'%')->orWhere('id', $row['subject'])->first()->id ?? null,
-                    'subject_part' => SubjectPart::where('name', 'like', '%'.$row['subject_part'].'%')->orWhere('id', $row['subject_part'])->first()->id ?? null,
-                    'subject_lesson_chapter' => SubjectPartLesson::where('name', 'like', '%'.$row['subject_lesson_chapter'].'%')->orWhere('id', $row['subject_lesson_chapter'])->first()->id ?? null,
-                    'question_type' => $row['question_type'] == 'MCQ' ? '1' : '2',
-                    'mcq_options' => $row['mcq_options'],
-                    'question' => $images[$key] != $key ? '<img src="'.'/storage/questionImage/'.
-$images[$key].'" />'.'<p>'.$row['question'].'</p>' : $row['question'],
-                    'solution' => $row['solution'],
-                    'explanation' => $row['explanation'],
-                    'ans_1' => $row['ans_1'],
-                    'ans_2' => $row['ans_2'],
-                    'ans_3' => $row['ans_3'],
-                    'ans_4' => $row['ans_4'],
-                    'ans_5' => $row['ans_5'],
-                    'mcq_answer' => $row['mcq_answer'],
-                    'alloted_for_check_id' => $row['alloted_for_check_id'],
-                    'creator_id' => User::where('name', 'like', '%'.$row['creator_id'].'%')->orWhere('id', $row['creator_id'])->first()->id ?? null,
-                    'status' => $row['status'],
-                    'checked_by_id' => $row['checked_by_id'],
-                    'checker_comments' => $row['checker_comments'],
-                ]
-            );
+            $this->parsedData[] = [
+                'education_type_id' => $this->importData['education_type_id'] ?? null,
+                'class_group_exam_id' => $this->importData['class_group_exam_id'] ?? null,
+                'board_agency_state_id' => $this->importData['board_agency_state_id'] ?? null,
+                'subject' => $this->importData['subject'] ?? null,
+                'subject_part' => $this->importData['subject_part'] ?? null,
+                'subject_lesson_chapter' => $this->importData['subject_lesson_chapter'] ?? null,
+                'question_type' => $this->importData['question_type'] ?? ($row['question_type'] == 'MCQ' ? '1' : '2'),
+                'mcq_options' => $row['mcq_options'] ?? 4,
+                'question' => isset($images[$key]) && $images[$key] != $key ? '<img src="'.'/storage/questionImage/'.$images[$key].'" />'.'<p>'.($row['question'] ?? '').'</p>' : ($row['question'] ?? ''),
+                'solution' => $row['solution'] ?? null,
+                'explanation' => $row['explanation'] ?? null,
+                'ans_1' => $row['ans_1'] ?? null,
+                'ans_2' => $row['ans_2'] ?? null,
+                'ans_3' => $row['ans_3'] ?? null,
+                'ans_4' => $row['ans_4'] ?? null,
+                'ans_5' => $row['ans_5'] ?? null,
+                'mcq_answer' => $row['mcq_answer'] ?? null,
+                'alloted_for_check_id' => $row['alloted_for_check_id'] ?? null,
+                'creator_id' => isset($row['creator_id']) ? (User::where('name', 'like', '%'.$row['creator_id'].'%')->orWhere('id', $row['creator_id'])->first()?->id ?? Auth::id() ?? null) : (Auth::id() ?? null),
+                'status' => $row['status'] ?? 'pending',
+                'checked_by_id' => $row['checked_by_id'] ?? null,
+                'checker_comments' => $row['checker_comments'] ?? null,
+            ];
         }
     }
 }

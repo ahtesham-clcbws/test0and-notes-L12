@@ -27,3 +27,16 @@
 - [ ] Unit/Feature tests for Test/Section/Question relationships.
 - [ ] UI/UX final touch-ups (animations, accessibility).
 - [ ] Verify Legacy compatibility.
+
+## Phase 4: Question Bank Import Enhancement (COMPLETED)
+- [x] Analyze Question Bank structure and import process.
+- [x] Add categorization selectors (Education Type, Class, Subject, etc.) to `QuestionImport` Livewire component.
+- [x] Implement cascading dropdowns in `question-import.blade.php`.
+- [x] Modify `QuestionBankImport` logic to use UI-selected categories instead of excel columns.
+- [x] Create a sample Excel format for easy client upload.
+
+## Phase 5: Question Import Editable Preview Table (COMPLETED)
+- [x] Refactor `QuestionBankImport.php` to return an array of parsed data instead of hitting DB.
+- [x] Add `$previewData` and `$showPreview` state to `QuestionImport.php`.
+- [x] Build the editable UI datatable in `question-import.blade.php`.
+- [x] Implement the final `saveAll()` function to process the approved preview table.
