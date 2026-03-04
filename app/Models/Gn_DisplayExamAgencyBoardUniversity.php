@@ -25,5 +25,5 @@ class Gn_DisplayExamAgencyBoardUniversity extends Model
     //         'created_at',
     //         'updated_at',
     //     ]);
-    // } 
+    // }
 }

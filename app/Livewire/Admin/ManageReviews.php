@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Admin;
 
-use Livewire\Component;
 use App\Models\Review;
 use Livewire\Attributes\Layout;
+use Livewire\Component;
 use Livewire\WithPagination;
 
 #[Layout('Layouts.admin')]
@@ -17,7 +17,7 @@ class ManageReviews extends Component
     public function toggleApproval($id)
     {
         $review = Review::find($id);
-        $review->is_approved = !$review->is_approved;
+        $review->is_approved = ! $review->is_approved;
         $review->save();
 
         session()->flash('message', 'Review status updated.');
@@ -26,7 +26,7 @@ class ManageReviews extends Component
     public function toggleFeatured($id)
     {
         $review = Review::find($id);
-        $review->is_featured = !$review->is_featured;
+        $review->is_featured = ! $review->is_featured;
         $review->save();
 
         session()->flash('message', 'Featured status updated.');
@@ -39,6 +39,7 @@ class ManageReviews extends Component
     }
 
     public $selectedReviewReviewText = '';
+
     public $showModal = false;
 
     public function showReviewDetail($id)
@@ -57,8 +58,9 @@ class ManageReviews extends Component
     public function render()
     {
         $reviews = Review::with('user')->latest()->paginate(10);
+
         return view('livewire.admin.manage-reviews', [
-            'reviews' => $reviews
+            'reviews' => $reviews,
         ]);
     }
 }

@@ -12,8 +12,9 @@ class PagesList extends Component
     public function render()
     {
         $pages = Pages::all();
-        return view('livewire.admin.pages.pages-list',[
-            'pages' => $pages
+
+        return view('livewire.admin.pages.pages-list', [
+            'pages' => $pages,
         ]);
     }
 }

@@ -25,7 +25,12 @@ class TestSectionManager extends Component
     protected $listeners = [
         'sectionRemoved' => 'removeSectionByKey',
         'sectionSaved' => 'handleSectionSaved',
+        'recalculateTotal' => 'calculateUsedQuestions',
     ];
+
+    public $totalTestQuestions = 0;
+
+    public $usedQuestions = 0;
 
     public function mount($testId)
     {
@@ -50,6 +55,9 @@ class TestSectionManager extends Component
                 $q->where('roles', 'like', '%"publisher"%')
                     ->orWhere('roles', 'superadmin');
             })->get();
+
+        $this->totalTestQuestions = $this->test->total_questions ?? 0;
+        $this->calculateUsedQuestions();
 
         $this->loadSections();
     }
@@ -78,14 +86,20 @@ class TestSectionManager extends Component
         // Sections are dictated by TestForm.
     }
 
-    public function removeSectionByKey($data)
+    public function removeSectionByKey($data = null)
     {
         // Manual removal is no longer needed as per user request.
     }
 
-    public function handleSectionSaved($data)
+    public function handleSectionSaved($data = null)
     {
-        // Optional: Show a global success notification
+        $this->calculateUsedQuestions();
+    }
+
+    public function calculateUsedQuestions()
+    {
+        $this->usedQuestions = TestSections::where('test_id', $this->testId)->sum('number_of_questions');
+        $this->dispatch('updateRemaining', remaining: ($this->totalTestQuestions - $this->usedQuestions))->to(TestSectionRow::class);
     }
 
     public function saveAll()

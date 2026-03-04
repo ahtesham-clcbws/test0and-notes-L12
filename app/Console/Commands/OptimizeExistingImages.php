@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Services\ImageService;
 use App\Models\Gn_PackagePlan;
 use App\Models\Studymaterial;
 use App\Models\UserDetails;
+use App\Services\ImageService;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -61,6 +61,7 @@ class OptimizeExistingImages extends Command
         $this->optimizeUserDetails();
 
         $this->info('Image optimization completed!');
+
         return 0;
     }
 
@@ -74,7 +75,7 @@ class OptimizeExistingImages extends Command
 
             // Banner Photo
             if ($page->banner_photo && $this->shouldOptimize($page->banner_photo)) {
-                $newPath = $this->processImage('home/' . $page->banner_photo, 2000);
+                $newPath = $this->processImage('home/'.$page->banner_photo, 2000);
                 if ($newPath) {
                     $updates['banner_photo'] = basename($newPath); // Stores filename only
                 }
@@ -91,7 +92,7 @@ class OptimizeExistingImages extends Command
                         $url = is_array($item) ? ($item['url'] ?? '') : '';
 
                         if ($this->shouldOptimize($imageName)) {
-                            $newPath = $this->processImage('home/slider/' . $imageName, 1024);
+                            $newPath = $this->processImage('home/slider/'.$imageName, 1024);
                             if ($newPath) {
                                 $newSliderImages[] = ['image' => basename($newPath), 'url' => $url];
                                 $changed = true;
@@ -108,7 +109,7 @@ class OptimizeExistingImages extends Command
                 }
             }
 
-            if (!empty($updates)) {
+            if (! empty($updates)) {
                 DB::table('landing_page')->where('id', $page->id)->update($updates);
                 $this->info("Updated Landing Page ID: {$page->id}");
             }
@@ -122,8 +123,8 @@ class OptimizeExistingImages extends Command
         Studymaterial::chunk(100, function ($materials) {
             foreach ($materials as $material) {
                 if ($material->study_material_image && $material->study_material_image != 'NA' && $this->shouldOptimize($material->study_material_image)) {
-                     // Assuming path is relative to public disk root or 'study_material_image/' prefix is needed?
-                     // Based on controller, it uses store('study_material_image', 'public'), so path in DB is likely 'study_material_image/filename.jpg'
+                    // Assuming path is relative to public disk root or 'study_material_image/' prefix is needed?
+                    // Based on controller, it uses store('study_material_image', 'public'), so path in DB is likely 'study_material_image/filename.jpg'
                     $newPath = $this->processImage($material->study_material_image, 1024);
                     if ($newPath) {
                         $material->study_material_image = $newPath;
@@ -146,31 +147,32 @@ class OptimizeExistingImages extends Command
         // Quick check: PlanController uses it.
 
         Gn_PackagePlan::chunk(100, function ($plans) {
-             foreach ($plans as $plan) {
-                 // Check if attribute exists to avoid errors if column missing
-                 if (isset($plan->package_image) && $plan->package_image != 'NA' && $this->shouldOptimize($plan->package_image)) {
-                     $newPath = $this->processImage($plan->package_image, 1024);
-                     if ($newPath) {
-                         $plan->package_image = $newPath;
-                         $plan->save();
-                         $this->line("Updated Package Plan ID: {$plan->id}");
-                     }
-                 }
-             }
+            foreach ($plans as $plan) {
+                // Check if attribute exists to avoid errors if column missing
+                if (isset($plan->package_image) && $plan->package_image != 'NA' && $this->shouldOptimize($plan->package_image)) {
+                    $newPath = $this->processImage($plan->package_image, 1024);
+                    if ($newPath) {
+                        $plan->package_image = $newPath;
+                        $plan->save();
+                        $this->line("Updated Package Plan ID: {$plan->id}");
+                    }
+                }
+            }
         });
     }
 
-    private function optimizeUserDetails() {
+    private function optimizeUserDetails()
+    {
         $this->info('Optimizing User Details...');
         UserDetails::chunk(100, function ($users) {
             foreach ($users as $user) {
                 if ($user->photo_url && $this->shouldOptimize($user->photo_url)) {
-                     $newPath = $this->processImage($user->photo_url, 500); // Profile pics can be smaller
-                     if ($newPath) {
-                         $user->photo_url = $newPath;
-                         $user->save();
-                         $this->line("Updated UserDetails ID: {$user->id}");
-                     }
+                    $newPath = $this->processImage($user->photo_url, 500); // Profile pics can be smaller
+                    if ($newPath) {
+                        $user->photo_url = $newPath;
+                        $user->save();
+                        $this->line("Updated UserDetails ID: {$user->id}");
+                    }
                 }
             }
         });
@@ -178,7 +180,10 @@ class OptimizeExistingImages extends Command
 
     private function shouldOptimize($filename)
     {
-        if (empty($filename)) return false;
+        if (empty($filename)) {
+            return false;
+        }
+
         // Skip if already webp
         return strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'webp';
     }
@@ -190,11 +195,12 @@ class OptimizeExistingImages extends Command
             // Storage::disk('public') root is storage/app/public.
 
             // Check if file exists
-            if (!Storage::disk('public')->exists($relativePath)) {
+            if (! Storage::disk('public')->exists($relativePath)) {
                 // Try finding it in 'public/' directly if migration hasn't moved them yet?
                 // The prompt implies "if available in the storage".
                 // If not found in storage disk, we might skip.
                 $this->warn("File not found: {$relativePath}");
+
                 return null;
             }
 
@@ -209,7 +215,8 @@ class OptimizeExistingImages extends Command
             return $newPath;
 
         } catch (\Exception $e) {
-            $this->error("Failed to optimize {$relativePath}: " . $e->getMessage());
+            $this->error("Failed to optimize {$relativePath}: ".$e->getMessage());
+
             return null;
         }
     }

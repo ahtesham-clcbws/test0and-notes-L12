@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -39,7 +38,7 @@ class User extends Authenticatable
         'device',
         'device_type',
         'device_id',
-        'selectedDays'
+        'selectedDays',
     ];
 
     /**
@@ -48,7 +47,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password'
+        'password',
     ];
 
     /**
@@ -82,11 +81,12 @@ class User extends Authenticatable
 
     public function role()
     {
-        return $this->hasMany(RoleAssign::class,'user_id','id');
+        return $this->hasMany(RoleAssign::class, 'user_id', 'id');
     }
+
     public static function generateCounts()
     {
-        $data = array(
+        $data = [
             [
                 'namekey' => 'new_user',
                 // 'box_index' => 0,
@@ -260,14 +260,15 @@ class User extends Authenticatable
                 // 'title' => 'Multi Franchise',
                 'page_url' => route('administrator.franchise_type', 'other'),
                 // 'category' => 'franchise'
-            ]
-        );
+            ],
+        ];
         foreach ($data as $value) {
             Count::updateOrCreate(
                 ['namekey' => $value['namekey']],
                 ['count' => $value['count']]
             );
         }
+
         return true;
     }
 }

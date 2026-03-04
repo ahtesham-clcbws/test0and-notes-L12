@@ -2,16 +2,16 @@
 
 namespace App\Helpers;
 
-use App\Models\User;
 use App\Models\CorporateEnquiry;
+use App\Models\User;
 
 class ProfileValidationHelper
 {
     /**
      * Check if email is unique across users and valid corporate enquiries.
      *
-     * @param string $email
-     * @param int|null $excludeUserId
+     * @param  string  $email
+     * @param  int|null  $excludeUserId
      * @return bool
      */
     public static function isEmailUnique($email, $excludeUserId = null)
@@ -40,8 +40,8 @@ class ProfileValidationHelper
     /**
      * Check if mobile is unique across users and valid corporate enquiries.
      *
-     * @param string $mobile
-     * @param int|null $excludeUserId
+     * @param  string  $mobile
+     * @param  int|null  $excludeUserId
      * @return bool
      */
     public static function isMobileUnique($mobile, $excludeUserId = null)

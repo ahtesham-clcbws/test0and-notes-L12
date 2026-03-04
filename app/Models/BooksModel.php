@@ -12,6 +12,7 @@ class BooksModel extends Model
     use SoftDeletes;
 
     protected $table = 'books';
+
     protected $primaryKey = 'id';
 
     /**
@@ -39,7 +40,6 @@ class BooksModel extends Model
         'hardcover_price',
     ];
 
-
     /**
      * The attributes that should be cast.
      *
@@ -52,9 +52,11 @@ class BooksModel extends Model
         'hardcover_price' => 'float',
     ];
 
-
     public $timestamps = true;
+
     const CREATED_AT = 'created_at';
+
     const UPDATED_AT = 'updated_at';
+
     const DELETED_AT = 'deleted_at';
 }

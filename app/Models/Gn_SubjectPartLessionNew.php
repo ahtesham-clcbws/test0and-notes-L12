@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Gn_SubjectPartLessionNew extends Model
 {
     use HasFactory;
+
     public function subject()
     {
         return $this->hasOne(Subject::class, 'id', 'subject_id');
@@ -22,5 +23,4 @@ class Gn_SubjectPartLessionNew extends Model
     {
         return $this->hasOne(SubjectPartLesson::class, 'id', 'subject_chapter_id');
     }
-
 }

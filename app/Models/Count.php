@@ -11,6 +11,6 @@ class Count extends Model
 
     protected $fillable = [
         'namekey',
-        'count'
+        'count',
     ];
 }

@@ -59,12 +59,21 @@
                                             @if($test->testSections)
                                                 @foreach($test->testSections as $index => $section)
                                                     @if ($section->subject && $section->subject_part && $section->subject_part_lesson && $section->number_of_questions)
-                                                        <a href="{{ route('administrator.dashboard_test_section_question', [$test->id, $section->id]) }}" title="Section {{ $index + 1 }} Questions">
-                                                            <i class="bi bi-journal-text text-primary me-2"></i>
+                                                        @php
+                                                            $qCount = $section->get_questions_count ?? 0;
+                                                            $sColor = 'text-secondary';
+                                                            if ($qCount > 0 && $qCount < $section->number_of_questions) {
+                                                                $sColor = 'text-warning';
+                                                            } elseif ($qCount >= $section->number_of_questions) {
+                                                                $sColor = 'text-success';
+                                                            }
+                                                        @endphp
+                                                        <a href="{{ route('administrator.dashboard_test_section_question', [$test->id, $section->id]) }}" title="Section {{ $index + 1 }} Questions ({{$qCount}}/{{$section->number_of_questions}})">
+                                                            <i class="bi bi-journal-check {{ $sColor }} fs-5 me-1"></i>
                                                         </a>
                                                     @else
-                                                        <a href="javascript:void(0)" onclick="alert('Please Add section detail before adding questions.')">
-                                                            <i class="bi bi-journal-text text-primary me-2"></i>
+                                                        <a href="javascript:void(0)" onclick="alert('Please Add section detail before adding questions.')" title="Section {{ $index + 1 }} Incomplete">
+                                                            <i class="bi bi-journal-x text-danger fs-5 me-1"></i>
                                                         </a>
                                                     @endif
                                                 @endforeach

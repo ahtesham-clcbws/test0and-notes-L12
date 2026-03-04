@@ -52,12 +52,9 @@ class TestForm extends Component
 
     public $existing_image;
 
+    // Price and test type options
     public $test_type = 1;
-
     public $price;
-
-    // Package integration
-    public $selectedPackages = [];
 
     // Dropdown data
     public $educations = [];
@@ -67,8 +64,6 @@ class TestForm extends Component
     public $agencies = [];
 
     public $otherExams = [];
-
-    public $packages = [];
 
     // Constants
     public $marksOptions = [1, 2, 3, 4];
@@ -104,12 +99,8 @@ class TestForm extends Component
             $this->test_type = $test->test_type ?? 1;
             $this->price = $test->price;
 
-            $this->selectedPackages = Gn_PackagePlanTest::where('test_id', $this->testId)
-                ->pluck('gn_package_plan_id')
-                ->toArray();
-
             $this->loadClasses($this->education_type_id);
-            $this->loadAgenciesAndPackages($this->class_group_exam_id);
+            $this->loadAgencies($this->class_group_exam_id);
             $this->loadOtherExams($this->exam_agency_board_university_id);
         }
     }
@@ -119,21 +110,12 @@ class TestForm extends Component
         $this->classes = ClassGoupExamModel::where('education_type_id', $educationTypeId)->get();
     }
 
-    private function loadAgenciesAndPackages($classId)
+    private function loadAgencies($classId)
     {
         $this->agencies = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id', $this->education_type_id)
             ->where('classes_group_exams_id', $classId)
             ->with('agencyBoardUniversity')
             ->get();
-
-        // The legacy InternalRequestsController uses $request->input('test_type') directly
-        // to filter package_category. 1 = Free, 0 = Paid.
-        $this->packages = Gn_PackagePlan::where('education_type', $this->education_type_id)
-            ->where('class', $classId)
-            ->where('package_category', $this->test_type)
-            ->get();
-
-        \Illuminate\Support\Facades\Log::info('Loading packages for class: '.$classId.' Category: '.$this->test_type.' Found: '.count($this->packages));
     }
 
     private function loadOtherExams($agencyId)
@@ -149,20 +131,19 @@ class TestForm extends Component
         $this->loadClasses($value);
         $this->class_group_exam_id = null;
         $this->agencies = [];
-        $this->packages = [];
         $this->otherExams = [];
     }
 
     public function updatedClassGroupExamId($value)
     {
-        $this->loadAgenciesAndPackages($value);
+        $this->loadAgencies($value);
         $this->exam_agency_board_university_id = null;
         $this->otherExams = [];
     }
 
     public function updatedTestType($value)
     {
-        $this->loadAgenciesAndPackages($this->class_group_exam_id);
+        // No longer tied to test type changes
     }
 
     public function updatedExamAgencyBoardUniversityId($value)
@@ -205,7 +186,6 @@ class TestForm extends Component
             $test->user_id = Auth::id();
             $test->test_type = $this->test_type;
             $test->price = $this->price;
-            $test->package = ! empty($this->selectedPackages) ? implode(',', $this->selectedPackages) : null;
 
             if ($this->test_image) {
                 $test->test_image = app(ImageService::class)->handleUpload($this->test_image, 'test_image', 800);
@@ -234,16 +214,7 @@ class TestForm extends Component
                 }
             }
 
-            // Sync Packages
-            Gn_PackagePlanTest::where('test_id', $test->id)->delete();
-            if (! empty($this->selectedPackages)) {
-                foreach ($this->selectedPackages as $packageId) {
-                    Gn_PackagePlanTest::create([
-                        'gn_package_plan_id' => $packageId,
-                        'test_id' => $test->id,
-                    ]);
-                }
-            }
+            // End Handle sections creation/deletion
 
             DB::commit();
             session()->flash('message', 'Test saved successfully.');

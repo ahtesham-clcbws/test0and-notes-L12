@@ -12,9 +12,10 @@ class OtherCategoryClass extends Model
     use SoftDeletes;
 
     protected $table = 'other_category_class';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'name'
+        'name',
     ];
 }

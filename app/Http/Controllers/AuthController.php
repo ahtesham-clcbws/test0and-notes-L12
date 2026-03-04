@@ -7,9 +7,9 @@ use App\Models\OtpVerifications;
 use App\Models\PasswordResetModel;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -17,7 +17,6 @@ class AuthController extends Controller
     /**
      * Store a new user.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function adminlogin(Request $request)
@@ -27,19 +26,20 @@ class AuthController extends Controller
                 'success' => false,
                 'type' => 'failed',
                 'message' => '',
-                'otp' => ''
+                'otp' => '',
             ];
 
             $input = $request->all();
 
-            $user = array('email' => $input['username'], 'isAdminAllowed' => 1);
+            $user = ['email' => $input['username'], 'isAdminAllowed' => 1];
             $userData = User::where($user)->first();
 
             if (Auth::attempt([
                 'email' => $input['username'],
-                'password' => $input['password']
+                'password' => $input['password'],
             ])) {
                 $returnResponse['success'] = true;
+
                 return json_encode($returnResponse);
             }
 
@@ -68,8 +68,10 @@ class AuthController extends Controller
 
             return json_encode($returnResponse);
         }
+
         return view('Auth/superadmin_login');
     }
+
     public function franchiselogin()
     {
         if (request()->isMethod('post')) {
@@ -81,7 +83,7 @@ class AuthController extends Controller
                     // send email or mobile authentication for resetting password
                     $code = mt_rand(100000, 999999);
 
-                    $resetDb = new PasswordResetModel();
+                    $resetDb = new PasswordResetModel;
                     $resetDb->user_id = $userData->id;
                     $resetDb->user_type = 'franchise';
                     $resetDb->verify_type = 'email';
@@ -95,11 +97,11 @@ class AuthController extends Controller
                     $details = [
                         'name' => $userData['name'],
                         'verifyLink' => $verifyLink,
-                        'resetCode' => $code
+                        'resetCode' => $code,
                     ];
                     $mailToSend = new SendPasswordReset($details);
                     $sendMail = Mail::to($input['email'])->send($mailToSend);
-                    if (!$sendMail) {
+                    if (! $sendMail) {
                         return back()->withErrors(['franchiseError' => 'Error sending email, please try again later.']);
                         // $returnResponse['success'] = true;
                         // $returnResponse['type'] = 'success';
@@ -112,6 +114,7 @@ class AuthController extends Controller
                     }
                     // }
                 }
+
                 // return print_r('User not found');
                 // return back()->withInput(['input' => 'mobile']);
                 return back()->withErrors(['franchiseError' => 'User not found.']);
@@ -126,34 +129,38 @@ class AuthController extends Controller
                 }
                 $data = [
                     $fieldType => $input['username'],
-                    'password' => $input['password']
+                    'password' => $input['password'],
                 ];
 
                 if (Auth::attempt($data)) {
                     return redirect()->route('franchise.dashboard')->with('loginSuccess', 'Welcome User');
                 }
+
                 return back()->withErrors(['email' => 'Login failed, You are not authorized.']);
             }
         }
+
         return view('Auth/blacklogin');
     }
 
     public function adminPasswordReset($email, $code)
     {
-        $data = array();
+        $data = [];
         $data = [
             'email' => $email,
-            'code' => $code
+            'code' => $code,
         ];
+
         return view('Dashboard/Admin/Auth/reset_form')->with('data', $data);
     }
+
     public function franchisePasswordReset($email, $code)
     {
-        $data = array();
+        $data = [];
         $data = [
             'success' => true,
             'email' => $email,
-            'code' => $code
+            'code' => $code,
         ];
         $resetData = PasswordResetModel::where('code', $code)->where('user_type', 'franchise')->where('status', 0)->first();
         if (request()->isMethod('post')) {
@@ -168,17 +175,21 @@ class AuthController extends Controller
                 $user = User::find($userId);
                 $user->password = Hash::make($input['password']);
                 $user->save();
+
                 return redirect()->route('franchise.login')->withErrors(['resetSuccess' => 'Password reset successfull, please login.']);
             }
         }
-        if (!$resetData) {
+        if (! $resetData) {
             $data = [
-                'success' => false
+                'success' => false,
             ];
         }
+
         return view('Dashboard/Auth/franchise_reset')->with('data', $data);
     }
+
     public function studentPasswordReset($code) {}
+
     public function studentRegistration(Request $request)
     {
         $userData = $request->all();
@@ -187,13 +198,13 @@ class AuthController extends Controller
         unset($userData['password']);
         $userDetails = [
             'city' => $request->input('city'),
-            'country' => $request->input('country')
+            'country' => $request->input('country'),
         ];
         // unset if needed
         // password hashing
         $userData['password'] = bcrypt($request->input('password'));
         // assigning roles
-        $userData['roles'] = json_encode(["student"]);
+        $userData['roles'] = json_encode(['student']);
         // $userData = [
         //     'name' => $request->input('name'),
         //     'mobile' => $request->input('mobile'),
@@ -206,7 +217,6 @@ class AuthController extends Controller
 
         $userCreation = User::create($userData);
 
-        return;
     }
 
     public function getMobileOtp($mobileNumber)
@@ -214,7 +224,7 @@ class AuthController extends Controller
         $returnResponse = [
             'success' => false,
             'type' => 'failed',
-            'message' => ''
+            'message' => '',
         ];
 
         // $returnResponse = [
@@ -245,11 +255,11 @@ class AuthController extends Controller
 
             // $data       = "Dear user Your OTP for sign up to Test and Notes portal is $otp. Valid for 10 minutes. Please do not share this OTP. Regards Test and Notes Team";
             // $message    = "Dear user Your OTP for sign up to Test and Notes portal is $otp. Valid for 10 minutes. Please do not share this OTP. Regards Test and Notes Team";
-            $message    = rawurlencode('Dear user%nYour OTP for sign up to Test and Notes portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nTest and Notes Team');
+            $message = rawurlencode('Dear user%nYour OTP for sign up to Test and Notes portal is '.$otp.'.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nTest and Notes Team');
             // $message     = rawurlencode('Dear user Your OTP for sign up to Test and Notes portal is '. $otp .'. Valid for 10 minutes. Please do not share this OTP. Regards Test and Notes Team');
             // $message     = rawurlencode('Dear user Your OTP for login/ registered to Test and Notes portal is 111111 Valid for 10 minutes. Please do not share this OTP. Regards Test and Notes Team');
-            $sender     = urlencode("GYNLGY");
-            $apikey     = urlencode("MzQ0YzZhMzU2ZTY2NjI0YjU4Mzc0NDMxNmU3MjYzNmM=");
+            $sender = urlencode('GYNLGY');
+            $apikey = urlencode('MzQ0YzZhMzU2ZTY2NjI0YjU4Mzc0NDMxNmU3MjYzNmM=');
             // $url        = 'https://api.textlocal.in/send/?apikey='. $apikey .'&numbers='. $mobileNumber ."&sender=". $sender ."&message=". $message;
 
             // $ch = curl_init($url);
@@ -259,23 +269,24 @@ class AuthController extends Controller
             // curl_close($ch);
             // $response = json_decode($response);
             // dd($response);
-            $response = true; //added by vishal
+            $response = true; // added by vishal
             if ($response) {
-                $otpVerifications               = new OtpVerifications;
-                $otpVerifications->type         = 'mobile';
-                $otpVerifications->credential   = $mobileNumber;
-                $otpVerifications->otp          = 123456; //$otp; //comment by vishal
-                $saveToDb                       = $otpVerifications->save();
+                $otpVerifications = new OtpVerifications;
+                $otpVerifications->type = 'mobile';
+                $otpVerifications->credential = $mobileNumber;
+                $otpVerifications->otp = 123456; // $otp; //comment by vishal
+                $saveToDb = $otpVerifications->save();
 
                 // if ($saveToDb && $response->status == 'success') { //comment by vishal
                 if ($saveToDb) {
-                    $returnResponse['success']  = true;
-                    $returnResponse['type']     = 'success';
-                    $returnResponse['message']  = 123456; //$otp; //comment by vishal
+                    $returnResponse['success'] = true;
+                    $returnResponse['type'] = 'success';
+                    $returnResponse['message'] = 123456; // $otp; //comment by vishal
                 }
 
             }
         }
+
         return $returnResponse;
     }
 
@@ -290,7 +301,7 @@ class AuthController extends Controller
                     // send email or mobile authentication for resetting password
                     $code = mt_rand(100000, 999999);
 
-                    $resetDb = new PasswordResetModel();
+                    $resetDb = new PasswordResetModel;
                     $resetDb->user_id = $userData->id;
                     $resetDb->user_type = 'franchise';
                     $resetDb->verify_type = 'email';
@@ -304,7 +315,7 @@ class AuthController extends Controller
                     $details = [
                         'name' => $userData['name'],
                         'verifyLink' => $verifyLink,
-                        'resetCode' => $code
+                        'resetCode' => $code,
                     ];
                     $mailToSend = new SendPasswordReset($details);
                     $sendMail = Mail::to($input['email'])->send($mailToSend);
@@ -321,6 +332,7 @@ class AuthController extends Controller
                     }
                     // }
                 }
+
                 // return print_r('User not found');
                 // return back()->withInput(['input' => 'mobile']);
                 return back()->withErrors(['franchiseError' => 'User not found.']);
@@ -335,15 +347,17 @@ class AuthController extends Controller
                 }
                 $data = [
                     $fieldType => $input['username'],
-                    'password' => $input['password']
+                    'password' => $input['password'],
                 ];
 
                 if (Auth::attempt($data)) {
                     return back()->withErrors(['email' => 'Login failed, You are not authorized.']);
                 }
+
                 return back()->withErrors(['email' => 'Login failed, You are not authorized.']);
             }
         }
+
         return view('Auth/Management/management_login');
     }
 
@@ -352,17 +366,17 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->values, [
             'new_password' => 'required',
-            'confirm_password' => 'required'
+            'confirm_password' => 'required',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'error' => $validator->errors()->all()], 200);
         }
 
-        $user = new User();
+        $user = new User;
 
         $user->exists = true;
-        $user->id = Auth::user()->id;; //already exists in database.
+        $user->id = Auth::user()->id; // already exists in database.
 
         $user->password = bcrypt($request->values['new_password']);
 

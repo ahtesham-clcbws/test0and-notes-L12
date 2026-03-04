@@ -12,10 +12,11 @@ class BoardAgencyStateModel extends Model
     use SoftDeletes;
 
     protected $table = 'board_agency_exam';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'name'
+        'name',
     ];
 
     public function education()
@@ -27,5 +28,4 @@ class BoardAgencyStateModel extends Model
     {
         return $this->hasOne(ClassGoupExamModel::class, 'id', 'classes_group_exams_id');
     }
-
 }

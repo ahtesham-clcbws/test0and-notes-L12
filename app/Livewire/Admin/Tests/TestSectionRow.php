@@ -44,7 +44,11 @@ class TestSectionRow extends Component
 
     public $section_instruction;
 
-    protected $listeners = ['saveSection' => 'save'];
+    public $remainingQuestions = 0;
+
+    // Using #[On('updateRemaining')] equivalent but Livewire 3 supports listeners array dynamically if needed.
+    // However, it's better to calculate on the server side during save to prevent race conditions.
+    protected $listeners = ['saveSection' => 'save', 'updateRemaining' => 'setRemaining'];
 
     public $subjects = [];
 
@@ -58,12 +62,24 @@ class TestSectionRow extends Component
 
     public $publishers = [];
 
-    protected $rules = [
-        'subject_id' => 'required',
-        'number_of_questions' => 'required|numeric|min:1',
-        'question_type' => 'required',
-        'difficulty_level' => 'required|numeric|min:0|max:100',
+    protected function rules()
+    {
+        // Max questions allowed is whatever is currently saved in this section + the remaining global pool.
+        $maxAllowed = $this->number_of_questions_original + $this->remainingQuestions;
+
+        return [
+            'subject_id' => 'required',
+            'number_of_questions' => 'required|numeric|min:1|max:'.$maxAllowed,
+            'question_type' => 'required',
+            'difficulty_level' => 'required|numeric|min:0|max:100',
+        ];
+    }
+
+    protected $messages = [
+        'number_of_questions.max' => 'The total questions across all sections cannot exceed the Test\'s Total Questions limit.',
     ];
+
+    public $number_of_questions_original = 0;
 
     public function mount($index, $testId, $sectionId = 0, $subjects = [], $creators = [], $publishers = [])
     {
@@ -97,20 +113,21 @@ class TestSectionRow extends Component
             $this->updatedChapterId($this->chapter_id);
         }
 
-        $this->lesson_id = $section->gn_subject_part_lesson;
         $this->number_of_questions = $section->number_of_questions;
+        $this->number_of_questions_original = $section->number_of_questions ?? 0;
 
         // Automation: If this is the only section and no questions are set, pull from test
         if (empty($this->number_of_questions) || $this->number_of_questions == 0) {
             $test = \App\Models\TestModal::find($this->testId);
             if ($test && $test->sections == 1) {
                 $this->number_of_questions = $test->total_questions;
+                $this->number_of_questions_original = $this->number_of_questions;
             }
         }
 
         $this->question_type = $section->question_type ?? 1;
         $this->mcq_options = $section->mcq_options ?? 4;
-        $this->difficulty_level = $section->difficulty_level;
+        $this->difficulty_level = $section->difficulty_level ?: 50;
         $this->creator_id = $section->creator_id;
         $this->date_of_completion = $section->date_of_completion;
         $this->duration = $section->duration;
@@ -145,8 +162,20 @@ class TestSectionRow extends Component
         $this->lesson_id = '';
     }
 
+    public function setRemaining($remaining)
+    {
+        $this->remainingQuestions = $remaining;
+    }
+
     public function save()
     {
+        // Fetch fresh remaining questions total before validating to avoid race conditions
+        $totalTestQuestions = \App\Models\TestModal::find($this->testId)->total_questions ?? 0;
+        $otherSectionsSum = TestSections::where('test_id', $this->testId)->where('id', '!=', $this->sectionId)->sum('number_of_questions');
+        $this->remainingQuestions = $totalTestQuestions - $otherSectionsSum;
+        // Adjust original value if saving new row or updating row
+        $this->number_of_questions_original = 0; // The remaining pool is already calculated excluding this section's DB value
+
         $this->validate();
 
         $data = [
@@ -179,6 +208,7 @@ class TestSectionRow extends Component
             $this->dispatch('notify', type: 'error', message: 'Error saving section: '.$e->getMessage());
         }
 
+        $this->number_of_questions_original = $this->number_of_questions;
         $this->dispatch('sectionSaved', index: $this->index);
     }
 

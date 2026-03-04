@@ -2,9 +2,7 @@
 
 namespace App\Livewire\Frontend\Auth;
 
-use App\Models\ClassGoupExamModel;
 use App\Models\CorporateEnquiry;
-use App\Models\Educationtype;
 use App\Models\OtpVerifications;
 use App\Models\User;
 use App\Models\UserDetails;
@@ -17,13 +15,21 @@ class ContributorSignUp extends Component
     use WithFileUploads;
 
     public $name;
+
     public $email;
+
     public $mobile;
+
     public $mobile_otp;
+
     public $password;
+
     public $confirm_password;
+
     public $institute_code;
+
     public $user_logo;
+
     public $required_check_registration;
 
     public function rules()
@@ -34,7 +40,7 @@ class ContributorSignUp extends Component
                 'required',
                 'email',
                 \Illuminate\Validation\Rule::unique('users', 'email'),
-                \Illuminate\Validation\Rule::unique('corporate_enquiries', 'email')
+                \Illuminate\Validation\Rule::unique('corporate_enquiries', 'email'),
             ],
             'mobile' => 'required|digits:10|unique:users,mobile',
             'mobile_otp' => [
@@ -85,8 +91,8 @@ class ContributorSignUp extends Component
     }
 
     public $isOtpSend = false;
-    public $otpVerificationStatus = false;
 
+    public $otpVerificationStatus = false;
 
     public function getOtp()
     {
@@ -103,7 +109,7 @@ class ContributorSignUp extends Component
                         'credential' => $this->mobile,
                         'otp' => $otp,
                         'created_at' => now(),
-                        'updated_at' => now()
+                        'updated_at' => now(),
                     ]);
                 }
                 $this->isOtpSend = true;
@@ -124,6 +130,7 @@ class ContributorSignUp extends Component
         if (empty($this->institute_code)) {
             $this->institute_name = '';
             $this->resetValidation('institute_code');
+
             return;
         }
 
@@ -168,36 +175,35 @@ class ContributorSignUp extends Component
         return view('livewire.frontend.auth.contributor-sign-up');
     }
 
-
     public function register()
     {
         $this->validate();
         try {
 
-            $userDb         = new User();
-            $userDetailsDb  = new UserDetails();
+            $userDb = new User;
+            $userDetailsDb = new UserDetails;
 
-            $userDb->status     = 'unread';
-            $userDb->username   = $this->email;
-            $userDb->name       = $this->name;
-            $userDb->email      = $this->email;
-            $userDb->mobile     = $this->mobile;
+            $userDb->status = 'unread';
+            $userDb->username = $this->email;
+            $userDb->name = $this->name;
+            $userDb->email = $this->email;
+            $userDb->mobile = $this->mobile;
 
-            $userDb->is_staff       =  1;
-            $userDb->is_franchise   =  0;
-            $userDb->roles          = 'contributor';
+            $userDb->is_staff = 1;
+            $userDb->is_franchise = 0;
+            $userDb->roles = 'contributor';
 
-            $userDb->in_franchise           =  ($this->institute_code == '') ? 0 : 1;
-            $userDb->franchise_code         =  $this->institute_code;
-            $userDetailsDb->institute_code  =  filter_var($this->institute_code);
+            $userDb->in_franchise = ($this->institute_code == '') ? 0 : 1;
+            $userDb->franchise_code = $this->institute_code;
+            $userDetailsDb->institute_code = filter_var($this->institute_code);
 
-            $userDb->password        = Hash::make($this->password);
+            $userDb->password = Hash::make($this->password);
 
             if ($userDb->save()) {
-                $userDetailsDb->user_id =  $userDb->id;
+                $userDetailsDb->user_id = $userDb->id;
 
                 if ($this->user_logo) {
-                    $fullPath = app(\App\Services\ImageService::class)->handleUpload($this->user_logo, 'contributor_uploads/' . $userDb->id, 400);
+                    $fullPath = app(\App\Services\ImageService::class)->handleUpload($this->user_logo, 'contributor_uploads/'.$userDb->id, 400);
                     $userDetailsDb->photo_url = $fullPath;
                 }
 

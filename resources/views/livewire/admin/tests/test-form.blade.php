@@ -132,24 +132,7 @@
                 </div>
             </div>
 
-            <!-- NEW: Package Integration -->
-            <div class="row mt-3">
-                <div class="col-12">
-                    <small><b>Link to Packages</b></small>
-                    <div class="p-2 border rounded" style="max-height: 150px; overflow-y: auto;">
-                        @forelse($packages as $package)
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="{{ $package->id }}" wire:model="selectedPackages" id="pkg_{{ $package->id }}">
-                                <label class="form-check-label" for="pkg_{{ $package->id }}">
-                                    {{ $package->plan_name }} ({{ $package->package_category }})
-                                </label>
-                            </div>
-                        @empty
-                            <span class="text-muted small">No packages found for this class.</span>
-                        @endforelse
-                    </div>
-                </div>
-            </div>
+
 
             <div class="row mt-3">
                 <div class="col-4">

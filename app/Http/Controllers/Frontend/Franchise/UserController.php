@@ -6,37 +6,38 @@ use App\Http\Controllers\Controller;
 use App\Mail\NotifyAdminStudentAccountChanges;
 use App\Mail\NotifyUserAccountChanges;
 use App\Models\CorporateEnquiry;
-use App\Models\FranchiseDetails;
 use App\Models\Educationtype;
+use App\Models\FranchiseDetails;
+use App\Models\OtpVerifications;
+use App\Models\RoleAssign;
 use App\Models\User;
 use App\Models\UserDetails;
-use App\Models\RoleAssign;
-use Illuminate\Support\Facades\Hash;
+use App\Services\ImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use App\Models\OtpVerifications;
-use App\Mail\SendOtpMail;
-use App\Services\ImageService;
 
 class UserController extends Controller
 {
     public $returnResponse = [];
+
     protected $imageService;
 
-    public function __construct(ImageService $imageService){
+    public function __construct(ImageService $imageService)
+    {
         $this->imageService = $imageService;
         $this->returnResponse = [
             'message' => null,
-            'success' => false
+            'success' => false,
         ];
     }
 
     public function index($type = 'all')
     {
-        $data = array();
+        $data = [];
         $id = Auth::user()->id;
         $myDetails = FranchiseDetails::where('user_id', $id)->first();
         $branchCode = $myDetails->branch_code;
@@ -63,14 +64,15 @@ class UserController extends Controller
             $data = $data->where('status', 'active')->where('roles', 'publisher')->get();
         }
         if ($type == 'multi') {
-            $data = $data->where('status', 'active')->where('roles','like','%,%')->get();
+            $data = $data->where('status', 'active')->where('roles', 'like', '%,%')->get();
         }
 
         return view('Dashboard/Franchise/Dashboard/users')->with('data', $data);
     }
+
     public function new_signup()
     {
-        $data = array();
+        $data = [];
 
         $id = Auth::user()->id;
         $myDetails = FranchiseDetails::where('user_id', $id)->first();
@@ -83,36 +85,37 @@ class UserController extends Controller
 
         return view('Dashboard/Franchise/Dashboard/new_signup')->with('data', $data);
     }
+
     public function show($id)
     {
         $user = User::find($id);
         $data['user'] = $user;
-        $data['details'] = array();
+        $data['details'] = [];
         $data['details'] = UserDetails::where('user_id', $id)->first();
 
         if (request()->isMethod('post')) {
             $requestData = request()->all();
             $role_id = [];
-            if (!empty(request()->role)) {
+            if (! empty(request()->role)) {
                 foreach (request()->role as $key => $value) {
                     switch ($value) {
-                        case 'manager'   : $role_id[$key]   = 6;
-                        break;
+                        case 'manager'   : $role_id[$key] = 6;
+                            break;
 
-                        case 'creator'   : $role_id[$key]   = 8;
-                        break;
+                        case 'creator'   : $role_id[$key] = 8;
+                            break;
 
-                        case 'publisher' : $role_id[$key]   = 7;
-                        break;
+                        case 'publisher' : $role_id[$key] = 7;
+                            break;
 
-                        case 'verifier'  : $role_id[$key]   = 9;
-                        break;
+                        case 'verifier'  : $role_id[$key] = 9;
+                            break;
 
-                        case 'reviewer'  : $role_id[$key]   = 10;
-                        break;
+                        case 'reviewer'  : $role_id[$key] = 10;
+                            break;
 
                         default:
-                        break;
+                            break;
                     }
                 }
             }
@@ -122,21 +125,21 @@ class UserController extends Controller
                 $userDb = User::find($id);
 
                 // $userDb->id =  $id;
-                $userDb->name =  htmlspecialchars(request()->input('name'));
+                $userDb->name = htmlspecialchars(request()->input('name'));
 
                 if (request()->input('is_staff') == 0) {
-                    $userDb->roles              = 'student';
-                    $userDb->is_staff           = 0;
-                    $userDb->franchise_roles    = null;
+                    $userDb->roles = 'student';
+                    $userDb->is_staff = 0;
+                    $userDb->franchise_roles = null;
                 } else {
                     if ($userDb->franchise_code) {
-                        $userDb->roles              = implode(',',request()->input('role'));
-                        $userDb->is_staff           = 1;
-                        $userDb->franchise_roles    = json_encode(request()->input('role'));
+                        $userDb->roles = implode(',', request()->input('role'));
+                        $userDb->is_staff = 1;
+                        $userDb->franchise_roles = json_encode(request()->input('role'));
                     } else {
-                        $userDb->isAdminAllowed     = 1;
-                        $userDb->roles              = json_encode(request()->input('role'));
-                        $userDb->franchise_roles    = null;
+                        $userDb->isAdminAllowed = 1;
+                        $userDb->roles = json_encode(request()->input('role'));
+                        $userDb->franchise_roles = null;
                     }
                 }
 
@@ -147,10 +150,10 @@ class UserController extends Controller
                 $today = date('Y-m-d');
                 if ($userDetailsDB) {
                     if ($requestData['days'] !== $userDetailsDB['days'] || intval($requestData['days']) > 0 && $today < $userDetailsDB['inactive_at']) {
-                        $userDetailsDB->days        = $requestData['days'];
-                        $days                       = intval($requestData['days'] + 1);
-                        $endDate                    = date('Y-m-d', strtotime('+' . $days . ' days'));
-                        $userDetailsDB->started_at  = $today;
+                        $userDetailsDB->days = $requestData['days'];
+                        $days = intval($requestData['days'] + 1);
+                        $endDate = date('Y-m-d', strtotime('+'.$days.' days'));
+                        $userDetailsDB->started_at = $today;
                         $userDetailsDB->inactive_at = $endDate;
                         $userDetailsDB->education_type = isset($requestData['education_type_id']) ? $requestData['education_type_id'] : 0;
                         $userDetailsDB->class = isset($requestData['class_group_exam_id']) ? $requestData['class_group_exam_id'] : 0;
@@ -163,71 +166,73 @@ class UserController extends Controller
                 }
 
                 if (request()->input('password')) {
-                    $userDb->password =  Hash::make(request()->input('password'));
+                    $userDb->password = Hash::make(request()->input('password'));
                 }
-                $userDb->status =  request()->input('status');
+                $userDb->status = request()->input('status');
 
-                $diff_role_id = array_diff($userDb->role->pluck('role_id')->toArray(),$role_id);
+                $diff_role_id = array_diff($userDb->role->pluck('role_id')->toArray(), $role_id);
 
-                if (!empty($role_id)) {
+                if (! empty($role_id)) {
                     foreach ($role_id as $user_role_id) {
-                        $userRole           = new RoleAssign();
-                        $userRole->user_id  = $userDb->id;
-                        $userRole->role_id  = $user_role_id;
+                        $userRole = new RoleAssign;
+                        $userRole->user_id = $userDb->id;
+                        $userRole->role_id = $user_role_id;
                         $userRole->save();
                     }
                 }
 
-                if (!empty($diff_role_id)) {
-                    RoleAssign::where('user_id',$userDb->id)->whereIn('role_id',$diff_role_id)->delete();
+                if (! empty($diff_role_id)) {
+                    RoleAssign::where('user_id', $userDb->id)->whereIn('role_id', $diff_role_id)->delete();
                 }
 
                 if ($userDb->save()) {
-                    try{//on changes done on page /administrator/users/view/156 or institute/user/view/156
-                    //send deatils to super admin
-                    $user_datails = [
-                        'fullname' => $userDb->name,
-                        'email_id' => $userDb->email,
-                        'institute_code' => $userDb->franchise_code
-                    ];
+                    try {// on changes done on page /administrator/users/view/156 or institute/user/view/156
+                        // send deatils to super admin
+                        $user_datails = [
+                            'fullname' => $userDb->name,
+                            'email_id' => $userDb->email,
+                            'institute_code' => $userDb->franchise_code,
+                        ];
 
-                    $super_admins = User::where('roles', 'superadmin')->where('status', 'active')->where('deleted_at', null)->get(['email'])->toArray();
-                    $emails = [];
-                    foreach ($super_admins as $super_admin) {
-                        array_push($emails, $super_admin['email']);
-                    }
-                    $superAdminMailToSend = new NotifyAdminStudentAccountChanges($user_datails);
-                    $sendAdminMail = Mail::to($emails)->send($superAdminMailToSend);
-                    Log::build([
-                        'driver' => 'single',
-                        'path' => storage_path('logs/custom.log'),
-                    ])->info('student account update admin '.implode(" ", $emails).' '.count(Mail::failures()));
-                    //send email to user in which account changes are done
-                    $mailToSend = new NotifyUserAccountChanges($user_datails);
-                     $sendMail = Mail::to($userDb->email)->send($mailToSend);
-                     Log::build([
-                        'driver' => 'single',
-                        'path' => storage_path('logs/custom.log'),
-                    ])->info('student account update '.$userDb->email.' '.count(Mail::failures()));
-                     }catch (\Throwable $th) {
+                        $super_admins = User::where('roles', 'superadmin')->where('status', 'active')->where('deleted_at', null)->get(['email'])->toArray();
+                        $emails = [];
+                        foreach ($super_admins as $super_admin) {
+                            array_push($emails, $super_admin['email']);
+                        }
+                        $superAdminMailToSend = new NotifyAdminStudentAccountChanges($user_datails);
+                        $sendAdminMail = Mail::to($emails)->send($superAdminMailToSend);
+                        Log::build([
+                            'driver' => 'single',
+                            'path' => storage_path('logs/custom.log'),
+                        ])->info('student account update admin '.implode(' ', $emails).' '.count(Mail::failures()));
+                        // send email to user in which account changes are done
+                        $mailToSend = new NotifyUserAccountChanges($user_datails);
+                        $sendMail = Mail::to($userDb->email)->send($mailToSend);
+                        Log::build([
+                            'driver' => 'single',
+                            'path' => storage_path('logs/custom.log'),
+                        ])->info('student account update '.$userDb->email.' '.count(Mail::failures()));
+                    } catch (\Throwable $th) {
                         Log::build([
                             'driver' => 'single',
                             'path' => storage_path('logs/custom.log'),
                         ])->info('problem in email sending in user activation'.$th);
                     }
+
                     return json_encode(true);
                 }
                 User::generateCounts();
                 CorporateEnquiry::generateCounts();
+
                 return json_encode(true);
             }
         }
 
-        $data['manager']    = false;
-        $data['creator']    = false;
-        $data['publisher']  = false;
-        $data['verifier']   = false;
-        $data['reviewer']   = false;
+        $data['manager'] = false;
+        $data['creator'] = false;
+        $data['publisher'] = false;
+        $data['verifier'] = false;
+        $data['reviewer'] = false;
         if ($user['franchise_roles'] && $user['is_staff'] == 1) {
             $roles = json_decode($user['franchise_roles']);
             if ($roles == 'manager' || in_array('manager', $roles)) {
@@ -261,21 +266,21 @@ class UserController extends Controller
         $data['remainingSubscription'] = 'No Subscription';
         if ($data['details']->days) {
             $data['selectedDays'] = intval($data['details']->days);
-            $data['remainingSubscription'] = 'Expires at ' . date('d-M-Y', strtotime($data['details']['started_at'] . ' + ' . $data['selectedDays'] . ' days'));
+            $data['remainingSubscription'] = 'Expires at '.date('d-M-Y', strtotime($data['details']['started_at'].' + '.$data['selectedDays'].' days'));
         }
         $data['education_type'] = intval($data['details']->education_type);
         $data['class'] = intval($data['details']->class);
         // dd($data,$data['user']);
         // return print_r($data);
-        $gn_EduTypes      = Educationtype::get();
+        $gn_EduTypes = Educationtype::get();
         $data['gn_EduTypes'] = $gn_EduTypes;
 
-        $data['institute_code'] = DB::table('user_details')->where('user_id',$id)->first();
-        $data['institute_name'] = DB::table('franchise_details')->where('branch_code',$data['institute_code']->institute_code)->first();
-
+        $data['institute_code'] = DB::table('user_details')->where('user_id', $id)->first();
+        $data['institute_name'] = DB::table('franchise_details')->where('branch_code', $data['institute_code']->institute_code)->first();
 
         return view('Dashboard/Franchise/Dashboard/user_view')->with('data', $data);
     }
+
     public function myProfile()
     {
         $id = Auth::user()->id;
@@ -296,8 +301,8 @@ class UserController extends Controller
 
         if ($isOtherRole) {
             $details = UserDetails::where('user_id', $id)->first();
-            if (!$details) {
-                $detailsDb = new UserDetails();
+            if (! $details) {
+                $detailsDb = new UserDetails;
                 $detailsDb->user_id = $id;
                 $detailsDb->save();
                 $details = UserDetails::where('user_id', $id)->first();
@@ -306,13 +311,13 @@ class UserController extends Controller
 
         if (request()->isMethod('post')) {
             // Ensure details record exists before processing
-            if (!$details) {
+            if (! $details) {
                 if (str_contains($user['roles'], 'franchise')) {
                     // For franchise users, we need FranchiseDetails
                     return redirect()->back()->with('error', 'Franchise details not found. Please contact administrator.');
                 } else {
                     // For other users, create UserDetails if missing
-                    $detailsDb = new UserDetails();
+                    $detailsDb = new UserDetails;
                     $detailsDb->user_id = $id;
                     $detailsDb->save();
                     $details = UserDetails::where('user_id', $id)->first();
@@ -331,7 +336,7 @@ class UserController extends Controller
             if ($file = request()->file('user_image')) {
                 $details->photo_url = $this->imageService->handleUpload(request()->file('user_image'), 'institute/avatar', 400);
             }
-            if(str_contains($user['roles'], 'franchise')){
+            if (str_contains($user['roles'], 'franchise')) {
                 if ($file = request()->file('logo')) {
                     $details->logo = $this->imageService->handleUpload(request()->file('logo'), 'institute/logo', 400);
                 }
@@ -353,21 +358,22 @@ class UserController extends Controller
 
             $user->save();
             $details->save();
+
             return redirect()->back()->with('message', 'Profile Updated Successfully');
         }
         $details['email'] = $user['email'];
         $details['mobile'] = $user['mobile'];
         $user['details'] = $details;
 
-        if(strpos($user['roles'], 'franchise') !== false){
+        if (strpos($user['roles'], 'franchise') !== false) {
             return view('Dashboard/Franchise/Settings/profile')->with('user', $user);
         }
 
-        if(strpos($user['roles'], 'creator') !== false || strpos($user['roles'], 'publisher') !== false){
+        if (strpos($user['roles'], 'creator') !== false || strpos($user['roles'], 'publisher') !== false) {
             return view('Dashboard/Franchise/Settings/profile_creater')->with('user', $user);
         }
 
-        if(strpos($user['roles'], 'manager') !== false || strpos($user['roles'], 'verifier') !== false || strpos($user['roles'], 'reviewer') !== false){
+        if (strpos($user['roles'], 'manager') !== false || strpos($user['roles'], 'verifier') !== false || strpos($user['roles'], 'reviewer') !== false) {
             return view('Dashboard/Franchise/Settings/profile_manager')->with('user', $user);
         }
 
@@ -379,8 +385,8 @@ class UserController extends Controller
         $id = Auth::user()->id;
         $user = User::find($id);
         $details = UserDetails::where('user_id', $id)->first();
-        if (!$details) {
-            $detailsDb = new UserDetails();
+        if (! $details) {
+            $detailsDb = new UserDetails;
             $detailsDb->user_id = $id;
             $detailsDb->save();
             $details = UserDetails::where('user_id', $id)->first();
@@ -397,7 +403,7 @@ class UserController extends Controller
                 $user['email'] = $inputs['email'];
             }
             if ($file = request()->file('user_image')) {
-                $details->photo_url = $this->imageService->handleUpload(request()->file('user_image'), 'admin/' . $id, 400);
+                $details->photo_url = $this->imageService->handleUpload(request()->file('user_image'), 'admin/'.$id, 400);
             }
             if (request()->input('address') && $inputs['address'] !== $details['address']) {
                 $details->address = $inputs['address'];
@@ -413,22 +419,23 @@ class UserController extends Controller
             }
             $user->save();
             $details->save();
+
             return redirect()->back();
         }
         $details['email'] = $user['email'];
         $details['mobile'] = $user['mobile'];
         $user['details'] = $details;
+
         return view('Dashboard/Franchise/Management/Creater/Settings/profile')->with('user', $user);
     }
 
-
     public function addUser(Request $req)
     {
-        $data = array();
+        $data = [];
 
         $time = date('Y-m-d');
         $time .= '00:00:00';
-        $franchiseCodes = FranchiseDetails::select('id', 'branch_code', 'institute_name')->where('inactive_at', '>', $time)->where('user_id',Auth::user()->id)->get();
+        $franchiseCodes = FranchiseDetails::select('id', 'branch_code', 'institute_name')->where('inactive_at', '>', $time)->where('user_id', Auth::user()->id)->get();
         // dd($franchiseCodes,Auth::user()->franchise_code);
         // return print_r($franchiseCodes);
 
@@ -460,7 +467,7 @@ class UserController extends Controller
                     $emailError = true;
                     $validationErrorMessage .= ' Email already in use.';
                 }
-                $validationErrorMessage .= ' ' . $message;
+                $validationErrorMessage .= ' '.$message;
             }
             if ($request['mobile'] != '') {
                 $message = '';
@@ -474,42 +481,42 @@ class UserController extends Controller
                     $mobileError = true;
                     $validationErrorMessage .= ' Mobile already in use.';
                 }
-                $validationErrorMessage .= ' ' . $message;
+                $validationErrorMessage .= ' '.$message;
             }
 
             if ($usernameError || $emailError || $mobileError) {
                 // return print_r($validationErrorMessage);
                 return back()->withErrors(['userError' => $validationErrorMessage]);
             } else {
-                $userDb         = new User();
-                $userDetailsDb  = new UserDetails();
+                $userDb = new User;
+                $userDetailsDb = new UserDetails;
 
-                $userDb->status     = $request['status'];
-                $userDb->username   = $request['username'] != '' ? $request['username'] : NULL;
-                $userDb->name       = $request['name'];
-                $userDb->email      = $request['email'];
-                $userDb->mobile     = $request['mobile'];
+                $userDb->status = $request['status'];
+                $userDb->username = $request['username'] != '' ? $request['username'] : null;
+                $userDb->name = $request['name'];
+                $userDb->email = $request['email'];
+                $userDb->mobile = $request['mobile'];
 
-                $userDb->is_staff       =  1;
-                $userDb->is_franchise   =  0;
+                $userDb->is_staff = 1;
+                $userDb->is_franchise = 0;
 
                 if ($request['institute_code'] == 'Direct') {
-                    $userDb->in_franchise =  0;
-                    $userDb->franchise_code =  NULL;
+                    $userDb->in_franchise = 0;
+                    $userDb->franchise_code = null;
                 } else {
-                    $userDb->in_franchise           =  1;
-                    $userDb->franchise_code         =  $request['institute_code'];
-                    $userDetailsDb->institute_code  =  filter_var($request['institute_code']);
-                    $userDb->franchise_roles        = json_encode($request['role']);
+                    $userDb->in_franchise = 1;
+                    $userDb->franchise_code = $request['institute_code'];
+                    $userDetailsDb->institute_code = filter_var($request['institute_code']);
+                    $userDb->franchise_roles = json_encode($request['role']);
                 }
 
-                $userDb->password        = Hash::make($request['password']);
-                $userDb->roles           = implode(',', $request['role']);
+                $userDb->password = Hash::make($request['password']);
+                $userDb->roles = implode(',', $request['role']);
                 $userDb->franchise_roles = json_encode($request['role']);
 
                 if ($userDb->save()) {
                     foreach ($request['role'] as $key => $role_assign) {
-                        $userRole       = new RoleAssign();
+                        $userRole = new RoleAssign;
 
                         if ($role_assign == 'manager') {
                             $userRole->user_id = $userDb->id;
@@ -538,12 +545,13 @@ class UserController extends Controller
                         }
                     }
 
-                    $userDetailsDb->user_id =  $userDb->id;
+                    $userDetailsDb->user_id = $userDb->id;
                     if ($file = request()->file('user_logo')) {
-                        $userDetailsDb->photo_url = $this->imageService->handleUpload(request()->file('user_logo'), 'student_uploads/' . $userDb->id, 400);
+                        $userDetailsDb->photo_url = $this->imageService->handleUpload(request()->file('user_logo'), 'student_uploads/'.$userDb->id, 400);
                     }
                     $userDetailsDb->save();
                     User::generateCounts();
+
                     return redirect()->route('franchise.dashboard', [$userDb->id]);
                 } else {
                     return back()->withErrors(['userError' => 'Unable to create contributor, please try again later.']);
@@ -567,11 +575,13 @@ class UserController extends Controller
         }
 
         $data['franchiseCodes'] = $franchiseCodes;
+
         return view('Dashboard/Franchise/Dashboard/user_add')->with('data', $data);
     }
+
     public function verifymobile(Request $req, $mobile)
     {
-        if (!\App\Helpers\ProfileValidationHelper::isMobileUnique($mobile, Auth::id())) {
+        if (! \App\Helpers\ProfileValidationHelper::isMobileUnique($mobile, Auth::id())) {
             return false;
         } else {
             return $this->getMobileOtp($mobile);
@@ -580,7 +590,7 @@ class UserController extends Controller
 
     public function verifyemail(Request $req, $email)
     {
-        if (!\App\Helpers\ProfileValidationHelper::isEmailUnique($email, Auth::id())) {
+        if (! \App\Helpers\ProfileValidationHelper::isEmailUnique($email, Auth::id())) {
             return false;
         } else {
             return $this->getEmailOtp($email);
@@ -594,9 +604,10 @@ class UserController extends Controller
         // send once in only 10 minutes
         if ($otpData) {
             $this->returnResponse['message'] = 'You already request an OTP in last 10 minutes. please wait for another attempt.';
+
             return json_encode($this->returnResponse);
         }
-        $otp            = mt_rand(100000, 999999);
+        $otp = mt_rand(100000, 999999);
 
         // $message    = rawurlencode('Dear user%nYour OTP for sign up to Test and Notes portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nTest and Notes Team');
         // $sender     = urlencode("GYNLGY");
@@ -609,16 +620,16 @@ class UserController extends Controller
         // curl_close($ch);
         // $response   = json_decode($response);
         // if ($response) {
-            $otpVerifications               = new OtpVerifications;
-            $otpVerifications->type         = 'mobile';
-            $otpVerifications->credential   = $mobileNumber;
-            $otpVerifications->otp          = $otp;
-            $saveToDb                       = $otpVerifications->save();
+        $otpVerifications = new OtpVerifications;
+        $otpVerifications->type = 'mobile';
+        $otpVerifications->credential = $mobileNumber;
+        $otpVerifications->otp = $otp;
+        $saveToDb = $otpVerifications->save();
 
-            // if ($saveToDb && $response->status == 'success') {
-            if ($saveToDb) {
-                $this->returnResponse['success'] = true;
-            }
+        // if ($saveToDb && $response->status == 'success') {
+        if ($saveToDb) {
+            $this->returnResponse['success'] = true;
+        }
         // }
 
         return $this->returnResponse;
@@ -631,35 +642,36 @@ class UserController extends Controller
         // send once in only 10 minutes
         if ($otpData) {
             $this->returnResponse['message'] = 'You already request an OTP in last 10 minutes. please wait for another attempt.';
+
             return json_encode($this->returnResponse);
         }
-        $otp            = mt_rand(100000, 999999);
+        $otp = mt_rand(100000, 999999);
 
         $details = [
-            'otp' => $otp
+            'otp' => $otp,
         ];
 
         // Mail::to($email)->send(new \App\Mail\SendOtpMail($details));
         try {
-            Mail::raw('Your OTP for Test and Notes is ' . $otp, function ($message) use ($email) {
+            Mail::raw('Your OTP for Test and Notes is '.$otp, function ($message) use ($email) {
                 $message->to($email)
-                  ->subject('OTP Verification');
+                    ->subject('OTP Verification');
             });
         } catch (\Exception $e) {
             $this->returnResponse['message'] = 'Failed to send OTP. Please try again.';
-             return json_encode($this->returnResponse);
+
+            return json_encode($this->returnResponse);
         }
 
-        $otpVerifications               = new OtpVerifications;
-        $otpVerifications->type         = 'email';
-        $otpVerifications->credential   = $email;
-        $otpVerifications->otp          = $otp;
-        $saveToDb                       = $otpVerifications->save();
+        $otpVerifications = new OtpVerifications;
+        $otpVerifications->type = 'email';
+        $otpVerifications->credential = $email;
+        $otpVerifications->otp = $otp;
+        $saveToDb = $otpVerifications->save();
 
         if ($saveToDb) {
             $this->returnResponse['success'] = true;
         }
-
 
         return $this->returnResponse;
     }
@@ -674,11 +686,13 @@ class UserController extends Controller
                 $user->mobile = $credential;
             }
             if ($type == 'email') {
-                 $user->email = $credential;
+                $user->email = $credential;
             }
             $user->save();
+
             return true;
         }
+
         return false;
     }
 }

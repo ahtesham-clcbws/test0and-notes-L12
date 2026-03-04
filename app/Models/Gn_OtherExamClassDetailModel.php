@@ -23,5 +23,4 @@ class Gn_OtherExamClassDetailModel extends Model
     {
         return $this->hasOne(BoardAgencyStateModel::class, 'id', 'agency_board_university_id');
     }
-
 }

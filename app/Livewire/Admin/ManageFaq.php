@@ -15,6 +15,7 @@ class ManageFaq extends Component
     // use WithPagination;
     #[Url('limit')]
     public $limit = 5;
+
     #[Url('search')]
     public $search = '';
 
@@ -22,20 +23,23 @@ class ManageFaq extends Component
     {
         $query = FrequentlyAskedQuestion::query();
         if ($this->search) {
-            $query->where('question', 'LIKE', '%' . $this->search . '%')->orWhere('answer', 'LIKE', '%' . $this->search . '%');
+            $query->where('question', 'LIKE', '%'.$this->search.'%')->orWhere('answer', 'LIKE', '%'.$this->search.'%');
         }
         $faqs = $query->orderByDesc('id')->paginate($this->limit);
+
         return view('livewire.admin.manage-faq', [
-            'faqs' => $faqs
+            'faqs' => $faqs,
         ]);
     }
 
     public bool $formState = false;
+
     public ?int $faqId = null;
 
     #[Validate('required')]
     #[Validate('min:10')]
     public ?string $question = null;
+
     #[Validate('required')]
     #[Validate('min:10')]
     public ?string $answer = null;
@@ -57,7 +61,7 @@ class ManageFaq extends Component
                     ->update([
                         'question' => $this->question,
                         'answer' => $this->answer,
-                        'status' => true
+                        'status' => true,
                     ]);
             } else {
                 FrequentlyAskedQuestion::create([
@@ -87,8 +91,8 @@ class ManageFaq extends Component
         try {
             FrequentlyAskedQuestion::destroy($id);
         } catch (\Throwable $th) {
-            //throw $th;
-            $this->js('alert(' . $th->getMessage() . ')');
+            // throw $th;
+            $this->js('alert('.$th->getMessage().')');
         }
     }
 
@@ -97,8 +101,8 @@ class ManageFaq extends Component
         try {
             FrequentlyAskedQuestion::where('id', $id)->update(['status' => $status == 'true' ? false : true]);
         } catch (\Throwable $th) {
-            //throw $th;
-            $this->js('alert(' . $th->getMessage() . ')');
+            // throw $th;
+            $this->js('alert('.$th->getMessage().')');
         }
     }
 }

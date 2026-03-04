@@ -2,9 +2,8 @@
 
 use App\Models\Educationtype;
 use App\Models\TestModal;
-use Illuminate\Support\Facades\DB;
-
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 function education_types()
 {
@@ -34,11 +33,15 @@ function classes_groups_exams()
     });
 }
 
-function getOtp(){
+function getOtp()
+{
     $otp = mt_rand(100000, 999999);
+
     return $otp;
 }
-function getMobileOtp($mobileNumber){
+function getMobileOtp($mobileNumber)
+{
     $otp = getOtp();
+
     return $otp;
 }

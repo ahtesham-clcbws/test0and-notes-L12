@@ -10,10 +10,11 @@ class AssignClassBoardModel extends Model
     use HasFactory;
 
     protected $table = 'assign_classes_boards';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
         'class_id',
-        'board_id'
+        'board_id',
     ];
 }

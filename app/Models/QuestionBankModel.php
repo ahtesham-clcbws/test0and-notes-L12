@@ -12,6 +12,7 @@ class QuestionBankModel extends Model
     use SoftDeletes;
 
     protected $table = 'question_bank';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
@@ -38,45 +39,57 @@ class QuestionBankModel extends Model
         'checked_by_id',
         'checker_comments',
     ];
+
     public function educationType()
     {
         return $this->hasOne(Educationtype::class, 'id', 'education_type_id');
     }
+
     public function classGroup()
     {
         return $this->hasOne(ClassGoupExamModel::class, 'id', 'class_group_exam_id');
     }
+
     public function boardAgency()
     {
         return $this->hasOne(BoardAgencyStateModel::class, 'id', 'board_agency_state_id');
     }
+
     public function inSubject()
     {
         return $this->hasOne(Subject::class, 'id', 'subject');
     }
+
     public function inSubjectPart()
     {
         return $this->hasOne(SubjectPart::class, 'id', 'subject_part');
     }
+
     public function inSubjectLesson()
     {
         return $this->hasOne(SubjectPartLesson::class, 'id', 'subject_lesson_chapter');
     }
+
     public function creator()
     {
         return $this->hasOne(User::class, 'id', 'creator_id');
     }
+
     public function allotedTo()
     {
         return $this->hasOne(User::class, 'id', 'alloted_for_check_id');
     }
+
     public function checkedBy()
     {
         return $this->hasOne(User::class, 'id', 'checked_by_id');
     }
 
     public $timestamps = true;
+
     const CREATED_AT = 'created_at';
+
     const UPDATED_AT = 'updated_at';
+
     const DELETED_AT = 'deleted_at';
 }

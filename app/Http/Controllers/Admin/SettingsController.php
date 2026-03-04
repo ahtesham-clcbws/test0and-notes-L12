@@ -6,13 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Count;
 use App\Models\DefautlOtpNumber;
 use App\Models\Pdf;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Services\ImageService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Cache;
 
 class SettingsController extends Controller
 {
@@ -22,9 +22,10 @@ class SettingsController extends Controller
     {
         $this->imageService = $imageService;
     }
+
     public function dashboardSettings()
     {
-        $data = array();
+        $data = [];
         if (request()->isMethod('post')) {
             $data = request()->all();
             $countUpdate = Count::find($data['id']);
@@ -43,9 +44,10 @@ class SettingsController extends Controller
         foreach ($countsDataGrouped as $key => $countsArray) {
             array_multisort(array_column($countsArray, 'box_index'), SORT_ASC, $countsArray);
             $countsDataGroupedSorted[$key] = $countsArray;
-            $data[$key . '_counts'] = $countsArray;
+            $data[$key.'_counts'] = $countsArray;
         }
         $boxes = $countsDataGroupedSorted;
+
         return view('Dashboard/Admin/Settings/dashboard')->with('boxes', $boxes);
     }
 
@@ -53,14 +55,17 @@ class SettingsController extends Controller
     {
         $numbers = DefautlOtpNumber::get();
         $data['numbers'] = $numbers;
+
         return view('Dashboard/Admin/Settings/defaultnumbers')->with('data', $data);
     }
+
     public function delete_number($id)
     {
         $number = DefautlOtpNumber::find($id);
         if ($number) {
             $number->delete();
         }
+
         return redirect()->back();
     }
 
@@ -149,7 +154,7 @@ class SettingsController extends Controller
 
             if ($request->post('id') > 0) {
                 $arrImage = DB::table('landing_page')->where('id', $request->post('id'))->first();
-                $old_profile = 'home/' . $arrImage->banner_photo;
+                $old_profile = 'home/'.$arrImage->banner_photo;
                 if (Storage::disk('public')->exists($old_profile)) {
                     Storage::disk('public')->delete($old_profile);
                 }
@@ -164,15 +169,12 @@ class SettingsController extends Controller
             ]);
         }
 
-
-
-
         $banner_attr_image_1 = '';
         if ($request->hasfile('banner_attr_image_1')) {
 
             if ($request->post('id') > 0) {
                 $arrImage = DB::table('landing_page')->where('id', $request->post('id'))->first();
-                $old_profile = 'home/' . $arrImage->banner_attr_image_1;
+                $old_profile = 'home/'.$arrImage->banner_attr_image_1;
                 if (Storage::disk('public')->exists($old_profile)) {
                     Storage::disk('public')->delete($old_profile);
                 }
@@ -192,7 +194,7 @@ class SettingsController extends Controller
 
             if ($request->post('id') > 0) {
                 $arrImage = DB::table('landing_page')->where('id', $request->post('id'))->first();
-                $old_profile = 'home/' . $arrImage->banner_attr_image_2;
+                $old_profile = 'home/'.$arrImage->banner_attr_image_2;
                 if (Storage::disk('public')->exists($old_profile)) {
                     Storage::disk('public')->delete($old_profile);
                 }
@@ -212,7 +214,7 @@ class SettingsController extends Controller
 
             if ($request->post('id') > 0) {
                 $arrImage = DB::table('landing_page')->where('id', $request->post('id'))->first();
-                $old_profile = 'home/' . $arrImage->banner_attr_image_3;
+                $old_profile = 'home/'.$arrImage->banner_attr_image_3;
                 if (Storage::disk('public')->exists($old_profile)) {
                     Storage::disk('public')->delete($old_profile);
                 }
@@ -239,56 +241,56 @@ class SettingsController extends Controller
             'banner_title_first' => $request->subtitle1_first,
             'banner_title_second' => $request->subtitle1_second,
             'banner_title_third' => $request->subtitle1_third,
-            'banner_content' => $request->subtitle1_content
+            'banner_content' => $request->subtitle1_content,
         ]);
 
         DB::table('landing_page')->where('id', '3')->update([
             'banner_title_first' => $request->subtitle2_first,
             'banner_title_second' => $request->subtitle2_second,
             'banner_title_third' => $request->subtitle2_third,
-            'banner_content' => $request->subtitle2_content
+            'banner_content' => $request->subtitle2_content,
         ]);
 
         DB::table('landing_page')->where('id', '4')->update([
             'banner_title_first' => $request->subtitle3_first,
             'banner_title_second' => $request->subtitle3_second,
             'banner_title_third' => $request->subtitle3_third,
-            'banner_content' => $request->subtitle3_content
+            'banner_content' => $request->subtitle3_content,
         ]);
 
         DB::table('landing_page')->where('id', '5')->update([
             'banner_title_first' => $request->subtitle4_first,
             'banner_title_second' => $request->subtitle4_second,
             'banner_title_third' => $request->subtitle4_third,
-            'banner_content' => $request->subtitle4_content
+            'banner_content' => $request->subtitle4_content,
         ]);
 
         DB::table('landing_page')->where('id', '6')->update([
             'banner_title_first' => $request->subtitle5_first,
             'banner_title_second' => $request->subtitle5_second,
             'banner_title_third' => $request->subtitle5_third,
-            'banner_content' => $request->subtitle5_content
+            'banner_content' => $request->subtitle5_content,
         ]);
 
         DB::table('landing_page')->where('id', '7')->update([
             'banner_title_first' => $request->subtitle6_first,
             'banner_title_second' => $request->subtitle6_second,
             'banner_title_third' => $request->subtitle6_third,
-            'banner_content' => $request->subtitle6_content
+            'banner_content' => $request->subtitle6_content,
         ]);
 
         DB::table('landing_page')->where('id', '8')->update([
             'banner_title_first' => $request->subtitle7_first,
             'banner_title_second' => $request->subtitle7_second,
             'banner_title_third' => $request->subtitle7_third,
-            'banner_content' => $request->subtitle7_content
+            'banner_content' => $request->subtitle7_content,
         ]);
 
         DB::table('landing_page')->where('id', '9')->update([
             'banner_title_first' => $request->subtitle8_first,
             'banner_title_second' => $request->subtitle8_second,
             'banner_title_third' => $request->subtitle8_third,
-            'banner_content' => $request->subtitle8_content
+            'banner_content' => $request->subtitle8_content,
         ]);
 
         return redirect()->back();
@@ -299,7 +301,7 @@ class SettingsController extends Controller
         // 1. Fetch the record
         $landingPage = DB::table('landing_page')->where('id', '1')->first();
 
-        if (!$landingPage) {
+        if (! $landingPage) {
             return redirect()->back()->with('error', 'Landing page record not found.');
         }
 
@@ -313,9 +315,10 @@ class SettingsController extends Controller
             if ($imgName == $image) {
                 $found = true;
                 // Delete file
-                if (Storage::disk('public')->exists('home/slider/' . $image)) {
-                    Storage::disk('public')->delete('home/slider/' . $image);
+                if (Storage::disk('public')->exists('home/slider/'.$image)) {
+                    Storage::disk('public')->delete('home/slider/'.$image);
                 }
+
                 continue; // Skip adding this to updated array
             }
             $updatedImages[] = $item;
@@ -338,11 +341,13 @@ class SettingsController extends Controller
     {
         $request->validate([
             'image' => 'required',
-            'url' => 'nullable|url'
+            'url' => 'nullable|url',
         ]);
 
         $landingPage = DB::table('landing_page')->find('1');
-        if (!$landingPage) return redirect()->back();
+        if (! $landingPage) {
+            return redirect()->back();
+        }
 
         $sliderImages = json_decode($landingPage->slider_footer_image, true) ?? [];
         $updatedImages = [];
@@ -350,7 +355,7 @@ class SettingsController extends Controller
         foreach ($sliderImages as $item) {
             if (is_array($item) && $item['image'] == $request->image) {
                 $item['url'] = $request->url;
-            } elseif (!is_array($item) && $item == $request->image) {
+            } elseif (! is_array($item) && $item == $request->image) {
                 // Convert string to object if matching
                 $item = ['image' => $item, 'url' => $request->url];
             }
@@ -361,6 +366,7 @@ class SettingsController extends Controller
             'slider_footer_image' => json_encode($updatedImages),
         ]);
         Cache::forget('home_landing_pages');
+
         return redirect()->back()->with('success', 'URL updated successfully.');
     }
 
@@ -382,7 +388,7 @@ class SettingsController extends Controller
             $currentImages = $currentData ? json_decode($currentData, true) : [];
 
             // Ensure we have an array
-            if (!is_array($currentImages)) {
+            if (! is_array($currentImages)) {
                 $currentImages = [];
             }
 
@@ -392,6 +398,7 @@ class SettingsController extends Controller
                 'slider_footer_image' => json_encode($updatedImages),
             ]);
             Cache::forget('home_landing_pages');
+
             return redirect()->back()->with('success', 'Partner logos uploaded successfully.');
         }
 
@@ -404,6 +411,7 @@ class SettingsController extends Controller
 
         return view('Dashboard.Admin.Settings.pdf-list', compact('pdfList'));
     }
+
     public function pdfSubmit(request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -415,7 +423,7 @@ class SettingsController extends Controller
             // Return the first validation error message
             return response()->json([
                 'status' => false,
-                'message' => $validator->errors()->first()
+                'message' => $validator->errors()->first(),
             ], 400);
         }
         $title = $request->title;
@@ -424,25 +432,27 @@ class SettingsController extends Controller
 
         if ($request->hasFile('pdf_file')) {
             $file = $request->file('pdf_file');
-            $fileName = $title . rand(111, 999) . '-' . $file->getClientOriginalName();
+            $fileName = $title.rand(111, 999).'-'.$file->getClientOriginalName();
             $path = $file->storeAs('settingPdf', $fileName, 'public');
         }
-        $storePdf = new Pdf();
-        $storePdf->title = $title ?? "";
-        $storePdf->type = $type ?? "";
-        $storePdf->url = $path ?? "";
+        $storePdf = new Pdf;
+        $storePdf->title = $title ?? '';
+        $storePdf->type = $type ?? '';
+        $storePdf->url = $path ?? '';
         if ($storePdf->save()) {
-            $assetPath = asset('storage/' . $path);
+            $assetPath = asset('storage/'.$path);
+
             return response()->json(['status' => true, 'message' => 'File uploaded successfully', 'path' => $assetPath ?? $path, 'data' => $storePdf]);
         } else {
             return response()->json(['status' => false, 'message' => 'something went wrong']);
         }
     }
+
     public function pdfDelete(Request $request)
     {
 
         if ($request->id) {
-            $data =  Pdf::find($request->id);
+            $data = Pdf::find($request->id);
 
             if ($data->delete()) {
                 return response()->json(['status' => true, 'message' => 'file deleted success']);

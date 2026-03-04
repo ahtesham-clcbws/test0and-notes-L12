@@ -38,14 +38,15 @@ class Login extends Component
                 $fieldType = 'mobile';
             }
             $user = User::where($fieldType, $this->username)->first();
-            if(!$user || $user->roles !== 'student' || $user->status !== 'active'){
+            if (! $user || $user->roles !== 'student' || $user->status !== 'active') {
                 $this->addError('username', 'Your account is not active or credentials do not match');
+
                 return;
             }
             if (Auth::attempt([$fieldType => $this->username, 'password' => $this->password], $this->remember_me)) {
                 $this->js('success("Login successful")');
 
-                if (!empty($this->redirect)) {
+                if (! empty($this->redirect)) {
                     return redirect($this->redirect);
                 }
 
@@ -54,8 +55,8 @@ class Login extends Component
                 $this->addError('username', 'Credentials do not match');
             }
         } catch (\Throwable $th) {
-            $this->js('error("' . $th->getMessage() . '")');
-            //throw $th;
+            $this->js('error("'.$th->getMessage().'")');
+            // throw $th;
         }
     }
 }

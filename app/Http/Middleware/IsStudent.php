@@ -11,15 +11,15 @@ class IsStudent
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
-        if(Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active'){
+        if (Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active') {
             return $next($request);
         }
         Auth::logout();
-        return redirect()->route('login')->with('error',"You don't have admin access.");
+
+        return redirect()->route('login')->with('error', "You don't have admin access.");
     }
 }

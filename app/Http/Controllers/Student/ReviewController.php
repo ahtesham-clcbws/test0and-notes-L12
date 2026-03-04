@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
 use App\Models\Review;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
@@ -13,6 +12,7 @@ class ReviewController extends Controller
     public function index()
     {
         $review = Review::where('user_id', Auth::id())->first();
+
         return view('Dashboard/Student/Review/index', compact('review'));
     }
 

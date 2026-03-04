@@ -93,7 +93,9 @@ class TestTable extends Component
                 $join->on('franchise_details.user_id', '=', 'users.id')
                     ->whereNull('franchise_details.deleted_at');
             })
-            ->with(['EducationClass', 'Educationtype', 'getTestCat', 'testSections'])
+            ->with(['EducationClass', 'Educationtype', 'getTestCat', 'testSections' => function ($query) {
+                $query->withCount('getQuestions');
+            }])
             ->withCount('getQuestions as confirmed_questions_count');
 
         if (! empty($this->search)) {

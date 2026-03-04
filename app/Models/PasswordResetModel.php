@@ -10,20 +10,24 @@ class PasswordResetModel extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    
+
     protected $table = 'passwordresets';
+
     protected $primaryKey = 'id';
-    
+
     protected $fillable = [
         'user_id',
         'user_type',
         'verify_type',
         'code',
-        'status'
+        'status',
     ];
-    
+
     public $timestamps = true;
+
     const CREATED_AT = 'created_at';
+
     const UPDATED_AT = 'updated_at';
+
     const DELETED_AT = 'deleted_at';
 }

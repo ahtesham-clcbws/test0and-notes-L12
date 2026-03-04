@@ -1,10 +1,6 @@
 <?php
 
 use App\Http\Controllers\API\APIController;
-use App\Http\Controllers\API\Auth\AuthController;
-use App\Http\Controllers\API\TestController;
-use App\Http\Controllers\API\PlanController;
-
 use App\Http\Controllers\InternalRequests\InternalRequestsController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,4 +39,3 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::get('logout', [ApiController::class, 'logout']);
 });
-

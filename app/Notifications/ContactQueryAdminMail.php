@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -37,9 +36,10 @@ class ContactQueryAdminMail extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $contact = $this->contact;
+
         return (new MailMessage)
-        ->subject('Success: Contact Enquiry')
-        ->markdown('mail.admin.contact_enquiry',compact('contact'));
+            ->subject('Success: Contact Enquiry')
+            ->markdown('mail.admin.contact_enquiry', compact('contact'));
     }
 
     /**

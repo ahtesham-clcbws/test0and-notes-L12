@@ -2,21 +2,23 @@
 
 namespace App\Livewire\Frontend;
 
-use App\Models\NewModels\Pages as PageModel;
 use App\Models\Educationtype;
-use Livewire\Component;
+use App\Models\NewModels\Pages as PageModel;
 use Livewire\Attributes\Layout;
+use Livewire\Component;
 
 #[Layout('Layouts.frontend')]
 class Pages extends Component
 {
     public ?PageModel $page;
+
     public ?Educationtype $educationType;
+
     public $classes = [];
 
     public function mount(string $slug)
     {
-        if (!$slug) {
+        if (! $slug) {
             return redirect('/');
         }
 

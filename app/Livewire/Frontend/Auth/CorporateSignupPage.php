@@ -2,27 +2,35 @@
 
 namespace App\Livewire\Frontend\Auth;
 
-use Livewire\Component;
-use App\Models\User;
-use App\Models\FranchiseDetails;
+use App\Mail\NotifyAdminInstituteSignup;
 use App\Models\CorporateEnquiry;
+use App\Models\FranchiseDetails;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\NotifyAdminInstituteSignup;
+use Livewire\Component;
 
 class CorporateSignupPage extends Component
 {
     public $school_code;
+
     public $mobile_no;
+
     public $verify_email;
+
     public $password;
+
     public $confirm_password;
 
     public $validSchoolCode = false;
+
     public $validMobileNo = false;
+
     public $validVerifyEmail = false;
+
     public $validPassword = false;
+
     public $validConfirmPassword = false;
 
     public function updatedSchoolCode($value)
@@ -31,7 +39,7 @@ class CorporateSignupPage extends Component
         $this->validMobileNo = false;
         $this->validVerifyEmail = false;
 
-        if (!empty($value)) {
+        if (! empty($value)) {
             $exists = CorporateEnquiry::where('branch_code', $value)
                 ->where('status', 'approved')
                 ->exists();
@@ -47,7 +55,7 @@ class CorporateSignupPage extends Component
         $this->validMobileNo = false;
         $this->validVerifyEmail = false;
 
-        if ($this->validSchoolCode && !empty($value)) {
+        if ($this->validSchoolCode && ! empty($value)) {
             $exists = CorporateEnquiry::where('branch_code', $this->school_code)
                 ->where('mobile', $value)
                 ->where('status', 'approved')
@@ -63,7 +71,7 @@ class CorporateSignupPage extends Component
     {
         $this->validVerifyEmail = false;
 
-        if ($this->validSchoolCode && $this->validMobileNo && !empty($value)) {
+        if ($this->validSchoolCode && $this->validMobileNo && ! empty($value)) {
             $exists = CorporateEnquiry::where('branch_code', $this->school_code)
                 ->where('mobile', $this->mobile_no)
                 ->where('email', $value)
@@ -97,9 +105,10 @@ class CorporateSignupPage extends Component
             'confirm_password' => 'required|same:password|min:5',
         ]);
 
-        if (!$this->validSchoolCode || !$this->validMobileNo || !$this->validVerifyEmail) {
-             $this->addError('school_code', 'Please ensure all fields are valid and matched with an approved corporate enquiry.');
-             return;
+        if (! $this->validSchoolCode || ! $this->validMobileNo || ! $this->validVerifyEmail) {
+            $this->addError('school_code', 'Please ensure all fields are valid and matched with an approved corporate enquiry.');
+
+            return;
         }
 
         $branch_code = $this->school_code;
@@ -112,13 +121,14 @@ class CorporateSignupPage extends Component
             ->where('mobile', $branch_mobile)
             ->first();
 
-        if (!$enquiry) {
+        if (! $enquiry) {
             $this->addError('school_code', 'Enquiry not found matching these details.');
+
             return;
         }
 
-        $userDb = new User();
-        $roles = json_encode(["franchise", "franchise_creator", "franchise_publisher", "franchise_manager"]);
+        $userDb = new User;
+        $roles = json_encode(['franchise', 'franchise_creator', 'franchise_publisher', 'franchise_manager']);
 
         $userDb->name = $enquiry->name;
         $userDb->username = $branch_email;
@@ -129,7 +139,7 @@ class CorporateSignupPage extends Component
         $userDb->password = Hash::make($password);
 
         if ($userDb->save()) {
-            $userDetailsDb = new FranchiseDetails();
+            $userDetailsDb = new FranchiseDetails;
             $userDetailsDb->user_id = $userDb->id;
             $userDetailsDb->branch_code = $enquiry->branch_code;
             $userDetailsDb->institute_name = $enquiry->institute_name;
@@ -151,7 +161,7 @@ class CorporateSignupPage extends Component
                 $admin_datails = [
                     'fullname' => $enquiry->name,
                     'email_id' => $branch_email,
-                    'institute_code' => $enquiry->branch_code
+                    'institute_code' => $enquiry->branch_code,
                 ];
 
                 $super_admins = User::where('roles', 'superadmin')
@@ -161,19 +171,19 @@ class CorporateSignupPage extends Component
                     ->pluck('email')
                     ->toArray();
 
-                if (!empty($super_admins)) {
-                     try {
+                if (! empty($super_admins)) {
+                    try {
                         $superAdminMailToSend = new NotifyAdminInstituteSignup($admin_datails);
                         Mail::to($super_admins)->send($superAdminMailToSend);
-                        Log::info('Institute signup email sent to: ' . implode(', ', $super_admins));
+                        Log::info('Institute signup email sent to: '.implode(', ', $super_admins));
 
-                     } catch (\Exception $e) {
-                         Log::error('Failed to send institute signup email: ' . $e->getMessage());
-                     }
+                    } catch (\Exception $e) {
+                        Log::error('Failed to send institute signup email: '.$e->getMessage());
+                    }
                 }
 
             } catch (\Throwable $th) {
-                Log::error('Problem in email sending or logic: ' . $th->getMessage());
+                Log::error('Problem in email sending or logic: '.$th->getMessage());
             }
 
             CorporateEnquiry::generateCounts();

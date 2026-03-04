@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -12,8 +11,11 @@ class ContactFormAdminNotify extends Notification
     use Queueable;
 
     public $contactName = '';
+
     public $contactEmail = '';
+
     public $contactSubject = '';
+
     public $contactMessage = '';
 
     /**
@@ -53,12 +55,12 @@ class ContactFormAdminNotify extends Notification
             ->subject("You\'ve got new contact submition")
             ->replyTo($this->contactEmail)
             ->greeting('Hi, Admin')
-            ->line("Contact details below:")
+            ->line('Contact details below:')
             ->line('')
-            ->line('Name: ' . $this->contactName)
-            ->line('Email: ' . $this->contactEmail)
-            ->line('Subject: ' . $this->contactSubject)
-            ->line('Message: ' . $this->contactMessage);
+            ->line('Name: '.$this->contactName)
+            ->line('Email: '.$this->contactEmail)
+            ->line('Subject: '.$this->contactSubject)
+            ->line('Message: '.$this->contactMessage);
     }
 
     /**

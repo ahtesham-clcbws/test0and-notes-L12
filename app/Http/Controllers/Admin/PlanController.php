@@ -274,7 +274,7 @@ class PlanController extends Controller
 
         $model->is_featured = ! intval($status);
         $model->save();
-        $request->session()->flash('message','blog status updated');
+        $request->session()->flash('message', 'blog status updated');
 
         return redirect()->back();
     }

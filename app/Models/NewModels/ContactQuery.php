@@ -19,7 +19,7 @@ class ContactQuery extends Model
         'city',
         'subject',
         'query',
-        'isNew'
+        'isNew',
     ];
 
     public $casts = ['isNew' => 'boolean'];
@@ -28,7 +28,7 @@ class ContactQuery extends Model
         'fullname',
         'mobile',
         'reason_contact',
-        'message'
+        'message',
     ];
 
     public function replies()
@@ -54,5 +54,5 @@ class ContactQuery extends Model
     public function getMessageAttribute()
     {
         return $this->query;
-    }   
+    }
 }

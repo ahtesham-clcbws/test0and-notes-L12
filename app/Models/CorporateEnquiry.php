@@ -9,18 +9,22 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class CorporateEnquiry extends Model
 {
     use HasFactory, SoftDeletes;
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
     public function city()
     {
         return $this->belongsTo(City::class);
     }
+
     public function state()
     {
         return $this->belongsTo(State::class);
     }
+
     protected $fillable = [
         'name',
         'institute_name',
@@ -40,11 +44,12 @@ class CorporateEnquiry extends Model
         'branch_code',
         'branch_code',
         'photoUrl',
-        'institute_images_pdf'
+        'institute_images_pdf',
     ];
+
     public static function generateCounts()
     {
-        $data = array(
+        $data = [
             [
                 'namekey' => 'new_enquiry',
                 // 'box_index' => 0,
@@ -84,14 +89,15 @@ class CorporateEnquiry extends Model
                 // 'title' => 'New Corporate Sign Up',
                 'page_url' => route('administrator.corporate_enquiry_type', 'converted'),
                 // 'category' => 'corporate'
-            ]
-        );
+            ],
+        ];
         foreach ($data as $value) {
             Count::updateOrCreate(
                 ['namekey' => $value['namekey']],
                 ['count' => $value['count']]
             );
         }
+
         return true;
     }
 }

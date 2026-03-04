@@ -14,10 +14,13 @@ class PagesView extends Component
 
     #[Validate('required')]
     public $name = '';
+
     #[Validate('required')]
     public $title = '';
+
     #[Validate('required', 'unique')]
     public $slug = '';
+
     #[Validate('required')]
     public $content = '';
 
@@ -35,7 +38,6 @@ class PagesView extends Component
         return view('livewire.admin.pages.pages-view');
     }
 
-
     public function save()
     {
         if ($this->validate()) {
@@ -46,12 +48,13 @@ class PagesView extends Component
                 $this->page->save();
 
                 $this->js('success("Page saved successfully.")');
+
                 return $this->redirect(route('administrator.website_pages'));
             } catch (\Throwable $th) {
                 // throw $th;
-                logger('page data save error: ' . json_encode($th));
+                logger('page data save error: '.json_encode($th));
                 // $this->js('console.log(' . $th->getMessage() . ')');
-                $this->js('error("Failed to save page. Error: ' . $th->getMessage() . '")');
+                $this->js('error("Failed to save page. Error: '.$th->getMessage().'")');
             }
         }
     }

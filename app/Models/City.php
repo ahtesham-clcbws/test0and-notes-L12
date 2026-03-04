@@ -8,11 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class City extends Model
 {
     use HasFactory;
+
     public function state()
     {
         return $this->belongsTo(State::class);
     }
-    public function city_data() {
+
+    public function city_data()
+    {
         return $this->hasManyThrough(CorporateEnquiry::class, UserDetails::class);
-    }    
+    }
 }

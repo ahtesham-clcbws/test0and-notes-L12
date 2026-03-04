@@ -12,11 +12,12 @@ class Educationtype extends Model
     use SoftDeletes;
 
     protected $table = 'education_type';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
         'name',
-        'slug'
+        'slug',
     ];
 
     public function class_exam()

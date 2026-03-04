@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -15,6 +14,7 @@ class ContactQueryReplyMail extends Notification
      * Create a new notification instance.
      */
     public $contactInfo;
+
     public $message;
 
     public function __construct($contactInfo, $message)
@@ -43,8 +43,8 @@ class ContactQueryReplyMail extends Notification
 
         return (new MailMessage)->markdown('mail.contact.replyNotification', [
             'contactInfo' => $contactInfo,
-            'message' => $message
-        ])->subject('Reply: ' . $contactInfo->reason_contact);
+            'message' => $message,
+        ])->subject('Reply: '.$contactInfo->reason_contact);
     }
 
     /**

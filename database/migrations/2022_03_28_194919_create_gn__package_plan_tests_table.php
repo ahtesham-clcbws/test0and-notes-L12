@@ -15,8 +15,8 @@ class CreateGnPackagePlanTestsTable extends Migration
     {
         Schema::create('gn__package_plan_tests', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger("gn_package_plan_id");
-            $table->bigInteger("test_id");
+            $table->bigInteger('gn_package_plan_id');
+            $table->bigInteger('test_id');
             $table->timestamps();
         });
     }

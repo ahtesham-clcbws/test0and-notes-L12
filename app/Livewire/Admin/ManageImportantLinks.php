@@ -14,26 +14,28 @@ class ManageImportantLinks extends Component
     use WithFileUploads;
 
     public $length = 2;
+
     public $search = '';
+
     public ImportantLinkForm $form;
 
     public function render()
     {
         $important_links = ImportantLink::orderByDesc('id')
             ->when($this->search, function ($q) {
-                $searchString = '%' . $this->search . '%';
+                $searchString = '%'.$this->search.'%';
+
                 return $q
                     ->where('title', 'LIKE', $searchString)
                     ->orWhere('url', 'LIKE', $searchString);
             })
             ->get();
-            // ->pagina
+        // ->pagina
 
         return view('livewire.admin.manage-important-links', [
-            'important_links' => $important_links
+            'important_links' => $important_links,
         ]);
     }
-
 
     public function saveLink()
     {
@@ -56,7 +58,8 @@ class ManageImportantLinks extends Component
         }
     }
 
-    public function deleteLink($id) {
+    public function deleteLink($id)
+    {
         try {
             $important_link = ImportantLink::find($id);
             $important_link->delete();

@@ -1,28 +1,23 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Frontend\FormsController;
 use App\Http\Controllers\Frontend\Franchise\DashboardController;
 use App\Http\Controllers\Frontend\Franchise\ExamsController;
-use App\Http\Controllers\Frontend\Franchise\UserController;
-use App\Http\Controllers\StudymaterialController;
-
-use App\Http\Controllers\Frontend\Franchise\Management\DashboardController as ManagementDashboardController;
-use App\Http\Controllers\Frontend\Franchise\Management\ExamsController as ManagementExamsController;
-
 use App\Http\Controllers\Frontend\Franchise\Management\Creater\DashboardController as CreaterDashboardController;
 use App\Http\Controllers\Frontend\Franchise\Management\Creater\ExamsController as CreaterExamsController;
-
+use App\Http\Controllers\Frontend\Franchise\Management\DashboardController as ManagementDashboardController;
+use App\Http\Controllers\Frontend\Franchise\Management\ExamsController as ManagementExamsController;
 use App\Http\Controllers\Frontend\Franchise\Management\Manager\DashboardController as ManagerDashboardController;
 use App\Http\Controllers\Frontend\Franchise\Management\Manager\ExamsController as ManagerExamsController;
-
 use App\Http\Controllers\Frontend\Franchise\Management\Publisher\DashboardController as PublisherDashboardController;
 use App\Http\Controllers\Frontend\Franchise\Management\Publisher\ExamsController as PublisherExamsController;
+use App\Http\Controllers\Frontend\Franchise\UserController;
+use App\Http\Controllers\StudymaterialController;
 use App\Http\Middleware\IsFranchise;
 use App\Livewire\Frontend\Auth\ContributorSignUp;
+use Illuminate\Support\Facades\Route;
 
 // Route::any('contributor-signup', [FormsController::class, 'instituteUser'])->name('contributor');
 Route::any('contributor-signup', ContributorSignUp::class)->name('contributor');
@@ -250,7 +245,6 @@ Route::name('franchise.')->group(function () {
                 Route::any('update/{test_id}', [ExamsController::class, 'saveTest'])->name('dashboard_update_test_exam');
                 Route::any('publish/{test_id}', [ExamsController::class, 'publishTest'])->name('dashboard_publish_test_exam');
                 Route::any('student-list/{test_id}', [ExamsController::class, 'studentList'])->name('dashboard_student_list');
-
 
                 Route::prefix('section')->group(function () {
                     Route::any('question/{test_id}/{section_id}', [ExamsController::class, 'section_questions'])->name('dashboard_test_section_question');

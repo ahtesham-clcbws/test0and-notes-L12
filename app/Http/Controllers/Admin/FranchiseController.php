@@ -484,6 +484,6 @@ class FranchiseController extends Controller
             ->get();
 
         // return $model;
-        return view('Dashboard/Admin/Dashboard/institute_view_material',$data);
+        return view('Dashboard/Admin/Dashboard/institute_view_material', $data);
     }
 }

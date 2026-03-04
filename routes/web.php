@@ -1,15 +1,11 @@
 <?php
 
-use App\Http\Controllers\Frontend\FormsController;
-use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\InternalRequests\InternalRequestsController;
-use App\Http\Controllers\Frontend\HomeController;
-use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Frontend\CourseController;
-use Illuminate\Support\Facades\Artisan;
-
+use App\Http\Controllers\Frontend\FormsController;
+use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\InternalRequests\InternalRequestsController;
+use App\Http\Controllers\SessionsController;
 use App\Http\Controllers\TestController;
 use App\Livewire\Frontend\Auth\CorporateSignupPage;
 use App\Livewire\Frontend\Auth\ForgotPassword;
@@ -19,6 +15,8 @@ use App\Livewire\Frontend\ContactUsPage;
 use App\Livewire\Frontend\Faq;
 use App\Livewire\Frontend\ImportantLinksWebsitePage;
 use App\Livewire\Frontend\Pages;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,7 +54,7 @@ Route::any('forgot-password', ForgotPassword::class)->name('forgot_password');
 Route::get('faq', Faq::class)->name('faqs');
 Route::get('important-links', ImportantLinksWebsitePage::class)->name('important_links');
 
-//----------------------Test--------------------//
+// ----------------------Test--------------------//
 Route::get('test', [TestController::class, 'onlineTest'])->name('online_test');
 Route::get('test/{name}', [TestController::class, 'getTest'])->name('test-name');
 Route::get('start-test/{name}', [TestController::class, 'startTest'])->name('start-test');
@@ -66,7 +64,7 @@ Route::get('show-test-response/{name}/{test_id}', [TestController::class, 'showT
 // Route::get('question-paper', [HomeController::class,'questionPaper'])->name('question_paper');
 Route::get('question-paper/{name}', [TestController::class, 'questionPaper'])->name('question_paper');
 
-//----------------------Class details--------------------//
+// ----------------------Class details--------------------//
 Route::get('course/{edu_type}/{class}', [CourseController::class, 'index'])->name('course.index');
 
 Route::any('logout', [SessionsController::class, 'destroy'])->name('logout');
@@ -77,6 +75,7 @@ Route::get('/clear-cache', function () {
     Artisan::call('cache:clear');
     Artisan::call('view:clear');
     Artisan::call('route:clear');
+
     return redirect()->to('/');
 });
 
@@ -89,7 +88,6 @@ Route::view('resetpassword_creater', 'Dashboard/Franchise/Management/Creater/res
 Route::view('resetpassword_publisher', 'Dashboard/Franchise/Management/Publisher/reset_password');
 
 Route::post('resetpassword', [AuthController::class, 'resetPwd']);
-
 
 Route::any('{slug}', Pages::class)->name('policy-page');
 // Route::any('privacy-policy', Pages::class);

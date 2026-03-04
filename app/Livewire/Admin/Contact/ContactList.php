@@ -3,15 +3,15 @@
 namespace App\Livewire\Admin\Contact;
 
 use App\Models\NewModels\ContactQuery;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
-use Livewire\Attributes\Layout;
 
 #[Layout('Layouts.admin')]
 class ContactList extends Component
 {
-    use WithPagination, WithoutUrlPagination;
+    use WithoutUrlPagination, WithPagination;
 
     public $dataList = [];
 
@@ -24,7 +24,6 @@ class ContactList extends Component
     public $selectedRows = [];
 
     public ContactQuery $contactDetails;
-
 
     public function mount()
     {
@@ -42,25 +41,24 @@ class ContactList extends Component
     public function render()
     {
         $query = ContactQuery::orderBy('id', 'desc')
-        ->withCount('replies');
+            ->withCount('replies');
 
-        if (!empty(trim($this->searchQuery))) {
-            $query->where('name', 'LIKE', '%' . $this->searchQuery . '%');
-            $query->orWhere('email', 'LIKE', '%' . $this->searchQuery . '%');
-            $query->orWhere('phone', 'LIKE', '%' . $this->searchQuery . '%');
-            $query->orWhere('city', 'LIKE', '%' . $this->searchQuery . '%');
-            $query->orWhere('subject', 'LIKE', '%' . $this->searchQuery . '%');
-            $query->orWhere('query', 'LIKE', '%' . $this->searchQuery . '%');
+        if (! empty(trim($this->searchQuery))) {
+            $query->where('name', 'LIKE', '%'.$this->searchQuery.'%');
+            $query->orWhere('email', 'LIKE', '%'.$this->searchQuery.'%');
+            $query->orWhere('phone', 'LIKE', '%'.$this->searchQuery.'%');
+            $query->orWhere('city', 'LIKE', '%'.$this->searchQuery.'%');
+            $query->orWhere('subject', 'LIKE', '%'.$this->searchQuery.'%');
+            $query->orWhere('query', 'LIKE', '%'.$this->searchQuery.'%');
         }
 
         $contactsList = $query->paginate($this->perPage);
         $this->dataList = $contactsList->pluck('id');
 
         return view('livewire.admin.contact.contact-list', [
-            'contactsList' => $contactsList
+            'contactsList' => $contactsList,
         ]);
     }
-
 
     public function showModal($contactId)
     {
@@ -79,6 +77,7 @@ class ContactList extends Component
         $this->selectedRows = [];
         $this->selectAll = false;
     }
+
     public function delete($id)
     {
         ContactQuery::where('id', $id)->delete();

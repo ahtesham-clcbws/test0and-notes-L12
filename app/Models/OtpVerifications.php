@@ -10,19 +10,23 @@ class OtpVerifications extends Model
 {
     use HasFactory;
     use SoftDeletes;
-    
+
     protected $table = 'otp_verifications';
+
     protected $primaryKey = 'id';
-    
+
     protected $fillable = [
         'type',
         'credential',
         'otp',
-        'status'
+        'status',
     ];
-    
+
     public $timestamps = true;
+
     const CREATED_AT = 'created_at';
+
     const UPDATED_AT = 'updated_at';
+
     const DELETED_AT = 'deleted_at';
 }

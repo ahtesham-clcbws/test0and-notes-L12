@@ -5,7 +5,6 @@ namespace App\Livewire\Frontend\Auth;
 use App\Livewire\Forms\Frontend\StudentRegistrationForm;
 use App\Models\CorporateEnquiry;
 use App\Models\OtpVerifications;
-use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -16,8 +15,11 @@ class Register extends Component
     public StudentRegistrationForm $form;
 
     public $isOtpSend = false;
+
     public $otpVerificationStatus = false;
+
     public $states = [];
+
     public $cities = [];
 
     public function testFormInput()
@@ -76,7 +78,7 @@ class Register extends Component
                         'credential' => $this->form->mobile_number,
                         'otp' => $otp,
                         'created_at' => now(),
-                        'updated_at' => now()
+                        'updated_at' => now(),
                     ]);
                 }
                 $this->isOtpSend = true;
@@ -133,16 +135,18 @@ class Register extends Component
     {
         // first verify if mobile otp is verified
         if ($this->form->validate()) {
-            $registerUser =  $this->form->register();
+            $registerUser = $this->form->register();
 
             if ($registerUser) {
-                if (!empty(trim($this->form->institute_code))) {
+                if (! empty(trim($this->form->institute_code))) {
                     $this->js('success("Registeration succesfully goes to institute, please contact for activation.")');
                     $this->form->reset();
+
                     return $this->redirect('/', navigate: true);
                 }
                 $this->js('success("You are successfully registered, please login to continue.")');
                 $this->form->reset();
+
                 return $this->redirect(route('login'), navigate: true);
             } else {
                 $this->js('error("Server issue, please try again later.")');

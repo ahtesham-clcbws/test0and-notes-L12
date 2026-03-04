@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Mail\NotifyFranchiseAccountModify;
-use App\Mail\sendFranchiseEmail;
 use App\Models\CorporateEnquiry as ModelsCorporateEnquiry;
 use App\Models\FranchiseDetails;
 use App\Models\User;
@@ -16,7 +15,7 @@ class CorporateEnquiry extends Controller
 {
     public function index($type = 'all')
     {
-        $data = array();
+        $data = [];
         if ($type == 'all') {
             $data = ModelsCorporateEnquiry::join('states', 'corporate_enquiries.state_id', '=', 'states.id')
                 ->join('cities', 'corporate_enquiries.city_id', '=', 'cities.id')
@@ -28,7 +27,7 @@ class CorporateEnquiry extends Controller
                 ->join('cities', 'corporate_enquiries.city_id', '=', 'cities.id')
                 ->where('corporate_enquiries.status', $type)
                 ->orderByDesc('corporate_enquiries.id')
-                ->get(['corporate_enquiries.id', 'corporate_enquiries.status', 'corporate_enquiries.photoUrl', 'corporate_enquiries.name', 'corporate_enquiries.institute_name', 'corporate_enquiries.email', 'corporate_enquiries.mobile', 'corporate_enquiries.established_year', 'states.name as state_name', 'cities.name as city_name','corporate_enquiries.created_at','corporate_enquiries.branch_code']);
+                ->get(['corporate_enquiries.id', 'corporate_enquiries.status', 'corporate_enquiries.photoUrl', 'corporate_enquiries.name', 'corporate_enquiries.institute_name', 'corporate_enquiries.email', 'corporate_enquiries.mobile', 'corporate_enquiries.established_year', 'states.name as state_name', 'cities.name as city_name', 'corporate_enquiries.created_at', 'corporate_enquiries.branch_code']);
         }
 
         return view('Dashboard/Admin/Dashboard/corporate_enquiry')->with('data', $data);
@@ -40,8 +39,8 @@ class CorporateEnquiry extends Controller
             ->join('cities', 'corporate_enquiries.city_id', '=', 'cities.id')
             ->select(['corporate_enquiries.*', 'states.name as state_name', 'cities.name as city_name'])
             ->find($id);
-        $data['user'] = array();
-        $data['details'] = array();
+        $data['user'] = [];
+        $data['details'] = [];
         if ($data['status'] == 'converted' || $data['status'] == 'activated' || $data['status'] == 'expired' || $data['status'] == 'banned') {
             $data['user'] = User::where('email', $data->email)->where('mobile', $data->mobile)->first();
             $data['details'] = FranchiseDetails::where('enquiry_id', $id)->first();
@@ -118,9 +117,9 @@ class CorporateEnquiry extends Controller
                 $requestData = request()->all();
                 // return json_encode($requestData);
 
-                $franchiseDetailsSave   = FranchiseDetails::where('enquiry_id', $id)->first();
-                $franchiseSave          = User::find($data['user']['id']);
-                $enquirySave            = ModelsCorporateEnquiry::find($id);
+                $franchiseDetailsSave = FranchiseDetails::where('enquiry_id', $id)->first();
+                $franchiseSave = User::find($data['user']['id']);
+                $enquirySave = ModelsCorporateEnquiry::find($id);
 
                 $franchiseTypes = $requestData['type'];
                 // $franchiseTypes = implode(',', $requestData['type']);
@@ -137,13 +136,13 @@ class CorporateEnquiry extends Controller
 
                 if ($requestData['days'] !== $franchiseDetailsSave['days'] || intval($requestData['days']) > 0 && $today > $franchiseDetailsSave['inactive_at']) {
                     $franchiseDetailsSave->days = $requestData['days'];
-                    $days                               = intval($requestData['days'] + 1);
-                    $endDate                            = date('Y-m-d', strtotime('+' . $days . ' days'));
-                    $franchiseDetailsSave->started_at   = $today;
-                    $franchiseDetailsSave->inactive_at  = $endDate;
-                    $enquirySave->status                = 'activated';
+                    $days = intval($requestData['days'] + 1);
+                    $endDate = date('Y-m-d', strtotime('+'.$days.' days'));
+                    $franchiseDetailsSave->started_at = $today;
+                    $franchiseDetailsSave->inactive_at = $endDate;
+                    $enquirySave->status = 'activated';
                     $enquirySave->save();
-                    $franchiseSave->status              = 'active';
+                    $franchiseSave->status = 'active';
                 }
 
                 if ($requestData['institute_name'] !== $franchiseDetailsSave['institute_name']) {
@@ -184,8 +183,7 @@ class CorporateEnquiry extends Controller
 
                 if (count($franchiseTypes) > 1) {
                     $franchiseDetailsSave->is_multiple = 1;
-                }
-                else {
+                } else {
                     $franchiseDetailsSave->is_multiple = 0;
                 }
 
@@ -193,7 +191,7 @@ class CorporateEnquiry extends Controller
                     if ($franchiseSave->save()) {
                         $details = [
                             'institute_name' => $franchiseDetailsSave->institute_name,
-                            'institute_code' => $franchiseDetailsSave->branch_code
+                            'institute_code' => $franchiseDetailsSave->branch_code,
                         ];
                         try {
                             $mailToSend = new NotifyFranchiseAccountModify($details);
@@ -204,7 +202,7 @@ class CorporateEnquiry extends Controller
                             $returnResponse['message'] = 'Franchise account updated successfully.';
                         } catch (\Exception $e) {
                             $returnResponse['type'] = 'warning';
-                            $returnResponse['message'] = 'Franchise details saved, but unable to send email: ' . $e->getMessage();
+                            $returnResponse['message'] = 'Franchise details saved, but unable to send email: '.$e->getMessage();
                         }
 
                         Log::build([
@@ -212,19 +210,19 @@ class CorporateEnquiry extends Controller
                             'path' => storage_path('logs/custom.log'),
                         ])->info('Institute account update by admin 7 '.$requestData['email']);
 
-                    }
-                    else {
+                    } else {
                         $returnResponse['message'] = 'Franchise details not saved, please try again later';
                     }
                     User::generateCounts();
                     ModelsCorporateEnquiry::generateCounts();
-                }
-                else {
+                } else {
                     $returnResponse['message'] = 'Details not saved, please try again later';
                 }
+
                 return json_encode($returnResponse);
             }
         }
+
         // return print_r($data);
         return view('Dashboard/Admin/Dashboard/corporate_enquiry_view')->with('data', $data);
     }
@@ -232,12 +230,13 @@ class CorporateEnquiry extends Controller
     public function delete($id)
     {
         $enquiryUser = FranchiseDetails::where('enquiry_id', $id)->first();
-        if (!$enquiryUser) {
+        if (! $enquiryUser) {
             $enquiry = ModelsCorporateEnquiry::find($id);
             $enquiry->delete();
             User::generateCounts();
             ModelsCorporateEnquiry::generateCounts();
         }
+
         return redirect()->back();
     }
 }

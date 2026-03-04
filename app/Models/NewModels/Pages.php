@@ -13,6 +13,6 @@ class Pages extends Model
         'name',
         'title',
         'slug',
-        'content'
+        'content',
     ];
 }

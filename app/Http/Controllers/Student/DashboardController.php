@@ -3,34 +3,35 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Count;
-use App\Models\User;
-use App\Models\TestModal;
 use App\Models\Gn_StudentTestAttempt;
-use App\Models\Studymaterial;
-use App\Models\UserDetails;
-use App\Models\TestCat;
-use Illuminate\Support\Facades\DB;
 use App\Models\OtpVerifications;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\SendOtpMail;
-
+use App\Models\Studymaterial;
+use App\Models\TestCat;
+use App\Models\TestModal;
+use App\Models\User;
+use App\Models\UserDetails;
 use App\Services\ImageService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class DashboardController extends Controller
 {
     public $returnResponse = [];
+
     protected $imageService;
 
-    public function __construct(ImageService $imageService){
+    public function __construct(ImageService $imageService)
+    {
         $this->imageService = $imageService;
         $this->returnResponse = [
             'message' => null,
-            'success' => false
+            'success' => false,
         ];
     }
+
     public function index(Request $req)
     {
         $stud_id = Auth::user()->id;
@@ -40,7 +41,7 @@ class DashboardController extends Controller
         $testAttempt = Gn_StudentTestAttempt::where('student_id', $stud_id)->get();
         $testAttemptCount = $testAttempt->count();
 
-        $testTotal = TestModal::where('user_id', NULL)->where('published', 1)->where('education_type_id', $education_type)->get();
+        $testTotal = TestModal::where('user_id', null)->where('published', 1)->where('education_type_id', $education_type)->get();
         // $testCount = $testTotal->count();
 
         $testCount = [];
@@ -48,28 +49,28 @@ class DashboardController extends Controller
         foreach ($test_cat as $cat) {
             $testCount[$cat->id] = $testTotal->where('test_cat', $cat->id)->count();
         }
-        if (!empty(Auth::user()->myInstitute)) {
+        if (! empty(Auth::user()->myInstitute)) {
             $testInstitute = Auth::user()->myInstitute->test()->where('published', 1)->where('education_type_id', $education_type)->count();
         } else {
             $testInstitute = 0;
         }
 
-        $notes_count = Studymaterial::where('category', 'Study Notes & E-Books')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('education_type', $education_type)->where("status", 1)->where("material_seen", 1)->get();
+        $notes_count = Studymaterial::where('category', 'Study Notes & E-Books')->whereIn('institute_id', [Auth::user()->myInstitute?->id, 0])->where('education_type', $education_type)->where('status', 1)->where('material_seen', 1)->get();
         $notes_count = $notes_count->count($notes_count);
 
-        $video_count = Studymaterial::where('category', 'Live & Video Classes')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('education_type', $education_type)->where("status", 1)->where("material_seen", 1)->get();
+        $video_count = Studymaterial::where('category', 'Live & Video Classes')->whereIn('institute_id', [Auth::user()->myInstitute?->id, 0])->where('education_type', $education_type)->where('status', 1)->where('material_seen', 1)->get();
         $video_count = $video_count->count($video_count);
 
-        $gk_count = Studymaterial::where('category', 'Static GK & Current Affairs')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('education_type', $education_type)->where("status", 1)->where("material_seen", 1)->get();
+        $gk_count = Studymaterial::where('category', 'Static GK & Current Affairs')->whereIn('institute_id', [Auth::user()->myInstitute?->id, 0])->where('education_type', $education_type)->where('status', 1)->where('material_seen', 1)->get();
         $gk_count = $gk_count->count($gk_count);
 
-        $comprehensive_count = Studymaterial::where('category', 'Comprehensive Study Material')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('education_type', $education_type)->where("status", 1)->where("material_seen", 1)->get();
+        $comprehensive_count = Studymaterial::where('category', 'Comprehensive Study Material')->whereIn('institute_id', [Auth::user()->myInstitute?->id, 0])->where('education_type', $education_type)->where('status', 1)->where('material_seen', 1)->get();
         $comprehensive_count = $comprehensive_count->count($comprehensive_count);
 
-        $short_notes_count = Studymaterial::where('category', 'Short Notes & One Liner')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('education_type', $education_type)->where("status", 1)->where("material_seen", 1)->get();
+        $short_notes_count = Studymaterial::where('category', 'Short Notes & One Liner')->whereIn('institute_id', [Auth::user()->myInstitute?->id, 0])->where('education_type', $education_type)->where('status', 1)->where('material_seen', 1)->get();
         $short_notes_count = $short_notes_count->count($short_notes_count);
 
-        $premium_count = Studymaterial::where('category', 'Premium Study Notes')->whereIn('institute_id', array(Auth::user()->myInstitute?->id, 0))->where('education_type', $education_type)->where("status", 1)->where("material_seen", 1)->get();
+        $premium_count = Studymaterial::where('category', 'Premium Study Notes')->whereIn('institute_id', [Auth::user()->myInstitute?->id, 0])->where('education_type', $education_type)->where('status', 1)->where('material_seen', 1)->get();
         $premium_count = $premium_count->count($premium_count);
         // dd($testCount);
 
@@ -92,9 +93,10 @@ class DashboardController extends Controller
 
     public function verifynumber(Request $req, $mobile_number)
     {
-        if (!\App\Helpers\ProfileValidationHelper::isMobileUnique($mobile_number, Auth::id())) {
+        if (! \App\Helpers\ProfileValidationHelper::isMobileUnique($mobile_number, Auth::id())) {
             return false;
         }
+
         return $this->getMobileOtp($mobile_number);
     }
 
@@ -105,14 +107,14 @@ class DashboardController extends Controller
         // send once in only 10 minutes
         if ($otpData) {
             $this->returnResponse['message'] = 'You already request an OTP in last 10 minutes. please wait for another attempt.';
+
             return json_encode($this->returnResponse);
         }
-        $otp            = mt_rand(100000, 999999);
+        $otp = mt_rand(100000, 999999);
         // $mobileMessage  = 'Dear user, Your OTP for sign up to Test and Notes portal is ' . $otp . '. Valid for 10 minutes. Please do not share this OTP. Regards, Test and Notes Team';
         // $templateId     = 1207163026060776390;
         // $url            = 'http://198.24.149.4/API/pushsms.aspx?loginID=rajji1&password=kanpureduup78&mobile=' . $mobileNumber . '&text=' . $mobileMessage . '&senderid=GYNLGY&route_id=2&Unicode=0&Template_id=' . $templateId;
         // $response       = Http::get($url);
-
 
         // $message    = rawurlencode('Dear user%nYour OTP for sign up to Test and Notes portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nTest and Notes Team');
         // $sender     = urlencode("GYNLGY");
@@ -125,39 +127,42 @@ class DashboardController extends Controller
         // curl_close($ch);
         // $response   = json_decode($response);
         // if ($response) {
-            $otpVerifications               = new OtpVerifications;
-            $otpVerifications->type         = 'mobile';
-            $otpVerifications->credential   = $mobileNumber;
-            $otpVerifications->otp          = $otp;
-            $saveToDb                       = $otpVerifications->save();
+        $otpVerifications = new OtpVerifications;
+        $otpVerifications->type = 'mobile';
+        $otpVerifications->credential = $mobileNumber;
+        $otpVerifications->otp = $otp;
+        $saveToDb = $otpVerifications->save();
 
-            // if ($saveToDb && $response->status == 'success') {
-            if ($saveToDb) {
-                $this->returnResponse['success'] = true;
-            }
+        // if ($saveToDb && $response->status == 'success') {
+        if ($saveToDb) {
+            $this->returnResponse['success'] = true;
+        }
         // }
 
         return $this->returnResponse;
     }
+
     public function verifyotp($mobile, $otp)
     {
 
-        $type =  'mobile';
+        $type = 'mobile';
         $time = date('Y-m-d H:i:s', strtotime('-11 minutes'));
         $otpData = OtpVerifications::where([['type', '=', $type], ['credential', '=', $mobile], ['otp', '=', $otp], ['created_at', '>', $time]])->first();
         if ($otpData) {
             $user = User::find(Auth::user()->id);
             $user->mobile = $mobile;
             $user->save();
+
             return true;
         }
     }
 
     public function verifyemail(Request $req, $email)
     {
-        if (!\App\Helpers\ProfileValidationHelper::isEmailUnique($email, Auth::id())) {
+        if (! \App\Helpers\ProfileValidationHelper::isEmailUnique($email, Auth::id())) {
             return false;
         }
+
         return $this->getEmailOtp($email);
     }
 
@@ -170,48 +175,50 @@ class DashboardController extends Controller
             $this->returnResponse['message'] = 'You already request an OTP in last 10 minutes. please wait for another attempt.';
             // return json_encode($this->returnResponse);
         }
-        $otp            = mt_rand(100000, 999999);
+        $otp = mt_rand(100000, 999999);
 
         $details = [
-            'otp' => $otp
+            'otp' => $otp,
         ];
 
         // Mail::to($email)->send(new \App\Mail\SendOtpMail($details));
         try {
-            Mail::raw('Your OTP for Test and Notes is ' . $otp, function ($message) use ($email) {
+            Mail::raw('Your OTP for Test and Notes is '.$otp, function ($message) use ($email) {
                 $message->to($email)
-                  ->subject('OTP Verification');
+                    ->subject('OTP Verification');
             });
         } catch (\Exception $e) {
             $this->returnResponse['message'] = 'Failed to send OTP. Please try again.';
-             return json_encode($this->returnResponse);
+
+            return json_encode($this->returnResponse);
         }
 
-        $otpVerifications               = new OtpVerifications;
-        $otpVerifications->type         = 'email';
-        $otpVerifications->credential   = $email;
-        $otpVerifications->otp          = $otp;
-        $saveToDb                       = $otpVerifications->save();
+        $otpVerifications = new OtpVerifications;
+        $otpVerifications->type = 'email';
+        $otpVerifications->credential = $email;
+        $otpVerifications->otp = $otp;
+        $saveToDb = $otpVerifications->save();
 
         if ($saveToDb) {
             $this->returnResponse['success'] = true;
         }
-
 
         return $this->returnResponse;
     }
 
     public function verifyemailotp($email, $otp)
     {
-        $type =  'email';
+        $type = 'email';
         $time = date('Y-m-d H:i:s', strtotime('-11 minutes'));
         $otpData = OtpVerifications::where([['type', '=', $type], ['credential', '=', $email], ['otp', '=', $otp], ['created_at', '>', $time]])->first();
         if ($otpData) {
             $user = User::find(Auth::user()->id);
             $user->email = $email;
             $user->save();
+
             return true;
         }
+
         return false;
     }
 
@@ -224,7 +231,7 @@ class DashboardController extends Controller
 
         // Handle photo upload
         if ($req->hasfile('photo_url')) {
-            $image_name = $this->imageService->handleUpload($req->file('photo_url'), 'student_uploads/' . $user->id, 400);
+            $image_name = $this->imageService->handleUpload($req->file('photo_url'), 'student_uploads/'.$user->id, 400);
             DB::table('user_details')
                 ->where('user_id', Auth::user()->id)
                 ->update(['photo_url' => $image_name]);
@@ -235,16 +242,17 @@ class DashboardController extends Controller
             ->where('user_id', Auth::user()->id)
             ->update([
                 'state' => $req->state,
-                'city' => $req->city
+                'city' => $req->city,
             ]);
 
         $req->session()->flash('message', 'Profile Updated.');
+
         return redirect()->back();
     }
 
     public function package_manage(Request $req, $id)
     {
 
-        return view("Dashboard/Student/MyPlan/package_manage");
+        return view('Dashboard/Student/MyPlan/package_manage');
     }
 }

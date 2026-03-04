@@ -10,23 +10,35 @@ use App\Models\User;
 use App\Models\UserDetails;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Livewire\Form;
 use Illuminate\Support\Facades\Mail;
+use Livewire\Form;
 
 class StudentRegistrationForm extends Form
 {
     public $full_name;
+
     public $email;
+
     public $mobile_number;
+
     public $mobile_otp;
+
     public $password;
+
     public $confirm_password;
+
     public $institute_code;
+
     public $education_type_id;
+
     public $class_group_exam_id;
+
     public $user_logo;
+
     public $state;
+
     public $city;
+
     public $required_check_registration;
 
     public function rules()
@@ -95,19 +107,19 @@ class StudentRegistrationForm extends Form
     public function register()
     {
         try {
-            $user = new User();
+            $user = new User;
 
-            $user->name =  htmlspecialchars($this->full_name);
-            $user->roles =  'student';
+            $user->name = htmlspecialchars($this->full_name);
+            $user->roles = 'student';
             if (empty(trim($this->institute_code))) {
-                $user->status =  'active';
+                $user->status = 'active';
             } else {
-                $user->in_franchise =  '1';
-                $user->franchise_code =  filter_var($this->institute_code);
+                $user->in_franchise = '1';
+                $user->franchise_code = filter_var($this->institute_code);
             }
-            $user->email =  filter_var($this->email, FILTER_VALIDATE_EMAIL) ? $this->email : null;
-            $user->mobile =  filter_var($this->mobile_number, FILTER_SANITIZE_NUMBER_INT);
-            $user->password =  Hash::make($this->password);
+            $user->email = filter_var($this->email, FILTER_VALIDATE_EMAIL) ? $this->email : null;
+            $user->mobile = filter_var($this->mobile_number, FILTER_SANITIZE_NUMBER_INT);
+            $user->password = Hash::make($this->password);
             $mail_flag = 0;
             // return json_encode($user);
             // $query = $user->save();
@@ -115,46 +127,46 @@ class StudentRegistrationForm extends Form
                 Log::build([
                     'driver' => 'single',
                     'path' => storage_path('logs/custom.log'),
-                ])->info('from student signup -form_name registration_form user saved ' . $this->email . ' ' . $this->full_name . ' ' . $this->institute_code);
+                ])->info('from student signup -form_name registration_form user saved '.$this->email.' '.$this->full_name.' '.$this->institute_code);
 
                 if ($this->email) {
                     $details = [
                         'fullname' => $this->full_name,
                         'typeMessage' => 'Account updated.',
-                        'message' => 'You are succesfully registered.'
+                        'message' => 'You are succesfully registered.',
                     ];
 
                     try {
-                        //code to send institute student signup notification email
+                        // code to send institute student signup notification email
                         if ($this->institute_code != '') {
                             $inst = FranchiseDetails::where('branch_code', $this->institute_code)->get()->first();
                             $inst_email = User::where('id', $inst->user_id)->get(['email'])->first();
                             Log::build([
                                 'driver' => 'single',
                                 'path' => storage_path('logs/custom.log'),
-                            ])->info('Institute email fro student signup ' . $this->institute_code . ' ' . $inst);
+                            ])->info('Institute email fro student signup '.$this->institute_code.' '.$inst);
                             Log::build([
                                 'driver' => 'single',
                                 'path' => storage_path('logs/custom.log'),
-                            ])->info('Institute email fro student signup ' . $this->institute_code . ' ' . $inst_email);
+                            ])->info('Institute email fro student signup '.$this->institute_code.' '.$inst_email);
                             $inst_details = [
                                 'inst_name' => $inst->institute_name,
                                 'email_id' => $this->email,
                                 'institute_code' => $this->institute_code,
-                                'fullname' => $this->full_name
+                                'fullname' => $this->full_name,
                             ];
                             $instMailToSend = new NotifyFranchiseStudentSignup($inst_details);
                             $sendMail = Mail::to($inst_email->email)->send($instMailToSend);
                             Log::build([
                                 'driver' => 'single',
                                 'path' => storage_path('logs/custom.log'),
-                            ])->info('Institute email to ' . $inst_email->email . ' for student ' . $this->email . ' signup' . ' ' . count(Mail::failures()));
+                            ])->info('Institute email to '.$inst_email->email.' for student '.$this->email.' signup'.' '.count(Mail::failures()));
                         }
-                        //code to send superadmin student signup notification email
+                        // code to send superadmin student signup notification email
                         $admin_details = [
                             'fullname' => $this->full_name,
                             'email_id' => $this->email,
-                            'institute_code' => $this->institute_code
+                            'institute_code' => $this->institute_code,
                         ];
 
                         $super_admins = User::where('roles', 'superadmin')->where('status', 'active')->where('deleted_at', null)->get(['email'])->toArray();
@@ -167,39 +179,39 @@ class StudentRegistrationForm extends Form
                         Log::build([
                             'driver' => 'single',
                             'path' => storage_path('logs/custom.log'),
-                        ])->info('student signup super admin ' . implode(" ", $emails) . ' ' . count(Mail::failures()));
+                        ])->info('student signup super admin '.implode(' ', $emails).' '.count(Mail::failures()));
 
                         $mailToSend = new sendFranchiseEmail($details);
                         $sendMail = Mail::to($this->email)->send($mailToSend);
                         Log::build([
                             'driver' => 'single',
                             'path' => storage_path('logs/custom.log'),
-                        ])->info('student signup -student ' . $this->email . ' ' . count(Mail::failures()));
+                        ])->info('student signup -student '.$this->email.' '.count(Mail::failures()));
                     } catch (\Throwable $th) {
 
                         $mail_flag = 1;
                         Log::build([
                             'driver' => 'single',
                             'path' => storage_path('logs/custom.log'),
-                        ])->info('problem in email sending' . $th);
+                        ])->info('problem in email sending'.$th);
                     }
                 }
 
-                $userDetailsDb = new UserDetails();
-                $userDetailsDb->user_id =  $user->id;
+                $userDetailsDb = new UserDetails;
+                $userDetailsDb->user_id = $user->id;
                 if ($this->institute_code) {
-                    $userDetailsDb->institute_code =  filter_var($this->institute_code);
+                    $userDetailsDb->institute_code = filter_var($this->institute_code);
                 }
                 if ($this->user_logo) {
-                    $fullPath = app(\App\Services\ImageService::class)->handleUpload($this->user_logo, 'student_uploads/' . $user->id, 400);
+                    $fullPath = app(\App\Services\ImageService::class)->handleUpload($this->user_logo, 'student_uploads/'.$user->id, 400);
                     $userDetailsDb->photo_url = $fullPath;
                 }
 
                 $userDetailsDb->days = '7';
-                $userDetailsDb->education_type =  filter_var($this->education_type_id, FILTER_SANITIZE_NUMBER_INT);
-                $userDetailsDb->class =  filter_var($this->class_group_exam_id, FILTER_SANITIZE_NUMBER_INT);
-                $userDetailsDb->state =  $this->state;
-                $userDetailsDb->city =  $this->city;
+                $userDetailsDb->education_type = filter_var($this->education_type_id, FILTER_SANITIZE_NUMBER_INT);
+                $userDetailsDb->class = filter_var($this->class_group_exam_id, FILTER_SANITIZE_NUMBER_INT);
+                $userDetailsDb->state = $this->state;
+                $userDetailsDb->city = $this->city;
                 $userDetailsDb->save();
                 // send email here
                 User::generateCounts();

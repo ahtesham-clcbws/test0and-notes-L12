@@ -14,24 +14,37 @@ class QuestionImport extends Component
     use WithFileUploads;
 
     public $education_type_id = '';
+
     public $class_id = '';
+
     public $board_id = '';
+
     public $subject_id = '';
+
     public $part_id = '';
+
     public $lesson_id = '';
+
     public $question_type = 1;
 
     public $educationTypes = [];
+
     public $classes = [];
+
     public $boards = [];
+
     public $subjects = [];
+
     public $parts = [];
+
     public $lessons = [];
 
     public $file;
 
     public $isImporting = false;
+
     public $showPreview = false;
+
     public $previewData = [];
 
     public function mount()
@@ -111,6 +124,7 @@ class QuestionImport extends Component
                 \App\Models\QuestionBankModel::create($data);
             }
             session()->flash('success', 'Questions successfully integrated into architectural bank.');
+
             return redirect()->route('administrator.dashboard_question_list');
         } catch (\Exception $e) {
             $this->dispatch('notify', ['type' => 'error', 'message' => 'Failed to save to database: '.$e->getMessage()]);

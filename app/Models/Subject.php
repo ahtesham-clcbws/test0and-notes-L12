@@ -12,15 +12,18 @@ class Subject extends Model
     use SoftDeletes;
 
     protected $table = 'subjects';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'name'
+        'name',
     ];
+
     public function subject_parts()
     {
         return $this->hasMany(SubjectPart::class, 'subject_id', 'id');
     }
+
     public function subject_part_lessons()
     {
         return $this->hasMany(SubjectPartLesson::class, 'subject_id', 'id');

@@ -51,7 +51,7 @@ class ImportantLinkForm extends Form
         }
 
         $this->validate();
-        $important_link = new ImportantLink();
+        $important_link = new ImportantLink;
         $important_link->title = $this->title;
         $important_link->url = $this->url;
 

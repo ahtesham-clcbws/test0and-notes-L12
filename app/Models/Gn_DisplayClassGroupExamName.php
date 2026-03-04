@@ -16,7 +16,6 @@ class Gn_DisplayClassGroupExamName extends Model
 
     public function class_exam()
     {
-        return $this->belongsToMany(ClassGoupExamModel::class, 'gn__assign_class_group_exam_names', 'education_type_id', 'classes_group_exams_id','education_type_id');
+        return $this->belongsToMany(ClassGoupExamModel::class, 'gn__assign_class_group_exam_names', 'education_type_id', 'classes_group_exams_id', 'education_type_id');
     }
-
 }

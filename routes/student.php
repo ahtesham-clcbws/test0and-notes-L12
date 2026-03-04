@@ -1,14 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Student\DashboardController;
 use App\Http\Controllers\Student\ExamsController;
 use App\Http\Controllers\Student\StudentPlanController;
 use App\Http\Controllers\StudymaterialController;
-
+use Illuminate\Support\Facades\Route;
 
 Route::name('student.')->group(function () {
     Route::prefix('student')->group(function () {

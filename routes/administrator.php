@@ -102,10 +102,10 @@ Route::name('administrator.')->group(function () {
 
                 Route::any('attempt', [ExamsController::class, 'attemptTest'])->name('dashboard_tests_attempt');
                 Route::any('update/{test_id}', [ExamsController::class, 'saveTest'])->name('dashboard_update_test_exam');
-                Route::any('publish/{test_id}', [ExamsController::class, 'publishTest'])->name('dashboard_publish_test_exam');
+                Route::get('publish/{test_id}', \App\Livewire\Admin\Tests\PublishTest::class)->name('dashboard_publish_test_exam');
                 Route::any('student-list/{test_id}', [ExamsController::class, 'studentList'])->name('dashboard_student_list');
                 Route::prefix('section')->group(function () {
-                    Route::any('question/{test_id}/{section_id}', [ExamsController::class, 'section_questions'])->name('dashboard_test_section_question');
+                    Route::get('question/{test_id}/{section_id}', \App\Livewire\Admin\Tests\TestQuestionsManager::class)->name('dashboard_test_section_question');
                     Route::any('questionadd/{test_id}/{section_id}', [ExamsController::class, 'section_question_add'])->name('test_section_question_add');
                     Route::any('{test_id}/add-update', [ExamsController::class, 'testSections'])->name('dashboard_test_sections');
                     Route::any('{test_id}', [ExamsController::class, 'section'])->name('dashboard_test_section');

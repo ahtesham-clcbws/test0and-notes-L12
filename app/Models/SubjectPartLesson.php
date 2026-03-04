@@ -12,17 +12,20 @@ class SubjectPartLesson extends Model
     use SoftDeletes;
 
     protected $table = 'subjects_part_lesson';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
         'subject_id',
         'subject_part_id',
-        'name'
+        'name',
     ];
+
     public function subject()
     {
         return $this->hasOne(Subject::class, 'id', 'subject_id');
     }
+
     public function subject_part()
     {
         return $this->hasOne(SubjectPart::class, 'id', 'subject_part_id');

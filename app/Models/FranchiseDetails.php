@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class FranchiseDetails extends Model
 {
     use HasFactory, SoftDeletes;
-    public function corporate(){
+
+    public function corporate()
+    {
         return $this->hasOne(CorporateEnquiry::class, 'id', 'enquiry_id');
     }
 

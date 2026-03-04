@@ -17,7 +17,7 @@ class CreateCorporateEnquiryRepliesTable extends Migration
             $table->id();
             $table->foreignId('corporate_enquiry_id');
             $table->text('message')->nullable();
-            $table->enum('type', ['approve','reject','reply'])->default('reply');
+            $table->enum('type', ['approve', 'reject', 'reply'])->default('reply');
             $table->foreignId('user_id');
             $table->timestamps();
         });

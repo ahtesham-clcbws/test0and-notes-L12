@@ -39,7 +39,7 @@ class AjaxController extends Controller
 
             $enquiryReply = new CorporateEnquiryReply;
             $enquiryReply->corporate_enquiry_id = $requestedData['id'];
-            $enquiryReply->message = $typeMessage . ' <br>' . $requestedData['message'];
+            $enquiryReply->message = $typeMessage.' <br>'.$requestedData['message'];
             $enquiryReply->type = $requestedData['type'];
             $enquiryReply->user_id = $admin['id'];
             $queryResponse = $enquiryReply->save();
@@ -69,7 +69,7 @@ class AjaxController extends Controller
 
                 $details = [
                     'institute_name' => $enquiryData->institute_name,
-                    'institute_code' => $enquiryData->branch_code
+                    'institute_code' => $enquiryData->branch_code,
                 ];
                 if ($requestedData['type'] == 'approved') {
                     try {
@@ -97,11 +97,13 @@ class AjaxController extends Controller
             } else {
                 $response['success'] = false;
                 $response['message'] = 'You are not authorized.';
+
                 return json_encode($response);
             }
         } else {
             $response['success'] = false;
             $response['message'] = 'You are not authorized.';
+
             return json_encode($response);
         }
     }

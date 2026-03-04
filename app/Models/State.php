@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class State extends Model
 {
     use HasFactory;
-    public function state_data() {
+
+    public function state_data()
+    {
         return $this->hasManyThrough(CorporateEnquiry::class, UserDetails::class, City::class);
     }
 }

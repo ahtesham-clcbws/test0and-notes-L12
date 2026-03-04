@@ -12,6 +12,7 @@ class ClassGoupExamModel extends Model
     use SoftDeletes;
 
     protected $table = 'classes_groups_exams';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
@@ -20,7 +21,7 @@ class ClassGoupExamModel extends Model
         'boards',
         'subjects',
         'image',
-        'summary'
+        'summary',
     ];
 
     public function education()

@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class CorporateEnquiryReply extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'corporate_enquiry_id',
         'type',
         'message',
-        'user_id'
+        'user_id',
     ];
 }

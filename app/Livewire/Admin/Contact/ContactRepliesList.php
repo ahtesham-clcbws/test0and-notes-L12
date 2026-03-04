@@ -3,8 +3,8 @@
 namespace App\Livewire\Admin\Contact;
 
 use App\Models\NewModels\ContactQuery;
-use Livewire\Component;
 use Livewire\Attributes\Layout;
+use Livewire\Component;
 
 #[Layout('Layouts.admin')]
 class ContactRepliesList extends Component

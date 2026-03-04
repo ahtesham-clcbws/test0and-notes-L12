@@ -23,17 +23,19 @@ class UserDetails extends Model
         'allowed_to_upload',
         'days',
         'started_at',
-        'inactive_at'
+        'inactive_at',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
     public function city_data()
     {
         return $this->belongsTo(City::class, 'city');
     }
+
     public function state()
     {
         return $this->belongsTo(State::class, 'state');

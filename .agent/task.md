@@ -12,5 +12,9 @@
 [x] Add loaders and notifications for test section actions
 [x] Document overall phase state for new agent in `.agent/current_work_status.md`
 
-**Next Phase Focus (For Next Agent):**
-[ ] Implement mapping for actual Questions to the TestSections (QuestionBank mapping via `Admin\Tests\TestTable` and `ExamsController`).
+**Phase 2: Question Mapping & Migration Finetuning (COMPLETED)**
+[x] Move Package Selection from `TestForm` to a new `PublishTest` Livewire Component.
+[x] Implement validation in `TestSectionManager` and `TestSectionRow` to dynamically limit `number_of_questions` so that combined questions do not exceed `TestModal::total_questions`.
+[x] Create `TestQuestionsManager` Livewire Component to map Question Bank questions to a Test Section.
+[x] Add UI strict validation in `TestQuestionsManager` so exactly `Section::number_of_questions` are selectable and duplicates within a same section are prevented.
+[x] Update relevant Routes to point to new Livewire components instead of Legacy Controllers.

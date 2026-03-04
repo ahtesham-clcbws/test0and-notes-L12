@@ -10,10 +10,11 @@ class AssignClassSubjectsModel extends Model
     use HasFactory;
 
     protected $table = 'assign_classes_subjects';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
         'class_id',
-        'subject_id'
+        'subject_id',
     ];
 }

@@ -11,7 +11,7 @@ class Gn_PackagePlan extends Model
 
     public function test()
     {
-        return $this->belongsToMany(TestModal::class,'gn__package_plan_tests','gn_package_plan_id','test_id');
+        return $this->belongsToMany(TestModal::class, 'gn__package_plan_tests', 'gn_package_plan_id', 'test_id');
     }
 
     // public function study_material()

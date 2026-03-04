@@ -2,13 +2,6 @@
 
 namespace App\Imports;
 
-use App\Models\BoardAgencyStateModel;
-use App\Models\ClassGoupExamModel;
-use App\Models\Educationtype;
-use App\Models\QuestionBankModel;
-use App\Models\Subject;
-use App\Models\SubjectPart;
-use App\Models\SubjectPartLesson;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +24,9 @@ class QuestionBankImport implements ToCollection, WithHeadingRow
     // }
 
     protected $filePath;
+
     protected $importData;
+
     public $parsedData = [];
 
     public function __construct($filePath = null, $importData = [])

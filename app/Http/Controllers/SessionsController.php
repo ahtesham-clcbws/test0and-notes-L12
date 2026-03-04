@@ -7,13 +7,14 @@ use Illuminate\Support\Facades\Auth;
 
 class SessionsController extends Controller
 {
-    public function destroy(Request $request) {
+    public function destroy(Request $request)
+    {
         Auth::logout();
-    
+
         $request->session()->invalidate();
-    
+
         $request->session()->regenerateToken();
-    
+
         return redirect('/');
 
         // auth()->logout();

@@ -1896,7 +1896,7 @@ class ExamsController extends Controller
 
     }
 
-    public function delete_category(Request $req,$id)
+    public function delete_category(Request $req, $id)
     {
 
         DB::table('test_cat')->where('id', $id)->delete();

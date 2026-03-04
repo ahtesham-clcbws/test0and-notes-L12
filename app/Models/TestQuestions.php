@@ -12,6 +12,7 @@ class TestQuestions extends Model
     use SoftDeletes;
 
     protected $table = 'test_questions';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
@@ -21,30 +22,37 @@ class TestQuestions extends Model
         'question_id',
         'allotter_id',
     ];
+
     public function fromTest()
     {
-        return $this->belongsTo(TestModal::class, 'id', 'test_id');
+        return $this->belongsTo(TestModal::class, 'test_id', 'id');
     }
 
     public function forSection()
     {
-        return $this->belongsTo(TestSections::class, 'id', 'section_id');
+        return $this->belongsTo(TestSections::class, 'section_id', 'id');
     }
+
     public function question()
     {
-        return $this->hasOne(QuestionBankModel::class, 'id', 'question_id');
+        return $this->belongsTo(QuestionBankModel::class, 'question_id', 'id');
     }
+
     public function alloted_by()
     {
-        return $this->belongsTo(User::class, 'id', 'allotter_id');
+        return $this->belongsTo(User::class, 'allotter_id', 'id');
     }
+
     public function question_creator()
     {
-        return $this->belongsTo(User::class, 'id', 'creator_id');
+        return $this->belongsTo(User::class, 'creator_id', 'id');
     }
 
     public $timestamps = true;
+
     const CREATED_AT = 'created_at';
+
     const UPDATED_AT = 'updated_at';
+
     const DELETED_AT = 'deleted_at';
 }
