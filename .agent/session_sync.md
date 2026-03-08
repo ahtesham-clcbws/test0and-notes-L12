@@ -29,3 +29,14 @@ All tasks in the "Migration: Test Form and Test Sections" phase are marked as co
   - Resolved the `TestQuestionsManager` filtering bug by strictly querying `Subject` and `Part`, without hidden query scopes holding questions back.
 - **The "Why":** The previous logic allowed users to access un-purchased/ineligible packages by direct URL, and published tests could become invalid if a user deleted sections/questions post-publish. The Observer pattern closes this gap without cluttering controllers.
 - **Next Steps (for next session):** Continue monitoring soft deletes and verify test rendering in the student dashboard when multiple `study_material` types are attached.
+
+## Session Handoff - 2026-03-09 (Inline Creation & Dashboard Refinement)
+- **Current State:** Finalized the question bank import persistence, refined package visibility for students, and implemented inline question creation in test sections.
+- **Key Achievements:**
+  - **Question Import Fix:** Resolved the `status` data truncation error (SQL Warning 1265) by enforcing the 'approved' status and ensuring all form-selected categorization (Subject, Part, etc.) is correctly injected into the `$previewData` during save.
+  - **Inline Question Creation:** Added a modal to `TestQuestionsManager` that allows creators to add new questions without leaving the section view. Categorization is auto-locked to match the section.
+  - **Dashboard Integrity:** Updated `StudentPlanController` to filter packages by student education type and class, preventing cross-category noise.
+  - **Homepage Eligibility:** Refactor the home page button logic to prioritize purchased status over strict eligibility.
+  - **UI/UX Cleanup:** Updated labels to "Class/Group/Exam Name" and added a secondary save button to the question form.
+- **The "Why":** The previous eligibility logic was too strict, blocking users from content they already owned. The inline question creation directly addresses the friction of jumping between the Test Manager and Question Bank modules.
+- **Next Steps:** Monitor the `TestCompletenessService` during high-volume inline additions and verify if any legacy test attempts require migration of the new categorization labels.

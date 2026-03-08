@@ -39,3 +39,11 @@
 - [x] Add `$previewData` and `$showPreview` state to `QuestionImport.php`.
 - [x] Build the editable UI datatable in `question-import.blade.php`.
 - [x] Implement the final `saveAll()` function to process the approved preview table.
+
+## Phase 6: Inline Creation & Visibility (COMPLETED)
+- [x] Fix `QuestionImport` status truncation and categorization mapping.
+- [x] Implement Inline Question Creation modal in `TestQuestionsManager`.
+- [x] Refactor `home.blade.php` to prioritize purchased status over strict eligibility.
+- [x] Filter Student Dashboard packages by `education_type` and `class`.
+- [x] UI: Update labels to "Class/Group/Exam Name" and add bottom save buttons.
+- [x] Execute `npm run build` and push all changes to master.
