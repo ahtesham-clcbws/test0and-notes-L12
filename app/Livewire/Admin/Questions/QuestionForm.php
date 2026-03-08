@@ -36,6 +36,8 @@ class QuestionForm extends Component
 
     public $part_id = '';
 
+    public $chapter_id = '';
+
     public $lesson_id = '';
 
     public $question_content = '';
@@ -68,6 +70,8 @@ class QuestionForm extends Component
 
     public $parts = [];
 
+    public $chapters = [];
+
     public $lessons = [];
 
     protected $rules = [
@@ -95,10 +99,15 @@ class QuestionForm extends Component
         $this->classes = ClassGoupExamModel::where('education_type_id', $this->education_type_id)->get();
 
         $this->class_id = $question->class_group_exam_id;
-        $this->boards = BoardAgencyStateModel::where('classes_group_exams_id', $this->class_id)->get();
-
         $class = ClassGoupExamModel::find($this->class_id);
-        $this->subjects = $class ? $class->class_subjects()->get() : [];
+
+        $agency_board_university = \App\Models\Gn_EducationClassExamAgencyBoardUniversity::where('classes_group_exams_id', $this->class_id)->pluck('board_agency_exam_id')->toArray();
+        $this->boards = empty($agency_board_university) ? [] : BoardAgencyStateModel::whereIn('id', $agency_board_university)->get();
+
+        $this->subjects = \App\Models\Subject::select('subjects.*')
+            ->leftJoin('gn__class_subjects', 'gn__class_subjects.subject_id', '=', 'subjects.id')
+            ->where('gn__class_subjects.classes_group_exams_id', $this->class_id)
+            ->get();
 
         $this->board_id = $question->board_agency_state_id;
         $this->subject_id = $question->subject;
@@ -109,10 +118,24 @@ class QuestionForm extends Component
 
         $this->part_id = $question->subject_part;
         if ($this->part_id) {
-            $this->lessons = SubjectPartLesson::where('subject_part_id', $this->part_id)->get();
+            $this->chapters = SubjectPartLesson::where('subject_part_id', $this->part_id)->get();
         }
 
-        $this->lesson_id = $question->subject_lesson_chapter;
+        // Determine if subject_lesson_chapter holds a Chapter (level 3) or Lesson (level 4)
+        $savedValue = $question->subject_lesson_chapter;
+        if ($savedValue) {
+            $isLesson = \App\Models\Gn_SubjectPartLessionNew::find($savedValue);
+            if ($isLesson) {
+                // It's a Level 4 lesson
+                $this->chapter_id = $isLesson->subject_chapter_id;
+                $this->lessons = \App\Models\Gn_SubjectPartLessionNew::where('subject_chapter_id', $this->chapter_id)->get();
+                $this->lesson_id = $savedValue;
+            } else {
+                // It's a Level 3 chapter
+                $this->chapter_id = $savedValue;
+                $this->lessons = \App\Models\Gn_SubjectPartLessionNew::where('subject_chapter_id', $this->chapter_id)->get();
+            }
+        }
         $this->question_type = $question->question_type;
         $this->mcq_options_count = (int) ($question->mcq_options ?? 4);
         $this->mcq_answer = (int) (str_replace('ans_', '', $question->mcq_answer) ?: 1);
@@ -125,33 +148,43 @@ class QuestionForm extends Component
         $this->ans_5 = $question->ans_5;
         $this->solution = $question->solution;
         $this->explanation = $question->explanation;
-        $this->difficulty_level = $question->difficulty_level;
+        $this->difficulty_level = $question->difficulty_level ?? 0;
         $this->status = $question->status ?? 'pending';
     }
 
     public function updatedEducationTypeId($value)
     {
         $this->classes = $value ? ClassGoupExamModel::where('education_type_id', $value)->get() : [];
-        $this->reset(['class_id', 'board_id', 'subject_id', 'part_id', 'lesson_id', 'boards', 'subjects', 'parts', 'lessons']);
+        $this->reset(['class_id', 'board_id', 'subject_id', 'part_id', 'chapter_id', 'lesson_id', 'boards', 'subjects', 'parts', 'chapters', 'lessons']);
     }
 
     public function updatedClassId($value)
     {
-        $this->boards = $value ? BoardAgencyStateModel::where('classes_group_exams_id', $value)->get() : [];
         $class = $value ? ClassGoupExamModel::find($value) : null;
-        $this->subjects = $class ? $class->class_subjects()->get() : [];
-        $this->reset(['board_id', 'subject_id', 'part_id', 'lesson_id', 'parts', 'lessons']);
+        $agency_board_university = \App\Models\Gn_EducationClassExamAgencyBoardUniversity::where('classes_group_exams_id', $value)->pluck('board_agency_exam_id')->toArray();
+        $this->boards = empty($agency_board_university) ? [] : BoardAgencyStateModel::whereIn('id', $agency_board_university)->get();
+        $this->subjects = $class ? \App\Models\Subject::select('subjects.*')
+            ->leftJoin('gn__class_subjects', 'gn__class_subjects.subject_id', '=', 'subjects.id')
+            ->where('gn__class_subjects.classes_group_exams_id', $value)
+            ->get() : [];
+        $this->reset(['board_id', 'subject_id', 'part_id', 'chapter_id', 'lesson_id', 'parts', 'chapters', 'lessons']);
     }
 
     public function updatedSubjectId($value)
     {
         $this->parts = $value ? SubjectPart::where('subject_id', $value)->get() : [];
-        $this->reset(['part_id', 'lesson_id', 'lessons']);
+        $this->reset(['part_id', 'chapter_id', 'lesson_id', 'chapters', 'lessons']);
     }
 
     public function updatedPartId($value)
     {
-        $this->lessons = $value ? SubjectPartLesson::where('subject_part_id', $value)->get() : [];
+        $this->chapters = $value ? SubjectPartLesson::where('subject_part_id', $value)->get() : [];
+        $this->reset(['chapter_id', 'lesson_id', 'lessons']);
+    }
+
+    public function updatedChapterId($value)
+    {
+        $this->lessons = $value ? \App\Models\Gn_SubjectPartLessionNew::where('subject_chapter_id', $value)->get() : [];
         $this->reset(['lesson_id']);
     }
 
@@ -170,7 +203,7 @@ class QuestionForm extends Component
             'board_agency_state_id' => $this->board_id,
             'subject' => $this->subject_id,
             'subject_part' => $this->part_id,
-            'subject_lesson_chapter' => $this->lesson_id,
+            'subject_lesson_chapter' => $this->lesson_id ?: $this->chapter_id,
             'question_type' => $this->question_type,
             'question' => $this->question_content,
             'difficulty_level' => $this->difficulty_level,

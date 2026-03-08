@@ -68,7 +68,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-4 col-sm-6">
+                    <div class="col-md-3 col-sm-6">
                         <label class="form-label fw-semibold">Subject Part</label>
                         <select class="form-select bg-light border-2" wire:model.live="part_id"
                             @disabled(!$subject_id)>
@@ -79,18 +79,29 @@
                         </select>
                     </div>
 
-                    <div class="col-md-4 col-sm-6">
-                        <label class="form-label fw-semibold">Lesson / Chapter</label>
-                        <select class="form-select bg-light border-2" wire:model="lesson_id"
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label fw-semibold">Chapter</label>
+                        <select class="form-select bg-light border-2" wire:model.live="chapter_id"
                             @disabled(!$part_id)>
-                            <option value="">Select Lesson/Chapter</option>
+                            <option value="">Select Chapter</option>
+                            @foreach ($chapters as $c)
+                                <option value="{{ $c->id }}">{{ $c->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label fw-semibold">Lesson</label>
+                        <select class="form-select bg-light border-2" wire:model="lesson_id"
+                            @disabled(!$chapter_id)>
+                            <option value="">Select Lesson</option>
                             @foreach ($lessons as $l)
                                 <option value="{{ $l->id }}">{{ $l->name }}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <div class="col-md-4 col-sm-12">
+                    <div class="col-md-3 col-sm-12">
                         <label class="form-label fw-semibold">Question Type <span class="text-danger">*</span></label>
                         <select class="form-select bg-light border-2" wire:model.live="question_type">
                             <option value="1">MCQ (Multiple Choice Question)</option>

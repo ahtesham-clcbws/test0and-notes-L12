@@ -498,11 +498,18 @@
                                                 </div>
                                                 <div class="footer-new-poup mt-2">
                                                     @if (Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active')
-                                                        <a
-                                                            href="{{ route('student.package_manage', [$item->id]) }}" class="btn-custom text-center">Start</a>
+                                                        @if ($item->education_type == Auth::user()->education_type && $item->class == Auth::user()->class)
+                                                            @if (in_array($item->id, $purchased_packages ?? []) || $item->final_fees == 0)
+                                                                <a href="{{ route('student.package_manage', [$item->id]) }}" class="btn-custom text-center">Start</a>
+                                                            @else
+                                                                <a href="{{ route('student.plan-checkout', [$item->id]) }}" class="btn-custom text-center">Buy</a>
+                                                            @endif
+                                                        @else
+                                                            <button class="btn-custom text-center" disabled style="opacity: 0.6; cursor: not-allowed;">Not Eligible</button>
+                                                        @endif
                                                     @else
                                                         <a href="{{ route('login', ['redirect' => route('student.package_manage', [$item->id])]) }}"
-                                                            class="btn-custom text-center">Start</a>
+                                                            class="btn-custom text-center">{{ $item->final_fees > 0 ? 'Buy' : 'Start' }}</a>
                                                     @endif
                                                 </div>
                                             </div>
@@ -598,11 +605,18 @@
                                                 </div>
                                                 <div class="footer-new-poup mt-2">
                                                     @if (Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active')
-                                                        <a
-                                                            href="{{ route('student.package_manage', [$item->id]) }}"><button>Start</button></a>
+                                                        @if ($item->education_type == Auth::user()->education_type && $item->class == Auth::user()->class)
+                                                            @if (in_array($item->id, $purchased_packages ?? []) || $item->final_fees == 0)
+                                                                <a href="{{ route('student.package_manage', [$item->id]) }}" class="btn-custom text-center">Start</a>
+                                                            @else
+                                                                <a href="{{ route('student.plan-checkout', [$item->id]) }}" class="btn-custom text-center">Buy</a>
+                                                            @endif
+                                                        @else
+                                                            <button class="btn-custom text-center" disabled style="opacity: 0.6; cursor: not-allowed;">Not Eligible</button>
+                                                        @endif
                                                     @else
                                                         <a href="{{ route('login', ['redirect' => route('student.package_manage', [$item->id])]) }}"
-                                                            class="btn-custom">{{ $item->permission_to_download }}</a>
+                                                            class="btn-custom text-center">{{ $item->final_fees > 0 ? 'Buy' : 'Start' }}</a>
                                                     @endif
                                                     <div class="like-bt">
                                                         <i class="fa fa-heart" aria-hidden="true"></i>
@@ -705,11 +719,18 @@
                                             </div>
                                             <div class="footer-new-poup mt-2">
                                                 @if (Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active')
-                                                    <a
-                                                        href="{{ route('student.package_manage', [$item->id]) }}"><button>Start</button></a>
+                                                    @if ($item->education_type == Auth::user()->education_type && $item->class == Auth::user()->class)
+                                                        @if (in_array($item->id, $purchased_packages ?? []) || $item->final_fees == 0)
+                                                            <a href="{{ route('student.package_manage', [$item->id]) }}" class="btn-custom text-center">Start</a>
+                                                        @else
+                                                            <a href="{{ route('student.plan-checkout', [$item->id]) }}" class="btn-custom text-center">Buy</a>
+                                                        @endif
+                                                    @else
+                                                        <button class="btn-custom text-center" disabled style="opacity: 0.6; cursor: not-allowed;">Not Eligible</button>
+                                                    @endif
                                                 @else
                                                     <a href="{{ route('login', ['redirect' => route('student.package_manage', [$item->id])]) }}"
-                                                        class="btn-custom">Start</a>
+                                                        class="btn-custom text-center">{{ $item->final_fees > 0 ? 'Buy' : 'Start' }}</a>
                                                 @endif
                                                 <div class="like-bt">
                                                     <i class="fa fa-heart" aria-hidden="true"></i>
@@ -792,11 +813,18 @@
                                             </div>
                                             <div class="footer-new-poup mt-2">
                                                 @if (Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active')
-                                                    <a
-                                                        href="{{ route('student.package_manage', [$item->id]) }}"><button>Start</button></a>
+                                                    @if ($item->education_type == Auth::user()->education_type && $item->class == Auth::user()->class)
+                                                        @if (in_array($item->id, $purchased_packages ?? []) || $item->final_fees == 0)
+                                                            <a href="{{ route('student.package_manage', [$item->id]) }}" class="btn-custom text-center">Start</a>
+                                                        @else
+                                                            <a href="{{ route('student.plan-checkout', [$item->id]) }}" class="btn-custom text-center">Buy</a>
+                                                        @endif
+                                                    @else
+                                                        <button class="btn-custom text-center" disabled style="opacity: 0.6; cursor: not-allowed;">Not Eligible</button>
+                                                    @endif
                                                 @else
                                                     <a href="{{ route('login', ['redirect' => route('student.package_manage', [$item->id])]) }}"
-                                                        class="btn-custom">Start</a>
+                                                        class="btn-custom text-center">{{ $item->final_fees > 0 ? 'Buy' : 'Start' }}</a>
                                                 @endif
                                                 <div class="like-bt">
                                                     <i class="fa fa-heart" aria-hidden="true"></i>

@@ -67,7 +67,7 @@
                     <div class="mb-4">
                         <label class="form-label fw-bold text-muted small text-uppercase ls-1">The Question</label>
                         <div wire:ignore class="editor-wrap rounded-4 overflow-hidden border">
-                            <textarea id="question_content" class="ckeditor-instance" data-model="question_content">{{ $this->question_content }}</textarea>
+                            <textarea id="question_content" class="tinyMce" data-model="question_content">{!! $this->question_content !!}</textarea>
                         </div>
                         @error('question_content') <span class="text-danger small">{{ $message }}</span> @enderror
                     </div>
@@ -99,7 +99,7 @@
                                                 </div>
                                             </div>
                                             <div wire:ignore>
-                                                <textarea id="ans_editor_{{ $i }}" class="ckeditor-instance" data-model="ans_{{ $i }}">{{ $this->{'ans_' . $i} }}</textarea>
+                                                <textarea id="ans_editor_{{ $i }}" class="tinyMce" data-model="ans_{{ $i }}">{!! $this->{'ans_' . $i} !!}</textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -113,13 +113,13 @@
                         <div class="col-md-6">
                             <label class="form-label fw-bold text-muted small text-uppercase ls-1">The Ideal Solution</label>
                             <div wire:ignore class="editor-wrap rounded-3 border">
-                                <textarea id="solution" class="ckeditor-instance" data-model="solution">{{ $this->solution }}</textarea>
+                                <textarea id="solution" class="tinyMce" data-model="solution">{!! $this->solution !!}</textarea>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold text-muted small text-uppercase ls-1">Detailed Explanation</label>
                             <div wire:ignore class="editor-wrap rounded-3 border">
-                                <textarea id="explanation" class="ckeditor-instance" data-model="explanation">{{ $this->explanation }}</textarea>
+                                <textarea id="explanation" class="tinyMce" data-model="explanation">{!! $this->explanation !!}</textarea>
                             </div>
                         </div>
                     </div>
@@ -129,7 +129,7 @@
 
         <!-- Sidebar Components -->
         <div class="col-lg-4 animate__animated animate__fadeInRight">
-            <div class="sticky-top" style="top: 2rem;">
+            <div class="sticky-top" style="top: 3rem;">
                 <!-- Categorization -->
                 <div class="card border-0 shadow-sm rounded-4 mb-4">
                     <div class="card-header bg-light border-0 py-3 px-4">
@@ -188,9 +188,19 @@
                             </select>
                         </div>
 
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Chapter</label>
+                            <select wire:model.live="chapter_id" class="form-select custom-select" @disabled(!$part_id)>
+                                <option value="">Select Chapter</option>
+                                @foreach($chapters as $c)
+                                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div class="mb-0">
-                            <label class="form-label small fw-bold text-muted">Lesson / Chapter</label>
-                            <select wire:model="lesson_id" class="form-select custom-select" @disabled(!$part_id)>
+                            <label class="form-label small fw-bold text-muted">Lesson</label>
+                            <select wire:model="lesson_id" class="form-select custom-select" @disabled(!$chapter_id)>
                                 <option value="">Select Lesson</option>
                                 @foreach($lessons as $l)
                                     <option value="{{ $l->id }}">{{ $l->name }}</option>
@@ -228,67 +238,86 @@
         </div>
     </div>
 
-    <!-- Notification system for errors -->
-    <div x-data="{ show: false, message: '', type: 'success' }"
-         x-on:notify.window="show = true; message = $event.detail.message; type = $event.detail.type; setTimeout(() => show = false, 5000)"
-         class="position-fixed top-0 end-0 p-4" style="z-index: 10000">
-        <div x-show="show" x-transition.duration.300ms
-             :class="type === 'success' ? 'bg-success' : 'bg-danger'"
-             class="text-white px-4 py-3 rounded-4 shadow-lg border-0 d-flex align-items-center gap-3">
-            <i class="bi" :class="type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
-            <span x-text="message" class="fw-bold"></span>
-        </div>
-    </div>
+    <!-- Notification system replaced with SweetAlert2 in script block -->
 
     @once
-    <script src="{{ asset('js/ckeditor.js') }}"></script>
+    <script src="{{ asset('tinymce/tinymce.min.js') }}"></script>
     <script>
         document.addEventListener('livewire:init', () => {
-             const initCK = (selector, modelName) => {
-                if(!window.CKEDITOR) {
-                    console.error('CKEDITOR not found. Retrying in 500ms...');
-                    setTimeout(() => initCK(selector, modelName), 500);
+            // Setup Notifications
+            Livewire.on('notify', (event) => {
+                let data = event[0] || event;
+                if (data && data.message && typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: data.type || 'success',
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                    });
+                }
+            });
+
+            const initTiny = (selector, modelName) => {
+                if (!window.tinymce) {
+                    console.error('TinyMCE not found. Retrying...');
+                    setTimeout(() => initTiny(selector, modelName), 500);
                     return;
                 }
-                if (CKEDITOR.instances[selector]) return;
 
-                const editor = CKEDITOR.replace(selector, {
-                    removePlugins: 'elementspath',
-                    resize_enabled: false,
-                    height: selector.includes('ans') ? 100 : 200,
-                    toolbarGroups: [
-                        { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-                        { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi', 'paragraph' ] },
-                        { name: 'insert', groups: [ 'insert' ] },
-                        { name: 'styles', groups: [ 'styles' ] },
-                    ]
-                });
-
-                editor.on('change', () => {
-                    @this.set(modelName, editor.getData());
-                });
-
-                // Sync from Livewire
-                Livewire.on('editor-sync-' + modelName, (event) => {
-                    const data = Array.isArray(event) ? event[0].data : event.data;
-                    if (editor.getData() !== data) {
-                        editor.setData(data);
+                tinymce.init({
+                    selector: '#' + selector,
+                    height: selector.includes('ans') ? 150 : 250,
+                    menubar: false,
+                    plugins: 'lists link image table code',
+                    toolbar: 'undo redo | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | code',
+                    branding: false,
+                    automatic_uploads: true,
+                    file_picker_types: 'image',
+                    file_picker_callback: function (cb, value, meta) {
+                        var input = document.createElement('input');
+                        input.setAttribute('type', 'file');
+                        input.setAttribute('accept', 'image/*');
+                        input.onchange = function () {
+                            var file = this.files[0];
+                            var reader = new FileReader();
+                            reader.onload = function () {
+                                var id = 'blobid' + (new Date()).getTime();
+                                var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                                var base64 = reader.result.split(',')[1];
+                                var blobInfo = blobCache.create(id, file, base64);
+                                blobCache.add(blobInfo);
+                                cb(blobInfo.blobUri(), {
+                                    title: file.name
+                                });
+                            };
+                            reader.readAsDataURL(file);
+                        };
+                        input.click();
+                    },
+                    setup: (editor) => {
+                        editor.on('change', () => {
+                            @this.set(modelName, editor.getContent());
+                        });
+                        editor.on('blur', () => {
+                            @this.set(modelName, editor.getContent());
+                        });
                     }
                 });
             };
 
             const autoInit = () => {
-                document.querySelectorAll('.ckeditor-instance').forEach(el => {
-                    if (!CKEDITOR.instances[el.id]) {
-                        initCK(el.id, el.dataset.model);
+                document.querySelectorAll('.tinyMce').forEach(el => {
+                    if (!tinymce.get(el.id)) {
+                        initTiny(el.id, el.dataset.model);
                     }
                 });
             };
 
-            // Initial global init for all instances
             autoInit();
 
-            // Watch for MCQ count changes to init new editors
             Livewire.on('mcq-updated', () => {
                 setTimeout(autoInit, 100);
             });

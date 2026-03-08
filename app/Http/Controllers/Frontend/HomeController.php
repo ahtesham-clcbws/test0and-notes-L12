@@ -215,7 +215,15 @@ class HomeController extends Controller
                 ->get();
         });
 
-        return view('Frontend/home', compact('Gn_PackagePlanTestAndNotes', 'Gn_PackagePlanTestAndNotes2', 'StudymaterialGovComp', 'StudymaterialGovComp2', 'StudymaterialGovComp3', 'StudymaterialGovComp4', 'StudymaterialGovComp5', 'Gn_PackagePackagelist', 'Gn_PackagePlanInstitute', 'result', 'pdf', 'reviews'));
+        $purchased_packages = [];
+        if (\Illuminate\Support\Facades\Auth::check()) {
+            $purchased_packages = \App\Models\Gn_PackageTransaction::where('student_id', \Illuminate\Support\Facades\Auth::id())
+                ->where('plan_status', 1)
+                ->pluck('plan_id')
+                ->toArray();
+        }
+
+        return view('Frontend/home', compact('Gn_PackagePlanTestAndNotes', 'Gn_PackagePlanTestAndNotes2', 'StudymaterialGovComp', 'StudymaterialGovComp2', 'StudymaterialGovComp3', 'StudymaterialGovComp4', 'StudymaterialGovComp5', 'Gn_PackagePackagelist', 'Gn_PackagePlanInstitute', 'result', 'pdf', 'reviews', 'purchased_packages'));
     }
 
     public function page()

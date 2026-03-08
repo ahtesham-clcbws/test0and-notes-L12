@@ -23,6 +23,8 @@ class QuestionImport extends Component
 
     public $part_id = '';
 
+    public $chapter_id = '';
+
     public $lesson_id = '';
 
     public $question_type = 1;
@@ -36,6 +38,8 @@ class QuestionImport extends Component
     public $subjects = [];
 
     public $parts = [];
+
+    public $chapters = [];
 
     public $lessons = [];
 
@@ -55,26 +59,36 @@ class QuestionImport extends Component
     public function updatedEducationTypeId($value)
     {
         $this->classes = $value ? \App\Models\ClassGoupExamModel::where('education_type_id', $value)->get() : [];
-        $this->reset(['class_id', 'board_id', 'subject_id', 'part_id', 'lesson_id', 'boards', 'subjects', 'parts', 'lessons']);
+        $this->reset(['class_id', 'board_id', 'subject_id', 'part_id', 'chapter_id', 'lesson_id', 'boards', 'subjects', 'parts', 'chapters', 'lessons']);
     }
 
     public function updatedClassId($value)
     {
-        $this->boards = $value ? \App\Models\BoardAgencyStateModel::where('classes_group_exams_id', $value)->get() : [];
         $class = $value ? \App\Models\ClassGoupExamModel::find($value) : null;
-        $this->subjects = $class ? $class->class_subjects()->get() : [];
-        $this->reset(['board_id', 'subject_id', 'part_id', 'lesson_id', 'parts', 'lessons']);
+        $agency_board_university = \App\Models\Gn_EducationClassExamAgencyBoardUniversity::where('classes_group_exams_id', $value)->pluck('board_agency_exam_id')->toArray();
+        $this->boards = empty($agency_board_university) ? [] : \App\Models\BoardAgencyStateModel::whereIn('id', $agency_board_university)->get();
+        $this->subjects = $class ? \App\Models\Subject::select('subjects.*')
+            ->leftJoin('gn__class_subjects', 'gn__class_subjects.subject_id', '=', 'subjects.id')
+            ->where('gn__class_subjects.classes_group_exams_id', $value)
+            ->get() : [];
+        $this->reset(['board_id', 'subject_id', 'part_id', 'chapter_id', 'lesson_id', 'parts', 'chapters', 'lessons']);
     }
 
     public function updatedSubjectId($value)
     {
         $this->parts = $value ? \App\Models\SubjectPart::where('subject_id', $value)->get() : [];
-        $this->reset(['part_id', 'lesson_id', 'lessons']);
+        $this->reset(['part_id', 'chapter_id', 'lesson_id', 'chapters', 'lessons']);
     }
 
     public function updatedPartId($value)
     {
-        $this->lessons = $value ? \App\Models\SubjectPartLesson::where('subject_part_id', $value)->get() : [];
+        $this->chapters = $value ? \App\Models\SubjectPartLesson::where('subject_part_id', $value)->get() : [];
+        $this->reset(['chapter_id', 'lesson_id', 'lessons']);
+    }
+
+    public function updatedChapterId($value)
+    {
+        $this->lessons = $value ? \App\Models\Gn_SubjectPartLessionNew::where('subject_chapter_id', $value)->get() : [];
         $this->reset(['lesson_id']);
     }
 
@@ -97,7 +111,7 @@ class QuestionImport extends Component
                 'board_agency_state_id' => $this->board_id,
                 'subject' => $this->subject_id,
                 'subject_part' => $this->part_id,
-                'subject_lesson_chapter' => $this->lesson_id,
+                'subject_lesson_chapter' => $this->lesson_id ?: $this->chapter_id,
                 'question_type' => $this->question_type,
             ];
 

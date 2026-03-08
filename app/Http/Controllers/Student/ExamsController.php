@@ -60,6 +60,31 @@ class ExamsController extends Controller
 
     public function package_manage(Request $req, $id)
     {
+        $package_plan = \App\Models\Gn_PackagePlan::find($id);
+
+        if (!$package_plan || $package_plan->status != 1) {
+            return redirect()->route('student.dashboard')->with('error', 'Package not found or inactive.');
+        }
+
+        $user = Auth::user();
+
+        // Eligibility Check
+        if ($package_plan->education_type != $user->education_type || $package_plan->class != $user->class) {
+            return redirect()->route('student.dashboard')->with('error', 'You are not eligible for this package based on your education type and class.');
+        }
+
+        // Purchase Verification
+        if ($package_plan->final_fees > 0) {
+            $has_purchased = \App\Models\Gn_PackageTransaction::where('student_id', $user->id)
+                ->where('plan_id', $id)
+                ->where('plan_status', 1)
+                ->exists();
+
+            if (!$has_purchased) {
+                return redirect()->route('student.plan')->with('error', 'You need to purchase this package to view it.');
+            }
+        }
+
         $result = [
             'onegk' => [],
             'live_video' => [],
@@ -87,48 +112,54 @@ class ExamsController extends Controller
             ->where('id', $id)
             ->first();
 
-        $static_gk_ids = array_map('intval', explode(',', $static_gk_id->static_gk_id));
-        foreach ($static_gk_ids as $onegkid) {
-            $data = DB::table('study_material')
-                ->leftJoin('classes_groups_exams', function ($join) {
-                    $join->on('study_material.class', 'classes_groups_exams.id')
-                        ->whereNull('classes_groups_exams.deleted_at');
-                })
-                ->select('study_material.*', 'classes_groups_exams.name')
-                ->where('study_material.id', $onegkid)
-                ->first();
-            if ($data) {
-                $result['onegk'][] = $data;
+        if ($static_gk_id && $static_gk_id->static_gk_id) {
+            $static_gk_ids = array_filter(array_map('intval', explode(',', $static_gk_id->static_gk_id)));
+            foreach ($static_gk_ids as $onegkid) {
+                $data = DB::table('study_material')
+                    ->leftJoin('classes_groups_exams', function ($join) {
+                        $join->on('study_material.class', 'classes_groups_exams.id')
+                            ->whereNull('classes_groups_exams.deleted_at');
+                    })
+                    ->select('study_material.*', 'classes_groups_exams.name')
+                    ->where('study_material.id', $onegkid)
+                    ->first();
+                if ($data) {
+                    $result['onegk'][] = $data;
+                }
             }
         }
 
-        $video_ids = array_map('intval', explode(',', $video_id->video_id));
-        foreach ($video_ids as $onevideo) {
-            $data = DB::table('study_material')
-                ->leftJoin('classes_groups_exams', function ($join) {
-                    $join->on('study_material.class', 'classes_groups_exams.id')
-                        ->whereNull('classes_groups_exams.deleted_at');
-                })
-                ->select('study_material.*', 'classes_groups_exams.name')
-                ->where('study_material.id', $onevideo)
-                ->first();
-            if ($data) {
-                $result['live_video'][] = $data;
+        if ($video_id && $video_id->video_id) {
+            $video_ids = array_filter(array_map('intval', explode(',', $video_id->video_id)));
+            foreach ($video_ids as $onevideo) {
+                $data = DB::table('study_material')
+                    ->leftJoin('classes_groups_exams', function ($join) {
+                        $join->on('study_material.class', 'classes_groups_exams.id')
+                            ->whereNull('classes_groups_exams.deleted_at');
+                    })
+                    ->select('study_material.*', 'classes_groups_exams.name')
+                    ->where('study_material.id', $onevideo)
+                    ->first();
+                if ($data) {
+                    $result['live_video'][] = $data;
+                }
             }
         }
 
-        $study_material_ids = array_map('intval', explode(',', $study_material_id[0]->study_material_id));
-        foreach ($study_material_ids as $onematerial) {
-            $data = DB::table('study_material')
-                ->leftJoin('classes_groups_exams', function ($join) {
-                    $join->on('study_material.class', 'classes_groups_exams.id')
-                        ->whereNull('classes_groups_exams.deleted_at');
-                })
-                ->select('study_material.*', 'classes_groups_exams.name')
-                ->where('study_material.id', $onematerial)
-                ->first();
-            if ($data) {
-                $result['study_material'][] = $data;
+        if ($study_material_id && isset($study_material_id[0]) && $study_material_id[0]->study_material_id) {
+            $study_material_ids = array_filter(array_map('intval', explode(',', $study_material_id[0]->study_material_id)));
+            foreach ($study_material_ids as $onematerial) {
+                $data = DB::table('study_material')
+                    ->leftJoin('classes_groups_exams', function ($join) {
+                        $join->on('study_material.class', 'classes_groups_exams.id')
+                            ->whereNull('classes_groups_exams.deleted_at');
+                    })
+                    ->select('study_material.*', 'classes_groups_exams.name')
+                    ->where('study_material.id', $onematerial)
+                    ->first();
+                if ($data) {
+                    $result['study_material'][] = $data;
+                }
             }
         }
 
@@ -141,12 +172,14 @@ class ExamsController extends Controller
                 ->select('test.*', 'classes_groups_exams.name as class_name')
                 ->where('test.id', $onetest->test_id)
                 ->whereNull('test.deleted_at')
+                ->where('test.published', 1)
                 ->first();
             if ($data) {
                 $result['test'][] = $data;
             }
         }
 
+        $result['package_plan'] = $package_plan;
         return view('Dashboard/Student/MyPlan/package_manage', $result);
     }
 

@@ -180,6 +180,9 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Gn_PackagePlan::observe(\App\Observers\GnPackagePlanObserver::class);
         \App\Models\Studymaterial::observe(\App\Observers\StudymaterialObserver::class);
         \App\Models\Review::observe(\App\Observers\ReviewObserver::class);
+        \App\Models\TestModal::observe(\App\Observers\TestObserver::class);
+        \App\Models\TestSections::observe(\App\Observers\TestSectionObserver::class);
+        \App\Models\TestQuestions::observe(\App\Observers\TestQuestionObserver::class);
 
         // View Composer for Student Sidebar
         View::composer('Dashboard.Student.partials.sidebar', function ($view) {

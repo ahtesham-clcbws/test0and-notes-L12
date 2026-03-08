@@ -15,13 +15,12 @@
 - [x] Add loaders and notifications for test section actions
 - [x] Document overall phase state for new agent in `.agent/current_work_status.md`
 
-## Phase 2: Question Mapping (ACTIVE)
-- [ ] Research `QuestionBankModel` selection patterns.
-- [ ] Implement mapping for actual Questions to the `TestSections` (`QuestionBank` mapping via `Admin\Tests\TestTable` and `ExamsController`).
-- [ ] Create UI for selecting/filtering questions based on Section criteria (Subject, Board, Class, Lesson/Topic).
-- [ ] Implement batch mapping of multiple questions to a section.
-- [ ] Add preview functionality for mapped questions within the `TestSections`.
-- [ ] Verify interaction between `TestSections` and `TestQuestions` tables.
+## Phase 2: Question Mapping (COMPLETED)
+- [x] Implement mapping for actual Questions to the `TestSections` (`QuestionBank` mapping via `Admin\Tests\TestTable` and `ExamsController`).
+- [x] Create UI for selecting/filtering questions based on Section criteria (Strict Subject & Part match).
+- [x] Refactor Notification in Question Form using Livewire and SweetAlert.
+- [x] Enforce Package Eligibility & Purchase Safeguards globally.
+- [x] Develop System for Auto-Unpublishing Tests upon Section/Question deletion via Observers.
 
 ## Phase 3: Testing & Polish (UPCOMING)
 - [ ] Unit/Feature tests for Test/Section/Question relationships.

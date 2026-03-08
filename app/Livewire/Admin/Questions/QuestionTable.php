@@ -6,7 +6,6 @@ use App\Models\BoardAgencyStateModel;
 use App\Models\ClassGoupExamModel;
 use App\Models\Educationtype;
 use App\Models\QuestionBankModel;
-use App\Models\Subject;
 use App\Models\SubjectPart;
 use App\Models\SubjectPartLesson;
 use Livewire\Attributes\Layout;
@@ -70,8 +69,13 @@ class QuestionTable extends Component
             $this->classes = ClassGoupExamModel::where('education_type_id', $this->education_type_id)->get();
         }
         if ($this->class_id) {
-            $this->boards = BoardAgencyStateModel::where('class_group_exam_id', $this->class_id)->get();
-            $this->subjects = Subject::where('class_id', $this->class_id)->get();
+            $class = ClassGoupExamModel::find($this->class_id);
+            $agency_board_university = \App\Models\Gn_EducationClassExamAgencyBoardUniversity::where('classes_group_exams_id', $this->class_id)->pluck('board_agency_exam_id')->toArray();
+            $this->boards = empty($agency_board_university) ? [] : BoardAgencyStateModel::whereIn('id', $agency_board_university)->get();
+            $this->subjects = \App\Models\Subject::select('subjects.*')
+                ->leftJoin('gn__class_subjects', 'gn__class_subjects.subject_id', '=', 'subjects.id')
+                ->where('gn__class_subjects.classes_group_exams_id', $this->class_id)
+                ->get();
         }
     }
 
@@ -84,8 +88,13 @@ class QuestionTable extends Component
 
     public function updatedClassId($value)
     {
-        $this->boards = $value ? BoardAgencyStateModel::where('class_group_exam_id', $value)->get() : [];
-        $this->subjects = $value ? Subject::where('class_id', $value)->get() : [];
+        $class = $value ? ClassGoupExamModel::find($value) : null;
+        $agency_board_university = \App\Models\Gn_EducationClassExamAgencyBoardUniversity::where('classes_group_exams_id', $value)->pluck('board_agency_exam_id')->toArray();
+        $this->boards = empty($agency_board_university) ? [] : BoardAgencyStateModel::whereIn('id', $agency_board_university)->get();
+        $this->subjects = $class ? \App\Models\Subject::select('subjects.*')
+            ->leftJoin('gn__class_subjects', 'gn__class_subjects.subject_id', '=', 'subjects.id')
+            ->where('gn__class_subjects.classes_group_exams_id', $value)
+            ->get() : [];
         $this->reset(['board_id', 'subject_id', 'part_id', 'lesson_id', 'parts', 'lessons']);
         $this->resetPage();
     }
@@ -191,8 +200,11 @@ class QuestionTable extends Component
         $this->educationTypes = Educationtype::all();
         $this->classes = $this->education_type_id ? ClassGoupExamModel::where('education_type_id', $this->education_type_id)->get() : [];
 
-        $class = $this->class_id ? ClassGoupExamModel::find($this->class_id) : null;
-        $this->subjects = $class ? $class->class_subjects()->get() : [];
+        $class = $this->class_id ? \App\Models\ClassGoupExamModel::find($this->class_id) : null;
+        $this->subjects = $class ? \App\Models\Subject::select('subjects.*')
+            ->leftJoin('gn__class_subjects', 'gn__class_subjects.subject_id', '=', 'subjects.id')
+            ->where('gn__class_subjects.classes_group_exams_id', $this->class_id)
+            ->get() : [];
 
         $this->parts = $this->subject_id ? SubjectPart::where('subject_id', $this->subject_id)->get() : [];
         $this->lessons = $this->part_id ? SubjectPartLesson::where('subject_part_id', $this->part_id)->get() : [];

@@ -60,27 +60,20 @@ class TestQuestionsManager extends Component
 
     public function getAvailableQuestionsProperty()
     {
-        // Ensure we load matching questions based on Test configuration
-        // i.e., same Education Type, Class, and Board
-        // and optionally matching Section's subject criteria
-        $query = QuestionBankModel::where('education_type_id', $this->test->education_type_id)
-            ->where('class_group_exam_id', $this->test->education_type_child_id);
-
-        if ($this->test->board_state_agency) {
-            $query->where('board_agency_state_id', $this->test->board_state_agency);
-        }
+        // Match questions strictly based on Section's subject criteria
+        // as requested: "matching subject & part, nothing else"
+        $query = QuestionBankModel::query();
 
         if ($this->section->subject) {
             $query->where('subject', $this->section->subject);
         }
+
         if ($this->section->subject_part) {
             $query->where('subject_part', $this->section->subject_part);
         }
-        if ($this->section->subject_part_lesson) {
-            $query->where('subject_lesson_chapter', $this->section->subject_part_lesson);
-        }
 
         // Filter out those already added to THIS section explicitly
+
         // (Requirements said it's okay to add to another section, but not duplicate in THIS section)
         $alreadyAssignedIds = TestQuestions::where('section_id', $this->sectionId)
             ->pluck('question_id')

@@ -188,7 +188,7 @@
                                             @endif
                                             @if($question->status !== 'rejected')
                                                 <button wire:click="updateStatus({{ $question->id }}, 'rejected')" class="btn btn-sm btn-white border-end" title="Reject">
-                                                    <i class="bi bi-x-large text-danger"></i>
+                                                    <i class="bi bi-x-lg text-danger"></i>
                                                 </button>
                                             @endif
                                             <button wire:click="deleteQuestion({{ $question->id }})"

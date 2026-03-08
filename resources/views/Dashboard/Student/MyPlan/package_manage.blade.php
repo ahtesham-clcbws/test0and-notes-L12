@@ -120,6 +120,35 @@
 @section('main')
 <div class="container-fluid py-4">
 
+    {{-- Package Header Section --}}
+    @if(isset($package_plan))
+    <div class="package-section mb-5" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white; border-radius: 16px; padding: 2.5rem; box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.2), 0 8px 10px -6px rgba(59, 130, 246, 0.1);">
+        <div class="d-flex justify-content-between align-items-md-center flex-column flex-md-row gap-4">
+            <div>
+                <span class="badge bg-white text-primary mb-3 px-3 py-2 rounded-pill shadow-sm" style="font-weight: 600; letter-spacing: 0.5px;">
+                    <i class="bi bi-mortarboard-fill me-1"></i> {{ $package_plan->educationType?->name ?? 'Package' }} • {{ $package_plan->classType?->name ?? 'General' }}
+                </span>
+                <h1 class="display-5 fw-bold mb-3 text-white" style="letter-spacing: -1px; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">{{ $package_plan->plan_name }}</h1>
+                <div class="d-flex gap-3 flex-wrap opacity-90">
+                    <span class="d-inline-flex align-items-center"><i class="bi bi-journal-text me-2"></i> {{ $package_plan->total_test ?? 0 }} Tests</span>
+                    <span class="d-inline-flex align-items-center"><i class="bi bi-camera-video me-2"></i> {{ $package_plan->total_video ?? 0 }} Videos</span>
+                    <span class="d-inline-flex align-items-center"><i class="bi bi-file-earmark-pdf me-2"></i> {{ $package_plan->total_notes ?? 0 }} Notes</span>
+                </div>
+            </div>
+            <div class="text-md-end bg-white bg-opacity-10 p-4 rounded-4 border border-white border-opacity-25" style="backdrop-filter: blur(12px); min-width: 250px;">
+                <div class="mb-3">
+                    <div class="opacity-75 small text-uppercase fw-bold tracking-wider mb-1"><i class="bi bi-clock-history me-1"></i> Subscribed Duration</div>
+                    <div class="fs-4 fw-bold text-white">{{ $package_plan->duration }} Days</div>
+                </div>
+                <div>
+                    <div class="opacity-75 small text-uppercase fw-bold tracking-wider mb-1"><i class="bi bi-calendar-event me-1"></i> Package Expiry</div>
+                    <div class="fs-6 text-white">{{ \Carbon\Carbon::parse($package_plan->expire_date)->format('d M, Y') }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Tests Section --}}
     <div class="package-section">
         <h3 class="package-section-title">
