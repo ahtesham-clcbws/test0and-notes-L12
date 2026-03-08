@@ -498,8 +498,12 @@
                                                 </div>
                                                 <div class="footer-new-poup mt-2">
                                                     @if (Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active')
-                                                        @if ($item->education_type == Auth::user()->education_type && $item->class == Auth::user()->class)
-                                                            @if (in_array($item->id, $purchased_packages ?? []) || $item->final_fees == 0)
+                                                        @php
+                                                            $isPurchased = in_array($item->id, $purchased_packages ?? []);
+                                                            $isEligible = ($item->education_type == Auth::user()->education_type && $item->class == Auth::user()->class);
+                                                        @endphp
+                                                        @if ($isPurchased || $isEligible || $item->final_fees == 0)
+                                                            @if ($isPurchased || $item->final_fees == 0)
                                                                 <a href="{{ route('student.package_manage', [$item->id]) }}" class="btn-custom text-center">Start</a>
                                                             @else
                                                                 <a href="{{ route('student.plan-checkout', [$item->id]) }}" class="btn-custom text-center">Buy</a>
@@ -605,8 +609,12 @@
                                                 </div>
                                                 <div class="footer-new-poup mt-2">
                                                     @if (Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active')
-                                                        @if ($item->education_type == Auth::user()->education_type && $item->class == Auth::user()->class)
-                                                            @if (in_array($item->id, $purchased_packages ?? []) || $item->final_fees == 0)
+                                                        @php
+                                                            $isPurchased = in_array($item->id, $purchased_packages ?? []);
+                                                            $isEligible = ($item->education_type == Auth::user()->education_type && $item->class == Auth::user()->class);
+                                                        @endphp
+                                                        @if ($isPurchased || $isEligible || $item->final_fees == 0)
+                                                            @if ($isPurchased || $item->final_fees == 0)
                                                                 <a href="{{ route('student.package_manage', [$item->id]) }}" class="btn-custom text-center">Start</a>
                                                             @else
                                                                 <a href="{{ route('student.plan-checkout', [$item->id]) }}" class="btn-custom text-center">Buy</a>
@@ -719,8 +727,12 @@
                                             </div>
                                             <div class="footer-new-poup mt-2">
                                                 @if (Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active')
-                                                    @if ($item->education_type == Auth::user()->education_type && $item->class == Auth::user()->class)
-                                                        @if (in_array($item->id, $purchased_packages ?? []) || $item->final_fees == 0)
+                                                    @php
+                                                        $isPurchased = in_array($item->id, $purchased_packages ?? []);
+                                                        $isEligible = ($item->education_type == Auth::user()->education_type && $item->class == Auth::user()->class);
+                                                    @endphp
+                                                    @if ($isPurchased || $isEligible || $item->final_fees == 0)
+                                                        @if ($isPurchased || $item->final_fees == 0)
                                                             <a href="{{ route('student.package_manage', [$item->id]) }}" class="btn-custom text-center">Start</a>
                                                         @else
                                                             <a href="{{ route('student.plan-checkout', [$item->id]) }}" class="btn-custom text-center">Buy</a>
@@ -813,8 +825,12 @@
                                             </div>
                                             <div class="footer-new-poup mt-2">
                                                 @if (Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active')
-                                                    @if ($item->education_type == Auth::user()->education_type && $item->class == Auth::user()->class)
-                                                        @if (in_array($item->id, $purchased_packages ?? []) || $item->final_fees == 0)
+                                                    @php
+                                                        $isPurchased = in_array($item->id, $purchased_packages ?? []);
+                                                        $isEligible = ($item->education_type == Auth::user()->education_type && $item->class == Auth::user()->class);
+                                                    @endphp
+                                                    @if ($isPurchased || $isEligible || $item->final_fees == 0)
+                                                        @if ($isPurchased || $item->final_fees == 0)
                                                             <a href="{{ route('student.package_manage', [$item->id]) }}" class="btn-custom text-center">Start</a>
                                                         @else
                                                             <a href="{{ route('student.plan-checkout', [$item->id]) }}" class="btn-custom text-center">Buy</a>

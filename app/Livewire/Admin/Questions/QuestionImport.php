@@ -3,6 +3,9 @@
 namespace App\Livewire\Admin\Questions;
 
 use App\Imports\QuestionBankImport;
+use App\Models\QuestionBankModel;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -135,9 +138,19 @@ class QuestionImport extends Component
         $this->isImporting = true;
         try {
             foreach ($this->previewData as $data) {
-                \App\Models\QuestionBankModel::create($data);
+                // Ensure categorization and status are correctly set
+                $data['education_type_id'] = $this->education_type_id;
+                $data['class_group_exam_id'] = $this->class_id;
+                $data['board_agency_state_id'] = $this->board_id;
+                $data['subject'] = $this->subject_id;
+                $data['subject_part'] = $this->part_id;
+                $data['subject_lesson_chapter'] = $this->lesson_id ?: $this->chapter_id;
+                $data['status'] = 'approved'; 
+                $data['creator_id'] = Auth::id();
+
+                QuestionBankModel::create($data);
             }
-            session()->flash('success', 'Questions successfully integrated into architectural bank.');
+            session()->flash('success', 'Questions successfully integrated into system bank.');
 
             return redirect()->route('administrator.dashboard_question_list');
         } catch (\Exception $e) {

@@ -25,7 +25,9 @@ class StudentPlanController extends Controller
                     $query->where('franchise_details.branch_code', '=', Auth::user()->franchise_code)
                         ->orWhere('gn__package_plans.package_type', '=', 0);
                 })
-                ->where('gn__package_plans.status', '=', 1);
+                ->where('gn__package_plans.status', '=', 1)
+                ->where('gn__package_plans.education_type', Auth::user()->education_type)
+                ->where('gn__package_plans.class', Auth::user()->class);
 
             $active_plans = Gn_PackageTransaction::where('student_id', Auth::user()->id)
                 ->where('plan_status', 1)

@@ -148,7 +148,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label small fw-bold text-muted">Academic Class</label>
+                            <label class="form-label small fw-bold text-muted">Class / Group / Exam Name</label>
                             <select wire:model.live="class_id" class="form-select custom-select" @disabled(!$education_type_id)>
                                 <option value="">Select Class</option>
                                 @foreach($classes as $c)
@@ -210,30 +210,22 @@
                     </div>
                 </div>
 
-                <!-- Guidance Info -->
-                <div class="card border-0 bg-primary bg-gradient text-white rounded-4 shadow-sm overflow-hidden">
-                    <div class="card-body p-4 relative">
-                        <div class="glass-orb"></div>
-                        <h6 class="fw-bold mb-3 d-flex align-items-center">
-                            <i class="bi bi-lightbulb-fill me-2 text-warning"></i>
-                            Design Guidelines
-                        </h6>
-                        <ul class="list-unstyled small mb-0">
-                            <li class="mb-2 d-flex gap-2">
-                                <i class="bi bi-check2-circle text-warning"></i>
-                                Ensure clear, unambiguous language.
-                            </li>
-                            <li class="mb-2 d-flex gap-2">
-                                <i class="bi bi-check2-circle text-warning"></i>
-                                Include relevant diagrams via editor.
-                            </li>
-                            <li class="d-flex gap-2">
-                                <i class="bi bi-check2-circle text-warning"></i>
-                                Map to exact lesson for better analytics.
-                            </li>
-                        </ul>
-                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extra Save Button for convenience -->
+    <div class="row mt-4 animate__animated animate__fadeInUp">
+        <div class="col-12 text-end bg-white p-3 rounded-4 shadow-sm border border-opacity-10 mb-5">
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{{ route('administrator.dashboard_question_list') }}" class="btn btn-light border rounded-3 px-4 py-2 text-muted fw-semi-bold transition-all hover-translate-y">
+                    <i class="bi bi-arrow-left me-2"></i>Cancel
+                </a>
+                <button wire:click="save" wire:loading.attr="disabled" class="btn btn-primary rounded-3 px-4 py-2 shadow-sm fw-bold border-0 transition-all hover-glow">
+                    <span wire:loading.remove><i class="bi bi-save me-2"></i>Persist Changes</span>
+                    <span wire:loading><span class="spinner-border spinner-border-sm me-2"></span>Saving...</span>
+                </button>
             </div>
         </div>
     </div>

@@ -16,16 +16,26 @@ class TestQuestionsManager extends Component
     use WithPagination;
 
     public $testId;
-
     public $sectionId;
-
     public $test;
-
     public $section;
-
     public $totalAllowed = 0;
-
     public $currentlyAssigned = 0;
+
+    // New Question Modal Properties
+    public $showAddModal = false;
+    public $newQuestion = [
+        'question' => '',
+        'question_type' => 1,
+        'ans_1' => '',
+        'ans_2' => '',
+        'ans_3' => '',
+        'ans_4' => '',
+        'ans_5' => '',
+        'mcq_answer' => 'ans_1',
+        'solution' => '',
+        'explanation' => '',
+    ];
 
     protected $listeners = ['questionAdded' => '$refresh', 'questionRemoved' => '$refresh'];
 
@@ -130,6 +140,55 @@ class TestQuestionsManager extends Component
             $this->updateCounts();
             session()->flash('success', 'Question removed from section.');
         }
+    }
+
+    public function openAddModal()
+    {
+        $this->resetErrorBag();
+        $this->newQuestion = [
+            'question' => '',
+            'question_type' => 1,
+            'ans_1' => '',
+            'ans_2' => '',
+            'ans_3' => '',
+            'ans_4' => '',
+            'ans_5' => '',
+            'mcq_answer' => 'ans_1',
+            'solution' => '',
+            'explanation' => '',
+        ];
+        $this->showAddModal = true;
+    }
+
+    public function closeAddModal()
+    {
+        $this->showAddModal = false;
+    }
+
+    public function saveNewQuestion()
+    {
+        $this->validate([
+            'newQuestion.question' => 'required',
+            'newQuestion.question_type' => 'required',
+            'newQuestion.mcq_answer' => 'required_if:newQuestion.question_type,1',
+        ]);
+
+        $data = $this->newQuestion;
+        $data['education_type_id'] = $this->test->education_type_id;
+        $data['class_group_exam_id'] = $this->test->education_type_child_id;
+        $data['board_agency_state_id'] = $this->test->board_state_agency;
+        $data['subject'] = $this->section->subject;
+        $data['subject_part'] = $this->section->subject_part;
+        $data['subject_lesson_chapter'] = $this->section->subject_part_lesson;
+        $data['status'] = 'approved';
+        $data['creator_id'] = Auth::id();
+
+        $question = QuestionBankModel::create($data);
+
+        $this->addQuestion($question->id);
+        
+        $this->showAddModal = false;
+        $this->dispatch('notify', ['type' => 'success', 'message' => 'Question created and attached successfully!']);
     }
 
     #[Layout('Layouts.admin')]

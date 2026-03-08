@@ -117,7 +117,12 @@
                 <!-- Question Bank Selection -->
                 <div class="card shadow-sm border-0">
                     <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 text-dark fw-bold"><i class="bi bi-cloud-arrow-down text-primary me-2"></i> Select from Question Bank</h5>
+                        <div class="d-flex align-items-center gap-3">
+                            <h5 class="mb-0 text-dark fw-bold"><i class="bi bi-cloud-arrow-down text-primary me-2"></i> Select from Question Bank</h5>
+                            <button wire:click="openAddModal" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold shadow-sm">
+                                <i class="bi bi-plus-lg me-1"></i> Add New Question
+                            </button>
+                        </div>
                         
                         @if($currentlyAssigned >= $totalAllowed)
                             <span class="badge bg-warning text-dark px-3 py-2"><i class="bi bi-lock-fill me-1"></i> Section Full</span>
@@ -180,6 +185,93 @@
                     </div>
                 </div>
             
+            </div>
+        </div>
+    </div>
+
+    <!-- Inline Question Creation Modal -->
+    <div class="modal fade @if($showAddModal) show d-block @endif" tabindex="-1" role="dialog" 
+         style="background: rgba(0,0,0,0.5); overflow-y: auto;">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header bg-primary text-white border-0 py-3">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-patch-plus me-2"></i>Create New Question</h5>
+                    <button type="button" class="btn-close btn-close-white" wire:click="closeAddModal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Read-only Categorization Context -->
+                    <div class="alert alert-info border-0 bg-info bg-opacity-10 d-flex flex-wrap gap-2 mb-4 p-3 rounded-4">
+                        <span class="badge bg-white text-info border border-info border-opacity-25 px-2 py-1">
+                            <i class="bi bi-tag-fill me-1"></i> {{ $section->sectionSubject->name ?? 'Subject' }}
+                        </span>
+                        @if($section->subject_part)
+                            <span class="badge bg-white text-info border border-info border-opacity-25 px-2 py-1">
+                                <i class="bi bi-layers-fill me-1"></i> Part: {{ $section->sectionPart->name ?? 'Part' }}
+                            </span>
+                        @endif
+                        <span class="text-muted small ms-auto d-flex align-items-center">
+                            <i class="bi bi-info-circle me-1"></i> Automatically linked to this section
+                        </span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-muted">Question Content</label>
+                            <textarea wire:model="newQuestion.question" class="form-control rounded-3 bg-light border-0" rows="3" placeholder="Enter question text..."></textarea>
+                            @error('newQuestion.question') <span class="text-danger small">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Question Type</label>
+                            <select wire:model.live="newQuestion.question_type" class="form-select rounded-3 bg-light border-0">
+                                <option value="1">MCQ (Multiple Choice)</option>
+                                <option value="2">Subjective (Long Answer)</option>
+                            </select>
+                        </div>
+
+                        @if($newQuestion['question_type'] == 1)
+                            <div class="col-12 mt-4 animate__animated animate__fadeIn">
+                                <h6 class="fw-bold mb-3"><i class="bi bi-ui-checks me-2 text-primary"></i>Options & Answer</h6>
+                                <div class="row g-2">
+                                    @foreach(['ans_1', 'ans_2', 'ans_3', 'ans_4'] as $field)
+                                        <div class="col-md-6">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-white border-0 fw-bold">{{ substr($field, -1) }}</span>
+                                                <input type="text" wire:model="newQuestion.{{ $field }}" class="form-control border-0 bg-light rounded-3" placeholder="Option {{ substr($field, -1) }}">
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    <div class="col-12 mt-3">
+                                        <label class="form-label fw-bold small text-success">Correct Answer</label>
+                                        <select wire:model="newQuestion.mcq_answer" class="form-select rounded-3 bg-success bg-opacity-10 border-0 fw-bold text-success">
+                                            <option value="ans_1">Option 1</option>
+                                            <option value="ans_2">Option 2</option>
+                                            <option value="ans_3">Option 3</option>
+                                            <option value="ans_4">Option 4</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="col-md-6 mt-4">
+                            <label class="form-label fw-bold small text-muted">Solution Placeholder</label>
+                            <textarea wire:model="newQuestion.solution" class="form-control rounded-3 bg-light border-0" rows="2" placeholder="Brief answer/solution..."></textarea>
+                        </div>
+
+                        <div class="col-md-6 mt-4">
+                            <label class="form-label fw-bold small text-muted">Explanation</label>
+                            <textarea wire:model="newQuestion.explanation" class="form-control rounded-3 bg-light border-0" rows="2" placeholder="Why is this answer correct?"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-3 px-4 fw-semi-bold" wire:click="closeAddModal">Cancel</button>
+                    <button type="button" class="btn btn-primary rounded-3 px-4 fw-bold shadow-sm" wire:click="saveNewQuestion">
+                        <span wire:loading.remove wire:target="saveNewQuestion"><i class="bi bi-save me-2"></i>Create & Attach</span>
+                        <span wire:loading wire:target="saveNewQuestion"><span class="spinner-border spinner-border-sm me-2"></span>Saving...</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
