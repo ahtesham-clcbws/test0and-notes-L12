@@ -71,6 +71,7 @@
                         <h5 class="mb-0 text-dark fw-bold"><i class="bi bi-list-check text-success me-2"></i> Questions in this Section</h5>
                     </div>
                     <div class="card-body p-0">
+                        {{-- {{ json_encode($assignedQuestions) }} --}}
                         @if($assignedQuestions->count() > 0)
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">

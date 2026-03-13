@@ -3,6 +3,15 @@
 ## Current State
 All tasks in the "Migration: Test Form and Test Sections" phase are marked as completed. The Livewire components for managing test sections are stable and feature-complete for the current scope.
 
+## Session Handoff - 2026-03-14 (Package List Investigation)
+- **Current State:** Investigated why the package list was not appearing on the Test Publication page (`/administrator/test/publish/{id}`).
+- **Key Findings:**
+  - The `PublishTest` Livewire component filters packages based on `education_type`, `class`, and `package_category`.
+  - Identified a mismatch between `test_type` (integer: 0/1) in `TestModal` and `package_category` (string: "Paid"/"Free") in `gn__package_plans`.
+  - Confirmed via database inspection that matching packages exist but were being filtered out by the logic.
+- **Resolution:** The user resolved the issue independently. No further action taken.
+- **Next Steps:** None for this specific issue. Proceed with Phase 3 (Testing & Polish) in `backlog.md`.
+
 ## Key Decisions & "The Why"
 - **Test Creation Dictates Section Count:** Modified `TestForm` to be the source of truth for the number of sections (`no_of_sections`). This prevents UI clutter in the `TestSectionManager` and ensures consistent data sync.
 - **Subject Hierarchy Levels:** Maintained a 4-level hierarchy in `TestSectionRow` (`subject` -> `part` -> `chapter` -> `lesson`) to match legacy system complexity while using Livewire 3 for a modern experience.

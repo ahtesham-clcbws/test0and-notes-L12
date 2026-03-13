@@ -55,6 +55,8 @@ class TestQuestionsManager extends Component
     {
         // Re-calculate the number of assigned questions
         $this->currentlyAssigned = TestQuestions::where('test_id', $this->testId)
+            ->where('deleted_at', null)
+            ->has('question')
             ->where('section_id', $this->sectionId)
             ->count();
     }
@@ -64,7 +66,9 @@ class TestQuestionsManager extends Component
         // Get already assigned questions for the top table
         return TestQuestions::where('test_id', $this->testId)
             ->where('section_id', $this->sectionId)
+            ->has('question')
             ->with(['question.classGroup', 'question_creator'])
+            ->where('deleted_at', null)
             ->get();
     }
 

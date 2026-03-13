@@ -36,7 +36,7 @@ class PublishTest extends Component
     // Form data sources
     public $categories = [];
 
-    public $availablePackages = [];
+    public $availablePackages;
 
     public function mount($test_id)
     {
@@ -72,8 +72,8 @@ class PublishTest extends Component
     {
         if ($this->test) {
             // Refined matching logic: Match mainly based on class/group/exam
-            $query = Gn_PackagePlan::where('class', $this->test->education_type_child_id)
-                ->where('package_category', $this->test_type);
+            $query = Gn_PackagePlan::where('class', $this->test->education_type_child_id);
+                // ->where('package_category', $this->test_type);
             
             // If education type is also relevant, we can add it, but user says "mainly match with test class/group/exam"
             // Let's keep education_type as well but ensure it's not too restrictive if it's the main matching criteria
