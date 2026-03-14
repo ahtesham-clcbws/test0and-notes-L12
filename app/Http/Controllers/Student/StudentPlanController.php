@@ -25,9 +25,7 @@ class StudentPlanController extends Controller
                     $query->where('franchise_details.branch_code', '=', Auth::user()->franchise_code)
                         ->orWhere('gn__package_plans.package_type', '=', 0);
                 })
-                ->where('gn__package_plans.status', '=', 1)
-                ->where('gn__package_plans.education_type', Auth::user()->education_type)
-                ->where('gn__package_plans.class', Auth::user()->class);
+                ->where('gn__package_plans.status', '=', 1);
 
             $active_plans = Gn_PackageTransaction::where('student_id', Auth::user()->id)
                 ->where('plan_status', 1)
@@ -38,7 +36,8 @@ class StudentPlanController extends Controller
                 $model->where('gn__package_plans.final_fees', '>', 0)
                     ->whereNotIn('gn__package_plans.id', $active_plans);
             } elseif ($type == 'free') {
-                $model->where('gn__package_plans.final_fees', '=', 0);
+                $model->where('gn__package_plans.final_fees', '=', 0)
+                    ->whereNotIn('gn__package_plans.id', $active_plans);
             } elseif ($type == 'purchased') {
                 $model->whereIn('gn__package_plans.id', $active_plans)
                     ->where('gn__package_plans.final_fees', '>', 0);
@@ -99,7 +98,13 @@ class StudentPlanController extends Controller
                 'gn__package_plans.duration', 'gn__package_plans.final_fees', 'gn__package_transactions.plan_status', 'gn__package_transactions.plan_id')
                 ->leftJoin('gn__package_plans', 'gn__package_transactions.plan_id', 'gn__package_plans.id')
                 ->where('gn__package_transactions.student_id', Auth::user()->id)
-                ->where('gn__package_plans.final_fees', '>', 0)
+                ->where(function ($query) {
+                    $query->where('gn__package_plans.final_fees', '>', 0)
+                        ->orWhere(function ($q) {
+                            $q->where('gn__package_plans.final_fees', '=', 0)
+                                ->where('gn__package_plans.status', '=', 1);
+                        });
+                })
                 ->get();
 
             return Datatables::of($model)

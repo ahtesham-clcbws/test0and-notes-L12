@@ -62,16 +62,17 @@ class ExamsController extends Controller
     {
         $package_plan = \App\Models\Gn_PackagePlan::find($id);
 
-        if (!$package_plan || $package_plan->status != 1) {
-            return redirect()->route('student.dashboard')->with('error', 'Package not found or inactive.');
+        if (!$package_plan) {
+            return redirect()->route('student.dashboard')->with('error', 'Package not found.');
+        }
+
+        if ($package_plan->status != 1 && $package_plan->final_fees == 0) {
+            return redirect()->route('student.dashboard')->with('error', 'This free package is no longer available.');
         }
 
         $user = Auth::user();
 
-        // Eligibility Check
-        if ($package_plan->education_type != $user->education_type || $package_plan->class != $user->class) {
-            return redirect()->route('student.dashboard')->with('error', 'You are not eligible for this package based on your education type and class.');
-        }
+        // Eligibility Check Removed as requested.
 
         // Purchase Verification
         if ($package_plan->final_fees > 0) {

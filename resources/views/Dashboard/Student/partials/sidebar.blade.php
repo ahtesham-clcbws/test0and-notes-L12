@@ -11,6 +11,12 @@
                 src="{{ auth()->user()->user_details && auth()->user()->user_details['photo_url'] ? '/storage/' . auth()->user()->user_details['photo_url'] : asset('super/images/default-avatar.jpg') }}">
             <h5>
                 {{ auth()->user()->name }}<br>
+                @if(auth()->user()->user_details)
+                    <small style="font-size: 0.75rem; color: #6c757d;">
+                        {{ auth()->user()->user_details->education_type_data?->name ?? '' }} / 
+                        {{ auth()->user()->user_details->class_data?->name ?? '' }}
+                    </small>
+                @endif
             </h5>
         </div>
         <ul class="nav flex-column">

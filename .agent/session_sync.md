@@ -1,51 +1,13 @@
-# Session Sync - 2026-03-01
+# Session Sync - Momin Scholar Program
 
-## Current State
-All tasks in the "Migration: Test Form and Test Sections" phase are marked as completed. The Livewire components for managing test sections are stable and feature-complete for the current scope.
-
-## Session Handoff - 2026-03-14 (Package List Investigation)
-- **Current State:** Investigated why the package list was not appearing on the Test Publication page (`/administrator/test/publish/{id}`).
-- **Key Findings:**
-  - The `PublishTest` Livewire component filters packages based on `education_type`, `class`, and `package_category`.
-  - Identified a mismatch between `test_type` (integer: 0/1) in `TestModal` and `package_category` (string: "Paid"/"Free") in `gn__package_plans`.
-  - Confirmed via database inspection that matching packages exist but were being filtered out by the logic.
-- **Resolution:** The user resolved the issue independently. No further action taken.
-- **Next Steps:** None for this specific issue. Proceed with Phase 3 (Testing & Polish) in `backlog.md`.
-
-## Key Decisions & "The Why"
-- **Test Creation Dictates Section Count:** Modified `TestForm` to be the source of truth for the number of sections (`no_of_sections`). This prevents UI clutter in the `TestSectionManager` and ensures consistent data sync.
-- **Subject Hierarchy Levels:** Maintained a 4-level hierarchy in `TestSectionRow` (`subject` -> `part` -> `chapter` -> `lesson`) to match legacy system complexity while using Livewire 3 for a modern experience.
-- **Removed "Topic/Lesson" from View:** Per user request/legacy screenshot alignment, this field was removed from the main display but its logic persists in the backend `TestSectionRow` for future-proofing.
-- **Alpine.js for Interactivity:** Used Alpine.js for loaders and notifications instead of purely backend-driven UI to ensure a snappier, premium feel.
-
-## Unresolved Questions / Risks
-- **Question Mapping Scale:** How will the mapping handle very large question banks? Need to ensure the `TestTable` or Question Selection phase is optimized.
-- **Legacy Interactions:** Need to verify if other legacy controllers depend on the `TestSections` data structure in ways that might be affected by the Livewire refactoring.
-
-## Session Handoff - 2026-03-01 (Question Bank Mass Import)
-- **Current State:** Successfully completed Phase 4 and Phase 5 in `backlog.md`. The `/administrator/questions-bank/import` module has been completely overhauled. 
-- **The "Why":** We shifted from a direct database insert model to a "Review First" model to avoid garbage data entering the architectural bank. The categorization logic was extracted from the Excel requirement and moved to the UI (Education Type -> Class -> Board -> Subject etc.) to simplify the expected Excel schema for clients.
-- **Architectural Shift:** `QuestionBankImport` now parses the file and maps it to a UI-bound array (`$previewData`). The user gets a full-screen, editable table preview of the parsed data before confirming to execute `saveAll()`, which finally runs the `QuestionBankModel::create()` statements.
-- **Next Steps (for next session):** The "Question Mapping" phase (Phase 2) is next, where we map these imported questions back to the `TestSections` created previously.
-
-## Session Handoff - 2026-03-08 (Package Integrity & Access Control)
-- **Current State:** Successfully secured package access logic and refined the question bank interface.
+## Session Handoff - 2026-03-14 (Granular Package Management)
+- **Current State:** Implemented distinct rules for Premium vs Free package lifecycles.
 - **Key Achievements:**
-  - Enforced eligibility matches (Education Type, Class) and purchase verification (Status 1) via middleware/controller logic (`ExamsController`).
-  - Implemented dynamic CTA buttons (Buy vs. Start/Not Eligible) natively in `home.blade.php`.
-  - Shifted from manual completeness checks to an Observer-driven `TestCompletenessService` to auto-unpublish `TestModal` if questions/sections drop below requirements.
-  - Replaced buggy Alpine.js toast notifications in `QuestionForm` with pure Livewire event-driven SweetAlert2 toasts.
-  - Resolved the `TestQuestionsManager` filtering bug by strictly querying `Subject` and `Part`, without hidden query scopes holding questions back.
-- **The "Why":** The previous logic allowed users to access un-purchased/ineligible packages by direct URL, and published tests could become invalid if a user deleted sections/questions post-publish. The Observer pattern closes this gap without cluttering controllers.
-- **Next Steps (for next session):** Continue monitoring soft deletes and verify test rendering in the student dashboard when multiple `study_material` types are attached.
+  - **Premium Protection:** Purchased premium packages remain accessible to students even if deactivated by an admin, until their transaction expires.
+  - **Free Package Lifecycle:** Free packages are automatically hidden from the "Free" list once started. If an admin deactivates a free package, it is immediately hidden from "My Packages" and access is blocked.
+  - **Discovery Optimization:** Updated both the dashboard and homepage to properly transition free packages from discovery to ownership.
+  - **Homepage UX:** Synchronized homepage buttons to follow the same transaction/access flow as the dashboard.
 
-## Session Handoff - 2026-03-09 (Inline Creation & Dashboard Refinement)
-- **Current State:** Finalized the question bank import persistence, refined package visibility for students, and implemented inline question creation in test sections.
-- **Key Achievements:**
-  - **Question Import Fix:** Resolved the `status` data truncation error (SQL Warning 1265) by enforcing the 'approved' status and ensuring all form-selected categorization (Subject, Part, etc.) is correctly injected into the `$previewData` during save.
-  - **Inline Question Creation:** Added a modal to `TestQuestionsManager` that allows creators to add new questions without leaving the section view. Categorization is auto-locked to match the section.
-  - **Dashboard Integrity:** Updated `StudentPlanController` to filter packages by student education type and class, preventing cross-category noise.
-  - **Homepage Eligibility:** Refactor the home page button logic to prioritize purchased status over strict eligibility.
-  - **UI/UX Cleanup:** Updated labels to "Class/Group/Exam Name" and added a secondary save button to the question form.
-- **The "Why":** The previous eligibility logic was too strict, blocking users from content they already owned. The inline question creation directly addresses the friction of jumping between the Test Manager and Question Bank modules.
-- **Next Steps:** Monitor the `TestCompletenessService` during high-volume inline additions and verify if any legacy test attempts require migration of the new categorization labels.
+## Previous Sessions
+- **Sidebar Update:** Added Education Type and Class info to the student sidebar.
+- **Relationship Fix:** Added necessary relationships to `UserDetails` model.

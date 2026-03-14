@@ -40,4 +40,14 @@ class UserDetails extends Model
     {
         return $this->belongsTo(State::class, 'state');
     }
+
+    public function education_type_data()
+    {
+        return $this->belongsTo(Educationtype::class, 'education_type');
+    }
+
+    public function class_data()
+    {
+        return $this->belongsTo(ClassGoupExamModel::class, 'class');
+    }
 }
