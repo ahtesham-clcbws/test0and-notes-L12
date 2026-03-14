@@ -456,17 +456,17 @@
                                             <div class="flip-card-back">
                                                 <h5>{{ $item->plan_name }}</h5>
                                                 <ul>
-                                                    @if ($item->total_test != '0')
-                                                        <li>&#x2713; {{ $item->total_test }} Test</li>
+                                                    @if ($item->published_tests_count > 0)
+                                                        <li>&#x2713; {{ $item->published_tests_count }} Test</li>
                                                     @endif
-                                                    @if ($item->total_video != '0')
-                                                        <li>&#x2713; {{ $item->total_video }} Video/ Live Class</li>
+                                                    @if ($item->videos_count > 0)
+                                                        <li>&#x2713; {{ $item->videos_count }} Video/ Live Class</li>
                                                     @endif
-                                                    @if ($item->total_notes != '0')
-                                                        <li>&#x2713; {{ $item->total_notes }} Study Notes & E-Books</li>
+                                                    @if ($item->notes_count > 0)
+                                                        <li>&#x2713; {{ $item->notes_count }} Study Notes & E-Books</li>
                                                     @endif
-                                                    @if ($item->current_affairs_allow != '0')
-                                                        <li>&#x2713; {{ $item->current_affairs_allow }} Current Affairs
+                                                    @if ($item->gk_count > 0)
+                                                        <li>&#x2713; {{ $item->gk_count }} GK & Current Affairs
                                                         </li>
                                                     @endif
                                                     @if ($item->special_remark_1 != '0')
@@ -559,17 +559,17 @@
                                             <div class="flip-card-back">
                                                 <h5>{{ $item->plan_name }}</h5>
                                                 <ul>
-                                                    @if ($item->total_test != '0')
-                                                        <li>&#x2713; {{ $item->total_test }} Test</li>
+                                                    @if ($item->published_tests_count > 0)
+                                                        <li>&#x2713; {{ $item->published_tests_count }} Test</li>
                                                     @endif
-                                                    @if ($item->total_video != '0')
-                                                        <li>&#x2713; {{ $item->total_video }} Video/ Live Class</li>
+                                                    @if ($item->videos_count > 0)
+                                                        <li>&#x2713; {{ $item->videos_count }} Video/ Live Class</li>
                                                     @endif
-                                                    @if ($item->total_notes != '0')
-                                                        <li>&#x2713; {{ $item->total_notes }} Study Notes & E-Books</li>
+                                                    @if ($item->notes_count > 0)
+                                                        <li>&#x2713; {{ $item->notes_count }} Study Notes & E-Books</li>
                                                     @endif
-                                                    @if ($item->current_affairs_allow != '0')
-                                                        <li>&#x2713; {{ $item->current_affairs_allow }} Current Affairs
+                                                    @if ($item->gk_count > 0)
+                                                        <li>&#x2713; {{ $item->gk_count }} GK & Current Affairs
                                                         </li>
                                                     @endif
                                                     @if ($item->special_remark_1 != '0')
@@ -682,9 +682,10 @@
                                         <div class="flip-card-back">
                                             <h5>{{ $item->plan_name }}</h5>
                                             <ul>
-                                                <li>{{ $item->total_test }} Test</li>
-                                                <li>{{ $item->total_video }} Video/ Live Class</li>
-                                                <li>{{ $item->current_affairs_allow }}</li>
+                                                <li>{{ $item->published_tests_count }} Test</li>
+                                                <li>{{ $item->videos_count }} Video/ Live Class</li>
+                                                <li>{{ $item->notes_count }} Study Notes</li>
+                                                <li>{{ $item->gk_count }} GK & Current Affairs</li>
                                                 <li>{{ $item->special_remark_1 }}</li>
                                                 <li>{{ $item->special_remark_2 }}</li>
                                             </ul>
@@ -771,9 +772,10 @@
                                         <div class="flip-card-back">
                                             <h5>{{ $item->plan_name }}</h5>
                                             <ul>
-                                                <li>{{ $item->total_test }} Test</li>
-                                                <li>{{ $item->total_video }} Video/ Live Class</li>
-                                                <li>{{ $item->current_affairs_allow }}</li>
+                                                <li>{{ $item->published_tests_count }} Test</li>
+                                                <li>{{ $item->videos_count }} Video/ Live Class</li>
+                                                <li>{{ $item->notes_count }} Study Notes</li>
+                                                <li>{{ $item->gk_count }} GK & Current Affairs</li>
                                                 <li>{{ $item->special_remark_1 }}</li>
                                                 <li>{{ $item->special_remark_2 }}</li>
                                             </ul>

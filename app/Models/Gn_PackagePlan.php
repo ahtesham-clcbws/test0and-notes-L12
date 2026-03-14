@@ -14,6 +14,26 @@ class Gn_PackagePlan extends Model
         return $this->belongsToMany(TestModal::class, 'gn__package_plan_tests', 'gn_package_plan_id', 'test_id');
     }
 
+    public function getPublishedTestsCountAttribute(): int
+    {
+        return $this->test()->where('published', 1)->count();
+    }
+
+    public function getVideosCountAttribute(): int
+    {
+        return count(array_filter(explode(',', $this->video_id)));
+    }
+
+    public function getNotesCountAttribute(): int
+    {
+        return count(array_filter(explode(',', $this->study_material_id)));
+    }
+
+    public function getGkCountAttribute(): int
+    {
+        return count(array_filter(explode(',', $this->static_gk_id)));
+    }
+
     // public function study_material()
     // {
     //     return $this->belongsToMany(Studymaterial::class,'select_package','id');
