@@ -47,3 +47,11 @@
 - [x] Filter Student Dashboard packages by `education_type` and `class`.
 - [x] UI: Update labels to "Class/Group/Exam Name" and add bottom save buttons.
 - [x] Execute `npm run build` and push all changes to master.
+
+## Phase 7: Livewire Online Test Module (UPCOMING/PLANNING)
+- [ ] Create `OnlineTestRunner` Livewire component <!-- id: 1 -->
+- [ ] Implement single attempt guard & re-hydration <!-- id: 2 -->
+- [ ] Build interactive examination UI <!-- id: 3 -->
+- [ ] Implement Livewire actions: "Save & Next", "Clear Response", "Mark for Review" <!-- id: 4 -->
+- [ ] Add countdown timer with auto-submit <!-- id: 5 -->
+- [ ] Finalize secure submission flow <!-- id: 6 -->

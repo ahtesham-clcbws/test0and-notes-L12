@@ -29,7 +29,8 @@ Route::name('student.')->group(function () {
 
                 Route::any('dashboard_gyanology_list/{cat?}', [ExamsController::class, 'index'])->name('dashboard_gyanology_list');
                 Route::get('{name}', [ExamsController::class, 'getTest'])->name('test-name');
-                Route::get('start-test/{test_id}', [ExamsController::class, 'startTest'])->name('start-test');
+                Route::get('start-test/{testId}', \App\Livewire\Student\Tests\OnlineTestRunner::class)->name('start-test');
+                // Route::get('conduct-test/{testId}', \App\Livewire\Student\Tests\OnlineTestRunner::class)->name('conduct-test');
                 Route::get('question-paper/{test_id}', [ExamsController::class, 'questionPaper'])->name('question-paper');
                 Route::get('show-result/{student_id}/{test_id}', [ExamsController::class, 'showResult'])->name('show-result');
                 // Route::get('attempt/{student_id}/{test_id}', [ExamsController::class, 'testAttempt'])->name('test-attempt');

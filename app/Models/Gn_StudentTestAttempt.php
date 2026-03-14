@@ -17,6 +17,8 @@ class Gn_StudentTestAttempt extends Model
         'student_id',
         'test_id',
         'test_attempt',
+        'status',
+        'draft_state',
     ];
 
     public function test()

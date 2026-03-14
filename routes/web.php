@@ -57,7 +57,7 @@ Route::get('important-links', ImportantLinksWebsitePage::class)->name('important
 // ----------------------Test--------------------//
 Route::get('test', [TestController::class, 'onlineTest'])->name('online_test');
 Route::get('test/{name}', [TestController::class, 'getTest'])->name('test-name');
-Route::get('start-test/{name}', [TestController::class, 'startTest'])->name('start-test');
+Route::get('start-test/{testId}', \App\Livewire\Student\Tests\OnlineTestRunner::class)->name('start-test');
 Route::post('end-test/{name}', [TestController::class, 'endTest'])->name('end-test');
 Route::get('show-result/{name}/{test_id}', [TestController::class, 'showResult'])->name('showResult');
 Route::get('show-test-response/{name}/{test_id}', [TestController::class, 'showTestResponse'])->name('showTestResponse');
