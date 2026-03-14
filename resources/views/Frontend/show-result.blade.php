@@ -186,7 +186,7 @@
 									<h5 class="">Total Marks: </h5><b><span id="marked_review">{{ $data['final_marks'] }}</span></b>
 								</div>
 							</div>
-							@foreach($data['test']->getSection as $i => $section)
+							@foreach($data['test']->testSections as $i => $section)
 								<div class="eld mb-3">
 									<h5 class="font-medium">{{ $section->sectionSubject->name }}</h5>
 									<ul class="number-que-list">
@@ -206,7 +206,7 @@
 				<!-- </div> -->
 			</div>
 			<div class="col-lg-8 col-md-12 order-lg-last">
-				@foreach($data['test']->getSection as $i => $section)
+				@foreach($data['test']->testSections as $i => $section)
 					@foreach($section->getQuestions()->wherePivot('deleted_at','=',NULL)->get() as $j => $questions)
                             <div class="edu_wraper test-questions test-questions_{{ $j+=1 }}" key="{{ $questions->id }}" id="question_{{ $questions->id }}">
                             @if($data['test']->show_answer == 1)

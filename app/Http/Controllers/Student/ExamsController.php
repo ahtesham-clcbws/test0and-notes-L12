@@ -195,7 +195,7 @@ class ExamsController extends Controller
         // }
 
         $this->data['test'] = $test;
-        $section_time = $this->data['test']->getSection()->select('number_of_questions', 'duration')->get()->toArray();
+        $section_time = $this->data['test']->testSections()->select('number_of_questions', 'duration')->get()->toArray();
         $time = [];
         foreach ($section_time as $key => $section) {
             $time[$key] = $section['number_of_questions'] * $section['duration'];
@@ -215,7 +215,7 @@ class ExamsController extends Controller
     {
 
         $test = TestModal::find($name);
-        if (empty($test) || Auth::user()->myInstitute->id != $test->institude->id) {
+        if (empty($test)) {
             return redirect('/');
         }
 
@@ -226,7 +226,7 @@ class ExamsController extends Controller
 
         $this->data['test_start'] = $test;
         $this->data['questions'] = $test->getQuestions()->wherePivot('deleted_at', '=', null)->get()->groupBy('pivot.section_id');
-        $section_time = $this->data['test_start']->getSection()->select('number_of_questions', 'duration')->get()->toArray();
+        $section_time = $this->data['test_start']->testSections()->select('number_of_questions', 'duration')->get()->toArray();
         $time = [];
         foreach ($section_time as $key => $section) {
             $time[$key] = $section['number_of_questions'] * $section['duration'];
@@ -239,7 +239,7 @@ class ExamsController extends Controller
     public function questionPaper($name)
     {
         $test = TestModal::find($name);
-        if (empty($test) || Auth::user()->myInstitute->id != $test->institude->id) {
+        if (empty($test)) {
             return redirect('/');
         }
         $this->data['test_question_paper'] = $test;

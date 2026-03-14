@@ -87,7 +87,7 @@
                             <label for="privacy_policy" class="checkbox-custom-label">I accept privacy policy</label>
                         </li>
                     </ul>
-                    <!-- <h4 class="edu_title">Sections</h4>
+                    {{-- <h4 class="edu_title">Sections</h4>
                         @foreach($data['test']->getSection as $key => $section)
                             <h5 class="edu_title">{{ $section->sectionSubject->name }}</h5>
                             <ul class="lists-3 row">
@@ -97,7 +97,7 @@
                                 <li class="col-xl-4 col-lg-6 col-md-6 m-0">{{ $section->number_of_questions }}{{ ' Questions' }}</li>
                                 <li class="col-xl-4 col-lg-6 col-md-6 m-0">{{ $section->duration }}{{ ' minutes per question' }}</li>
                             </ul></br>
-                        @endforeach -->
+                        @endforeach --}}
                         <!-- <h5 class="edu_title">Main Subject 1</h5>
                         <ul class="lists-3 row">
                             <li class="col-xl-4 col-lg-6 col-md-6 m-0">Subject Part</li>

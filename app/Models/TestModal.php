@@ -122,6 +122,10 @@ class TestModal extends Model
     {
         return $this->hasMany(TestSections::class, 'test_id');
     }
+    public function getSection()
+    {
+        return $this->hasMany(TestSections::class, 'test_id');
+    }
 
     public function institude()
     {

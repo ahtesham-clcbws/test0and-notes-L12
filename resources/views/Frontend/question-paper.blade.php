@@ -30,7 +30,7 @@
             <div class="col-lg-8 col-md-12 order-lg-first">
                 
                 <!-- Overview -->
-                @foreach($data['test_question_paper']->getSection as $i => $section)
+                @foreach($data['test_question_paper']->testSections as $i => $section)
                     @foreach($section->getQuestions()->wherePivot('deleted_at','=',NULL)->get() as $j => $questions)
                     <div class="edu_wraper test-questions">
                         <h3 class="edu_title">Question Number {{ $j+=1 }}</h3>

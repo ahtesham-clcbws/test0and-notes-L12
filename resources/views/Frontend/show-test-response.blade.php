@@ -203,7 +203,7 @@
             <div class="col-lg-6 col-md-12 col-sm-12">
                 <div class="custom-tab customize-tab tabs_creative">
                     <ul class="nav nav-tabs pb-2 b-0" id="myTab" role="tablist">
-                        @foreach($data['test_start']->getSection as $i => $section)
+                        @foreach($data['test_start']->testSections as $i => $section)
                             @if($i == 0)
                                 <li class="nav-item">
                                     <a class="nav-link active" id="profile-tab" data-toggle="tab" href="#{{ $section->sectionSubject->name }}_{{ $section->id }}" role="tab" aria-controls="profile" aria-selected="false">{{ $section->sectionSubject->name }}</a>
@@ -216,7 +216,7 @@
                         @endforeach
                     </ul>
                     <!-- <div class="tab-content" id="myTabContent">
-                        @foreach($data['test_start']->getSection as $i => $section)
+                        @foreach($data['test_start']->testSections as $i => $section)
                             @foreach($section->getQuestions()->wherePivot('deleted_at','=',NULL)->get() as $j => $questions)
                             @endforeach
                         @endforeach
@@ -244,7 +244,7 @@
             <div class="row">
                 <div class="col-lg-8 col-md-12 order-lg-first">
                     <!-- Overview -->
-                    @foreach($data['test_start']->getSection as $i => $section)
+                    @foreach($data['test_start']->testSections as $i => $section)
                         @foreach($section->getQuestions()->wherePivot('deleted_at','=',NULL)->get() as $j => $questions)
                             <div class="edu_wraper test-questions test-questions_{{ $j+=1 }}" key="{{ $questions->id }}" id="question_{{ $questions->id }}">
                                 <h3 class="edu_title">Question Number {{ $j }}</h3>
@@ -329,7 +329,7 @@
                             <h2 class="">USERNAME</h2>
                         </div>
                         <div class="tab-content" id="myTabContent">
-                            @foreach($data['test_start']->getSection as $i => $section)
+                            @foreach($data['test_start']->testSections as $i => $section)
                                 @if($i == 0)
                                     <div class="tab-pane fade show active" id="{{ $section->sectionSubject->name }}_{{ $section->id }}" role="tabpanel" aria-labelledby="home-tab">
                                         <div class="eld mb-3">
@@ -375,7 +375,7 @@
                             </div> -->
                         </div>
                         <div class="ed_view_features">
-                            <!-- @foreach($data['test_start']->getSection as $key => $section)
+                            <!-- @foreach($data['test_start']->testSections as $key => $section)
                                 <div class="eld mb-3">
                                     <h5 class="font-medium">{{ $section->sectionSubject->name }}</h5>
                                     <ul class="number-que-list">
@@ -463,7 +463,7 @@
                                     </div>
                                     
                                     <div class="">
-                                        @foreach($data['test_start']->getSection as $i => $section)
+                                        @foreach($data['test_start']->testSections as $i => $section)
                                             <div class="tab-pane fade show active" id="{{ $section->sectionSubject->name }}_{{ $section->id }}" role="tabpanel" aria-labelledby="home-tab">
                                                 <div class="eld mb-3">
                                                     <h5 class="font-medium">{{ $section->sectionSubject->name }}</h5>

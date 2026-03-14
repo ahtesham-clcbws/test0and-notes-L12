@@ -213,7 +213,7 @@
             <div class="col-lg-6 col-md-12 col-sm-12">
                 <div class="custom-tab customize-tab tabs_creative">
                     <ul class="nav nav-tabs b-0 pb-2" id="myTab" role="tablist">
-                        @foreach ($data['test_start']->getSection as $i => $section)
+                        @foreach ($data['test_start']->testSections as $i => $section)
                             @if ($i == 0)
                                 <li class="nav-item">
                                     <a class="nav-link active test-tab-{{ $i }}"
@@ -244,7 +244,7 @@
                         <!-- Overview -->
                         <input id="show_result" name="show_result" type="hidden" value="0">
                         <?php $questions_count = 0; ?>
-                        @foreach ($data['test_start']->getSection as $i => $section)
+                        @foreach ($data['test_start']->testSections as $i => $section)
                             @foreach ($section->getQuestions()->wherePivot('deleted_at', '=', null)->get() as $j => $questions)
                                 <div class="edu_wraper test-questions test-questions_{{ $j += 1 }} px-1 py-0"
                                     id="question_{{ $questions->id }}" data-id="{{ $i }}"
@@ -288,7 +288,7 @@
                         <div class="ed_view_box style_2 border-success rounded-0 border border-2">
                             <?php $questions_count = 0; ?>
                             <div class="tab-content" id="myTabContent">
-                                @foreach ($data['test_start']->getSection as $i => $section)
+                                @foreach ($data['test_start']->testSections as $i => $section)
                                     @if ($i == 0)
                                         <div class="row">
                                             <div class="col-3">
@@ -370,7 +370,7 @@
 
                                             <div class="">
                                                 <?php $questions_count = 0; ?>
-                                                @foreach ($data['test_start']->getSection as $i => $section)
+                                                @foreach ($data['test_start']->testSections as $i => $section)
                                                     <!-- <div class="tab-pane fade" id="{{ $section->sectionSubject->name }}_{{ $section->id }}" role="tabpanel" aria-labelledby="home-tab"> -->
                                                     <div class="eld mb-3">
                                                         <h5 class="font-medium">{{ $section->sectionSubject->name }}</h5>
