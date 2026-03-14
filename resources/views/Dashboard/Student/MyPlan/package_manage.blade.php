@@ -140,10 +140,6 @@
                     <div class="opacity-75 small text-uppercase fw-bold tracking-wider mb-1"><i class="bi bi-clock-history me-1"></i> Subscribed Duration</div>
                     <div class="fs-4 fw-bold text-white">{{ $package_plan->duration }} Days</div>
                 </div>
-                <div>
-                    <div class="opacity-75 small text-uppercase fw-bold tracking-wider mb-1"><i class="bi bi-calendar-event me-1"></i> Package Expiry</div>
-                    <div class="fs-6 text-white">{{ \Carbon\Carbon::parse($package_plan->expire_date)->format('d M, Y') }}</div>
-                </div>
             </div>
         </div>
     </div>

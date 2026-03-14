@@ -34,9 +34,11 @@ class StudentPlanController extends Controller
 
             if ($type == 'premium') {
                 $model->where('gn__package_plans.final_fees', '>', 0)
+                    ->where('gn__package_plans.expire_date', '>=', date('Y-m-d'))
                     ->whereNotIn('gn__package_plans.id', $active_plans);
             } elseif ($type == 'free') {
                 $model->where('gn__package_plans.final_fees', '=', 0)
+                    ->where('gn__package_plans.expire_date', '>=', date('Y-m-d'))
                     ->whereNotIn('gn__package_plans.id', $active_plans);
             } elseif ($type == 'purchased') {
                 $model->whereIn('gn__package_plans.id', $active_plans)
@@ -169,8 +171,8 @@ class StudentPlanController extends Controller
     public function checkout(Request $request, $plan_id)
     {
         $package_plan = Gn_PackagePlan::find($plan_id);
-        if ($package_plan == null || $package_plan->status != 1) {
-            return redirect()->route('student.plan');
+        if ($package_plan == null || $package_plan->status != 1 || $package_plan->expire_date < date('Y-m-d')) {
+            return redirect()->route('student.plan')->with('error', 'This package is no longer available for purchase.');
         }
 
         // Handle Free Plan Acquisition

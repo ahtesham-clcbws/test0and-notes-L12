@@ -478,11 +478,7 @@
 
                                                 </ul>
                                                 <div class="row" style="margin:0px;">
-                                                    <div class="col-12 three-sec">
-                                                        <p class="pop-box-text">Offer Start: {{ $item->active_date }}</p>
-                                                        <p class="pop-box-text pop2-text">Offer End:
-                                                            {{ $item->expire_date }}</p>
-                                                    </div>
+
                                                     <div class="col-12 three-sec">
                                                         <p class="pop-box-text">{{ $item->duration }} Days +
                                                             {{ $item->free_duration }} Days (Free)</p>
@@ -584,11 +580,7 @@
                                                     @endif
                                                 </ul>
                                                 <div class="row">
-                                                    <div class="col-12 three-sec">
-                                                        <p class="pop-box-text">Offer Start: {{ $item->active_date }}</p>
-                                                        <p class="pop-box-text pop2-text">Offer End:
-                                                            {{ $item->expire_date }}</p>
-                                                    </div>
+
                                                     <div class="col-12 three-sec">
                                                         <p class="pop-box-text">{{ $item->duration }} Days +
                                                             {{ $item->free_duration }} Days (Free)</p>
@@ -697,11 +689,7 @@
                                                 <li>{{ $item->special_remark_2 }}</li>
                                             </ul>
                                             <div class="row">
-                                                <div class="col-12 three-sec">
-                                                    <p class="pop-box-text">Offer Start: {{ $item->active_date }}</p>
-                                                    <p class="pop-box-text pop2-text">Offer End: {{ $item->expire_date }}
-                                                    </p>
-                                                </div>
+
                                                 <div class="col-12 three-sec">
                                                     <p class="pop-box-text">{{ $item->duration }} Days +
                                                         {{ $item->free_duration }} Days (Free)</p>
@@ -717,18 +705,13 @@
                                             </div>
                                             <div class="footer-new-poup mt-2">
                                                 @if (Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active')
-                                                    @php
-                                                        $isPurchased = in_array($item->id, $purchased_packages ?? []);
-                                                        $isEligible = true;
-                                                    @endphp
-                                                    @if ($isPurchased || $isEligible || $item->final_fees == 0)
-                                                        @if ($isPurchased || $item->final_fees == 0)
-                                                            <a href="{{ route('student.package_manage', [$item->id]) }}" class="btn-custom text-center">Start</a>
-                                                        @else
-                                                            <a href="{{ route('student.plan-checkout', [$item->id]) }}" class="btn-custom text-center">Buy</a>
-                                                        @endif
+                                                    @php $is_purchased = in_array($item->id, $purchased_packages ?? []); @endphp
+                                                    @if ($is_purchased)
+                                                        <a href="{{ route('student.package_manage', [$item->id]) }}" class="btn-custom text-center">Start</a>
+                                                    @elseif($item->final_fees == 0)
+                                                        <a href="{{ route('student.plan-checkout', [$item->id]) }}" class="btn-custom text-center">Start</a>
                                                     @else
-                                                        <button class="btn-custom text-center" disabled style="opacity: 0.6; cursor: not-allowed;">Not Eligible</button>
+                                                        <a href="{{ route('student.plan-checkout', [$item->id]) }}" class="btn-custom text-center">Buy</a>
                                                     @endif
                                                 @else
                                                     <a href="{{ route('login', ['redirect' => route('student.package_manage', [$item->id])]) }}"
@@ -795,11 +778,7 @@
                                                 <li>{{ $item->special_remark_2 }}</li>
                                             </ul>
                                             <div class="row">
-                                                <div class="col-12 three-sec">
-                                                    <p class="pop-box-text">Offer Start: {{ $item->active_date }}</p>
-                                                    <p class="pop-box-text pop2-text">Offer End: {{ $item->expire_date }}
-                                                    </p>
-                                                </div>
+
                                                 <div class="col-12 three-sec">
                                                     <p class="pop-box-text">{{ $item->duration }} Days +
                                                         {{ $item->free_duration }} Days (Free)</p>

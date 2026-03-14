@@ -109,10 +109,11 @@ class HomeController extends Controller
                 ->get(['study_material.*']);
         });
 
-        $Gn_PackagePackagelist = Cache::remember('home_package_list', $cacheDuration, function () {
+        $Gn_PackagePackagelist = Cache::remember('home_package_list', $cacheDuration, function () use ($current_date) {
             return Gn_PackagePlan::with(['educationType', 'classType'])
                 ->where('status', 1)
                 ->where('education_type', 53)
+                ->where('expire_date', '>=', $current_date)
                 ->orderBy('id', 'desc')
                 ->limit(6)
                 ->get(['gn__package_plans.*', DB::raw('(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration')]);
