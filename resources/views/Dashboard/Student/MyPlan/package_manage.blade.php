@@ -130,9 +130,10 @@
                 </span>
                 <h1 class="display-5 fw-bold mb-3 text-white" style="letter-spacing: -1px; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">{{ $package_plan->plan_name }}</h1>
                 <div class="d-flex gap-3 flex-wrap opacity-90">
-                    <span class="d-inline-flex align-items-center"><i class="bi bi-journal-text me-2"></i> {{ $package_plan->total_test ?? 0 }} Tests</span>
-                    <span class="d-inline-flex align-items-center"><i class="bi bi-camera-video me-2"></i> {{ $package_plan->total_video ?? 0 }} Videos</span>
-                    <span class="d-inline-flex align-items-center"><i class="bi bi-file-earmark-pdf me-2"></i> {{ $package_plan->total_notes ?? 0 }} Notes</span>
+                    <span class="d-inline-flex align-items-center"><i class="bi bi-journal-text me-2"></i> {{ count($test) }} Tests</span>
+                    <span class="d-inline-flex align-items-center"><i class="bi bi-camera-video me-2"></i> {{ count($live_video) }} Videos</span>
+                    <span class="d-inline-flex align-items-center"><i class="bi bi-file-earmark-pdf me-2"></i> {{ count($study_material) }} Notes</span>
+                    <span class="d-inline-flex align-items-center"><i class="bi bi-globe me-2"></i> {{ count($onegk) }} GK</span>
                 </div>
             </div>
             <div class="text-md-end bg-white bg-opacity-10 p-4 rounded-4 border border-white border-opacity-25" style="backdrop-filter: blur(12px); min-width: 250px;">
