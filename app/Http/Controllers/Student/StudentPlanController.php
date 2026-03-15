@@ -38,7 +38,6 @@ class StudentPlanController extends Controller
                     ->whereNotIn('gn__package_plans.id', $active_plans);
             } elseif ($type == 'free') {
                 $model->where('gn__package_plans.final_fees', '=', 0)
-                    ->where('gn__package_plans.expire_date', '>=', date('Y-m-d'))
                     ->whereNotIn('gn__package_plans.id', $active_plans);
             } elseif ($type == 'purchased') {
                 $model->whereIn('gn__package_plans.id', $active_plans)

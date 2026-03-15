@@ -18,7 +18,7 @@
                             <tr>
 								<th scope="col">Sr</th>
                                 <th scope="col">Plan Name</th>
-                                <th scope="col">Package Type</th>
+                                <th scope="col">Created By</th>
 
                                 <th scope="col">Fees</th>
                                 <th scope="col">Status</th>
