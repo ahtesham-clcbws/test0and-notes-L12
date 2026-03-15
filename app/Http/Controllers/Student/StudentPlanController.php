@@ -100,15 +100,20 @@ class StudentPlanController extends Controller
                 'gn__package_plans.duration', 'gn__package_plans.final_fees', 'gn__package_transactions.plan_status', 'gn__package_transactions.plan_id')
                 ->leftJoin('gn__package_plans', 'gn__package_transactions.plan_id', 'gn__package_plans.id')
                 ->where('gn__package_transactions.student_id', Auth::user()->id)
-                ->whereIn('gn__package_transactions.plan_status', [0, 1]) // Only show queued, or active
-                ->where(function ($query) {
-                    $query->where('gn__package_plans.final_fees', '>', 0)
-                        ->orWhere(function ($q) {
-                            $q->where('gn__package_plans.final_fees', '=', 0)
-                                ->where('gn__package_plans.status', '=', 1);
-                        });
+
+                ->where('gn__package_plans.final_fees', '>', 0) // Exclude Free packages from My Plan lists
+                ->get()
+                ->sortBy(function ($item) {
+                    // Sorting priority: Active (1) > Expired (2) > InQueue (0) > Inactive (3)
+                    return match ($item->plan_status) {
+                        1 => 0,
+                        2 => 1,
+                        0 => 2,
+                        3 => 3,
+                        default => 4
+                    };
                 })
-                ->get();
+                ->unique('plan_id'); // Only show one unique state row per plan_id
 
 
 
