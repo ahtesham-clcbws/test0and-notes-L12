@@ -78,7 +78,7 @@ class ExamsController extends Controller
         if ($package_plan->final_fees > 0) {
             $has_purchased = \App\Models\Gn_PackageTransaction::where('student_id', $user->id)
                 ->where('plan_id', $id)
-                ->where('plan_status', 1)
+                ->whereIn('plan_status', [1, 2])
                 ->exists();
 
             if (!$has_purchased) {

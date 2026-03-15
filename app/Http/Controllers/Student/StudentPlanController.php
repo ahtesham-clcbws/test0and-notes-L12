@@ -163,7 +163,7 @@ class StudentPlanController extends Controller
                     }
                 })
                 ->addColumn('actions', function ($model) {
-                    if ($model->plan_status == 1) {
+                    if (in_array($model->plan_status, [1, 2])) {
                         return '<a href="'.route('student.package_manage', [$model->plan_id]).'" class="btn btn-sm btn-info">View</a>';
                     }
 
