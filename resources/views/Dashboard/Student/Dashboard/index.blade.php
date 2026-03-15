@@ -13,7 +13,7 @@
     }
 </style>
 
-<div class="container p-0">
+<div class="p-0">
     <div class="dashboard-container">
         <div class="row-scrollable">
             <div class="row ">

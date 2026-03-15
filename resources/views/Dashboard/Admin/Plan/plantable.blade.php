@@ -24,6 +24,7 @@
                                 <th scope="col">Duration</th>
                                 <th scope="col">Package Type & Fee</th>
                                 <th scope="col">Status</th>
+                                <th scope="col">Expire Status</th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -122,6 +123,7 @@
                 {data: 'duration'},
                 {data: 'final_fees'},
                 {data: 'status'},
+                {data: 'expire_status', orderable: true},
                 {data: 'edit',orderable: false},
             ],
         });

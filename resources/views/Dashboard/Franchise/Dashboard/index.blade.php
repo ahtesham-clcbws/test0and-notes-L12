@@ -1,7 +1,7 @@
 @extends('Layouts.franchise')
 
 @section('main')
-    <div class="container p-0 franchise-dashboard">
+    <div class="p-0 franchise-dashboard">
 
         <div class="dashboard-container">
             <div class="row-scrollable">

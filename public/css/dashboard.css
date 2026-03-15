@@ -523,7 +523,8 @@ i.icon_img {
     width: 100%;
     float: left;
     padding: 1px;
-    display: block;
+    display: flex;
+    justify-content: space-between;
 }
 .part2 {
     width: 100%;
@@ -550,7 +551,7 @@ i.icon_img {
     float: left;
     display: block;
     margin-right: 0px !important;
-    background-color: #fff;
+    /* background-color: #fff; */
     margin-top: 10px;
     width: 80px;
     height: 60px;
@@ -560,7 +561,7 @@ i.icon_img {
     margin-left: 5px;
 }
 .head_area {
-    width: 84px;
+    width: auto;
     float: right;
     display: block;
 }

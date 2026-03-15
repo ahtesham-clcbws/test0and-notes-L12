@@ -410,10 +410,11 @@
                 </div>
             </div>
 
-            <div class="row justify-content-center">
-                <div class="col-xl-12 col-lg-12 col-sm-12 only-tow-slider">
-                    <div class="best-course space" style="overflow-x:visible;">
-                        @if (count($Gn_PackagePackagelist) > 0)
+            @if (count($Gn_PackagePackagelist) > 0)
+                <div class="row justify-content-center">
+                    <div class="col-xl-12 col-lg-12 col-sm-12 only-tow-slider">
+                        <div class="best-course space" style="overflow-x:visible;">
+
                             @foreach ($Gn_PackagePackagelist as $item)
                                 @if ($item->is_featured != '0')
                                     <div class="cource-item book-cource-item flip-card mx-2">
@@ -512,15 +513,16 @@
                                     </div>
                                 @endif
                             @endforeach
-                        @endif
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
 
-            <div class="row justify-content-center">
-                <div class="col-xl-12 col-lg-12 col-sm-12 only-tow-slider">
-                    <div class="best-course space">
-                        @if (count($Gn_PackagePlanInstitute) > 0)
+            @if (count($Gn_PackagePlanInstitute) > 0)
+                <div class="row justify-content-center">
+                    <div class="col-xl-12 col-lg-12 col-sm-12 only-tow-slider">
+                        <div class="best-course space" style="overflow-x:visible;">
+
                             @foreach ($Gn_PackagePlanInstitute as $item)
                                 @if ($item->is_featured != '0')
                                     <div class="cource-item book-cource-item flip-card mx-2">
@@ -617,10 +619,10 @@
                                     </div>
                                 @endif
                             @endforeach
-                        @endif
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
         </div>
     </section>
     <div class="clearfix"></div>
@@ -640,11 +642,12 @@
                 </div>
             </div>
 
-            <div class="row justify-content-center">
-                <div class="col-xl-12 col-lg-12 col-sm-12 only-tow-slider">
-                    <div class="best-course space">
-                        <!--@if ($result['competitive_courses_status'] == 1)-->
-                        @if (count($Gn_PackagePlanTestAndNotes) > 0)
+            @if (count($Gn_PackagePlanTestAndNotes) > 0)
+                <div class="row justify-content-center">
+                    <div class="col-xl-12 col-lg-12 col-sm-12 only-tow-slider">
+                        <div class="best-course space" style="overflow-x:visible;">
+                            <!--@if ($result['competitive_courses_status'] == 1)-->
+
                             @foreach ($Gn_PackagePlanTestAndNotes as $item)
                                 <div class="cource-item book-cource-item flip-card mx-2">
                                     <div class="flip-card-inner">
@@ -726,15 +729,15 @@
                                     </div>
                                 </div>
                             @endforeach
-                        @endif
-                        <!--@endif-->
+                            <!--@endif-->
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-xl-12 col-lg-12 col-sm-12 only-tow-slider">
-                    <div class="best-course space">
-                        @if (count($Gn_PackagePlanTestAndNotes2) > 0)
+            @endif
+            @if (count($Gn_PackagePlanTestAndNotes2) > 0)
+                <div class="row justify-content-center">
+                    <div class="col-xl-12 col-lg-12 col-sm-12 only-tow-slider">
+                        <div class="best-course space" style="overflow-x:visible;">
                             @foreach ($Gn_PackagePlanTestAndNotes2 as $item)
                                 <div class="cource-item book-cource-item flip-card mx-2">
                                     <div class="flip-card-inner">
@@ -816,10 +819,10 @@
                                     </div>
                                 </div>
                             @endforeach
-                        @endif
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
         </div>
 
     </section>

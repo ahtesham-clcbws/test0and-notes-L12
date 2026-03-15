@@ -34,7 +34,7 @@ class PlanController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $model = Gn_PackagePlan::select('gn__package_plans.id', 'gn__package_plans.study_material_id', 'gn__package_plans.video_id', 'gn__package_plans.static_gk_id', 'is_featured', 'plan_name', 'package_type', 'duration', 'free_duration', 'final_fees', 'status', 'package_image', 'package_category', 'special_remark_1', 'special_remark_2', 'student_rating', 'franchise_details.institute_name as my_institute_name', 'classes_groups_exams.name as class_name')
+            $model = Gn_PackagePlan::select('gn__package_plans.id', 'gn__package_plans.study_material_id', 'gn__package_plans.video_id', 'gn__package_plans.static_gk_id', 'gn__package_plans.expire_date', 'is_featured', 'plan_name', 'package_type', 'duration', 'free_duration', 'final_fees', 'status', 'package_image', 'package_category', 'special_remark_1', 'special_remark_2', 'student_rating', 'franchise_details.institute_name as my_institute_name', 'classes_groups_exams.name as class_name')
                 ->leftJoin('franchise_details', function ($join) {
                     $join->on('gn__package_plans.institute_id', '=', 'franchise_details.id')
                         ->whereNull('franchise_details.deleted_at');
@@ -149,12 +149,23 @@ class PlanController extends Controller
                         return $status = '<p style="color:#FF0000;font-weight:1000;">Deactive</p>';
                     }
                 })
+                ->addColumn('expire_status', function ($model) {
+                    $expire_date = $model['expire_date'];
+                    $current_date = date('Y-m-d');
+                    if ($expire_date && $expire_date < $current_date) {
+                        return '<p style="color:#FF0000;font-weight:1000;">Expired ('.date('d-M-Y', strtotime($expire_date)).')</p>';
+                    } elseif ($expire_date) {
+                        return '<p style="color:#198754;font-weight:1000;">Valid ('.date('d-M-Y', strtotime($expire_date)).')</p>';
+                    } else {
+                        return '<p style="color:#6c757d;font-weight:1000;">N/A</p>';
+                    }
+                })
                 ->addColumn('edit', function ($model) {
                     return $actionsHtml = '<a href="'.route('administrator.plan_view', [$model['id']]).'" title="Edit Test"><i class="bi bi-pencil-square text-success me-2"></i></a>
                     <a href="javascript:void(0);" class="delete_plan" id='.$model['id'].' data='.$model['status'].' title="Delete Test"><i class="bi bi-trash2-fill text-danger me-2"></i></a>';
                     // // return view('Admin.Partial.options',compact('model','path'));
                 })
-                ->rawColumns(['plan_image', 'is_featured', 'tests', 'plan_name', 'final_fees', 'status', 'edit'])
+                ->rawColumns(['plan_image', 'is_featured', 'tests', 'plan_name', 'final_fees', 'status', 'expire_status', 'edit'])
                 ->make(true);
         }
 

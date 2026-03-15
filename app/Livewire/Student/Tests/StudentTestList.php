@@ -48,22 +48,28 @@ class StudentTestList extends Component
             }])
             ->withCount('getQuestions as confirmed_questions_count');
 
-        if ($this->type == 1) {
-            // Institute Tests
+        // Filter by Student's Education Type
+        $query->where('education_type_id', $userDetails->education_type);
+
+        // Filter by Creator (Admin + HIS Institute tests)
+        $query->where(function ($q) use ($user) {
+            $q->whereNull('user_id')
+              ->orWhere('user_id', 1);
+
             if ($user->myInstitute) {
-                $query->where('education_type_id', $userDetails->education_type)
-                    ->where('user_id', $user->myInstitute->user_id);
-            } else {
-                // Return empty if no institute
+                $q->orWhere('user_id', $user->myInstitute->user_id);
+            }
+        });
+
+        if ($this->type == 1) {
+            // Institute Dashboard: Empty list if person belongs to no institute
+            if (!$user->myInstitute) {
                 return view('livewire.student.tests.student-test-list', [
-                    'tests' => collect([]),
+                    'tests' => TestModal::where('id', 0)->paginate(10), // empty paginated collection
                 ]);
             }
         } else {
-            // Gyanology Tests
-            $query->where('education_type_id', $userDetails->education_type)
-                ->whereNull('user_id');
-
+            // Gyanology Category lists
             if ($this->cat) {
                 $query->where('test_cat', $this->cat);
             }
