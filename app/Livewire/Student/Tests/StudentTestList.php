@@ -51,25 +51,23 @@ class StudentTestList extends Component
         // Filter by Student's Education Type
         $query->where('education_type_id', $userDetails->education_type);
 
-        // Filter by Creator (Admin + HIS Institute tests)
-        $query->where(function ($q) use ($user) {
-            $q->whereNull('user_id')
-              ->orWhere('user_id', 1);
-
-            if ($user->myInstitute) {
-                $q->orWhere('user_id', $user->myInstitute->user_id);
-            }
-        });
-
         if ($this->type == 1) {
             // Institute Dashboard: Empty list if person belongs to no institute
             if (!$user->myInstitute) {
                 return view('livewire.student.tests.student-test-list', [
-                    'tests' => TestModal::where('id', 0)->paginate(10), // empty paginated collection
+                    'tests' => TestModal::where('id', 0)->paginate(10), 
                 ]);
+            } else {
+                // Strictly Institute Tests Only
+                $query->where('user_id', $user->myInstitute->user_id);
             }
         } else {
-            // Gyanology Category lists
+            // Gyanology Category lists (Admin / SuperAdmin tests)
+            $query->where(function ($q) {
+                $q->whereNull('user_id')
+                  ->orWhere('user_id', 1);
+            });
+
             if ($this->cat) {
                 $query->where('test_cat', $this->cat);
             }
