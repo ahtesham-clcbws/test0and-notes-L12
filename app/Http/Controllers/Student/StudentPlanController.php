@@ -150,7 +150,7 @@ class StudentPlanController extends Controller
                             break;
 
                         case 2:
-                            return 'Expired';
+                            return 'Active';
                             break;
 
                         case 3:
