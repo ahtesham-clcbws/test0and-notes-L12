@@ -100,6 +100,7 @@ class StudentPlanController extends Controller
                 'gn__package_plans.duration', 'gn__package_plans.final_fees', 'gn__package_transactions.plan_status', 'gn__package_transactions.plan_id')
                 ->leftJoin('gn__package_plans', 'gn__package_transactions.plan_id', 'gn__package_plans.id')
                 ->where('gn__package_transactions.student_id', Auth::user()->id)
+                ->whereIn('gn__package_transactions.plan_status', [0, 1]) // Only show queued, or active
                 ->where(function ($query) {
                     $query->where('gn__package_plans.final_fees', '>', 0)
                         ->orWhere(function ($q) {
@@ -108,6 +109,8 @@ class StudentPlanController extends Controller
                         });
                 })
                 ->get();
+
+
 
             return Datatables::of($model)
                 ->addIndexColumn()
