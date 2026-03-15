@@ -19,7 +19,7 @@
 								<th scope="col">Sr</th>
                                 <th scope="col">Plan Name</th>
                                 <th scope="col">Package Type</th>
-                                <th scope="col">Start date</th>
+
                                 <th scope="col">Fees</th>
                                 <th scope="col">Status</th>
                                 <th class="text-end">Actions</th>
@@ -56,7 +56,7 @@
                 },
                 {data: 'plan_name'},
                 {data: 'package_type'},
-                {data: 'plan_start_date'},
+
                 {data: 'final_fees'},
                 {data: 'plan_status'},
                 {data: 'actions', orderable: false, searchable: false},
