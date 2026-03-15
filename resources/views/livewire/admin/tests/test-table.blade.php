@@ -20,6 +20,7 @@
                 <button type="button" wire:click="setCategory('6')" class="btn btn-outline-primary {{ $test_cat === '6' ? 'active' : '' }}">Previous Test</button>
                 <button type="button" wire:click="setCategory('7')" class="btn btn-outline-primary {{ $test_cat === '7' ? 'active' : '' }}">Premium Test</button>
             </div>
+
         </div>
     </div>
 

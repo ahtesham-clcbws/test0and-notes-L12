@@ -61,6 +61,37 @@ class TestTable extends Component
         }
     }
 
+    public function syncTestCounts()
+    {
+        $allTests = \App\Models\TestModal::get();
+        foreach ($allTests as $test) {
+            $totalQuestions = \App\Models\TestSections::where('test_id', $test->id)->sum('number_of_questions');
+
+            $questionsSubmitted = \Illuminate\Support\Facades\DB::table('test_questions')
+                ->join('test_section', 'test_section.id', '=', 'test_questions.section_id')
+                ->where('test_questions.test_id', $test->id)
+                ->whereNull('test_questions.deleted_at')
+                ->whereNull('test_section.deleted_at')
+                ->count();
+
+            $published = $test->published;
+            if ($questionsSubmitted < $totalQuestions) {
+                $published = 0; // Automatically un-publish if questions are missing
+            }
+
+            $test->update([
+                'total_questions' => $totalQuestions,
+                'questions_submitted' => $questionsSubmitted,
+                'published' => $published,
+            ]);
+        }
+    }
+
+    public function mount()
+    {
+        $this->syncTestCounts();
+    }
+
     public function render()
     {
         $query = TestModal::select([
@@ -96,7 +127,11 @@ class TestTable extends Component
             ->with(['EducationClass', 'Educationtype', 'getTestCat', 'testSections' => function ($query) {
                 $query->withCount('getQuestions');
             }])
-            ->withCount('getQuestions as confirmed_questions_count');
+            ->withCount(['getQuestions as confirmed_questions_count' => function ($query) {
+                $query->whereNull('test_questions.deleted_at')
+                    ->join('test_section', 'test_section.id', '=', 'test_questions.section_id')
+                    ->whereNull('test_section.deleted_at');
+            }]);
 
         if (! empty($this->search)) {
             $query->where('title', 'like', '%'.$this->search.'%');
