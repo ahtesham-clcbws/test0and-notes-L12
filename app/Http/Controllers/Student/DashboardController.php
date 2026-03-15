@@ -41,7 +41,16 @@ class DashboardController extends Controller
         $testAttempt = Gn_StudentTestAttempt::where('student_id', $stud_id)->get();
         $testAttemptCount = $testAttempt->count();
 
-        $testTotal = TestModal::where('user_id', null)->where('published', 1)->where('education_type_id', $education_type)->get();
+        $testTotal = TestModal::where('published', 1)
+            ->where('education_type_id', $education_type)
+            ->where(function ($q) {
+                $q->whereNull('user_id')
+                  ->orWhere('user_id', 1);
+
+                if (Auth::user()->myInstitute) {
+                    $q->orWhere('user_id', Auth::user()->myInstitute->user_id);
+                }
+            })->get();
         // $testCount = $testTotal->count();
 
         $testCount = [];

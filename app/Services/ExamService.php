@@ -44,7 +44,9 @@ class ExamService
             ->leftJoin('franchise_details', 'franchise_details.user_id', '=', 'users.id')
             ->with(['EducationClass', 'EducationType', 'getTestCat'])
             ->withCount(['getQuestions as confirmed_questions_count' => function ($query) {
-                $query->whereNull('test_questions.deleted_at');
+                $query->whereNull('test_questions.deleted_at')
+                    ->join('test_section', 'test_section.id', '=', 'test_questions.section_id')
+                    ->whereNull('test_section.deleted_at');
             }]);
 
         if (! empty($searchValue)) {
