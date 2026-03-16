@@ -1,42 +1,63 @@
-# Implementation Plan - Livewire Online Test Module
+# [Student Dashboard & Navigation Filtering]
 
-Refactor the "Online Conduct Test" into a **Livewire 3 stateful component** to enforce single-attempt security locks and implement real-time, reload-safe navigation answers logging.
+Implement strict filtering of student dashboard data based on their assigned Class/Group/Exam, while maintaining full access to all data from the homepage and contextual navigation from Course Details pages.
+
+## User Review Required
+
+> [!NOTE]
+> This change introduces STRICT filtering in the Student Dashboard and sub-views (Tests, Study Material, Packages). If a student has no Class assigned in their profile, they might see empty lists until filtered or assigned.
 
 ## Proposed Changes
 
-### 1. Database & Migrations
-Add tracking fields to securely locks attempts and supports resuming states safely without resetting timers:
-- **[NEW] Migration**: Add `status` and `draft_state` to `gn__student_test_attempts` table.
-    - `status`: String (`running`, `completed`) to track attempt lock status.
-    - `draft_state`: Text/JSON payload to store temporary UI layouts (Visited, Marked, Skipped) for seamless re-entry hydration on reload.
+### 1. **Student Dashboard**
+#### [MODIFY] [DashboardController.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Http/Controllers/Student/DashboardController.php)
+-   Update `index()` to filter `TestModal` and `Studymaterial` queries by `$User->class` (Class/Group/Exam) in addition to `education_type`.
+-   Query updates:
+    -   `TestModal`: `->where('education_type_child_id', $class)`
+    -   `Studymaterial`: `->where('class', $class)`
 
-### 2. Livewire Components
-#### **[NEW] `OnlineTestRunner`**
-**Path:** `app/Livewire/Student/Tests/OnlineTestRunner.php`
-Stateful coordinate managing single attempt testing cycle:
-- **Properties:**
-    - `TestModal $test`: Initializing configuration model.
-    - `array $questions`: Mapped sectional groups.
-    - `array $answers`: Linked model caching loaded rows accurately on initialization.
-    - `int $timeLeft`: Current server evaluated continuous ticking.
-- **Methods:**
-    - `mount($test_id)`: Creates attempts row at START with state `running`. Overrides duration triggers if re-entering.
-    - `saveSelection($qId, $val)`: Persists answers instantly into `Gn_Test_Response`.
-    - `submitTest()`: Marks status as `completed`, forcing immediate forward redirection.
+---
 
-### 3. Views & Layouts
-#### **[NEW] `online-test-runner.blade.php`**
-- **Timer Sub-module**: Polling server heartbeat `<div wire:poll.10s>` verifying absolute expiry safely overriding client slow CPU stalls.
-- **Question Dashboard**: Displaying active question metadata, answers nodes layout dynamically.
-- **Navigation Grid**: Rendering visisted vs marked indexes correctly hydrated on page reloads to prevent state loss mid-crash.
-- **🔒 Anti-Cheat Browser Guards**:
-    - Add Javascript navigation history trap (`history.pushState` and `window.onpopstate = history.go(1)`) to **disable the browser back button completely** during an active session, forcing students forward.
-- **Offline Triggers**: `<div wire:offline>` status locks preventing crashes while shaky internet reconnects.
+### 2. **Course details View**
+#### [MODIFY] [index.blade.php](file:///mnt/WebliesNew/test-and-notes-upgrading/resources/views/Frontend/ClassDetail/index.blade.php)
+-   Update navigation links (Tests, Study Material, Packages) to pass `class_id` and `edu_id` as query parameters so the destination pages can filter correctly.
+-   Example: `route('student.dashboard_gyanology_list', ['cat' => $item->id, 'class_id' => $classes_groups_exams_data->id])`
+
+---
+
+### 3. **Livewire Components**
+#### [MODIFY] [StudentTestList.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Tests/StudentTestList.php)
+-   Add `public $class_id;` property.
+-   In `render()`, filter by `$this->class_id` if present, otherwise fallback to `$userDetails->class`.
+-   Query update: `->where('education_type_child_id', $this->class_id ?? $userDetails->class)`
+
+---
+
+### 4. **Controllers**
+#### [MODIFY] [StudymaterialController.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Http/Controllers/StudymaterialController.php)
+-   Update `show()`, `showvideo()`, `showgk()` to check for `$request->class` (or `class_id`).
+-   Filter by query parameter if present, else fallback to `$student->class`.
+-   Query update: `->where('study_material.class', $class)`
+
+#### [MODIFY] [StudentPlanController.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Http/Controllers/Student/StudentPlanController.php)
+-   Update `index()` to filter `Gn_PackagePlan` by `education_type` and `class`.
+-   Look for `$request->class_id` or fallback to `$userDetails->class` (and education type).
+-   Query update: `->where('gn__package_plans.class', $class)`
 
 ---
 
 ## Verification Plan
 
-1. **Attempt verification**: Start test, leave active, re-open. Verify remaining duration DID NOT reset.
-2. **Review checks**: Mark indexes, reload frame. Validate VISITED/MARKED lightbulb flags persist exactly on dashboard resume grids.
-3. **Back-button verification**: Press back on the navigation bar. Validate the page keeps the student trapped in the continuous run loop safely.
+### Automated Tests
+-   No existing automated tests target this specific filtering logic. We rely on manual verification as this is a UI/Query logic shift.
+
+### Manual Verification
+1.  **Dashboard View**:
+    -   Log in as a student with a specific Class (e.g., Class X).
+    -   Visit Dashboard. Verify that count and lists match ONLY Class X items.
+2.  **Course Navigation**:
+    -   Go to Homepage and visit a Course Detail page for Class Y.
+    -   Click "Test & Quiz" or "Packages".
+    -   Verify that the resulting page lists items for Class Y, not Class X.
+3.  **Global View**:
+    -   Verify that viewing from homepage/unauthenticated context (if applicable) operates Normally or prompts login correctly with full access as designed.

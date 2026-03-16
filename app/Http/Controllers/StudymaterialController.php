@@ -511,6 +511,8 @@ class StudymaterialController extends Controller
         $name = Route::currentRouteName();
 
         $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
+        $class = $request->class_id ?? $student->class;
+        $edu_type = $request->education_type_id ?? $student->education_type;
         if ($request->ajax()) {
             $model = Studymaterial::select('study_material.id', 'title', 'sub_title', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'permission_to_download', 'users.name as name', 'classes_groups_exams.name as class_group')
                 ->leftJoin('users', function ($join) {
@@ -523,9 +525,14 @@ class StudymaterialController extends Controller
                 })
                 ->where('study_material.status', 1)
                 ->where('study_material.material_seen', 1)
-                ->where('study_material.education_type', $student->education_type)
-                // ->whereIn("study_material.institute_id", array(Auth::user()->myInstitute->id, 0))
+                ->where('study_material.education_type', $edu_type)
+                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute?->id, 0])
                 ->where('study_material.category', 'Study Notes & E-Books');
+
+            if ($class) {
+                $model->where('study_material.class', $class);
+            }
+
             $model = $model->orderBy('study_material.id', 'desc');
             $model->get();
 
@@ -633,6 +640,8 @@ class StudymaterialController extends Controller
         $name = Route::currentRouteName();
 
         $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
+        $class = $request->class_id ?? $student->class;
+        $edu_type = $request->education_type_id ?? $student->education_type;
         if ($request->ajax()) {
             $model = Studymaterial::select('study_material.id', 'title', 'sub_title', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'permission_to_download', 'users.name as name', 'classes_groups_exams.name as class_group')
                 ->leftJoin('users', function ($join) {
@@ -645,9 +654,14 @@ class StudymaterialController extends Controller
                 })
                 ->where('study_material.status', 1)
                 ->where('study_material.material_seen', 1)
-                ->where('study_material.education_type', $student->education_type)
-                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute->id, 0])
+                ->where('study_material.education_type', $edu_type)
+                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute?->id, 0])
                 ->where('study_material.category', 'Live & Video Classes');
+
+            if ($class) {
+                $model->where('study_material.class', $class);
+            }
+
             $model = $model->orderBy('study_material.id', 'desc');
             $model->get();
 
@@ -768,6 +782,8 @@ class StudymaterialController extends Controller
         $name = Route::currentRouteName();
 
         $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
+        $class = $request->class_id ?? $student->class;
+        $edu_type = $request->education_type_id ?? $student->education_type;
         if ($request->ajax()) {
             $model = Studymaterial::select('study_material.id', 'title', 'sub_title', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'permission_to_download', 'users.name as name', 'classes_groups_exams.name as class_group')
                 ->leftJoin('users', function ($join) {
@@ -780,9 +796,13 @@ class StudymaterialController extends Controller
                 })
                 ->where('study_material.status', 1)
                 ->where('study_material.material_seen', 1)
-                ->where('study_material.education_type', $student->education_type)
-                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute->id, 0]);
+                ->where('study_material.education_type', $edu_type)
+                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute?->id, 0]);
             $model->where('study_material.category', 'Static GK & Current Affairs');
+
+            if ($class) {
+                $model->where('study_material.class', $class);
+            }
 
             $model = $model->orderBy('study_material.id', 'desc');
             $model->get();
@@ -898,6 +918,8 @@ class StudymaterialController extends Controller
         $name = Route::currentRouteName();
 
         $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
+        $class = $request->class_id ?? $student->class;
+        $edu_type = $request->education_type_id ?? $student->education_type;
         if ($request->ajax()) {
             $model = Studymaterial::select('study_material.id', 'title', 'sub_title', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'permission_to_download', 'users.name as name', 'classes_groups_exams.name as class_group')
                 ->leftJoin('users', function ($join) {
@@ -910,9 +932,13 @@ class StudymaterialController extends Controller
                 })
                 ->where('study_material.status', 1)
                 ->where('study_material.material_seen', 1)
-                ->where('study_material.class', $student->class)
-                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute->id, 0])
+                ->where('study_material.education_type', $edu_type)
+                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute?->id, 0])
                 ->where('study_material.category', 'Comprehensive Study Material');
+
+            if ($class) {
+                $model->where('study_material.class', $class);
+            }
 
             $model = $model->orderBy('study_material.id', 'desc');
             $model->get();
@@ -1029,15 +1055,21 @@ class StudymaterialController extends Controller
         $name = Route::currentRouteName();
 
         $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
+        $class = $request->class_id ?? $student->class;
+        $edu_type = $request->education_type_id ?? $student->education_type;
         if ($request->ajax()) {
             $model = Studymaterial::select('study_material.id', 'title', 'sub_title', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'permission_to_download', 'users.name as name', 'classes_groups_exams.name as class_group')
                 ->leftJoin('users', 'users.id', 'study_material.created_by')
                 ->leftJoin('classes_groups_exams', 'classes_groups_exams.id', 'study_material.class')
                 ->where('study_material.status', 1)
                 ->where('study_material.material_seen', 1)
-                ->where('study_material.class', $student->class)
-                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute->id, 0])
+                ->where('study_material.education_type', $edu_type)
+                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute?->id, 0])
                 ->where('study_material.category', 'Short Notes & One Liner');
+
+            if ($class) {
+                $model->where('study_material.class', $class);
+            }
 
             $model = $model->orderBy('study_material.id', 'desc');
             $model->get();
@@ -1154,15 +1186,21 @@ class StudymaterialController extends Controller
         $name = Route::currentRouteName();
 
         $student = UserDetails::get()->where('user_id', Auth::user()->id)->first();
+        $class = $request->class_id ?? $student->class;
+        $edu_type = $request->education_type_id ?? $student->education_type;
         if ($request->ajax()) {
             $model = Studymaterial::select('study_material.id', 'title', 'sub_title', 'institute_id', 'publish_status', 'publish_date', 'document_type', 'created_by', 'file', 'video_link', 'permission_to_download', 'users.name as name', 'classes_groups_exams.name as class_group')
                 ->leftJoin('users', 'users.id', 'study_material.created_by')
                 ->leftJoin('classes_groups_exams', 'classes_groups_exams.id', 'study_material.class')
                 ->where('study_material.status', 1)
                 ->where('study_material.material_seen', 1)
-                ->where('study_material.class', $student->class)
-                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute->id, 0])
+                ->where('study_material.education_type', $edu_type)
+                ->whereIn('study_material.institute_id', [Auth::user()->myInstitute?->id, 0])
                 ->where('study_material.category', 'Premium Study Notes');
+
+            if ($class) {
+                $model->where('study_material.class', $class);
+            }
 
             $model = $model->orderBy('study_material.id', 'desc');
             $model->get();

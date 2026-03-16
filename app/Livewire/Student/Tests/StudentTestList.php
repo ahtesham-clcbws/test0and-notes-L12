@@ -16,6 +16,10 @@ class StudentTestList extends Component
 
     public $cat;  // Category for Gyanology
 
+    public $class_id;
+
+    public $education_type_id;
+
     public $search = '';
 
     public $perPage = 10;
@@ -48,14 +52,21 @@ class StudentTestList extends Component
             }])
             ->withCount('getQuestions as confirmed_questions_count');
 
-        // Filter by Student's Education Type
-        $query->where('education_type_id', $userDetails->education_type);
+        $edu_type = $this->education_type_id ?? $userDetails->education_type;
+        $class = $this->class_id ?? $userDetails->class;
+
+        // Filter by Student's Education Type & Class
+        $query->where('education_type_id', $edu_type);
+
+        if ($class) {
+            $query->where('education_type_child_id', $class);
+        }
 
         if ($this->type == 1) {
             // Institute Dashboard: Empty list if person belongs to no institute
-            if (!$user->myInstitute) {
+            if (! $user->myInstitute) {
                 return view('livewire.student.tests.student-test-list', [
-                    'tests' => TestModal::where('id', 0)->paginate(10), 
+                    'tests' => TestModal::where('id', 0)->paginate(10),
                 ]);
             } else {
                 // Strictly Institute Tests Only
@@ -65,7 +76,7 @@ class StudentTestList extends Component
             // Gyanology Category lists (Admin / SuperAdmin tests)
             $query->where(function ($q) {
                 $q->whereNull('user_id')
-                  ->orWhere('user_id', 1);
+                    ->orWhere('user_id', 1);
             });
 
             if ($this->cat) {

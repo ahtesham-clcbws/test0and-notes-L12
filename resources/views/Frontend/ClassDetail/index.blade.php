@@ -236,7 +236,7 @@
 
                                     <div class="start">
                                         @php
-                                            $targetRoute = route('student.dashboard_gyanology_list', ['cat' => $item->id]);
+                                            $targetRoute = route('student.dashboard_gyanology_list', ['cat' => $item->id, 'class_id' => $classes_groups_exams_data->id, 'education_type_id' => $education_type_data->id]);
                                             $loginRoute = route('login', ['redirect' => $targetRoute]);
                                             $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                         @endphp
@@ -258,7 +258,7 @@
 
                                 <div class="start">
                                     @php
-                                        $targetRoute = route('student.dashboard_tests_list');
+                                        $targetRoute = route('student.dashboard_tests_list', ['class_id' => $classes_groups_exams_data->id, 'education_type_id' => $education_type_data->id]);
                                         $loginRoute = route('login', ['redirect' => $targetRoute]);
                                         $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                     @endphp
@@ -278,7 +278,7 @@
 
                                 <div class="start">
                                     @php
-                                        $targetRoute = route('student.show');
+                                        $targetRoute = route('student.show', ['class_id' => $classes_groups_exams_data->id, 'education_type_id' => $education_type_data->id]);
                                         $loginRoute = route('login', ['redirect' => $targetRoute]);
                                         $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                     @endphp
@@ -294,7 +294,7 @@
 
                                 <div class="start">
                                     @php
-                                        $targetRoute = route('student.showComprehensive');
+                                        $targetRoute = route('student.showComprehensive', ['class_id' => $classes_groups_exams_data->id, 'education_type_id' => $education_type_data->id]);
                                         $loginRoute = route('login', ['redirect' => $targetRoute]);
                                         $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                     @endphp
@@ -310,7 +310,7 @@
 
                                 <div class="start">
                                     @php
-                                        $targetRoute = route('student.showShortNotes');
+                                        $targetRoute = route('student.showShortNotes', ['class_id' => $classes_groups_exams_data->id, 'education_type_id' => $education_type_data->id]);
                                         $loginRoute = route('login', ['redirect' => $targetRoute]);
                                         $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                     @endphp
@@ -326,7 +326,7 @@
 
                                 <div class="start">
                                     @php
-                                        $targetRoute = route('student.showPremium');
+                                        $targetRoute = route('student.showPremium', ['class_id' => $classes_groups_exams_data->id, 'education_type_id' => $education_type_data->id]);
                                         $loginRoute = route('login', ['redirect' => $targetRoute]);
                                         $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                     @endphp
@@ -346,7 +346,7 @@
 
                                 <div class="start">
                                     @php
-                                        $targetRoute = route('student.plan');
+                                        $targetRoute = route('student.plan', ['class_id' => $classes_groups_exams_data->id, 'education_type_id' => $education_type_data->id]);
                                         $loginRoute = route('login', ['redirect' => $targetRoute]);
                                         $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                     @endphp
@@ -362,7 +362,7 @@
 
                                 <div class="start">
                                     @php
-                                        $targetRoute = route('student.plan');
+                                        $targetRoute = route('student.plan', ['class_id' => $classes_groups_exams_data->id, 'education_type_id' => $education_type_data->id]); // Same route?
                                         $loginRoute = route('login', ['redirect' => $targetRoute]);
                                         $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                     @endphp
@@ -383,7 +383,7 @@
 
                                 <div class="start">
                                     @php
-                                        $targetRoute = route('student.showvideo');
+                                        $targetRoute = route('student.showvideo', ['class_id' => $classes_groups_exams_data->id, 'education_type_id' => $education_type_data->id]);
                                         $loginRoute = route('login', ['redirect' => $targetRoute]);
                                         $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                     @endphp
@@ -404,7 +404,7 @@
 
                                 <div class="start">
                                     @php
-                                        $targetRoute = route('student.showgk');
+                                        $targetRoute = route('student.showgk', ['class_id' => $classes_groups_exams_data->id, 'education_type_id' => $education_type_data->id]);
                                         $loginRoute = route('login', ['redirect' => $targetRoute]);
                                         $isStudent = Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 0 && Auth::user()->status == 'active';
                                     @endphp

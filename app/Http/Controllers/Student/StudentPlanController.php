@@ -27,6 +27,15 @@ class StudentPlanController extends Controller
                 })
                 ->where('gn__package_plans.status', '=', 1);
 
+            $student = \App\Models\UserDetails::where('user_id', Auth::user()->id)->first();
+            $class = $request->class_id ?? $student?->class;
+            $edu_type = $request->education_type_id ?? $student?->education_type;
+
+            $model->where('gn__package_plans.education_type', $edu_type);
+            if ($class) {
+                $model->where('gn__package_plans.class', $class);
+            }
+
             $active_plans = Gn_PackageTransaction::where('student_id', Auth::user()->id)
                 ->where('plan_status', 1)
                 ->pluck('plan_id')
@@ -113,8 +122,6 @@ class StudentPlanController extends Controller
                     };
                 })
                 ->unique('plan_id'); // Only show one unique state row per plan_id
-
-
 
             return Datatables::of($model)
                 ->addIndexColumn()

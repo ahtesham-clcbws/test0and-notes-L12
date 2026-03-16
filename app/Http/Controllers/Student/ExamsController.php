@@ -48,6 +48,8 @@ class ExamsController extends Controller
 
         $this->data['type'] = $type;
         $this->data['cat'] = $cat;
+        $this->data['class_id'] = $req->class_id;
+        $this->data['education_type_id'] = $req->education_type_id;
 
         $this->data['pagename'] = 'All Tests';
         if ($req->isMethod('post')) {
@@ -62,7 +64,7 @@ class ExamsController extends Controller
     {
         $package_plan = \App\Models\Gn_PackagePlan::find($id);
 
-        if (!$package_plan) {
+        if (! $package_plan) {
             return redirect()->route('student.dashboard')->with('error', 'Package not found.');
         }
 
@@ -81,7 +83,7 @@ class ExamsController extends Controller
                 ->whereIn('plan_status', [1, 2])
                 ->exists();
 
-            if (!$has_purchased) {
+            if (! $has_purchased) {
                 return redirect()->route('student.plan')->with('error', 'You need to purchase this package to view it.');
             }
         }
@@ -181,6 +183,7 @@ class ExamsController extends Controller
         }
 
         $result['package_plan'] = $package_plan;
+
         return view('Dashboard/Student/MyPlan/package_manage', $result);
     }
 
