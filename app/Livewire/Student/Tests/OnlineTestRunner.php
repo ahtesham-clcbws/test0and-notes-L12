@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('Layouts.frontend')]
+#[Layout('Layouts.exam')]
 class OnlineTestRunner extends Component
 {
     public $testId;
@@ -45,7 +45,16 @@ class OnlineTestRunner extends Component
             ->first();
 
         if ($attempt && $attempt->status === 'completed') {
-            return redirect()->route('student.show-result', [Auth::id(), $testId]);
+            $responsesCount = Gn_Test_Response::where('student_id', Auth::id())
+                ->where('test_id', $testId)
+                ->count();
+            
+            if ($responsesCount === 0) {
+                // False completion triggered by timing glitches: Reset to running with a fresh start
+                $attempt->update(['status' => 'running', 'created_at' => now()]);
+            } else {
+                return redirect()->route('student.show-result', [Auth::id(), $testId]);
+            }
         }
 
         if (! $attempt) {
@@ -56,6 +65,15 @@ class OnlineTestRunner extends Component
                 'status' => 'running',
                 'draft_state' => json_encode(['visited' => [], 'marked_for_review' => []]),
             ]);
+        } else {
+            // If already exists but no answers yet, reset created_at to now() to give full time for fresh starts/tests
+            $responsesCount = Gn_Test_Response::where('student_id', Auth::id())
+                ->where('test_id', $testId)
+                ->count();
+            
+            if ($responsesCount === 0 && $attempt->status === 'running') {
+                $attempt->update(['created_at' => now()]);
+            }
         }
 
         $this->attemptId = $attempt->id;
@@ -91,6 +109,11 @@ class OnlineTestRunner extends Component
             $totalDuration = array_sum($timeArray); // Assuming minutes
         }
 
+        // Safety Fallback to prevent immediate auto-submission on 0 duration
+        if (!$totalDuration || $totalDuration <= 0) {
+            $totalDuration = 60; // 60 minutes default for test configurations missing durations
+        }
+
         // timeRemaining = (created_at + duration_mins) - now()
         $startedAt = $attempt->created_at;
         $expiryTime = $startedAt->addMinutes($totalDuration ?? 0);
@@ -116,6 +139,14 @@ class OnlineTestRunner extends Component
             $this->questionsList[$key] = $questions->has($sectionId) 
                 ? $questions[$sectionId]->pluck('id')->toArray() 
                 : [];
+        }
+
+        // Safety: Start at the first section that actually has questions
+        foreach ($this->questionsList as $key => $qIds) {
+            if (!empty($qIds)) {
+                $this->currentSectionIndex = $key;
+                break;
+            }
         }
         
         if (!empty($this->questionsList)) {
@@ -193,12 +224,20 @@ class OnlineTestRunner extends Component
         if ($this->currentQuestionIndex < count($secQuestions) - 1) {
             $this->currentQuestionIndex++;
         } else {
-            if ($this->currentSectionIndex < count($this->sections) - 1) {
-                $this->currentSectionIndex++;
-                $this->currentQuestionIndex = 0;
-            } else {
+            // Must jump to next section that HAS questions
+            $nextSecIndex = $this->currentSectionIndex + 1;
+            while ($nextSecIndex < count($this->sections)) {
+                if (!empty($this->questionsList[$nextSecIndex] ?? [])) {
+                    $this->currentSectionIndex = $nextSecIndex;
+                    $this->currentQuestionIndex = 0;
+                    break;
+                }
+                $nextSecIndex++;
+            }
+
+            if ($nextSecIndex >= count($this->sections)) {
                 // Absolute end of test: Increment index beyond questions length to trigger Summary view!
-                $this->currentQuestionIndex++;
+                $this->currentQuestionIndex = count($secQuestions); 
                 return;
             }
         }
@@ -225,6 +264,10 @@ class OnlineTestRunner extends Component
                 $timeArray[] = $section['number_of_questions'] * $section['duration'];
             }
             $totalDuration = array_sum($timeArray);
+        }
+
+        if (!$totalDuration || $totalDuration <= 0) {
+            $totalDuration = 60; // 60 minutes safety default
         }
 
         $expiryTime = $attempt->created_at->addMinutes($totalDuration ?? 0);

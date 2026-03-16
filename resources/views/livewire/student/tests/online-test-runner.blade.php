@@ -69,10 +69,11 @@
                             <ul class="no-ul-list">
                                 @for ($k = 1; $k <= $currentQuestion->mcq_options; $k++)
                                     @php $optKey = 'ans_' . $k; @endphp
-                                    <li class="mb-2 p-2 border rounded" style="background: {{ ($answers[$currentQuestion->id] ?? '') == $optKey ? '#e6f4ea' : 'transparent' }}">
+                                    <li wire:key="option-{{ $currentQuestion->id }}-{{ $optKey }}" class="mb-2 p-2 border rounded" style="background: {{ ($answers[$currentQuestion->id] ?? '') == $optKey ? '#e6f4ea' : 'transparent' }}">
                                         <input class="checkbox-custom" 
                                                id="answer_{{ $currentQuestion->id }}_{{ $k }}" 
                                                type="radio" 
+                                               name="question_{{ $currentQuestion->id }}"
                                                value="{{ $optKey }}"
                                                wire:click="saveSelection({{ $currentQuestion->id }}, '{{ $optKey }}')"
                                                {{ ($answers[$currentQuestion->id] ?? '') == $optKey ? 'checked' : '' }}>
@@ -122,7 +123,6 @@
 
                         <hr>
 
-                        <h6>Questions Pallete</h6>
                         <div class="question-grid mb-3">
                             @foreach ($questionsList[$currentSectionIndex] ?? [] as $qIndex => $qId)
                                 @php
@@ -131,13 +131,17 @@
                                     $isVisited = in_array($qId, $visitedQuestions);
                                     
                                     $colorClass = 'bg-unvisited';
-                                    if ($hasAnswer) $colorClass = 'bg-answered';
-                                    elseif ($isMarked) $colorClass = 'bg-marked';
+                                    // Mark for Review takes highest priority
+                                    if ($isMarked) $colorClass = 'bg-marked';
+                                    elseif ($hasAnswer) $colorClass = 'bg-answered';
                                     elseif ($isVisited) $colorClass = 'bg-visited';
                                 @endphp
-                                <span class="numberlist {{ $colorClass }} pointer" 
+                                <span class="numberlist {{ $colorClass }} pointer position-relative d-flex align-items-center justify-content-center" 
                                       wire:click="selectQuestion({{ $currentSectionIndex }}, {{ $qIndex }})"
-                                      style="cursor: pointer; font-weight: bold;">
+                                      style="cursor: pointer; font-weight: bold; width: 30px; height: 30px; text-align: center;">
+                                    @if ($isMarked)
+                                        <i class="ti-eye text-white position-absolute" style="font-size: 8px; top: -5px; right: -5px; background: red; border-radius: 50%; padding: 2px;"></i>
+                                    @endif
                                     {{ $qIndex + 1 }}
                                 </span>
                             @endforeach
@@ -169,21 +173,23 @@
 
     @section('js')
         <script>
-            // Continuous Live Timer from component declaration second triggers
-            let timeLeft = {{ $timeLeft }};
+            // absolute timestamp end Calculation to prevent tab-sleep lags
+            let endTime = Date.now() + ({{ $timeLeft }} * 1000);
             const timerDisplay = document.getElementById('timer-display');
 
             function updateTimer() {
-                if (timeLeft <= 0) {
+                let now = Date.now();
+                let diff = Math.max(0, Math.floor((endTime - now) / 1000));
+
+                if (diff <= 0) {
                     clearInterval(timerInterval);
                     @this.submitTest();
                     return;
                 }
-                timeLeft--;
 
-                const hours = Math.floor(timeLeft / 3600);
-                const minutes = Math.floor((timeLeft % 3600) / 60);
-                const seconds = Math.floor(timeLeft % 60);
+                const hours = Math.floor(diff / 3600);
+                const minutes = Math.floor((diff % 3600) / 60);
+                const seconds = Math.floor(diff % 60);
 
                 timerDisplay.innerHTML = 
                     (hours < 10 ? '0' + hours : hours) + ":" +
@@ -191,8 +197,12 @@
                     (seconds < 10 ? '0' + seconds : seconds);
             }
 
-            // Sync countdown to live ticking
             const timerInterval = setInterval(updateTimer, 1000);
+
+            // 🔒 Guard rails against tab crashes or reloads
+            window.onbeforeunload = function() {
+                return "Are you sure you want to leave the test? Your progress is saved, but time continues ticking!";
+            };
 
             // 🔒 Disable Browser Back Button Lock override
             history.pushState(null, null, location.href);
