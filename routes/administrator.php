@@ -18,6 +18,7 @@ use App\Livewire\Admin\ManageFaq;
 use App\Livewire\Admin\ManageImportantLinks;
 use App\Livewire\Admin\Pages\PagesList;
 use App\Livewire\Admin\Pages\PagesView;
+use App\Livewire\Admin\Settings\OtpManager;
 use Illuminate\Support\Facades\Route;
 
 // Raj@KNP78  careerwithoutbarrier@gmail.com
@@ -125,6 +126,7 @@ Route::name('administrator.')->group(function () {
             Route::prefix('settings')->group(function () {
                 Route::any('dashboard', [SettingsController::class, 'dashboardSettings'])->name('dashboard_settings');
                 Route::any('no-otp-numbers', [SettingsController::class, 'noOtpNumbers'])->name('dashboard_default_numbers');
+                Route::any('otp-manager', OtpManager::class)->name('otp_manager');
                 Route::any('delete-number', [SettingsController::class, 'delete_number'])->name('dashboard_default_number_delete');
                 Route::any('manage_home', [SettingsController::class, 'manage_home'])->name('manage_home');
                 Route::post('manage_home_process', [SettingsController::class, 'manage_home_process'])->name('manage_home_process');

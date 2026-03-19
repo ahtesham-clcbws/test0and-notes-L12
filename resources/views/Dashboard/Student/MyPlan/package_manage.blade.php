@@ -165,7 +165,7 @@
                 </div>
                 <div class="card-footer">
                     <span class="badge bg-light text-dark border">{{ date('d M Y', strtotime($onetest->created_at)) }}</span>
-                    <a href="{{ route('student.test-name', [$onetest->id]) }}" class="btn-action btn-primary-soft">
+                    <a href="{{ route('start-test', [$onetest->id]) }}" class="btn-action btn-primary-soft">
                         <i class="bi bi-play-fill"></i> Start Test
                     </a>
                 </div>

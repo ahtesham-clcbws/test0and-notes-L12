@@ -10,7 +10,6 @@ use App\Models\Studymaterial;
 use App\Models\User;
 use App\Notifications\ContactFormAdminNotify;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
@@ -22,17 +21,26 @@ class HomeController extends Controller
         $current_date = date('Y-m-d');
         $cacheDuration = 60 * 60; // 1 hour
 
-        // Fetch Package Plans - COMBINED FOR HOMEPAGE
+        // Fetch Package Plans - FOR GOVT JOBS SECTION
         $Gn_PackagePackagelist = Gn_PackagePlan::with(['educationType', 'classType'])
             ->where('status', 1)
             ->where('is_featured', 1)
             ->where('expire_date', '>=', $current_date)
+            ->where('education_type', '!=', 52) // Exclude Academics
             ->orderBy('id', 'desc')
             ->limit(6)
             ->get(['gn__package_plans.*', DB::raw('(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration')]);
 
-        // Empty down-level lists to cleanly hide redundant sections down the page
-        $Gn_PackagePlanTestAndNotes = collect();
+        // Fetch Package Plans - FOR ACADEMICS SECTION
+        $Gn_PackagePlanTestAndNotes = Gn_PackagePlan::with(['educationType', 'classType'])
+            ->where('status', 1)
+            ->where('is_featured', 1)
+            ->where('expire_date', '>=', $current_date)
+            ->where('education_type', 52) // Include Academics Only
+            ->orderBy('id', 'desc')
+            ->limit(6)
+            ->get(['gn__package_plans.*', DB::raw('(gn__package_plans.duration + gn__package_plans.free_duration ) as total_duration')]);
+
         $Gn_PackagePlanTestAndNotes2 = collect();
         $Gn_PackagePlanInstitute = collect();
 
@@ -90,10 +98,8 @@ class HomeController extends Controller
             ->limit(6)
             ->get(['study_material.*']);
 
-
         // Batch fetch landing page data
         $landingPages = DB::table('landing_page')->whereBetween('id', [1, 9])->get()->keyBy('id');
-
 
         // Helper to get landing page data safely
         $getLandingData = function ($id) use ($landingPages) {

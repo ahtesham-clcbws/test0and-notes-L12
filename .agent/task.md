@@ -5,3 +5,7 @@
     - [x] Homepage: Ensure "Start" links to checkout for first-time free package acquisition <!-- id: 39 -->
 - [x] UI/Feedback Updates <!-- id: 40 -->
     - [x] Refined homepage button labels/logic <!-- id: 41 -->
+- [ ] Mobile App API & OTP Support
+    - [ ] Create `App\Livewire\Admin\Settings\OtpManager` under settings menu (Read/Delete existing `otp_verifications`)
+    - [ ] Build `Api\AuthController` (send/verify OTP)
+    - [ ] Build `Api/StudentController` for mobile data

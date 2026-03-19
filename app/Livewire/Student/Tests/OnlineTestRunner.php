@@ -35,6 +35,9 @@ class OnlineTestRunner extends Component
 
     public $attemptId;
 
+    // Set initial view state to testing to bypass inner instructions duplicates overlays
+    public $currentView = 'testing'; // 'instructions', 'testing', 'review'
+
     public function mount($testId)
     {
         $this->testId = $testId;
@@ -48,7 +51,7 @@ class OnlineTestRunner extends Component
             $responsesCount = Gn_Test_Response::where('student_id', Auth::id())
                 ->where('test_id', $testId)
                 ->count();
-            
+
             if ($responsesCount === 0) {
                 // False completion triggered by timing glitches: Reset to running with a fresh start
                 $attempt->update(['status' => 'running', 'created_at' => now()]);
@@ -70,7 +73,7 @@ class OnlineTestRunner extends Component
             $responsesCount = Gn_Test_Response::where('student_id', Auth::id())
                 ->where('test_id', $testId)
                 ->count();
-            
+
             if ($responsesCount === 0 && $attempt->status === 'running') {
                 $attempt->update(['created_at' => now()]);
             }
@@ -101,7 +104,7 @@ class OnlineTestRunner extends Component
                 ->select('number_of_questions', 'duration')
                 ->get()
                 ->toArray();
-            
+
             $timeArray = [];
             foreach ($section_time as $section) {
                 $timeArray[] = $section['number_of_questions'] * $section['duration'];
@@ -110,7 +113,7 @@ class OnlineTestRunner extends Component
         }
 
         // Safety Fallback to prevent immediate auto-submission on 0 duration
-        if (!$totalDuration || $totalDuration <= 0) {
+        if (! $totalDuration || $totalDuration <= 0) {
             $totalDuration = 60; // 60 minutes default for test configurations missing durations
         }
 
@@ -121,6 +124,7 @@ class OnlineTestRunner extends Component
 
         if ($this->timeLeft <= 0) {
             $this->submitTest();
+
             return;
         }
 
@@ -131,27 +135,27 @@ class OnlineTestRunner extends Component
     protected function loadQuestionsStructure(): void
     {
         $this->sections = $this->test->testSections()->with('sectionSubject')->get()->toArray();
-        
+
         $questions = $this->test->getQuestions()->get()->groupBy('pivot.section_id');
 
         foreach ($this->sections as $key => $section) {
             $sectionId = $section['id'];
-            $this->questionsList[$key] = $questions->has($sectionId) 
-                ? $questions[$sectionId]->pluck('id')->toArray() 
+            $this->questionsList[$key] = $questions->has($sectionId)
+                ? $questions[$sectionId]->pluck('id')->toArray()
                 : [];
         }
 
         // Safety: Start at the first section that actually has questions
         foreach ($this->questionsList as $key => $qIds) {
-            if (!empty($qIds)) {
+            if (! empty($qIds)) {
                 $this->currentSectionIndex = $key;
                 break;
             }
         }
-        
-        if (!empty($this->questionsList)) {
+
+        if (! empty($this->questionsList)) {
             $currentQId = $this->getCurrentQuestionId();
-            if ($currentQId && !in_array($currentQId, $this->visitedQuestions)) {
+            if ($currentQId && ! in_array($currentQId, $this->visitedQuestions)) {
                 $this->visitedQuestions[] = $currentQId;
                 $this->updateDraftState();
             }
@@ -169,7 +173,7 @@ class OnlineTestRunner extends Component
         $this->currentQuestionIndex = $qIndex;
 
         $currentQId = $this->getCurrentQuestionId();
-        if ($currentQId && !in_array($currentQId, $this->visitedQuestions)) {
+        if ($currentQId && ! in_array($currentQId, $this->visitedQuestions)) {
             $this->visitedQuestions[] = $currentQId;
             $this->updateDraftState();
         }
@@ -213,7 +217,7 @@ class OnlineTestRunner extends Component
                 'draft_state' => json_encode([
                     'visited' => $this->visitedQuestions,
                     'marked_for_review' => $this->markedQuestions,
-                ])
+                ]),
             ]);
         }
     }
@@ -227,7 +231,7 @@ class OnlineTestRunner extends Component
             // Must jump to next section that HAS questions
             $nextSecIndex = $this->currentSectionIndex + 1;
             while ($nextSecIndex < count($this->sections)) {
-                if (!empty($this->questionsList[$nextSecIndex] ?? [])) {
+                if (! empty($this->questionsList[$nextSecIndex] ?? [])) {
                     $this->currentSectionIndex = $nextSecIndex;
                     $this->currentQuestionIndex = 0;
                     break;
@@ -237,13 +241,14 @@ class OnlineTestRunner extends Component
 
             if ($nextSecIndex >= count($this->sections)) {
                 // Absolute end of test: Increment index beyond questions length to trigger Summary view!
-                $this->currentQuestionIndex = count($secQuestions); 
+                $this->currentQuestionIndex = count($secQuestions);
+
                 return;
             }
         }
 
         $currentQId = $this->getCurrentQuestionId();
-        if ($currentQId && !in_array($currentQId, $this->visitedQuestions)) {
+        if ($currentQId && ! in_array($currentQId, $this->visitedQuestions)) {
             $this->visitedQuestions[] = $currentQId;
             $this->updateDraftState();
         }
@@ -258,7 +263,7 @@ class OnlineTestRunner extends Component
                 ->select('number_of_questions', 'duration')
                 ->get()
                 ->toArray();
-            
+
             $timeArray = [];
             foreach ($section_time as $section) {
                 $timeArray[] = $section['number_of_questions'] * $section['duration'];
@@ -266,7 +271,7 @@ class OnlineTestRunner extends Component
             $totalDuration = array_sum($timeArray);
         }
 
-        if (!$totalDuration || $totalDuration <= 0) {
+        if (! $totalDuration || $totalDuration <= 0) {
             $totalDuration = 60; // 60 minutes safety default
         }
 
@@ -288,13 +293,36 @@ class OnlineTestRunner extends Component
         return redirect()->route('student.show-result', [Auth::id(), $this->testId]);
     }
 
+    public function startTest()
+    {
+        $this->currentView = 'testing';
+    }
+
+    public function goToReview()
+    {
+        $this->currentView = 'review';
+    }
+
     public function render()
     {
         $currentQId = $this->getCurrentQuestionId();
         $currentQuestion = $currentQId ? QuestionBankModel::find($currentQId) : null;
 
+        // Calculate counts for Review View
+        $totalQuestions = 0;
+        foreach ($this->questionsList as $qIds) {
+            $totalQuestions += count($qIds);
+        }
+        $attemptedCount = count($this->answers);
+        $reviewCount = count($this->markedQuestions);
+        $notAttemptedCount = $totalQuestions - $attemptedCount;
+
         return view('livewire.student.tests.online-test-runner', [
             'currentQuestion' => $currentQuestion,
+            'totalQuestions' => $totalQuestions,
+            'attemptedCount' => $attemptedCount,
+            'reviewCount' => $reviewCount,
+            'notAttemptedCount' => $notAttemptedCount,
         ]);
     }
 }

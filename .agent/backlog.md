@@ -55,3 +55,8 @@
 - [ ] Implement Livewire actions: "Save & Next", "Clear Response", "Mark for Review" <!-- id: 4 -->
 - [ ] Add countdown timer with auto-submit <!-- id: 5 -->
 - [ ] Finalize secure submission flow <!-- id: 6 -->
+
+## Phase 8: Mobile App Integration API & Admin Support (UPCOMING/PLANNING)
+- [ ] Create `App\Livewire\Admin\Settings\OtpManager` under settings menu (Read/Delete existing `otp_verifications`)
+- [ ] Build `Api\AuthController` (send/verify OTP for Mobile Login)
+- [ ] Build `Api\StudentController` (My Packages, Tests, Profile Sync for Mobile)

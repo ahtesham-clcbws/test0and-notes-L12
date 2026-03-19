@@ -33,7 +33,7 @@
                                         @endphp
 
                                         @if (!$attempt)
-                                            <a class="btn btn-sm btn-info" href="{{ route('student.test-name', [$test->id]) }}" title="Start Test">
+                                            <a class="btn btn-sm btn-info" href="{{ route('start-test', [$test->id]) }}" title="Start Test">
                                                 <i class="bi bi-pencil-square me-2"></i>Start Test
                                             </a>
                                         @else
