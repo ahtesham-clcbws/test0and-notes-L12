@@ -4,21 +4,51 @@
             .number-que-list { display: flex; flex-wrap: wrap; flex-direction: row; align-content: space-between; justify-content: space-around; }
             .numberlist { height: 25px; width: 25px; border: solid 1px grey; border-radius: 50%; display: block; text-align: center; }
             .numberlist:hover { background-color: #03b97c; color: #fff; }
-            .question-grid { display: grid; grid-template-columns: repeat(5, 1fr); justify-items: center; gap: 8px; }
+            .question-grid { display: grid; grid-template-columns: repeat(10, 1fr); justify-items: center; gap: 6px; }
             
             /* Status Colors synced with wire state */
-            .bg-answered { background-color: #03b97c !important; color: #fff !important; }
-            .bg-marked { background-color: #e8741c !important; color: #fff !important; }
-            .bg-visited { background-color: #700404 !important; color: #fff !important; }
-            .bg-unvisited { background-color: #B4B1AD !important; color: #fff !important; }
+            .bg-answered { background-color: #04ba65 !important; color: #fff !important; }
+            .bg-unvisited { background-color: #adb5bd !important; color: #000 !important; }
 
-            .counter { display: flex; color: #fff; }
-            .ed_title { color: #03b97c; }
-            .nav-link { padding: 4px 20px; font-size: 16px; color: #03b97c; cursor: pointer; }
-            .nav-link.active { background: #03b97c; color: white; }
-            .student_image { width: 80px; height: 80px; object-fit: cover; }
-            .studen_name { margin: 0; background: #8fcea8; flex: 1; display: flex; justify-content: center; align-items: center; }
-            .test_name { margin: 0; background: #04ba65; flex: 1; display: flex; justify-content: center; align-items: center; color: white; }
+            /* 🟢 Custom Styles for Online Test (No Bootstrap Conflicts) */
+            .ot-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border-bottom: 2px solid #04ba65; margin-bottom: 10px; }
+            .ot-header-title { color: #04ba65; font-weight: bold; font-size: 24px; margin: 0; }
+            .ot-header-stats { display: flex; gap: 30px; align-items: center; }
+            .ot-timer { color: red; font-weight: bold; font-size: 20px; margin: 0; }
+            .ot-questions-count { color: #000; font-weight: bold; font-size: 20px; margin: 0; }
+            .ot-question-number { color: red; font-weight: bold; font-size: 20px; margin-bottom: 15px; }
+            .ot-subject-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+            .ot-tab { background: #dcebd2; color: #000; padding: 8px 16px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; }
+            .ot-tab.active { background: #04ba65; color: #fff; }
+            .ot-container { display: flex; gap: 20px; align-items: flex-start; }
+            .ot-question-panel { flex: 1; background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 25px; box-shadow: 0px 2px 4px rgba(0,0,0,0.03); }
+            .ot-question-box { padding-bottom: 0px; margin-bottom: 0px; }
+            .ot-question-text { font-size: 18px; line-height: 1.5; margin-bottom: 25px; color: #333; }
+            .ot-options-list { list-style: none; padding: 0; margin: 0 0 40px 0; }
+            .ot-option-item { display: flex; align-items: flex-start; margin-bottom: 15px; }
+            .ot-option-label { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; font-size: 16px; width: 100%; }
+            .ot-option-input { width: 18px; height: 18px; cursor: pointer; opacity: 1 !important; position: static !important; -webkit-appearance: auto !important; appearance: auto !important; margin-top: 3px; }
+            .ot-action-bar { display: flex; gap: 10px; border-top: 1px solid #ddd; padding-top: 20px; }
+            .ot-btn { padding: 8px 16px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 16px; }
+            .ot-btn-success { background: #04ba65; color: #fff; }
+            .ot-btn-clear { background: #ffffda; color: red; border: 1px solid #ccc !important; }
+            .ot-btn-next { background: #04ba65; color: #fff; margin-left: auto; }
+            .ot-sidebar { width: 320px; border: 2px solid #04ba65; background: #fff; }
+            .ot-profile { display: flex; background: #e1e9d9; align-items: stretch; border-bottom: 1px solid #ccc; }
+            .ot-profile-img-wrap { background: #fff; padding: 8px; border-right: 1px solid #ccc; }
+            .ot-profile-img { width: 60px; height: 60px; object-fit: cover; }
+            .ot-profile-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+            .ot-profile-name { padding-top: 10px; font-weight: bold; color: #000; text-align: center; font-size: 16px; }
+            .ot-profile-subject { background: #04ba65; color: #fff; text-align: center; padding: 4px; font-weight: bold; font-size: 14px; }
+            .ot-sidebar-content { padding: 15px; }
+            .ot-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; margin-bottom: 20px; }
+            .ot-node { width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; cursor: pointer; border: 1px solid #888; text-decoration: none; color: #000; }
+            .ot-node-answered { background: #04ba65 !important; color: #fff !important; border-color: #04ba65 !important; }
+            .ot-node-unvisited { background: #adb5bd !important; color: #000 !important; }
+            .ot-star-badge { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); font-size: 16px; color: gold; text-shadow: 0px 0px 2px #000; }
+            .ot-sidebar-links { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 15px; }
+            .ot-sidebar-link { color: #04ba65; font-weight: bold; text-decoration: none; }
+            .ot-submit-btn { display: block; width: 100%; background: #04ba65; color: #fff; text-align: center; padding: 12px; font-weight: bold; border: none; font-size: 18px; cursor: pointer; }
         </style>
     @endsection
 
@@ -76,85 +106,55 @@
         </div>
 
     @elseif ($currentView == 'testing')
-        {{-- ============================ SCREENSHOT 2: CONDUCT TEST ============================ --}}
-        <div class="ed_detail_head" style="padding: 10px; background: #fff; border-bottom: 2px solid #04ba65;">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-4">
-                        <h3 style="color: #04ba65; font-weight: bold; margin:0;">{{ $test->title }}</h3>
-                    </div>
-                    <div class="col-md-4 text-center">
-                        <h4 style="color: red; font-weight: bold; margin:0;">
-                             @if ($currentQuestion) Question No {{ $currentQuestionIndex + 1 }} @endif
-                        </h4>
-                    </div>
-                    <div class="col-md-4 text-end d-flex align-items-center justify-content-end gap-3">
-                        <h5 style="color: red; margin:0; font-weight: bold;">Time Left : <span id="timer-display">00:00:00</span></h5>
-                        <h5 style="color: #333; margin:0; font-weight: bold;">Qs: {{ $totalQuestions }}</h5>
-                    </div>
-                </div>
+        {{-- ============================ SCREENSHOT 2: CONDUCT TEST (CUSTOM CSS LAYOUT) ============================ --}}
+        <div class="ot-header">
+            <h3 class="ot-header-title">{{ $test->title }}</h3>
+            <div class="ot-header-stats">
+                <h5 class="ot-timer">Time Left : <span id="timer-display">00:00:00</span></h5>
+                <h5 class="ot-questions-count">Qs: {{ $totalQuestions }}</h5>
             </div>
         </div>
 
-        <section class="pt-2">
-            <div class="container">
-                {{-- Section Subject Tabs --}}
-                <div class="col-md-12 mb-3">
-                    <ul class="nav nav-pills b-0 gap-2">
-                        @foreach ($sections as $i => $section)
-                            <li class="nav-item">
-                                <a class="nav-link rounded {{ $currentSectionIndex == $i ? 'active' : '' }}" 
-                                   wire:click="selectQuestion({{ $i }}, 0)"
-                                   style="background: {{ $currentSectionIndex == $i ? '#04ba65' : '#e9ecef' }}; color: {{ $currentSectionIndex == $i ? '#fff' : '#495057' }}; font-weight:bold;">
-                                   {{ $section['section_subject']['name'] }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
+        <section class="p-0">
+            <div style="width: 100%; max-width: 1200px; margin: 0 auto; padding: 15px;">
+                <div class="ot-question-number">
+                    @if ($currentQuestion) Question No {{ $currentQuestionIndex + 1 }} @endif
                 </div>
 
-                <div class="row">
-                    {{-- Main Question Display Area --}}
-                    <div class="col-lg-8 col-md-12">
-                        <div class="edu_wraper p-4 mb-3 border bg-white" style="border-radius:8px;">
-                            @if ($currentQuestion)
-                                <div class="d-flex mb-3">
-                                    <div class="fs-5" style="line-height: 1.6;">{!! $currentQuestion->question !!}</div>
-                                </div>
+                <div class="ot-subject-tabs">
+                    @foreach ($sections as $i => $section)
+                        <button class="ot-tab {{ $currentSectionIndex == $i ? 'active' : '' }}" wire:click="selectQuestion({{ $i }}, 0)">
+                            {{ $section['section_subject']['name'] }}
+                        </button>
+                    @endforeach
+                </div>
 
-                                <ul class="no-ul-list list-unstyled">
+                <div class="ot-container">
+                    <div class="ot-question-panel">
+                        <div class="ot-question-box">
+                            @if ($currentQuestion)
+                                <div class="ot-question-text">{!! $currentQuestion->question !!}</div>
+
+                                <ul class="ot-options-list">
                                     @for ($k = 1; $k <= $currentQuestion->mcq_options; $k++)
                                         @php $optKey = 'ans_' . $k; @endphp
-                                        <li wire:key="option-{{ $currentQuestion->id }}-{{ $optKey }}" 
-                                            wire:click="saveSelection({{ $currentQuestion->id }}, '{{ $optKey }}')"
-                                            class="mb-2 p-3 border rounded d-flex align-items-center" 
-                                            style="background: {{ ($answers[$currentQuestion->id] ?? '') == $optKey ? '#e6f4ea' : '#f8f9fa' }}; cursor:pointer;">
-                                            
-                                            <input class="form-check-input" 
-                                                   id="answer_{{ $currentQuestion->id }}_{{ $k }}" 
-                                                   type="radio" 
-                                                   name="question_{{ $currentQuestion->id }}"
-                                                   value="{{ $optKey }}"
-                                                   {{ ($answers[$currentQuestion->id] ?? '') == $optKey ? 'checked' : '' }}
-                                                   style="transform: scale(1.2); cursor:pointer;">
-                                            <label class="form-check-label ms-3 mb-0 w-100" for="answer_{{ $currentQuestion->id }}_{{ $k }}" style="cursor:pointer;">
-                                                {!! $currentQuestion->$optKey !!}
+                                        <li wire:key.live="option-{{ $currentQuestion->id }}-{{ $optKey }}" class="ot-option-item">
+                                            <label class="ot-option-label" wire:click="saveSelection({{ $currentQuestion->id }}, '{{ $optKey }}')">
+                                                <input id="answer_{{ $currentQuestion->id }}_{{ $k }}" wire:key="input-{{ $currentQuestion->id }}-{{ $k }}-{{ isset($answers[$currentQuestion->id]) ? 'filled' : 'empty' }}" class="ot-option-input" type="radio" name="question_{{ $currentQuestion->id }}" value="{{ $optKey }}" {{ ($answers[$currentQuestion->id] ?? '') == $optKey ? 'checked' : '' }} />
+                                                <span>{!! $currentQuestion->$optKey !!}</span>
                                             </label>
                                         </li>
                                     @endfor
                                 </ul>
 
-                                <hr>
-
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-warning text-white d-flex align-items-center gap-1" wire:click="toggleMarkForReview({{ $currentQuestion->id }})" style="background: #e8741c; border:none; padding:8px 16px;">
-                                        <i class="ti-hand-open"></i> 
-                                        {{ in_array($currentQuestion->id, $markedQuestions) ? 'Unmark Review' : 'Mark for Review' }}
+                                <div class="ot-action-bar">
+                                    <button class="ot-btn ot-btn-success" wire:click="toggleMarkForReview({{ $currentQuestion->id }})">
+                                        <i class="ti-star"></i> {{ in_array($currentQuestion->id, $markedQuestions) ? 'Unmark Review' : 'Mark for Review' }}
                                     </button>
-                                    <button class="btn btn-secondary d-flex align-items-center gap-1" wire:click="clearResponse({{ $currentQuestion->id }})" style="background:#555; padding:8px 16px;">
+                                    <button class="ot-btn ot-btn-clear" wire:click="clearResponse({{ $currentQuestion->id }})">
                                         <i class="ti-reload"></i> Clear Response
                                     </button>
-                                    <button class="btn btn-success ms-auto d-flex align-items-center gap-1" wire:click="saveAndNext" style="background:#04ba65; padding:8px 20px; font-weight:bold;">
+                                    <button class="ot-btn ot-btn-next" wire:click="saveAndNext">
                                         Save & Next <i class="ti-angle-right"></i>
                                     </button>
                                 </div>
@@ -168,58 +168,46 @@
                         </div>
                     </div>
 
-                    {{-- Sidebar Control Panel Card --}}
-                    <div class="col-lg-4 col-md-12">
-                        <div class="border bg-white p-0" style="border-radius:8px; overflow:hidden;">
-                            <div class="row m-0 align-items-center" style="background: #e9ecef; padding: 12px;">
-                                <div class="col-3 p-0">
-                                    <img class="student_image rounded-circle border bg-white" src="{{ '/storage/' . auth()->user()->user_details->photo_url }}" alt="" style="width:50px; height:50px; object-fit:cover;">
-                                </div>
-                                <div class="col-9">
-                                    <h6 class="mb-0 font-weight-bold">{{ auth()->user()->name }}</h6>
-                                    <small class="text-muted" style="background:#04ba65; color:#fff !important; padding:2px 6px; border-radius:4px; font-size:11px;">
-                                         {{ $sections[$currentSectionIndex]['section_subject']['name'] ?? 'Exam' }}
-                                    </small>
+                    <div class="ot-sidebar">
+                        <div class="ot-profile">
+                            <div class="ot-profile-img-wrap">
+                                <img src="{{ '/storage/' . auth()->user()->user_details->photo_url }}" class="ot-profile-img" />
+                            </div>
+                            <div class="ot-profile-info">
+                                <div class="ot-profile-name">{{ auth()->user()->name }}</div>
+                                <div class="ot-profile-subject">
+                                     {{ $sections[$currentSectionIndex]['section_subject']['name'] ?? 'Exam' }}
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="p-3">
-                                <div class="question-grid mb-3">
-                                    @foreach ($questionsList[$currentSectionIndex] ?? [] as $qIndex => $qId)
-                                        @php
-                                            $hasAnswer = isset($answers[$qId]);
-                                            $isMarked = in_array($qId, $markedQuestions);
-                                            $isVisited = in_array($qId, $visitedQuestions);
-                                            
-                                            $colorClass = 'bg-unvisited';
-                                            if ($isMarked) $colorClass = 'bg-marked';
-                                            elseif ($hasAnswer) $colorClass = 'bg-answered';
-                                            elseif ($isVisited) $colorClass = 'bg-visited';
-                                        @endphp
-                                        <span class="numberlist {{ $colorClass }} pointer position-relative d-flex align-items-center justify-content-center" 
-                                              wire:click="selectQuestion({{ $currentSectionIndex }}, {{ $qIndex }})"
-                                              style="cursor: pointer; font-weight: bold; width: 32px; height: 32px; font-size:14px; text-align: center;">
-                                            @if ($isMarked)
-                                                <i class="ti-hand-open text-white position-absolute" style="font-size: 7px; top: -4px; right: -4px; background: #e8741c; border-radius: 50%; padding: 2px;"></i>
-                                            @endif
-                                            {{ $qIndex + 1 }}
-                                        </span>
-                                    @endforeach
-                                </div>
-
-                                <ul class="list-unstyled small mb-3" style="line-height: 1.6;">
-                                    <li><span class="d-inline-block bg-answered rounded-circle me-1" style="width:10px; height:10px; background-color:#03b97c !important;"></span> Answered</li>
-                                    <li><span class="d-inline-block bg-marked rounded-circle me-1" style="width:10px; height:10px; background-color:#e8741c !important;"></span> Marked for review</li>
-                                    <li><span class="d-inline-block bg-visited rounded-circle me-1" style="width:10px; height:10px; background-color:#700404 !important;"></span> Visited (Not Answered)</li>
-                                    <li><span class="d-inline-block bg-unvisited rounded-circle me-1" style="width:10px; height:10px; background-color:#B4B1AD !important;"></span> Not Visited</li>
-                                </ul>
-
-                                <hr>
-
-                                <button class="btn btn-success w-100" type="button" wire:click="goToReview" style="background:#04ba65; border:none; padding:10px; font-weight:bold; font-size:16px;">
-                                    Review & Submit
-                                </button>
+                        <div class="ot-sidebar-content">
+                            <div class="ot-grid">
+                                @foreach ($questionsList[$currentSectionIndex] ?? [] as $qIndex => $qId)
+                                    @php
+                                        $hasAnswer = isset($answers[$qId]);
+                                        $isMarked = in_array($qId, $markedQuestions);
+                                        
+                                        $colorClass = 'ot-node-unvisited'; 
+                                        if ($hasAnswer) {
+                                            $colorClass = 'ot-node-answered';
+                                        }
+                                    @endphp
+                                    <span class="ot-node {{ $colorClass }} position-relative" wire:click="selectQuestion({{ $currentSectionIndex }}, {{ $qIndex }})">
+                                        @if ($isMarked)
+                                            <span class="ot-star-badge">★</span>
+                                        @endif
+                                        {{ $qIndex + 1 }}
+                                    </span>
+                                @endforeach
                             </div>
+
+                            <div class="ot-sidebar-links">
+                                <a href="#" class="ot-sidebar-link">Questions List</a>
+                                <a href="#" class="ot-sidebar-link">Instructions</a>
+                            </div>
+
+                            <button class="ot-submit-btn" type="button" wire:click="goToReview">Review & Submit</button>
                         </div>
                     </div>
                 </div>
@@ -285,18 +273,17 @@
                             @php
                                 $hasAnswer = isset($answers[$qId]);
                                 $isMarked = in_array($qId, $markedQuestions);
-                                $isVisited = in_array($qId, $visitedQuestions);
                                 
-                                $colorClass = 'bg-unvisited';
-                                if ($isMarked) $colorClass = 'bg-marked';
-                                elseif ($hasAnswer) $colorClass = 'bg-answered';
-                                elseif ($isVisited) $colorClass = 'bg-visited';
+                                $colorClass = '';
+                                if ($hasAnswer) {
+                                    $colorClass = 'bg-answered';
+                                }
                             @endphp
                             <span class="numberlist {{ $colorClass }} pointer position-relative d-flex align-items-center justify-content-center" 
                                   wire:click="selectQuestion({{ $secIndex }}, {{ $loop->index }}); @this.set('currentView', 'testing');"
                                   style="cursor: pointer; font-weight: bold; width: 35px; height: 35px; text-align: center;">
                                 @if ($isMarked)
-                                    <i class="ti-hand-open text-white position-absolute" style="font-size: 8px; top: -5px; right: -5px; background: #e8741c; border-radius: 50%; padding: 2px;"></i>
+                                    <i class="ti-eye text-white position-absolute" style="font-size: 8px; top: -5px; right: -5px; background: #e8741c; border-radius: 50%; padding: 2px;"></i>
                                 @endif
                                 {{ $globalIndex++ }}
                             </span>
