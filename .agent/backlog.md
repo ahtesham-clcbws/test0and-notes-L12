@@ -1,62 +1,13 @@
-# Backlog & Sprints
+# Laravel Backlog
 
-## Phase 1: Test Form & Sections UI/UX (COMPLETED)
-- [x] Implement `TestSectionManager` Livewire component
-- [x] Implement `TestSectionRow` child component
-- [x] Implement cascading dropdown logic in `TestSectionRow`
-- [x] Create premium UI for `TestSectionManager` and `TestSectionRow`
-- [x] Refactor `ExamsController@testSections` to use Livewire
-- [x] Refactor `sections.blade.php` to host the Livewire component
-- [x] Final manual verification of dynamic section addition/removal
-- [x] Verification of batch saving across all sections
-- [x] Debug "Link to Packages" in `TestForm.php`
-- [x] Review Laravel logs for component errors
-- [x] Fix `class_id` QueryException and subject hierarchy in TestSection components
-- [x] Add loaders and notifications for test section actions
-- [x] Document overall phase state for new agent in `.agent/current_work_status.md`
+## Pending Tasks
+- [ ] Refine `studentLogin` for mobile compatibility
+- [ ] Implement `studentSignup` for mobile
+- [ ] Implement Forgot Password / OTP APIs
+- [ ] Restore Instructions page in Test Conduct flow
+- [ ] Create/Update Test Listing API
+- [ ] Create/Update Test Detail/Conduct API
 
-## Phase 2: Question Mapping (COMPLETED)
-- [x] Implement mapping for actual Questions to the `TestSections` (`QuestionBank` mapping via `Admin\Tests\TestTable` and `ExamsController`).
-- [x] Create UI for selecting/filtering questions based on Section criteria (Strict Subject & Part match).
-- [x] Refactor Notification in Question Form using Livewire and SweetAlert.
-- [x] Enforce Package Eligibility & Purchase Safeguards globally.
-- [x] Develop System for Auto-Unpublishing Tests upon Section/Question deletion via Observers.
-
-## Phase 3: Testing & Polish (UPCOMING)
-- [ ] Unit/Feature tests for Test/Section/Question relationships.
-- [ ] UI/UX final touch-ups (animations, accessibility).
-- [ ] Verify Legacy compatibility.
-
-## Phase 4: Question Bank Import Enhancement (COMPLETED)
-- [x] Analyze Question Bank structure and import process.
-- [x] Add categorization selectors (Education Type, Class, Subject, etc.) to `QuestionImport` Livewire component.
-- [x] Implement cascading dropdowns in `question-import.blade.php`.
-- [x] Modify `QuestionBankImport` logic to use UI-selected categories instead of excel columns.
-- [x] Create a sample Excel format for easy client upload.
-
-## Phase 5: Question Import Editable Preview Table (COMPLETED)
-- [x] Refactor `QuestionBankImport.php` to return an array of parsed data instead of hitting DB.
-- [x] Add `$previewData` and `$showPreview` state to `QuestionImport.php`.
-- [x] Build the editable UI datatable in `question-import.blade.php`.
-- [x] Implement the final `saveAll()` function to process the approved preview table.
-
-## Phase 6: Inline Creation & Visibility (COMPLETED)
-- [x] Fix `QuestionImport` status truncation and categorization mapping.
-- [x] Implement Inline Question Creation modal in `TestQuestionsManager`.
-- [x] Refactor `home.blade.php` to prioritize purchased status over strict eligibility.
-- [x] Filter Student Dashboard packages by `education_type` and `class`.
-- [x] UI: Update labels to "Class/Group/Exam Name" and add bottom save buttons.
-- [x] Execute `npm run build` and push all changes to master.
-
-## Phase 7: Livewire Online Test Module (UPCOMING/PLANNING)
-- [ ] Create `OnlineTestRunner` Livewire component <!-- id: 1 -->
-- [ ] Implement single attempt guard & re-hydration <!-- id: 2 -->
-- [ ] Build interactive examination UI <!-- id: 3 -->
-- [ ] Implement Livewire actions: "Save & Next", "Clear Response", "Mark for Review" <!-- id: 4 -->
-- [ ] Add countdown timer with auto-submit <!-- id: 5 -->
-- [ ] Finalize secure submission flow <!-- id: 6 -->
-
-## Phase 8: Mobile App Integration API & Admin Support (UPCOMING/PLANNING)
-- [ ] Create `App\Livewire\Admin\Settings\OtpManager` under settings menu (Read/Delete existing `otp_verifications`)
-- [ ] Build `Api\AuthController` (send/verify OTP for Mobile Login)
-- [ ] Build `Api\StudentController` (My Packages, Tests, Profile Sync for Mobile)
+## Completed Tasks
+- [x] Added `getHomepageData` endpoint
+- [x] Fixed API route syntax

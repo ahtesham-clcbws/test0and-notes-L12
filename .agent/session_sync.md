@@ -1,4 +1,31 @@
+# Laravel Backlog
+
+## Pending Tasks
+- [ ] UI Audit: Finalize parity for all student profile/settings screens.
+- [ ] End-to-End Testing on physical device.
+
+## Completed Tasks
+- [x] Implement Assessment Engine APIs (`getTests`, `getTestDetails`, `endTest`)
+- [x] Implement Razorpay Order & Verification APIs
+- [x] Restore Instructions page in Test Conduct flow
+- [x] Fix Test Runner Timer flickering
+- [x] Added `getHomepageData` endpoint
+- [x] Fixed API route syntax
+- [x] Refine `studentLogin` for mobile compatibility
+- [x] Implement `studentSignup` for mobile
+- [x] Implement Forgot Password / OTP APIs
+
 # Session Sync - Momin Scholar Program
+
+## Session Handoff - 2026-03-25 (Assessment Engine & Razorpay Integration)
+- **Current State:** Successfully implemented live assessment APIs and Razorpay payment flow for Mobile.
+- **Key Achievements:**
+  - **Assessment APIs:** Built `getTests`, `getTestDetails`, and `endTest` endpoints in `APIController.php` to serve dynamic test data and process mobile submissions.
+  - **Razorpay Integration:** Stabilized `createRazorpayOrder` and `verifyRazorpayPayment` with signature validation.
+  - **Test Conduct UI Fix:** Restored Instructions page and resolved timer flicker issues in the Laravel side (previous request).
+- **Next Steps:**
+  - Audit UI parity for any remaining student screens.
+  - Perform end-to-end user flow testing (Auth -> Premium -> Test).
 
 ## Session Handoff - 2026-03-18 (Mobile API & Admin OTP Feature Complete)
 - **Current State:** Successfully built the foundational Auth API connections for the Mobile App.

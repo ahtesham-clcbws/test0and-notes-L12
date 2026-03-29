@@ -149,66 +149,128 @@ class TestController extends Controller
 
     public function showResult($name, $test_id)
     {
+        // ... (Existing showResult)
+    }
 
-        $education_types = DB::table('education_type')->get();
-        $classes_groups_exams = DB::table('classes_groups_exams')->get();
+    public function getTestResult(Request $request)
+    {
+        $student_id = Auth::id();
+        $test_id = $request->input('test_id');
+
         $test = TestModal::find($test_id);
+        if (! $test) {
+            return response()->json(['status' => 0, 'message' => 'Test not found']);
+        }
 
-        if (empty($test) || ! empty($test->institude)) {
-            if (! empty($test->institude) && Auth::user()->myInstitute && Auth::user()->myInstitute->id == $test->institude->id) {
-                return redirect()->route('student.show-result', [$name, $test_id]);
+        $test_responses = Gn_Test_Response::where('student_id', $student_id)
+            ->where('test_id', $test_id)
+            ->orderBy('question_id', 'asc')
+            ->get();
+
+        $questions = QuestionBankModel::whereIn('id', $test_responses->pluck('question_id'))
+            ->orderBy('id', 'asc')
+            ->get()
+            ->keyBy('id');
+
+        $correct = 0;
+        $incorrect = 0;
+        $unattempted = 0;
+        $sections_data = [];
+
+        foreach ($test_responses as $resp) {
+            $q = $questions->get($resp->question_id);
+            if (! $q) {
+                continue;
             }
 
-            return redirect('/', compact('education_types', 'classes_groups_exams'));
-        }
-
-        if ($name != Auth::user()->id) {
-            abort(403, 'Unauthorized access to test result.');
-        }
-        $test_response = Gn_Test_Response::where('student_id', $name)->where('test_id', $test_id)->orderBy('question_id', 'asc')->get();
-        $questions = QuestionBankModel::whereIn('id', $test_response->pluck('question_id')->toArray())->orderBy('id', 'asc')->get();
-        $correct_answer = 0;
-        $incorrect_answer = 0;
-        $not_attempted = 0;
-
-        $answer['correct_answer'] = collect([]);
-        $answer['incorrect_answer'] = collect([]);
-        $answer['not_attempted'] = collect([]);
-        foreach ($questions as $key => $question) {
-            if ($question->id == $test_response[$key]->question_id) {
-                if ($test_response[$key]->answer == null) {
-                    $not_attempted += 1;
-                    $answer['not_attempted']->push($test_response[$key]);
-                }
-                if ($question->mcq_answer == $test_response[$key]->answer) {
-                    $correct_answer += 1;
-                    $answer['correct_answer']->push($test_response[$key]);
-                }
-                if ($question->mcq_answer != $test_response[$key]->answer && $test_response[$key]->answer != null) {
-                    $incorrect_answer += 1;
-                    $answer['incorrect_answer']->push($test_response[$key]);
-                }
+            $status = 'unattempted';
+            if ($resp->answer === null) {
+                $unattempted++;
+                $status = 'unattempted';
+            } elseif ($q->mcq_answer == $resp->answer) {
+                $correct++;
+                $status = 'correct';
+            } else {
+                $incorrect++;
+                $status = 'incorrect';
             }
-        }
-        $negativeMarks = ($test->negative_marks * $test->gn_marks_per_questions);
-        $this->data['not_attempted'] = $not_attempted;
-        $this->data['total_question'] = count($test_response);
-        $this->data['total_marks'] = count($test_response) * $test->gn_marks_per_questions;
-        $this->data['negative_marks'] = $incorrect_answer * $negativeMarks;
-        $this->data['out_of_marks'] = $correct_answer * $test->gn_marks_per_questions;
-        $this->data['final_marks'] = $this->data['out_of_marks'] - ($incorrect_answer * $negativeMarks);
-        $this->data['correct_answer'] = $correct_answer;
-        $this->data['incorrect_answer'] = $incorrect_answer;
-        $this->data['test'] = $test;
-        $this->data['student_id'] = $name;
-        $this->data['answer'] = $answer;
 
-        if ($test->show_result == 1) {
-            return view('Frontend/show-result', compact('education_types', 'classes_groups_exams'))->with('data', $this->data);
-        } else {
-
-            return redirect('/', compact('education_types', 'classes_groups_exams'));
+            // Section breakdown
+            $section_id = $q->section_id ?? 0;
+            if (! isset($sections_data[$section_id])) {
+                $sections_data[$section_id] = [
+                    'id' => $section_id,
+                    'name' => 'Section '.$section_id, // Default
+                    'correct' => 0,
+                    'incorrect' => 0,
+                    'unattempted' => 0,
+                    'total' => 0,
+                ];
+            }
+            $sections_data[$section_id][$status]++;
+            $sections_data[$section_id]['total']++;
         }
+
+        // Hydrate section names
+        $sections = DB::table('test_sections')->whereIn('id', array_keys($sections_data))->get();
+        foreach ($sections as $s) {
+            $sections_data[$s->id]['name'] = $s->name;
+        }
+
+        $marks_per_q = $test->gn_marks_per_questions ?? 1;
+        $neg_marks = ($test->negative_marks ?? 0) * $marks_per_q;
+
+        $total_score = ($correct * $marks_per_q) - ($incorrect * $neg_marks);
+        $max_score = count($test_responses) * $marks_per_q;
+
+        $detailed_questions = [];
+        foreach ($test_responses as $resp) {
+            $q = $questions->get($resp->question_id);
+            if (! $q) {
+                continue;
+            }
+
+            $status = 'unattempted';
+            if ($resp->answer === null || $resp->answer === '') {
+                $status = 'unattempted';
+            } elseif ($q->mcq_answer == $resp->answer) {
+                $status = 'correct';
+            } else {
+                $status = 'incorrect';
+            }
+
+            $detailed_questions[] = [
+                'id' => $q->id,
+                'question' => $q->question,
+                'options' => [
+                    $q->option_1,
+                    $q->option_2,
+                    $q->option_3,
+                    $q->option_4,
+                    $q->option_5,
+                ],
+                'correct_answer' => $q->mcq_answer,
+                'user_answer' => $resp->answer,
+                'status' => $status,
+                'solution' => $q->solution,
+            ];
+        }
+
+        return response()->json([
+            'status' => 1,
+            'data' => [
+                'test_name' => $test->title,
+                'total_questions' => count($test_responses),
+                'correct' => $correct,
+                'incorrect' => $incorrect,
+                'unattempted' => $unattempted,
+                'total_score' => round($total_score, 2),
+                'max_score' => $max_score,
+                'accuracy' => count($test_responses) > 0 ? round(($correct / count($test_responses)) * 100, 2) : 0,
+                'sections' => array_values($sections_data),
+                'questions' => $detailed_questions,
+            ],
+        ]);
     }
 
     public function showTestResponse($name, $test_id)

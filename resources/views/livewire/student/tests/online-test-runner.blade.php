@@ -52,9 +52,8 @@
         </style>
     @endsection
 
-    {{-- Continuous polling trigger for countdown validations (30s intervals hybrid) --}}
-    <div wire:poll.30s="verifyTimerStatus"></div>
-    <div id="countdown-bridge" data-time-left="{{ $timeLeft }}" style="display:none;"></div>
+    {{-- Stable Bridge for JS Countdown --}}
+    <div id="countdown-bridge" data-time-left="{{ $timeLeft }}" data-end-timestamp="{{ $endTimestamp }}" style="display:none;"></div>
 
     @if ($currentView == 'instructions')
         {{-- ============================ SCREENSHOT 1: INSTRUCTIONS ============================ --}}
@@ -110,7 +109,7 @@
         <div class="ot-header">
             <h3 class="ot-header-title">{{ $test->title }}</h3>
             <div class="ot-header-stats">
-                <h5 class="ot-timer">Time Left : <span id="timer-display">00:00:00</span></h5>
+                <h5 class="ot-timer">Time Left : <span id="timer-display" wire:ignore>--:--:--</span></h5>
                 <h5 class="ot-questions-count">Qs: {{ $totalQuestions }}</h5>
             </div>
         </div>
@@ -226,7 +225,7 @@
                         <h3 style="color: #04ba65; font-weight: bold; margin:0;">{{ $test->title }}</h3>
                     </div>
                     <div class="col-md-4 text-end">
-                        <h5 style="color: red; margin:0; font-weight: bold;">Time Left : <span id="timer-display-review">00:00:00</span></h5>
+                        <h5 style="color: red; margin:0; font-weight: bold;">Time Left : <span id="timer-display-review" wire:ignore>--:--:--</span></h5>
                     </div>
                 </div>
             </div>
@@ -311,12 +310,18 @@
             
             function syncWithBridge() {
                 if (!bridge) return;
+                
+                let endTs = parseInt(bridge.getAttribute('data-end-timestamp'));
+                if (endTs) {
+                    window.testEndTime = endTs;
+                    return;
+                }
+
                 let currentBridgeVal = parseInt(bridge.getAttribute('data-time-left')) || 0;
                 let expectedEndTime = Date.now() + (currentBridgeVal * 1000);
 
                 if (!window.testEndTime || Math.abs(window.testEndTime - expectedEndTime) > 3000) {
                     window.testEndTime = expectedEndTime;
-                    window.lastSyncedBridgeVal = currentBridgeVal;
                 }
             }
 
@@ -328,29 +333,20 @@
             function updateTimer() {
                 if (!bridge) return;
                 
-                // Peek if Livewire pushed a new value during 30s background poll triggers
-                let currentBridgeVal = parseInt(bridge.getAttribute('data-time-left')) || 0;
-                if (window.lastSyncedBridgeVal !== undefined && currentBridgeVal !== window.lastSyncedBridgeVal) {
-                    syncWithBridge();
-                }
-
                 let now = Date.now();
                 let diff = Math.max(0, Math.floor((window.testEndTime - now) / 1000));
 
                 if (diff <= 0) {
-                    clearInterval(window.timerInterval);
-                    // 🛡️ Hybrid Safety: Double check absolute DB on local zero before submit triggers
+                    // Hybrid Safety: check with server before final submit
                     @this.verifyTimerStatus().then(() => {
                          let finalBridgeVal = parseInt(bridge.getAttribute('data-time-left')) || 0;
                          if (finalBridgeVal <= 0) {
-                              @this.submitTest();
+                               @this.submitTest();
                          } else {
-                              // DB confirms time is still remaining, re-initialise local loop tick from pulled DB bridge value
-                              syncWithBridge();
-                              window.timerInterval = setInterval(updateTimer, 1000);
+                               syncWithBridge();
                          }
                     });
-                    return;
+                    // Don't clearInterval yet, let verifyTimerStatus decide if it's really the end
                 }
 
                 const hours = Math.floor(diff / 3600);
@@ -366,7 +362,19 @@
             }
 
             window.timerInterval = setInterval(updateTimer, 1000);
-            updateTimer(); // Direct trigger immediately on mount re-hydration!
+            updateTimer(); 
+
+            // Livewire hook to re-sync after any update
+            document.addEventListener('livewire:init', () => {
+                Livewire.hook('request', ({ succeed }) => {
+                    succeed(() => {
+                        setTimeout(() => {
+                            syncWithBridge();
+                            updateTimer();
+                        }, 50);
+                    });
+                });
+            });
             
             window.onbeforeunload = function() {
                 return "Are you sure you want to leave the test? Your progress is saved, but time continues ticking!";

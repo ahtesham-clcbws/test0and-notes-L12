@@ -499,6 +499,8 @@ class InternalRequestsController extends Controller
                     $userDetailsDb->days = '7';
                     $userDetailsDb->education_type = filter_var($request->input('education_type_id'), FILTER_SANITIZE_NUMBER_INT);
                     $userDetailsDb->class = filter_var($request->input('class_group_exam_id'), FILTER_SANITIZE_NUMBER_INT);
+                    $userDetailsDb->state = filter_var($request->input('state_id'), FILTER_SANITIZE_NUMBER_INT);
+                    $userDetailsDb->city = filter_var($request->input('city_id'), FILTER_SANITIZE_NUMBER_INT);
                     $userDetailsDb->save();
                     // send email here
                     User::generateCounts();
@@ -1436,6 +1438,16 @@ class InternalRequestsController extends Controller
     public function getStates()
     {
         return json_encode(getStates());
+    }
+
+    public function getCities(Request $request)
+    {
+        $stateId = $request->input('state_id');
+        if (! $stateId) {
+            return response()->json(['success' => false, 'message' => 'State ID is required']);
+        }
+
+        return json_encode(getCitiesByState($stateId));
     }
 
     public function demoemail(Request $request)

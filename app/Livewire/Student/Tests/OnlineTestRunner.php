@@ -35,8 +35,10 @@ class OnlineTestRunner extends Component
 
     public $attemptId;
 
-    // Set initial view state to testing to bypass inner instructions duplicates overlays
-    public $currentView = 'testing'; // 'instructions', 'testing', 'review'
+    // Set initial view state to instructions (Restore instructions page after terms)
+    public $currentView = 'instructions'; // 'instructions', 'testing', 'review'
+
+    public $endTimestamp; // Stable timestamp for JS to count down to
 
     public function mount($testId)
     {
@@ -121,6 +123,7 @@ class OnlineTestRunner extends Component
         $startedAt = $attempt->created_at;
         $expiryTime = $startedAt->addMinutes($totalDuration ?? 0);
         $this->timeLeft = max(0, now()->diffInSeconds($expiryTime, false));
+        $this->endTimestamp = $expiryTime->timestamp * 1000; // Milliseconds for JS
 
         if ($this->timeLeft <= 0) {
             $this->submitTest();

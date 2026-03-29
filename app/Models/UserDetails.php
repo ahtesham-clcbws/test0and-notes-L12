@@ -24,6 +24,8 @@ class UserDetails extends Model
         'days',
         'started_at',
         'inactive_at',
+        'education_type',
+        'class',
     ];
 
     public function user()
