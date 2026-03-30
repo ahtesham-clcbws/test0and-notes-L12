@@ -4,6 +4,9 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Student\DashboardController;
 use App\Http\Controllers\Student\ExamsController;
+use App\Livewire\Student\Exams\Index as ExamsIndex;
+use App\Http\Middleware\IsStudent;
+use App\Http\Middleware\IsStudentGuest;
 use App\Livewire\Student\Dashboard;
 use App\Http\Controllers\Student\StudentPlanController;
 use App\Http\Controllers\StudymaterialController;
@@ -12,9 +15,9 @@ use Illuminate\Support\Facades\Route;
 Route::name('student.')->group(function () {
     Route::prefix('student')->group(function () {
         // Route::any('/login', [AuthController::class, 'studentlogin'])->middleware(['studentguest'])->name('login');
-        Route::any('/password-reset/{code}', [AuthController::class, 'studentPasswordReset'])->middleware(['studentguest'])->name('password_reset');
+        Route::any('/password-reset/{code}', [AuthController::class, 'studentPasswordReset'])->middleware([IsStudentGuest::class])->name('password_reset');
         // Route::any('/forget-password', [AuthController::class, 'forgetPassword'])->middleware(['studentguest'])->name('forget_password');
-        Route::middleware(['is_student'])->group(function () {
+        Route::middleware([IsStudent::class])->group(function () {
             Route::get('/', Dashboard::class)->name('dashboard');
             Route::any('/package_manage/{id}', [ExamsController::class, 'package_manage'])->name('package_manage');
             Route::any('attempt', [ExamsController::class, 'testAttempt'])->name('test-attempt');
@@ -26,9 +29,9 @@ Route::name('student.')->group(function () {
             Route::post('/manage_profile_process', [DashboardController::class, 'manage_profile_process'])->name('manage_profile_process');
 
             Route::prefix('test')->group(function () {
-                Route::any('', [ExamsController::class, 'index'])->name('dashboard_tests_list');
+                Route::get('', ExamsIndex::class)->name('dashboard_tests_list');
 
-                Route::any('dashboard_gyanology_list/{cat?}', [ExamsController::class, 'index'])->name('dashboard_gyanology_list');
+                Route::get('dashboard_gyanology_list/{cat?}', ExamsIndex::class)->name('dashboard_gyanology_list');
                 Route::get('{name}', [ExamsController::class, 'getTest'])->name('test-name');
                 Route::get('start-test/{testId}', \App\Livewire\Student\Tests\OnlineTestRunner::class)->name('start-test');
                 // Route::get('conduct-test/{testId}', \App\Livewire\Student\Tests\OnlineTestRunner::class)->name('conduct-test');
