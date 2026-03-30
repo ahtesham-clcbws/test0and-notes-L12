@@ -1,271 +1,237 @@
 <div>
-    @section('css')
-        <style>
-            .number-que-list { display: flex; flex-wrap: wrap; flex-direction: row; align-content: space-between; justify-content: space-around; }
-            .numberlist { height: 25px; width: 25px; border: solid 1px grey; border-radius: 50%; display: block; text-align: center; }
-            .numberlist:hover { background-color: #03b97c; color: #fff; }
-            .question-grid { display: grid; grid-template-columns: repeat(10, 1fr); justify-items: center; gap: 6px; }
-            
-            /* Status Colors synced with wire state */
-            .bg-answered { background-color: #04ba65 !important; color: #fff !important; }
-            .bg-unvisited { background-color: #adb5bd !important; color: #000 !important; }
-
-            /* 🟢 Custom Styles for Online Test (No Bootstrap Conflicts) */
-            .ot-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border-bottom: 2px solid #04ba65; margin-bottom: 10px; }
-            .ot-header-title { color: #04ba65; font-weight: bold; font-size: 24px; margin: 0; }
-            .ot-header-stats { display: flex; gap: 30px; align-items: center; }
-            .ot-timer { color: red; font-weight: bold; font-size: 20px; margin: 0; }
-            .ot-questions-count { color: #000; font-weight: bold; font-size: 20px; margin: 0; }
-            .ot-question-number { color: red; font-weight: bold; font-size: 20px; margin-bottom: 15px; }
-            .ot-subject-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-            .ot-tab { background: #dcebd2; color: #000; padding: 8px 16px; font-weight: bold; text-decoration: none; cursor: pointer; border: none; }
-            .ot-tab.active { background: #04ba65; color: #fff; }
-            .ot-container { display: flex; gap: 20px; align-items: flex-start; }
-            .ot-question-panel { flex: 1; background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 25px; box-shadow: 0px 2px 4px rgba(0,0,0,0.03); }
-            .ot-question-box { padding-bottom: 0px; margin-bottom: 0px; }
-            .ot-question-text { font-size: 18px; line-height: 1.5; margin-bottom: 25px; color: #333; }
-            .ot-options-list { list-style: none; padding: 0; margin: 0 0 40px 0; }
-            .ot-option-item { display: flex; align-items: flex-start; margin-bottom: 15px; }
-            .ot-option-label { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; font-size: 16px; width: 100%; }
-            .ot-option-input { width: 18px; height: 18px; cursor: pointer; opacity: 1 !important; position: static !important; -webkit-appearance: auto !important; appearance: auto !important; margin-top: 3px; }
-            .ot-action-bar { display: flex; gap: 10px; border-top: 1px solid #ddd; padding-top: 20px; }
-            .ot-btn { padding: 8px 16px; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 16px; }
-            .ot-btn-success { background: #04ba65; color: #fff; }
-            .ot-btn-clear { background: #ffffda; color: red; border: 1px solid #ccc !important; }
-            .ot-btn-next { background: #04ba65; color: #fff; margin-left: auto; }
-            .ot-sidebar { width: 320px; border: 2px solid #04ba65; background: #fff; }
-            .ot-profile { display: flex; background: #e1e9d9; align-items: stretch; border-bottom: 1px solid #ccc; }
-            .ot-profile-img-wrap { background: #fff; padding: 8px; border-right: 1px solid #ccc; }
-            .ot-profile-img { width: 60px; height: 60px; object-fit: cover; }
-            .ot-profile-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-            .ot-profile-name { padding-top: 10px; font-weight: bold; color: #000; text-align: center; font-size: 16px; }
-            .ot-profile-subject { background: #04ba65; color: #fff; text-align: center; padding: 4px; font-weight: bold; font-size: 14px; }
-            .ot-sidebar-content { padding: 15px; }
-            .ot-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; margin-bottom: 20px; }
-            .ot-node { width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; cursor: pointer; border: 1px solid #888; text-decoration: none; color: #000; }
-            .ot-node-answered { background: #04ba65 !important; color: #fff !important; border-color: #04ba65 !important; }
-            .ot-node-unvisited { background: #adb5bd !important; color: #000 !important; }
-            .ot-star-badge { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); font-size: 16px; color: gold; text-shadow: 0px 0px 2px #000; }
-            .ot-sidebar-links { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 15px; }
-            .ot-sidebar-link { color: #04ba65; font-weight: bold; text-decoration: none; }
-            .ot-submit-btn { display: block; width: 100%; background: #04ba65; color: #fff; text-align: center; padding: 12px; font-weight: bold; border: none; font-size: 18px; cursor: pointer; }
-        </style>
-    @endsection
-
     {{-- Stable Bridge for JS Countdown --}}
-    <div id="countdown-bridge" data-time-left="{{ $timeLeft }}" data-end-timestamp="{{ $endTimestamp }}" style="display:none;"></div>
-
+    <div id="countdown-bridge" data-time-left="{{ $timeLeft }}" data-end-timestamp="{{ $endTimestamp }}" class="hidden"></div>
     @if ($currentView == 'instructions')
         {{-- ============================ SCREENSHOT 1: INSTRUCTIONS ============================ --}}
-        <div class="container py-4">
-            <div class="row">
-                <div class="col-md-9 bg-white p-4 border rounded" style="border-radius:8px;">
-                    <h2 class="mb-1" style="font-weight: bold; color: #333;">{{ $test->title }} <span class="fs-6 text-muted">({{ count($sections) }} Sections) • Duration: {{ $test->time_to_complete ?? 60 }} Minutes • Questions: {{ $totalQuestions }}</span></h2>
-                    <p class="small text-muted mb-4">{{ date('d F Y') }} <span style="color:magenta; font-weight:bold; margin-left: 10px;">Live Test</span></p>
-                    
-                    <h4 style="border-bottom: 2px solid #333; display:inline-block; padding-bottom:4px; font-weight:bold;">Instruction</h4>
-                    
-                    <div class="d-flex gap-4 my-4 align-items-center">
-                        <div><span class="d-inline-block bg-success rounded-circle me-1" style="width:16px; height:16px; background-color:#03b97c !important;"></span> Attempted</div>
-                        <div><span class="d-inline-block bg-secondary rounded-circle me-1" style="width:16px; height:16px; background-color:#B4B1AD !important;"></span> Not Attempted</div>
-                        <div class="d-flex align-items-center">
-                             <span class="position-relative d-inline-block me-1">
-                                <span class="d-inline-block bg-secondary rounded-circle" style="width:12px; height:12px; background:#B4B1AD !important;"></span>
-                                <i class="ti-hand-open position-absolute" style="font-size: 8px; top: -4px; right: -4px; color: gold;"></i>
-                             </span>
-                             Mark for Review
+        <div class="max-w-7xl mx-auto py-8 px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                
+                {{-- MAIN CONTENT --}}
+                <div class="lg:col-span-3">
+                    <x-card class="shadow-sm">
+                        <div class="mb-6">
+                            <h2 class="text-3xl font-bold text-base-content mb-2">{{ $test->title }}</h2>
+                            <div class="flex flex-wrap gap-4 text-sm text-base-content/70 items-center">
+                                <x-badge value="{{ count($sections) }} Sections" class="badge-neutral" />
+                                <span><x-icon name="o-clock" class="w-4 h-4 inline" /> Duration: {{ $test->time_to_complete ?? 60 }} mins</span>
+                                <span><x-icon name="o-document-text" class="w-4 h-4 inline" /> Questions: {{ $totalQuestions }}</span>
+                                <span class="text-primary font-bold"><x-icon name="o-play-circle" class="w-4 h-4 inline" /> Live Test</span>
+                                <span>{{ date('d F Y') }}</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="terms-text mb-4" style="line-height: 1.8;">
-                          <p class="m-0">0.25% marks will be deducted for each wrong answer</p>
-                          <p class="m-0">2 marks will be provided for each correct answer.</p>
-                          <p class="m-0">Total time will be allotted / count for whole test, time will not be calculated for each question</p>
-                          <p class="m-0">Time for test is set to according to the server.</p>
-                    </div>
+                        <x-header title="Instructions" size="text-xl" separator progress-indicator />
 
-                    <div class="form-check mb-2">
-                         <input class="form-check-input" type="checkbox" id="check1" checked>
-                         <label class="form-check-label ms-2" for="check1">I agree to all instructions and terms.</label>
-                    </div>
+                        {{-- LEGEND --}}
+                        <div class="flex flex-wrap gap-6 my-6 bg-base-200 p-4 rounded-lg">
+                            <div class="flex items-center gap-2">
+                                <span class="w-4 h-4 rounded-full bg-success inline-block"></span>
+                                <span class="font-medium text-sm">Attempted</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-4 h-4 rounded-full bg-neutral inline-block"></span>
+                                <span class="font-medium text-sm">Not Attempted</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="relative inline-block">
+                                    <span class="w-4 h-4 rounded-full bg-neutral inline-block"></span>
+                                    <x-icon name="s-star" class="w-3 h-3 text-warning absolute -top-1 -right-1" />
+                                </span>
+                                <span class="font-medium text-sm">Mark for Review</span>
+                            </div>
+                        </div>
 
-                    <button class="btn btn-success mt-3" wire:click="startTest" style="background:#04ba65; border:none; padding:10px 40px; font-weight:bold; font-size:16px; border-radius:4px;">Start Test</button>
+                        {{-- TERMS --}}
+                        <div class="prose max-w-none text-base-content/80 space-y-2 mb-8">
+                            <p>• 0.25% marks will be deducted for each wrong answer.</p>
+                            <p>• 2 marks will be provided for each correct answer.</p>
+                            <p>• Total time will be allotted / count for whole test, time will not be calculated for each question.</p>
+                            <p>• Time for test is set according to the server.</p>
+                        </div>
+
+                        <x-checkbox id="instruction-check" label="I agree to all instructions and terms." checked class="checkbox-primary mb-6" />
+
+                        <x-button label="Start Test" icon="o-play" wire:click="startTest" class="btn-primary w-full sm:w-auto px-10" />
+                    </x-card>
                 </div>
 
-                <div class="col-md-3">
-                    <div class="p-3 border rounded text-center h-100" style="background: #daf1e4; border-radius:8px;">
-                         <div class="bg-white p-4 rounded h-100 d-flex flex-column align-items-center justify-content-center" style="border-radius:8px;">
-                              <img class="student_image rounded-circle border mb-3" src="{{ '/storage/' . auth()->user()->user_details->photo_url }}" alt="" style="width:90px; height:90px;">
-                              <h5 class="mb-1"><b>{{ auth()->user()->name }}</b></h5>
-                              <p class="text-muted small m-0">City Competition Classes</p>
-                         </div>
-                    </div>
+                {{-- SIDEBAR PROFILE --}}
+                <div class="lg:col-span-1">
+                    <x-card class="bg-primary/10 border-primary/20 text-center shadow-sm">
+                        <div class="flex flex-col items-center justify-center py-4">
+                            <div class="avatar mb-4">
+                                <div class="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                                    <img src="{{ '/storage/' . auth()->user()->user_details->photo_url }}" alt="Profile" />
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-bold text-base-content">{{ auth()->user()->name }}</h3>
+                            <p class="text-sm text-base-content/60 mt-1">City Competition Classes</p>
+                        </div>
+                    </x-card>
                 </div>
+
             </div>
         </div>
 
     @elseif ($currentView == 'testing')
         {{-- ============================ SCREENSHOT 2: CONDUCT TEST (CUSTOM CSS LAYOUT) ============================ --}}
-        <div class="ot-header">
-            <h3 class="ot-header-title">{{ $test->title }}</h3>
-            <div class="ot-header-stats">
-                <h5 class="ot-timer">Time Left : <span id="timer-display" wire:ignore>--:--:--</span></h5>
-                <h5 class="ot-questions-count">Qs: {{ $totalQuestions }}</h5>
+        {{-- Sticky Header --}}
+        <div class="sticky top-0 z-50 bg-base-100 border-b-2 border-primary shadow-sm mb-4">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+                <h3 class="text-xl md:text-2xl font-bold text-primary truncate max-w-[50%]">{{ $test->title }}</h3>
+                <div class="flex items-center gap-4 md:gap-8">
+                    <div class="text-error font-bold text-lg md:text-xl flex items-center gap-2">
+                        <x-icon name="o-clock" class="w-6 h-6" />
+                        <span id="timer-display" wire:ignore>--:--:--</span>
+                    </div>
+                    <div class="font-bold text-lg hidden md:block">
+                        Qs: {{ $totalQuestions }}
+                    </div>
+                </div>
             </div>
         </div>
 
-        <section class="p-0">
-            <div style="width: 100%; max-width: 1200px; margin: 0 auto; padding: 15px;">
-                <div class="ot-question-number">
-                    @if ($currentQuestion) Question No {{ $currentQuestionIndex + 1 }} @endif
+        <div class="max-w-7xl mx-auto px-4 pb-8">
+            <div class="text-error font-bold text-xl mb-4">
+                @if ($currentQuestion) Question No {{ $currentQuestionIndex + 1 }} @endif
+            </div>
+
+            {{-- Subject Tabs --}}
+            <div class="flex flex-wrap gap-2 mb-6">
+                @foreach ($sections as $i => $section)
+                    <button class="btn btn-sm {{ $currentSectionIndex == $i ? 'btn-primary text-white' : 'btn-outline border-base-300' }}" wire:click="selectQuestion({{ $i }}, 0)">
+                        {{ $section['section_subject']['name'] }}
+                    </button>
+                @endforeach
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                {{-- Question Panel --}}
+                <div class="lg:col-span-3">
+                    <x-card class="h-full shadow-sm bg-base-100">
+                        @if ($currentQuestion)
+                            <div class="prose max-w-none text-lg mb-8 text-base-content" style="line-height: 1.6;">
+                                {!! $currentQuestion->question !!}
+                            </div>
+
+                            <div class="space-y-3 mb-8">
+                                @for ($k = 1; $k <= $currentQuestion->mcq_options; $k++)
+                                    @php $optKey = 'ans_' . $k; @endphp
+                                    <label class="flex items-start gap-3 p-3 rounded-lg border border-base-200 hover:border-primary/50 cursor-pointer transition-colors {{ ($answers[$currentQuestion->id] ?? '') == $optKey ? 'bg-primary/5 border-primary' : '' }}" wire:click="saveSelection({{ $currentQuestion->id }}, '{{ $optKey }}')">
+                                        <input id="answer_{{ $currentQuestion->id }}_{{ $k }}" class="radio radio-primary radio-sm mt-1" type="radio" name="question_{{ $currentQuestion->id }}" value="{{ $optKey }}" {{ ($answers[$currentQuestion->id] ?? '') == $optKey ? 'checked' : '' }} />
+                                        <div class="prose max-w-none m-0 text-base-content">
+                                            {!! $currentQuestion->$optKey !!}
+                                        </div>
+                                    </label>
+                                @endfor
+                            </div>
+
+                            {{-- Action Bar --}}
+                            <div class="flex flex-wrap items-center justify-between gap-3 pt-6 border-t border-base-200">
+                                <div class="flex gap-2">
+                                    <x-button class="btn-warning btn-sm" wire:click="toggleMarkForReview({{ $currentQuestion->id }})">
+                                        <x-icon name="{{ in_array($currentQuestion->id, $markedQuestions) ? 's-star' : 'o-star' }}" class="w-4 h-4" />
+                                        {{ in_array($currentQuestion->id, $markedQuestions) ? 'Unmark Review' : 'Mark for Review' }}
+                                    </x-button>
+                                    
+                                    <x-button class="btn-ghost btn-sm text-error" wire:click="clearResponse({{ $currentQuestion->id }})" icon="o-arrow-path">
+                                        Clear
+                                    </x-button>
+                                </div>
+                                
+                                <x-button class="btn-success btn-sm text-white" wire:click="saveAndNext">
+                                    Save & Next <x-icon name="o-chevron-right" class="w-4 h-4 ml-1" />
+                                </x-button>
+                            </div>
+                        @else
+                            <div class="text-center py-12">
+                                <x-icon name="o-check-circle" class="w-16 h-16 text-success mx-auto mb-4" />
+                                <h3 class="text-2xl font-bold mb-2">Review Sections complete.</h3>
+                                <p class="text-base-content/70 mb-6">Click the button below to review your answers before final submission.</p>
+                                <x-button class="btn-error text-white btn-lg" wire:click="goToReview">Review Choices</x-button>
+                            </div>
+                        @endif
+                    </x-card>
                 </div>
 
-                <div class="ot-subject-tabs">
-                    @foreach ($sections as $i => $section)
-                        <button class="ot-tab {{ $currentSectionIndex == $i ? 'active' : '' }}" wire:click="selectQuestion({{ $i }}, 0)">
-                            {{ $section['section_subject']['name'] }}
-                        </button>
-                    @endforeach
-                </div>
-
-                <div class="ot-container">
-                    <div class="ot-question-panel">
-                        <div class="ot-question-box">
-                            @if ($currentQuestion)
-                                <div class="ot-question-text">{!! $currentQuestion->question !!}</div>
-
-                                <ul class="ot-options-list">
-                                    @for ($k = 1; $k <= $currentQuestion->mcq_options; $k++)
-                                        @php $optKey = 'ans_' . $k; @endphp
-                                        <li wire:key.live="option-{{ $currentQuestion->id }}-{{ $optKey }}" class="ot-option-item">
-                                            <label class="ot-option-label" wire:click="saveSelection({{ $currentQuestion->id }}, '{{ $optKey }}')">
-                                                <input id="answer_{{ $currentQuestion->id }}_{{ $k }}" wire:key="input-{{ $currentQuestion->id }}-{{ $k }}-{{ isset($answers[$currentQuestion->id]) ? 'filled' : 'empty' }}" class="ot-option-input" type="radio" name="question_{{ $currentQuestion->id }}" value="{{ $optKey }}" {{ ($answers[$currentQuestion->id] ?? '') == $optKey ? 'checked' : '' }} />
-                                                <span>{!! $currentQuestion->$optKey !!}</span>
-                                            </label>
-                                        </li>
-                                    @endfor
-                                </ul>
-
-                                <div class="ot-action-bar">
-                                    <button class="ot-btn ot-btn-success" wire:click="toggleMarkForReview({{ $currentQuestion->id }})">
-                                        <i class="ti-star"></i> {{ in_array($currentQuestion->id, $markedQuestions) ? 'Unmark Review' : 'Mark for Review' }}
-                                    </button>
-                                    <button class="ot-btn ot-btn-clear" wire:click="clearResponse({{ $currentQuestion->id }})">
-                                        <i class="ti-reload"></i> Clear Response
-                                    </button>
-                                    <button class="ot-btn ot-btn-next" wire:click="saveAndNext">
-                                        Save & Next <i class="ti-angle-right"></i>
-                                    </button>
-                                </div>
-                            @else
-                                <div class="text-center py-5">
-                                    <h5 style="color: #555;">Review Sections complete.</h5>
-                                    <p class="text-muted">Click the button below to review your answers profile dashboard list before submit completed.</p>
-                                    <button class="btn btn-danger btn-lg mt-3" wire:click="goToReview" style="background:#dc3545; font-weight:bold;">Review Choices</button>
-                                </div>
-                            @endif
+                {{-- Sidebar Grid --}}
+                <div class="lg:col-span-1 border-2 border-primary bg-base-100 rounded-lg overflow-hidden flex flex-col">
+                    <div class="bg-primary/10 p-4 border-b border-primary/20 flex gap-4 items-center">
+                        <x-avatar image="{{ '/storage/' . auth()->user()->user_details->photo_url }}" class="w-12! h-12! border bg-base-100" />
+                        <div>
+                            <div class="font-bold text-sm">{{ auth()->user()->name }}</div>
+                            <div class="badge badge-primary badge-sm mt-1">{{ $sections[$currentSectionIndex]['section_subject']['name'] ?? 'Exam' }}</div>
                         </div>
                     </div>
 
-                    <div class="ot-sidebar">
-                        <div class="ot-profile">
-                            <div class="ot-profile-img-wrap">
-                                <img src="{{ '/storage/' . auth()->user()->user_details->photo_url }}" class="ot-profile-img" />
-                            </div>
-                            <div class="ot-profile-info">
-                                <div class="ot-profile-name">{{ auth()->user()->name }}</div>
-                                <div class="ot-profile-subject">
-                                     {{ $sections[$currentSectionIndex]['section_subject']['name'] ?? 'Exam' }}
-                                </div>
-                            </div>
+                    <div class="p-4 flex-1 overflow-y-auto">
+                        <div class="grid grid-cols-5 gap-2 mb-6 cursor-pointer">
+                            @foreach ($questionsList[$currentSectionIndex] ?? [] as $qIndex => $qId)
+                                @php
+                                    $hasAnswer = isset($answers[$qId]);
+                                    $isMarked = in_array($qId, $markedQuestions);
+                                    
+                                    $colorClass = 'bg-base-300 text-base-content border-transparent'; 
+                                    if ($hasAnswer) {
+                                        $colorClass = 'bg-success text-white border-success';
+                                    }
+                                    if ($isMarked) {
+                                        $colorClass .= ' ring-2 ring-warning ring-offset-1';
+                                    }
+                                @endphp
+                                <button class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border hover:opacity-80 transition hover:scale-105 relative {{ $colorClass }}" wire:click="selectQuestion({{ $currentSectionIndex }}, {{ $qIndex }})">
+                                    {{ $qIndex + 1 }}
+                                </button>
+                            @endforeach
                         </div>
-
-                        <div class="ot-sidebar-content">
-                            <div class="ot-grid">
-                                @foreach ($questionsList[$currentSectionIndex] ?? [] as $qIndex => $qId)
-                                    @php
-                                        $hasAnswer = isset($answers[$qId]);
-                                        $isMarked = in_array($qId, $markedQuestions);
-                                        
-                                        $colorClass = 'ot-node-unvisited'; 
-                                        if ($hasAnswer) {
-                                            $colorClass = 'ot-node-answered';
-                                        }
-                                    @endphp
-                                    <span class="ot-node {{ $colorClass }} position-relative" wire:click="selectQuestion({{ $currentSectionIndex }}, {{ $qIndex }})">
-                                        @if ($isMarked)
-                                            <span class="ot-star-badge">★</span>
-                                        @endif
-                                        {{ $qIndex + 1 }}
-                                    </span>
-                                @endforeach
-                            </div>
-
-                            <div class="ot-sidebar-links">
-                                <a href="#" class="ot-sidebar-link">Questions List</a>
-                                <a href="#" class="ot-sidebar-link">Instructions</a>
-                            </div>
-
-                            <button class="ot-submit-btn" type="button" wire:click="goToReview">Review & Submit</button>
-                        </div>
+                    </div>
+                    
+                    <div class="p-3 border-t border-base-200">
+                        <x-button class="btn-success w-full text-white" wire:click="goToReview">Review & Submit</x-button>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
     @elseif ($currentView == 'review')
         {{-- ============================ SCREENSHOT 3: REVIEW BEFORE SUBMIT ============================ --}}
-        <div class="ed_detail_head mb-3" style="padding: 10px; background: #fff; border-bottom: 2px solid #04ba65;">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-4">
-                         <h5 style="color: #333; margin:0; font-weight: bold;">Qs: {{ $totalQuestions }}</h5>
-                    </div>
-                    <div class="col-md-4 text-center">
-                        <h3 style="color: #04ba65; font-weight: bold; margin:0;">{{ $test->title }}</h3>
-                    </div>
-                    <div class="col-md-4 text-end">
-                        <h5 style="color: red; margin:0; font-weight: bold;">Time Left : <span id="timer-display-review" wire:ignore>--:--:--</span></h5>
-                    </div>
-                </div>
+        <div class="bg-base-100 border-b-2 border-primary mb-6 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="font-bold text-lg">Qs: {{ $totalQuestions }}</div>
+                <h3 class="text-2xl font-bold text-primary text-center truncate">{{ $test->title }}</h3>
+                <div class="text-error font-bold text-xl">Time Left : <span id="timer-display-review" wire:ignore>--:--:--</span></div>
             </div>
         </div>
 
-        <div class="container">
-            <div class="edu_wraper p-4 mb-3 border bg-white" style="border-radius:8px;">
-                <div class="row text-center mb-4">
-                    <div class="col-md-4">
-                        <div class="p-3 border rounded shadow-sm d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center">
-                                <span class="d-inline-block bg-success rounded-circle me-2" style="width:18px; height:18px; background-color:#03b97c !important;"></span>
-                                <span style="font-weight:bold;">Attempted Questions</span>
-                            </div>
-                            <h4 class="m-0" style="font-weight:bold; background: #e9ecef; padding: 4px 12px; border-radius: 4px; border:1px solid #ccc;">{{ $attemptedCount }}</h4>
+        <div class="max-w-7xl mx-auto px-4 pb-8">
+            <x-card class="bg-base-100 shadow-sm border border-base-200">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 text-center">
+                    <div class="p-4 border border-base-300 rounded-xl shadow-sm flex items-center justify-between bg-base-50">
+                        <div class="flex items-center gap-2">
+                            <span class="w-4 h-4 rounded-full bg-success inline-block"></span>
+                            <span class="font-bold">Attempted</span>
                         </div>
+                        <span class="font-bold text-lg bg-base-200 px-4 py-1 rounded-md">{{ $attemptedCount }}</span>
                     </div>
-                    <div class="col-md-4">
-                        <div class="p-3 border rounded shadow-sm d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center">
-                                <span class="d-inline-block bg-secondary rounded-circle me-2" style="width:18px; height:18px; background-color:#B4B1AD !important;"></span>
-                                <span style="font-weight:bold;">Not Attempted Questions</span>
-                            </div>
-                            <h4 class="m-0" style="font-weight:bold; background: #e9ecef; padding: 4px 12px; border-radius: 4px; border:1px solid #ccc;">{{ $notAttemptedCount }}</h4>
+                    <div class="p-4 border border-base-300 rounded-xl shadow-sm flex items-center justify-between bg-base-50">
+                        <div class="flex items-center gap-2">
+                            <span class="w-4 h-4 rounded-full bg-neutral inline-block"></span>
+                            <span class="font-bold">Not Attempted</span>
                         </div>
+                        <span class="font-bold text-lg bg-base-200 px-4 py-1 rounded-md">{{ $notAttemptedCount }}</span>
                     </div>
-                    <div class="col-md-4">
-                        <div class="p-3 border rounded shadow-sm d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center">
-                                <span class="d-inline-block bg-warning rounded-circle me-2" style="width:18px; height:18px; background-color:#e8741c !important;"></span>
-                                <span style="font-weight:bold;">Questions for Review</span>
-                            </div>
-                            <h4 class="m-0" style="font-weight:bold; background: #e9ecef; padding: 4px 12px; border-radius: 4px; border:1px solid #ccc;">{{ $reviewCount }}</h4>
+                    <div class="p-4 border border-base-300 rounded-xl shadow-sm flex items-center justify-between bg-base-50">
+                        <div class="flex items-center gap-2">
+                            <span class="w-4 h-4 rounded-full bg-warning inline-block"></span>
+                            <span class="font-bold">For Review</span>
                         </div>
+                        <span class="font-bold text-lg bg-base-200 px-4 py-1 rounded-md">{{ $reviewCount }}</span>
                     </div>
                 </div>
 
-                <hr>
+                <div class="divider">Questions Overview</div>
 
-                <div class="question-grid mb-4">
+                <div class="flex flex-wrap gap-3 justify-center mb-8 p-4 bg-base-200/50 rounded-xl border border-base-200">
                     @php $globalIndex = 1; @endphp
                     @foreach ($questionsList as $secIndex => $qIds)
                         @foreach($qIds as $qId)
@@ -273,34 +239,36 @@
                                 $hasAnswer = isset($answers[$qId]);
                                 $isMarked = in_array($qId, $markedQuestions);
                                 
-                                $colorClass = '';
+                                $colorClass = 'bg-base-300 text-base-content';
                                 if ($hasAnswer) {
-                                    $colorClass = 'bg-answered';
+                                    $colorClass = 'bg-success text-white border-success';
+                                }
+                                if ($isMarked) {
+                                    $colorClass .= ' ring-2 ring-warning ring-offset-1';
                                 }
                             @endphp
-                            <span class="numberlist {{ $colorClass }} pointer position-relative d-flex align-items-center justify-content-center" 
-                                  wire:click="selectQuestion({{ $secIndex }}, {{ $loop->index }}); @this.set('currentView', 'testing');"
-                                  style="cursor: pointer; font-weight: bold; width: 35px; height: 35px; text-align: center;">
-                                @if ($isMarked)
-                                    <i class="ti-eye text-white position-absolute" style="font-size: 8px; top: -5px; right: -5px; background: #e8741c; border-radius: 50%; padding: 2px;"></i>
-                                @endif
+                            <button class="w-10 h-10 rounded-full flex items-center justify-center font-bold border border-base-300 hover:scale-110 transition shadow-sm relative {{ $colorClass }}" 
+                                  wire:click="selectQuestion({{ $secIndex }}, {{ $loop->index }}); $set('currentView', 'testing');">
                                 {{ $globalIndex++ }}
-                            </span>
+                            </button>
                         @endforeach
                     @endforeach
                 </div>
 
-                <button class="btn btn-success btn-lg w-100 mt-2" wire:click="submitTest" style="background:#04ba65; border:none; padding:14px; font-weight:bold; font-size:18px; border-radius:4px;">Final Submit</button>
-            </div>
+                <div class="text-center max-w-md mx-auto">
+                    <x-button label="Final Submit" class="btn-success text-white w-full btn-lg font-bold shadow-lg" wire:click="submitTest" />
+                    <p class="text-xs text-base-content/50 mt-3">By clicking Submit, your responses will be locked and graded.</p>
+                </div>
+            </x-card>
         </div>
     @endif
 
     {{-- 🔒 Anti-coop Offline Guard --}}
-    <div wire:offline class="position-fixed top-0 start-0 w-100 p-3 text-center bg-danger text-white fs-5" style="z-index: 9999;">
+    <div wire:offline class="position-fixed top-0 inset-s-0 w-100 p-3 text-center bg-danger text-white fs-5" style="z-index: 9999;">
         <i class="ti-alert"></i> Connection Intermittent. Please do not close this window, responses will sync when reconnected.
     </div>
 
-    @section('js')
+    @push('scripts')
         <script>
             if (window.timerInterval) {
                 clearInterval(window.timerInterval);
@@ -385,5 +353,5 @@
                 history.go(1);
             };
         </script>
-    @endsection
+    @endpush
 </div>
