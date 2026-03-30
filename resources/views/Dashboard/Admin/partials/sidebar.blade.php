@@ -418,6 +418,7 @@
                 $settingsActive =
                     request()->routeIs('administrator.dashboard_default_numbers') ||
                     request()->routeIs('administrator.otp_manager') ||
+                    request()->routeIs('administrator.master_otps') ||
                     request()->routeIs('administrator.website_pages*') ||
                     request()->routeIs('administrator.manage.faq*') ||
                     request()->routeIs('administrator.manage.important_links*') ||
@@ -445,6 +446,12 @@
                             <a class="nav-link {{ request()->routeIs('administrator.otp_manager') ? 'active' : '' }}"
                                 href="{{ route('administrator.otp_manager') }}">
                                 OTP Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('administrator.master_otps') ? 'active' : '' }}"
+                                href="{{ route('administrator.master_otps') }}">
+                                Master OTPs
                             </a>
                         </li>
                         <li class="nav-item">

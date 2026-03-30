@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Mail\SendPasswordReset;
+use App\Models\DefaultOtp;
 use App\Models\OtpVerifications;
 use App\Models\PasswordResetModel;
 use App\Models\User;
+use App\Mail\AdminLoginOtp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -26,44 +28,75 @@ class AuthController extends Controller
                 'success' => false,
                 'type' => 'failed',
                 'message' => '',
-                'otp' => '',
             ];
 
             $input = $request->all();
+            $formName = $input['form_name'] ?? '';
 
-            $user = ['email' => $input['username'], 'isAdminAllowed' => 1];
-            $userData = User::where($user)->first();
+            if ($formName === 'get_otp') {
+                $email = $input['email'];
+                $user = User::where('email', $email)->where('isAdminAllowed', 1)->first();
 
-            if (Auth::attempt([
-                'email' => $input['username'],
-                'password' => $input['password'],
-            ])) {
+                if (!$user) {
+                    $returnResponse['message'] = 'Unauthorized email address.';
+                    return json_encode($returnResponse);
+                }
+
+                // Check for cooldown
+                $time = date('Y-m-d H:i:s', strtotime('-3 minutes'));
+                if (OtpVerifications::where([['credential', '=', $email], ['created_at', '>', $time]])->exists()) {
+                    $returnResponse['message'] = 'Please wait 3 minutes before requesting another OTP.';
+                    return json_encode($returnResponse);
+                }
+
+                $otp = mt_rand(100000, 999999);
+                OtpVerifications::where('credential', $email)->delete();
+
+                $otpEntry = new OtpVerifications;
+                $otpEntry->type = 'email';
+                $otpEntry->credential = $email;
+                $otpEntry->otp = $otp;
+                $otpEntry->save();
+
+                // Send Mail
+                Mail::to($email)->send(new AdminLoginOtp($otp));
+
                 $returnResponse['success'] = true;
-
+                $returnResponse['message'] = 'OTP sent to your email.';
                 return json_encode($returnResponse);
             }
 
-            if ($userData) {
-                // send OTP request
-                $getOtp = $this->getMobileOtp($userData['mobile']);
+            if ($formName === 'login_otp') {
+                $email = $input['email'];
+                $otp = $input['otp'];
 
-                if ($getOtp['success']) {
-                    if ($getOtp['type'] == 'default') {
-                        $returnResponse['otp'] = 121212;
-                    }
-                    if ($getOtp['type'] == 'already') {
-                        $returnResponse['message'] = 'You already request an OTP in last 10 minutes. please wait for another attempt.';
-                    }
-                    if ($getOtp['type'] == 'success') {
-                        $returnResponse['otp'] = $getOtp['message'];
-                    }
-                    $returnResponse['success'] = $getOtp['success'];
-                    $returnResponse['type'] = $getOtp['type'];
-                } else {
-                    $returnResponse['message'] = 'OTP request failed, please check the credentials.';
+                $user = User::where('email', $email)->where('isAdminAllowed', 1)->first();
+                if (!$user) {
+                    $returnResponse['message'] = 'Unauthorized access attempt.';
+                    return json_encode($returnResponse);
                 }
-            } else {
-                $returnResponse['message'] = 'User not found, please check the credentials.';
+
+                // Check Master OTP first
+                $isMasterOtp = DefaultOtp::where('otp', $otp)->where('is_active', 1)->exists();
+
+                if (!$isMasterOtp) {
+                    $time = date('Y-m-d H:i:s', strtotime('-10 minutes'));
+                    $otpData = OtpVerifications::where([
+                        ['credential', '=', $email],
+                        ['otp', '=', $otp],
+                        ['created_at', '>', $time]
+                    ])->first();
+
+                    if (!$otpData) {
+                        $returnResponse['message'] = 'Invalid or expired OTP.';
+                        return json_encode($returnResponse);
+                    }
+                    $otpData->delete();
+                }
+
+                Auth::login($user);
+                $returnResponse['success'] = true;
+                return json_encode($returnResponse);
             }
 
             return json_encode($returnResponse);

@@ -5,6 +5,7 @@ use App\Models\City;
 use App\Models\ClassGoupExamModel;
 use App\Models\CorporateEnquiry;
 use App\Models\DefautlOtpNumber;
+use App\Models\FranchiseDetails;
 use App\Models\OtherCategoryClass;
 use App\Models\State;
 use App\Models\Subject;
@@ -50,9 +51,22 @@ function getStates()
 {
     return State::all();
 }
+function getAvailableStates()
+{
+    $stateIds = FranchiseDetails::whereNull('deleted_at')->where('status', 'active')->distinct()->pluck('state_id');
+
+    return State::whereIn('id', $stateIds)->get();
+}
 function getCitiesByState($stateid)
 {
     $cities = City::select('id', 'name')->where('state_id', $stateid)->get();
+
+    return json_encode($cities);
+}
+function getAvailableCitiesByState($stateid)
+{
+    $cityIds = FranchiseDetails::whereNull('deleted_at')->where('status', 'active')->where('state_id', $stateid)->distinct()->pluck('city_id');
+    $cities = City::select('id', 'name')->whereIn('id', $cityIds)->get();
 
     return json_encode($cities);
 }

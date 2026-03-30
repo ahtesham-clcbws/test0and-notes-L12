@@ -12,7 +12,9 @@ use App\Mail\StudentResetCode;
 use App\Models\BoardAgencyStateModel;
 use App\Models\ClassGoupExamModel;
 use App\Models\CorporateEnquiry;
+use App\Models\DefaultOtp;
 use App\Models\Educationtype;
+use App\Models\OtpVerifications;
 use App\Models\FranchiseDetails;
 use App\Models\Gn_AssignClassGroupExamName;
 use App\Models\Gn_DisplayClassGroupExamName;
@@ -25,7 +27,6 @@ use App\Models\Gn_EducationClassExamAgencyBoardUniversity;
 use App\Models\Gn_OtherExamClassDetailModel;
 use App\Models\Gn_PackagePlan;
 use App\Models\Gn_SubjectPartLessionNew;
-use App\Models\OtpVerifications;
 use App\Models\PasswordResetModel;
 use App\Models\QuestionBankModel;
 use App\Models\Studymaterial;
@@ -85,9 +86,7 @@ class InternalRequestsController extends Controller
             if ($request->input('form_name') == 'get_cities') {
                 $stateId = $request->input('state_id');
 
-                return getCitiesByState($stateId);
-                //    $cities = City::select('id', 'name')->where('state_id', $stateId)->get();
-                //    return json_encode($cities);
+                return getAvailableCitiesByState($stateId);
             }
             // code to get study material for package
             if ($request->input('form_name') == 'get_study_material') {
@@ -218,11 +217,11 @@ class InternalRequestsController extends Controller
                     $this->returnResponse['success'] = true;
                 } else {
                     // return defaultNumberCheck($this->returnResponse);
-                    $time = date('Y-m-d H:i:s', strtotime('-10 minutes'));
+                    $time = date('Y-m-d H:i:s', strtotime('-3 minutes'));
                     $otpData = OtpVerifications::where([['type', '=', 'mobile'], ['credential', '=', $mobileNumber], ['created_at', '>', $time]])->first();
-                    // send once in only 10 minutes
+                    // send once in only 3 minutes gap
                     if ($otpData) {
-                        $this->returnResponse['message'] = 'You already request an OTP in last 10 minutes. please wait for another attempt.';
+                        $this->returnResponse['message'] = 'You already requested an OTP in the last 3 minutes. Please wait for another attempt.';
 
                         return json_encode($this->returnResponse);
                     }
@@ -243,6 +242,9 @@ class InternalRequestsController extends Controller
                     // curl_close($ch);
                     // $response   = json_decode($response);
                     // if ($response) {
+                    // Delete all old OTPs for this credential (any type) to ensure only the latest is active
+                    OtpVerifications::where('credential', $mobileNumber)->delete();
+
                     $otpVerifications = new OtpVerifications;
                     $otpVerifications->type = 'mobile';
                     $otpVerifications->credential = $mobileNumber;
@@ -259,12 +261,20 @@ class InternalRequestsController extends Controller
             }
             if ($request->input('form_name') == 'verify_otp') {
                 $mobile = $request->input('mobile');
+                $otp = $request->input('otp');
+                $type = $request->input('type');
+
+                // Check for Master OTP first (if active)
+                $masterOtp = DefaultOtp::where('otp', $otp)->where('is_active', 1)->exists();
+                if ($masterOtp) {
+                    return json_encode(true);
+                }
+
                 if (defaultNumberCheck($mobile)) {
                     return json_encode(true);
                 }
-                $otp = $request->input('otp');
-                $type = $request->input('type');
-                $time = date('Y-m-d H:i:s', strtotime('-11 minutes'));
+
+                $time = date('Y-m-d H:i:s', strtotime('-10 minutes'));
                 $otpData = OtpVerifications::where([['type', '=', $type], ['credential', '=', $mobile], ['otp', '=', $otp], ['created_at', '>', $time]])->first();
                 if ($otpData) {
                     return json_encode(true);
@@ -1437,7 +1447,7 @@ class InternalRequestsController extends Controller
 
     public function getStates()
     {
-        return json_encode(getStates());
+        return json_encode(getAvailableStates());
     }
 
     public function getCities(Request $request)
@@ -1447,7 +1457,7 @@ class InternalRequestsController extends Controller
             return response()->json(['success' => false, 'message' => 'State ID is required']);
         }
 
-        return json_encode(getCitiesByState($stateId));
+        return getAvailableCitiesByState($stateId);
     }
 
     public function demoemail(Request $request)
