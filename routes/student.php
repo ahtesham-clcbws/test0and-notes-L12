@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Student\DashboardController;
 use App\Http\Controllers\Student\ExamsController;
+use App\Livewire\Student\Dashboard;
 use App\Http\Controllers\Student\StudentPlanController;
 use App\Http\Controllers\StudymaterialController;
 use Illuminate\Support\Facades\Route;
@@ -14,7 +15,7 @@ Route::name('student.')->group(function () {
         Route::any('/password-reset/{code}', [AuthController::class, 'studentPasswordReset'])->middleware(['studentguest'])->name('password_reset');
         // Route::any('/forget-password', [AuthController::class, 'forgetPassword'])->middleware(['studentguest'])->name('forget_password');
         Route::middleware(['is_student'])->group(function () {
-            Route::any('/', [DashboardController::class, 'index'])->name('dashboard');
+            Route::get('/', Dashboard::class)->name('dashboard');
             Route::any('/package_manage/{id}', [ExamsController::class, 'package_manage'])->name('package_manage');
             Route::any('attempt', [ExamsController::class, 'testAttempt'])->name('test-attempt');
             Route::any('/profile', [DashboardController::class, 'profile'])->name('profile');
