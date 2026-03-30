@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('Layouts.exam')]
+#[Layout('components.layouts.student-mary')]
 class OnlineTestRunner extends Component
 {
     public $testId;
