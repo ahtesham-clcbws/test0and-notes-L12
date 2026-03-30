@@ -5,9 +5,13 @@
         "build": "vite build"
     },
     "devDependencies": {
+        "autoprefixer": "^10.4.27",
         "axios": "^1.7.9",
+        "daisyui": "^5.5.19",
         "laravel-vite-plugin": "^1.2.0",
         "lodash": "^4.17.21",
+        "postcss": "^8.5.8",
+        "tailwindcss": "^4.2.2",
         "vite": "^6.0.0"
     }
 }
