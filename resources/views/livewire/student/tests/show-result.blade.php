@@ -1,68 +1,73 @@
 <div>
-    {{-- Test Header Banner --}}
-    <div class="card mb-3 border-0 shadow-sm" style="border-radius: 8px;">
-        <div class="card-body bg-success text-white rounded-3 p-3">
-            <h4 class="mb-1 text-white">{{ $test->title ?? 'Online Test' }}</h4>
-            <div class="small text-white-50">
-                <i class="bi bi-calendar-check me-1"></i> Completed & Evaluated
-            </div>
-        </div>
-    </div>
+    <x-header title="{{ $test->title ?? 'Online Test' }}" subtitle="Completed & Evaluated" size="text-3xl" separator progress-indicator>
+        <x-slot:actions>
+            <x-button label="Back to Dashboard" icon="o-arrow-left" link="{{ route('student.dashboard_tests_list') }}" />
+            <x-button label="View Attempts History" icon="o-list-bullet" link="/student/attempt" class="btn-primary" />
+        </x-slot:actions>
+    </x-header>
 
-    <div class="row">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         {{-- Sidebar Score Panel --}}
-        <div class="col-lg-4 col-md-12 mb-3">
-            <div class="border bg-white p-3 rounded-lg shadow-sm">
-                <h4 class="text-center text-success mb-3">Test Result</h4>
+        <div class="lg:col-span-1">
+            <x-card title="Test Result" class="shadow-sm border border-base-200 bg-base-100 sticky top-4">
                 
-                <div class="d-flex justify-content-between border-bottom py-2">
-                    <span>Total Questions:</span>
-                    <span class="fw-bold">{{ $test->total_questions ?? $total_question }}</span>
-                </div>
-                <div class="d-flex justify-content-between border-bottom py-2">
-                    <span>Attempted:</span>
-                    <span class="fw-bold text-success">{{ $total_question - $not_attempted }}</span>
-                </div>
-                <div class="d-flex justify-content-between border-bottom py-2">
-                    <span>Not-Attempted:</span>
-                    <span class="fw-bold text-secondary">{{ $not_attempted }}</span>
-                </div>
-                <div class="d-flex justify-content-between border-bottom py-2">
-                    <span>Right Answers:</span>
-                    <span class="fw-bold text-success">{{ $correct_answer }} (<span class="text-secondary">{{ $out_of_marks }} Marks</span>)</span>
-                </div>
-                <div class="d-flex justify-content-between border-bottom py-2">
-                    <span>Wrong Answers:</span>
-                    <span class="fw-bold text-danger">{{ $incorrect_answer }} (<span class="text-secondary">-{{ $negative_marks }} Marks</span>)</span>
-                </div>
-                <div class="d-flex justify-content-between py-2 border-top border-2 mt-2">
-                    <span class="fw-bold fs-6">Final Marks:</span>
-                    <span class="fw-bold fs-6 text-success">{{ $final_marks }}</span>
-                </div>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center pb-3 border-b border-base-200">
+                        <span class="text-base-content/70">Total Questions</span>
+                        <span class="font-bold text-lg">{{ $test->total_questions ?? $total_question }}</span>
+                    </div>
 
-                <div class="mt-3 d-grid gap-2">
-                    {{-- Updated Dynamic Back buttons --}}
-                    <a href="{{ route('student.dashboard_tests_list') }}" class="btn btn-outline-success">
-                        <i class="ti-arrow-left me-1"></i> Back to Dashboard
-                    </a>
-                    <a href="/student/attempt" class="btn btn-success">
-                        <i class="ti-list me-1"></i> View Attempts History
-                    </a>
+                    <div class="flex justify-between items-center pb-3 border-b border-base-200">
+                        <span class="text-base-content/70">Attempted</span>
+                        <x-badge value="{{ $total_question - $not_attempted }}" class="badge-success badge-lg font-bold" />
+                    </div>
+
+                    <div class="flex justify-between items-center pb-3 border-b border-base-200">
+                        <span class="text-base-content/70">Not Attempted</span>
+                        <x-badge value="{{ $not_attempted }}" class="badge-neutral badge-lg font-bold" />
+                    </div>
+
+                    <div class="flex justify-between items-center pb-3 border-b border-base-200">
+                        <div>
+                            <span class="text-success font-bold flex items-center gap-1"><x-icon name="o-check-circle" class="w-4 h-4" /> Right Answers</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-success">{{ $correct_answer }}</span>
+                            <div class="text-xs text-base-content/50">{{ $out_of_marks }} Marks</div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center pb-3 border-b border-base-200">
+                        <div>
+                            <span class="text-error font-bold flex items-center gap-1"><x-icon name="o-x-circle" class="w-4 h-4" /> Wrong Answers</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-error">{{ $incorrect_answer }}</span>
+                            <div class="text-xs text-base-content/50">-{{ $negative_marks }} Marks</div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="font-bold text-xl">Final Score</span>
+                        <span class="font-bold text-4xl text-primary">{{ $final_marks }}</span>
+                    </div>
                 </div>
-            </div>
+            </x-card>
         </div>
 
         {{-- Detailed Question Responses / Solutions --}}
-        <div class="col-lg-8 col-md-12">
+        <div class="lg:col-span-2">
             @if ($test->show_answer == 1)
-                <div class="accordion" id="questionsAccordion">
-                    @foreach ($test->testSections as $secIndex => $section)
-                        <div class="mb-3">
-                            <h5 class="p-2 bg-light rounded text-success fw-bold">{{ $section->sectionSubject->name }}</h5>
-                            
+                @foreach ($test->testSections as $secIndex => $section)
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold text-primary mb-4 pb-2 border-b border-primary/20 flex items-center gap-2">
+                            <x-icon name="o-rectangle-stack" class="w-7 h-7" />
+                            {{ $section->sectionSubject->name }}
+                        </h3>
+                        
+                        <div class="space-y-4">
                             @foreach ($section->getQuestions()->wherePivot('deleted_at', '=', null)->get() as $qIndex => $question)
                                 @php
-                                    // Calculate result state for this question item
                                     $response = \App\Models\Gn_Test_Response::where('student_id', $studentId)
                                         ->where('test_id', $testId)
                                         ->where('question_id', $question->id)
@@ -70,65 +75,68 @@
                                     
                                     $isCorrect = $response && $response->answer === $question->mcq_answer;
                                     $isUnattempted = !$response || $response->answer === null || $response->answer === '';
+
+                                    $badgeClass = $isUnattempted ? 'badge-neutral' : ($isCorrect ? 'badge-success' : 'badge-error');
+                                    $badgeLabel = $isUnattempted ? 'Not Attempted' : ($isCorrect ? 'Correct' : 'Incorrect');
                                 @endphp
 
-                                <div class="card mb-2 border rounded-sm">
-                                    <div class="card-header bg-white d-flex justify-content-between align-items-center p-2" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#collapse_{{ $question->id }}">
-                                        <span class="fw-bold">
-                                            Question {{ $qIndex + 1 }}
-                                            @if ($isUnattempted)
-                                                <span class="badge bg-secondary ms-2">Not Attempted</span>
-                                            @elseif ($isCorrect)
-                                                <span class="badge bg-success ms-2">Correct</span>
-                                            @else
-                                                <span class="badge bg-danger ms-2">Incorrect</span>
-                                            @endif
-                                        </span>
-                                        <i class="ti-angle-down"></i>
-                                    </div>
-                                    <div id="collapse_{{ $question->id }}" class="collapse show" data-bs-parent="#questionsAccordion">
-                                        <div class="card-body p-3">
-                                            <div class="mb-3">{!! $question->question !!}</div>
-
-                                            <ul class="list-group">
-                                                @for ($k = 1; $k <= $question->mcq_options; $k++)
-                                                    @php 
-                                                        $optKey = 'ans_' . $k;
-                                                        $liClass = '';
-                                                        
-                                                        // Accurate background coloring for solutions review
-                                                        if ($question->mcq_answer === $optKey) {
-                                                            $liClass = 'list-group-item-success'; // Correct answer
-                                                        } elseif ($response && $response->answer === $optKey && !$isCorrect) {
-                                                            $liClass = 'list-group-item-danger'; // Selected wrong option
-                                                        }
-                                                    @endphp
-                                                    <li class="list-group-item {{ $liClass }} p-2">
-                                                        <span class="fw-bold">({{ chr(64 + $k) }})</span> {!! $question->$optKey !!}
-                                                    </li>
-                                                @endfor
-                                            </ul>
-
-                                            @if ($test->show_solution == 1)
-                                                <div class="mt-3 p-2 bg-gray-50 rounded border">
-                                                    @if ($question->solution)
-                                                        <div><strong>Solution:</strong> {!! $question->solution !!}</div>
-                                                    @endif
-                                                    @if ($question->explanation)
-                                                        <div class="mt-1 border-top pt-1"><strong>Explanation:</strong> {!! $question->explanation !!}</div>
-                                                    @endif
-                                                </div>
-                                            @endif
+                                <details class="collapse collapse-arrow bg-base-100 border border-base-200 shadow-sm" open>
+                                    <summary class="collapse-title text-lg font-medium flex items-center gap-3">
+                                        <span class="w-8 h-8 rounded-full bg-base-200 flex items-center justify-center text-sm font-bold">{{ $qIndex + 1 }}</span>
+                                        <span class="flex-1 line-clamp-1">{!! strip_tags($question->question) !!}</span>
+                                        <x-badge value="{{ $badgeLabel }}" class="{{ $badgeClass }}" />
+                                    </summary>
+                                    <div class="collapse-content px-6 pb-6 border-t border-base-200 pt-4">
+                                        <div class="prose max-w-none text-base-content mb-6">
+                                            {!! $question->question !!}
                                         </div>
+
+                                        <div class="space-y-3 mb-6">
+                                            @for ($k = 1; $k <= $question->mcq_options; $k++)
+                                                @php 
+                                                    $optKey = 'ans_' . $k;
+                                                    $itemClass = 'bg-base-50 border-base-200';
+                                                    
+                                                    if ($question->mcq_answer === $optKey) {
+                                                        $itemClass = 'bg-success/10 border-success text-success-content';
+                                                    } elseif ($response && $response->answer === $optKey && !$isCorrect) {
+                                                        $itemClass = 'bg-error/10 border-error text-error-content';
+                                                    }
+                                                @endphp
+                                                <div class="p-3 rounded-lg border flex gap-3 {{ $itemClass }}">
+                                                    <span class="font-bold opacity-70">({{ chr(64 + $k) }})</span>
+                                                    <div class="prose max-w-none m-0 {!! $itemClass !!}">{!! $question->$optKey !!}</div>
+                                                </div>
+                                            @endfor
+                                        </div>
+
+                                        @if ($test->show_solution == 1 && ($question->solution || $question->explanation))
+                                            <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 mt-4">
+                                                @if ($question->solution)
+                                                    <div class="mb-3">
+                                                        <h4 class="font-bold text-primary flex items-center gap-2 mb-2"><x-icon name="o-light-bulb" class="w-5 h-5"/> Solution</h4>
+                                                        <div class="prose max-w-none text-sm">{!! $question->solution !!}</div>
+                                                    </div>
+                                                @endif
+                                                @if ($question->explanation)
+                                                    <div>
+                                                        <h4 class="font-bold text-primary flex items-center gap-2 mb-2 mt-4 pt-4 border-t border-primary/10"><x-icon name="o-book-open" class="w-5 h-5"/> Explanation</h4>
+                                                        <div class="prose max-w-none text-sm">{!! $question->explanation !!}</div>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endif
                                     </div>
-                                </div>
+                                </details>
                             @endforeach
                         </div>
-                    @endforeach
-                </div>
+                    </div>
+                @endforeach
             @else
-                <div class="alert alert-info text-center">
-                    <i class="ti-info-alt me-1"></i> Responses for this exam are currently locked by the administrator.
+                <div class="flex flex-col items-center justify-center p-12 bg-base-100 border border-base-200 rounded-xl text-center shadow-sm">
+                    <x-icon name="o-lock-closed" class="w-20 h-20 text-warning mb-4" />
+                    <h3 class="text-2xl font-bold mb-2">Detailed Review Locked</h3>
+                    <p class="text-base-content/70">Responses & solutions for this exam are currently hidden by the administrator.</p>
                 </div>
             @endif
         </div>

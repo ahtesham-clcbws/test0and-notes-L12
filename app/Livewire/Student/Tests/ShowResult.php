@@ -5,8 +5,10 @@ namespace App\Livewire\Student\Tests;
 use App\Models\Gn_Test_Response;
 use App\Models\TestModal;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
+#[Layout('components.layouts.student-mary')]
 class ShowResult extends Component
 {
     public $testId;
@@ -82,13 +84,6 @@ class ShowResult extends Component
 
     public function render()
     {
-        return view('livewire.student.tests.show-result')
-            ->extends('Layouts.student', [
-                'data' => [
-                    'pagename' => ($this->test->title ?? 'Test').' - Result',
-                    'pageicon' => 'file-earmark-check',
-                ],
-            ])
-            ->section('main');
+        return view('livewire.student.tests.show-result');
     }
 }
