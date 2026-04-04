@@ -17,7 +17,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use Mary\Traits\Toast;
 
-    #[Layout('components.layouts.student-mary')]
+#[Layout('components.layouts.student-mary')]
 class Index extends Component
 {
     use WithFileUploads, Toast;
