@@ -21,12 +21,12 @@ Route::name('student.')->group(function () {
             Route::get('/', Dashboard::class)->name('dashboard');
             Route::any('/package_manage/{id}', [ExamsController::class, 'package_manage'])->name('package_manage');
             Route::get('attempt', \App\Livewire\Student\Exams\Attempted::class)->name('test-attempt');
-            Route::any('/profile', [DashboardController::class, 'profile'])->name('profile');
+            // Route::any('/profile', [DashboardController::class, 'profile'])->name('profile');
             Route::get('/verifynumber/{mobile_number}', [DashboardController::class, 'verifynumber'])->name('verifynumber');
             Route::get('/verifyotp/{mobile_number}/{mobile_otp}', [DashboardController::class, 'verifyotp'])->name('verifyotp');
             Route::get('/verifyemail/{email}', [DashboardController::class, 'verifyemail'])->name('verifyemail');
             Route::get('/verifyemailotp/{email}/{otp}', [DashboardController::class, 'verifyemailotp'])->name('verifyemailotp');
-            Route::post('/manage_profile_process', [DashboardController::class, 'manage_profile_process'])->name('manage_profile_process');
+            // Route::post('/manage_profile_process', [DashboardController::class, 'manage_profile_process'])->name('manage_profile_process');
 
             Route::prefix('test')->group(function () {
                 // Main Test Hub Redirect
