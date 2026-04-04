@@ -34,7 +34,7 @@
                 </a>
             </li>
             <li class="nav-item" style="border: 1px solid black;border-top: 0;">
-                <a class="nav-link btn-toggle collapsed rounded" href="{{ route('student.dashboard') }}" aria-current="page">
+                <a class="nav-link btn-toggle collapsed rounded" href="{{ route('old.student.dashboard') }}" aria-current="page">
                     <div class="row">
                         <div class="col-4">
                             <img class="box_icon" src="{{ asset('student1/images/test_attempt.png') }}">
@@ -62,19 +62,19 @@
                 <div class="collapse" id="test-quizes-collapse">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.test-attempt') }}">
+                            <a class="nav-link" href="{{ route('old.student.test-attempt') }}">
                                 Attempted Test
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.dashboard_tests_list') }}">
+                            <a class="nav-link" href="{{ route('old.student.dashboard_tests_list') }}">
                                 Institute Test
                             </a>
                         </li>
                         @if(isset($test_cat_sidebar))
                             @foreach($test_cat_sidebar as $cat)
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('student.dashboard_gyanology_list',['cat'=>$cat->id]) }}">
+                                <a class="nav-link" href="{{ route('old.student.dashboard_gyanology_list',['cat'=>$cat->id]) }}">
                                     {{ $cat->cat_name }}
                                 </a>
                             </li>
@@ -84,7 +84,7 @@
                 </div>
             </li>
             <li class="nav-item" style="border: 1px solid black;border-top: 0;">
-                <a class="nav-link btn-toggle collapsed rounded" href="{{ route('student.showvideo') }}" aria-current="page">
+                <a class="nav-link btn-toggle collapsed rounded" href="{{ route('old.student.showvideo') }}" aria-current="page">
                     <div class="row">
                         <div class="col-4">
                             <img class="box_icon" src="{{ asset('student1/images/video_note.png') }}">
@@ -96,7 +96,7 @@
                 </a>
             </li>
             <li class="nav-item" style="border: 1px solid black;border-top: 0;">
-                <a class="nav-link btn-toggle collapsed rounded" href="{{ route('student.showgk') }}" aria-current="page">
+                <a class="nav-link btn-toggle collapsed rounded" href="{{ route('old.student.showgk') }}" aria-current="page">
                     <div class="row">
                         <div class="col-4">
                             <img class="box_icon" src="{{ asset('student1/images/watch.png') }}">
@@ -123,22 +123,22 @@
                 <div class="collapse" id="study-material-collapse">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.show') }}">
+                            <a class="nav-link" href="{{ route('old.student.show') }}">
                                 Study Notes & E-Books
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.showComprehensive') }}">
+                            <a class="nav-link" href="{{ route('old.student.showComprehensive') }}">
                                 Comprehensive Study Material
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.showShortNotes') }}">
+                            <a class="nav-link" href="{{ route('old.student.showShortNotes') }}">
                                 Short Notes & One Liner
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.showPremium') }}">
+                            <a class="nav-link" href="{{ route('old.student.showPremium') }}">
                                 Premium Study Notes
                             </a>
                         </li>
@@ -161,17 +161,17 @@
                 <div class="collapse" id="packages-collapse">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.plan', ['type' => 'premium']) }}">
+                            <a class="nav-link" href="{{ route('old.student.plan', ['type' => 'premium']) }}">
                                 Premium Packages
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.plan', ['type' => 'free']) }}">
+                            <a class="nav-link" href="{{ route('old.student.plan', ['type' => 'free']) }}">
                                 Free Packages
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('student.my-plan') }}">
+                            <a class="nav-link" href="{{ route('old.student.my-plan') }}">
                                 My Packages
                             </a>
                         </li>
@@ -179,7 +179,7 @@
                 </div>
             </li>
             <li class="nav-item" style="border: 1px solid black;border-top: 0;">
-                <a class="nav-link btn-toggle collapsed rounded" href="{{ route('student.review.index') }}" aria-current="page">
+                <a class="nav-link btn-toggle collapsed rounded" href="{{ route('old.student.review.index') }}" aria-current="page">
                     <div class="row">
                         <div class="col-4">
                             <img class="box_icon" src="{{ asset('student1/images/test_attempt.png') }}">

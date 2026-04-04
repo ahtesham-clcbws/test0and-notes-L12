@@ -39,8 +39,31 @@ Goal: Convert the main landing page and sidebar.
 - **[NEW]** `App\Livewire\Student\Dashboard`: Create the primary Livewire component for the student home.
 - **[MODIFY]** `routes/student.php`: Update the main `/student/dashboard` route to point to the new Livewire component.
 
-### [Phase 3] Core Logic Migration - Tests & Exams (Est. 6-8 hrs)
-Goal: Re-implement the complex mock test flow as a single stateful Livewire component.
+### [Phase 3] Exams & Tests Migration (Est. 4-6 hrs)
+Goal: Convert the DataTable-based test listings to reactive Livewire components using MaryUI layouts.
+
+#### [NEW] `App\Livewire\Student\Exams\Index`
+- **Logic**: 
+    - Handle `type` (Tests vs Gyanology).
+    - Map `$cat` logic from existing URL parameters.
+    - Fetch tests filtered by student's `class` and `education_type`.
+- **UI**: 
+    - Premium MaryUI Table with custom slots for status (Attempted vs New).
+    - Searchable and Filterable by Category (`TestCat`).
+    - Responsive "Start Test" and "Show Result" buttons.
+
+### [Phase 4] Mock Test Flow & Results (Est. 6-8 hrs)
+Goal: Re-implement the actual test-taking interface and results visualization.
+#### [NEW] `App\Livewire\Student\Exams\TestRunner`
+- Stateful component to handle questions, timer, and auto-submission.
+- Legacy logic from `ExamsController@startTest` and `ExamsController@questionPaper`.
+
+### [Phase 5] Results & Analytics (Est. 2-3 hrs) - [DONE]
+Goal: Convert the Results summary screen to MaryUI.
+#### [NEW] `App\Livewire\Student\Tests\ShowResult`
+- [x] Modernized results dashboard from legacy Bootstrap `extends()`.
+- [x] Refactored legacy accordion into pure HTML `<details>` with MaryUI/Tailwind styling.
+- [x] Implemented responsive Tailwind Grid (`x-card`, `x-badge`) for marks, incorrect metrics, and review.
 
 ---
 

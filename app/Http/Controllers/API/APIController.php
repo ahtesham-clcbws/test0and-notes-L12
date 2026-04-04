@@ -98,14 +98,15 @@ class APIController extends Controller
     public function userDetails(Request $request)
     {
         $user = Auth::user();
-        Auth::user()->myInstitute->test();
-
+        
         return response()->json(['status' => 1, 'user_details' => $user]);
     }
 
     public function instituteTest(Request $request)
     {
-        $testTableData = Auth::user()->myInstitute->test()->get();
+        $user = Auth::user();
+        $myInstitute = $user ? $user->myInstitute : null;
+        $testTableData = $myInstitute ? $myInstitute->test()->get() : collect([]);
         foreach ($testTableData as $key => $testData) {
             $section_time = $testData->getSection()->select('number_of_questions', 'duration')->get()->toArray();
             $time = [];
@@ -118,7 +119,7 @@ class APIController extends Controller
             $testTableData[$key]['test_duration'] = array_sum($time);
             $testTableData[$key]['total_questions'] = $testData['total_questions'];
             $testTableData[$key]['total_questions_display'] = $testData['total_questions'].' / '.$testData->getQuestions()->wherePivot('deleted_at', '=', null)->count();
-            $testTableData[$key]['created_by'] = Auth::user()->name;
+            $testTableData[$key]['created_by'] = $user ? $user->name : 'Admin';
             $testTableData[$key]['created_date'] = date('d-m-Y', strtotime($testData->created_at));
             // $testTableData[$key]['class_name'] = $testData->EducationClass->name;
             $testTableData[$key]['class_name'] = $testData['title'];
@@ -143,7 +144,7 @@ class APIController extends Controller
             $testTableData[$key]['test_duration'] = array_sum($time);
             $testTableData[$key]['total_questions'] = $testData['total_questions'];
             $testTableData[$key]['total_questions_display'] = $testData['total_questions'].' / '.$testData->getQuestions()->wherePivot('deleted_at', '=', null)->count();
-            $testTableData[$key]['created_by'] = Auth::user()->name;
+            $testTableData[$key]['created_by'] = Auth::user() ? Auth::user()->name : 'Admin';
             $testTableData[$key]['created_date'] = date('d-m-Y', strtotime($testData->created_at));
             $testTableData[$key]['class_name'] = $testData['title'];
         }
@@ -782,10 +783,10 @@ class APIController extends Controller
     {
         try {
             $user = Auth::user();
-            $userDetails = UserDetails::where('user_id', $user->id)->first();
+            $userDetails = $user ? UserDetails::where('user_id', $user->id)->first() : null;
             $education_type = $userDetails?->education_type ?? 0;
             $class = $userDetails?->class ?? 0;
-            $institute_id = $user->myInstitute?->id ?? 0;
+            $institute_id = $user ? ($user->myInstitute?->id ?? 0) : 0;
 
             $query = DB::table('study_material')
                 ->select(
@@ -839,15 +840,14 @@ class APIController extends Controller
     {
         try {
             $user = Auth::user();
-            $userDetails = UserDetails::where('user_id', $user->id)->first();
+            $userDetails = $user ? UserDetails::where('user_id', $user->id)->first() : null;
             $education_type = $userDetails?->education_type ?? 0;
             $class = $userDetails?->class ?? 0;
-            $institute_owner_id = $user->myInstitute?->user_id ?? 0;
+            $institute_owner_id = $user?->myInstitute?->user_id ?? 0;
 
             // 1. Categories (Education Types)
             $categories = DB::table('education_type')
-                ->where('status', 'active')
-                ->get(['id', 'name', 'image']);
+                ->get(['id', 'name']);
 
             // 2. Test Categories (For filters)
             $test_categories = DB::table('test_cat')
@@ -860,7 +860,7 @@ class APIController extends Controller
                     $q->whereIn('user_id', [$institute_owner_id, 1])
                         ->orWhereNull('user_id');
                 })
-                ->where('free_test', 1)
+                ->where('test_type', 0)
                 ->orderByRaw('CASE WHEN education_type_id = ? AND education_type_child_id = ? THEN 0 ELSE 1 END', [$education_type, $class])
                 ->latest()
                 ->take(10)
@@ -893,11 +893,11 @@ class APIController extends Controller
     {
         try {
             $user = Auth::user();
-            $userDetails = UserDetails::where('user_id', $user->id)->first();
-            $education_type = $userDetails?->education_type;
-            $class = $userDetails?->class;
-            $institute_id = $user->myInstitute?->id ?? 0;
-            $institute_owner_id = $user->myInstitute?->user_id ?? 0;
+            $userDetails = $user ? UserDetails::where('user_id', $user->id)->first() : null;
+            $education_type = $userDetails?->education_type ?? 0;
+            $class = $userDetails?->class ?? 0;
+            $institute_id = $user ? ($user->myInstitute?->id ?? 0) : 0;
+            $institute_owner_id = $user ? ($user->myInstitute?->user_id ?? 0) : 0;
 
             // 1. Premium Packages
             $packages = Gn_PackagePlan::where('status', 1)
@@ -926,7 +926,7 @@ class APIController extends Controller
                     $q->whereIn('user_id', [$institute_owner_id, 1])
                         ->orWhereNull('user_id');
                 })
-                ->where('free_test', 0)
+                ->where('test_type', 1)
                 ->latest()
                 ->take(20)
                 ->get();
@@ -1056,10 +1056,10 @@ class APIController extends Controller
     {
         try {
             $user = Auth::user();
-            $userDetails = UserDetails::where('user_id', $user->id)->first();
+            $userDetails = $user ? UserDetails::where('user_id', $user->id)->first() : null;
             $education_type = $userDetails?->education_type ?? 0;
             $class = $userDetails?->class ?? 0;
-            $institute_owner_id = $user->myInstitute?->user_id ?? 0;
+            $institute_owner_id = $user ? ($user->myInstitute?->user_id ?? 0) : 0;
 
             $query = TestModal::with('EducationClass')
                 ->where('published', 1)

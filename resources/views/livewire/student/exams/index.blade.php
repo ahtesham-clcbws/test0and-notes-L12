@@ -1,6 +1,6 @@
 <div>
     {{-- HEADER --}}
-    <x-header :title="$type == 1 ? 'Practice Tests' : 'Gyanology Tests'" separator progress-indicator>
+    <x-header :title="$this->source == 'institute' ? 'Institute Tests' : ($type == 1 ? 'Practice Tests' : 'Gyanology Tests')" separator progress-indicator>
         <x-slot:middle class="justify-start!">
             <x-input placeholder="Search tests..." wire:model.live.debounce.300ms="search" clearable icon="o-magnifying-glass" />
         </x-slot:middle>
@@ -18,7 +18,12 @@
 
     {{-- TABLE --}}
     <x-card separator shadow>
-        <x-table :headers="$headers" :rows="$tests" with-pagination>
+        <x-table :headers="$headers" :rows="$tests" :sort-by="$sortBy" with-pagination>
+             {{-- Custom ID Slot --}}
+            @scope('cell_id', $test)
+                 <span class="opacity-50 text-xs">#{{ $test->id }}</span>
+            @endscope
+
             {{-- Custom Title Slot --}}
             @scope('cell_title', $test)
                 <div class="flex items-center gap-3">
@@ -36,12 +41,12 @@
 
             {{-- Custom Category Slot --}}
             @scope('cell_category_name', $test)
-                <x-badge :value="$test->category_name" class="badge-primary badge-outline" />
+                <x-badge :value="$test->category_name" class="badge-primary badge-outline text-[10px]" />
             @endscope
 
             {{-- Custom Date Slot --}}
-            @scope('cell_test_date', $test)
-                <span class="text-xs">{{ \Carbon\Carbon::parse($test->created_at)->format('d M, Y') }}</span>
+            @scope('cell_created_at', $test)
+                <span class="text-xs opacity-70">{{ \Carbon\Carbon::parse($test->created_at)->format('d M, Y') }}</span>
             @endscope
 
             {{-- Custom Status Slot --}}
@@ -60,18 +65,18 @@
                         <x-button
                             label="View Results"
                             icon="o-chart-bar"
-                            link="/student/test/show-result/{{ Auth::id() }}/{{ $test->id }}"
+                            link="{{ route('student.show-result', [Auth::id(), $test->id]) }}"
                             class="btn-sm btn-outline btn-success" />
                     @else
                         <x-button
                             label="Start Test"
                             icon="o-play"
-                            link="/student/test/start-test/{{ $test->id }}"
+                            link="{{ route('student.start-test', [$test->id]) }}"
                             class="btn-sm btn-primary" />
                     @endif
                     <x-button
                         icon="o-document-magnifying-glass"
-                        link="/student/test/question-paper/{{ $test->id }}"
+                        link="{{ route('student.question-paper', [$test->id]) }}"
                         class="btn-sm btn-ghost"
                         tooltip="Question Paper" />
                 </div>

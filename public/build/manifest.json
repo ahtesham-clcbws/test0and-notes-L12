@@ -4,6 +4,11 @@
     "src": "resources/css/app.css",
     "isEntry": true
   },
+  "resources/css/mary.css": {
+    "file": "assets/mary-AiPOg9vI.css",
+    "src": "resources/css/mary.css",
+    "isEntry": true
+  },
   "resources/js/app.js": {
     "file": "assets/app-NLOIpH7I.js",
     "name": "app",

@@ -24,6 +24,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->group(base_path('routes/student.php'));
 
             Route::middleware('web')
+                ->prefix('old')
+                ->name('old.')
+                ->group(base_path('routes/student_old.php'));
+
+            Route::middleware('web')
                 ->group(base_path('routes/old.php'));
 
             Route::middleware('web')

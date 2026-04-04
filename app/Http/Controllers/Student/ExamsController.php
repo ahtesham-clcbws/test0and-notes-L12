@@ -39,10 +39,12 @@ class ExamsController extends Controller
     public function index(Request $req, $cat = '')
     {
         $name = Route::currentRouteName();
-        if ($name == 'student.dashboard_tests_list') {
+        $type = 1; // Default to Tests
+
+        if (str_ends_with($name, 'dashboard_tests_list')) {
             $type = 1;
         }
-        if ($name == 'student.dashboard_gyanology_list') {
+        if (str_ends_with($name, 'dashboard_gyanology_list')) {
             $type = 0;
         }
 

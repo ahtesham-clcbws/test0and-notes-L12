@@ -622,13 +622,14 @@ class StudymaterialController extends Controller
                 ->rawColumns(['availability', 'view', 'download'])
                 ->make(true);
         }
-        if ($name == 'student.show') {
+        $title = 'Study Material'; // Default fallback
+        if ($name == 'student.show' || str_contains($name, 'show')) {
             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp; <b class="text-primary">Study Notes & E-Books</b>';
         }
-        if ($name == 'student.showvideo') {
+        if ($name == 'student.showvideo' || str_contains($name, 'showvideo')) {
             $title = '<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Live & Video Classes</b>';
         }
-        if ($name == 'student.showgk') {
+        if ($name == 'student.showgk' || str_contains($name, 'showgk')) {
             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Static GK & Current Affairs</b>';
         }
 
@@ -764,10 +765,11 @@ class StudymaterialController extends Controller
                 ->rawColumns(['availability', 'view', 'download'])
                 ->make(true);
         }
+        $title = 'Live & Video Classes'; // Fallback
         if ($name == 'student.show') {
             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp; <b class="text-primary">Study Notes & E-Books</b>';
         }
-        if ($name == 'student.showvideo') {
+        if ($name == 'student.showvideo' || str_contains($name, 'showvideo')) {
             $title = '<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Live & Video Classes</b>';
         }
         if ($name == 'student.showgk') {
@@ -906,7 +908,8 @@ class StudymaterialController extends Controller
                 ->rawColumns(['availability', 'view', 'download'])
                 ->make(true);
         }
-        if ($name == 'student.showgk') {
+        $title = 'Static GK & Current Affairs'; // Fallback
+        if ($name == 'student.showgk' || str_contains($name, 'showgk')) {
             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Static GK & Current Affairs</b>';
         }
 
@@ -1043,7 +1046,8 @@ class StudymaterialController extends Controller
                 ->make(true);
         }
 
-        if ($name == 'student.showComprehensive') {
+        $title = 'Comprehensive Study Material'; // Fallback
+        if ($name == 'student.showComprehensive' || str_contains($name, 'showComprehensive')) {
             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Comprehensive Study Material</b>';
         }
 
@@ -1174,7 +1178,8 @@ class StudymaterialController extends Controller
                 ->make(true);
         }
 
-        if ($name == 'student.showShortNotes') {
+        $title = 'Short Notes & One Liner'; // Fallback
+        if ($name == 'student.showShortNotes' || str_contains($name, 'showShortNotes')) {
             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Short Notes & One Liner</b>';
         }
 
@@ -1305,7 +1310,8 @@ class StudymaterialController extends Controller
                 ->make(true);
         }
 
-        if ($name == 'student.showPremium') {
+        $title = 'Premium Study Notes'; // Fallback
+        if ($name == 'student.showPremium' || str_contains($name, 'showPremium')) {
             $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp;<i class="bi bi-camera-video text-danger"></i>&nbsp;<i class="bi bi-file-music text-warning"></i>&nbsp;<i class="bi bi-youtube text-danger"></i>&nbsp; <b class="text-primary">Premium Study Notes</b>';
         }
 
