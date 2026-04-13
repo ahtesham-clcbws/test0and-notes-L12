@@ -10,7 +10,7 @@
         <meta name="_token" content="{{ csrf_token() }}">
 
         <!-- Site Metas -->
-        <title>{{ env('APP_NAME') }}</title>
+        <title>{{ config('app.name') }}</title>
         <!-- Site Icons -->
         <link type="image/x-icon" href="{{ asset('logos/logo-white-square.png') }}" rel="icon">
         <link type="image/x-icon" href="{{ asset('logos/logo-white-square.png') }}" rel="shortcut-icon">

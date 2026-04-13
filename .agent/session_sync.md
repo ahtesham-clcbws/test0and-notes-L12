@@ -1,6 +1,12 @@
 # Laravel Backlog
 
 ## Pending Tasks
+- [ ] Refine Test Conduct UI (Alpine Timer, Global Palette, Agreement Checkboxes, Summary View)
+- [ ] Migrate `package_manage` to Livewire (`App\Livewire\Student\Packages\Details`)
+- [ ] Migrate `test/details` (Instructions) to Livewire (`App\Livewire\Student\Exams\Instructions`)
+- [ ] Migrate `feedback` to Livewire (`App\Livewire\Student\Feedback\Index`)
+- [ ] Fix Package Listing: Include Free active packages in "My Packages"
+- [ ] Fix Package Discovery: Hide active packages from "All Packages"
 - [ ] UI Audit: Finalize parity for all student profile/settings screens.
 - [ ] End-to-End Testing on physical device.
 
@@ -14,8 +20,17 @@
 - [x] Refine `studentLogin` for mobile compatibility
 - [x] Implement `studentSignup` for mobile
 - [x] Implement Forgot Password / OTP APIs
+- [x] Legacy Routes: Mapped legacy student routes to `/old/student` via `student_old.php`.
 
 # Session Sync - Momin Scholar Program
+
+## Session Active - 2026-04-13 (Student Dashboard Migration & Alignment)
+- **Objective:** Resolve regressions in the new Livewire student test conduct and complete the migration of "balance" pages.
+- **Current Focus:**
+  - **Test Conduct**: Refactoring timer to Alpine.js, adding mandatory instructions agreement, and implementing a global question palette.
+  - **Balance Migration**: Converting remaining controller-based routes (`package_manage`, `feedback`, `test-instructions`) to Livewire 3 components.
+  - **Package Logic**: Fixing visibility for Free active packages and ensuring the discovery list is context-aware.
+- **Strategic Decision:** Preserve legacy code in the `App\Http\Controllers\Student` namespace for now but deactivate the routes gradually to ensure a safe transition.
 
 ## Session Handoff - 2026-03-30 (Student Dashboard Modernization - Part 2)
 - **Current State:** Successfully migrated the rest of the student exam flow (Test Conduct & Results) to Livewire 3 + MaryUI + Tailwind V4.

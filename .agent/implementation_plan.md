@@ -1,75 +1,50 @@
-# Implementation Plan: Student Panel Modernization (MaryUI + Livewire 3)
+# Implementation Plan - Strict 1:1 Student Dashboard Migration
 
-This plan outlines the architectural shift from the current Bootstrap/jQuery-based Student Panel to a high-performance, premium interface using **MaryUI**, **Tailwind CSS**, and **Livewire 3**.
+The objective is to achieve perfect functional parity between the old Controller-based dashboard and the new Livewire dashboard. We will replicate all data filters, navigation behaviors, and views as they existed, while only updating the aesthetic using MaryUI/Tailwind.
 
 ## User Review Required
 
-### ⚠️ Layout Isolation (Aesthetics & Compatibility)
-> [!WARNING]
-> Bootstrap and Tailwind CSS **will conflict** if loaded on the same page because they share identical utility class names (e.g., `p-4`, `container`, `m-2`) but apply different CSS properties.
-> 
-> **Solution**: **Layout Isolation**. We will use a dedicated `mary.blade.php` layout for the new panel that does NOT include Bootstrap. The existing Bootstrap-based views will remain on their current layout under the `/old` prefix.
-
-### 🔄 The "Old URL" Strategy
-> [!TIP]
-> I suggest creating a dedicated `routes/old.php` file to house all legacy routes. This keeps the main route files clean and prevents confusion.
-> We will wrap the legacy routes in a group: `Route::prefix('old/student')->as('old.student.')`.
-
----
+> [!IMPORTANT]
+> -   **No Enhancements**: We will NOT add new mandatory checkboxes or global palettes to the main view if they were absent in the old version.
+> -   **Strict Data Filters**: We will replicate the exact filters for packages (e.g., excluding Free packages from "Purchased Packages" if that was the old behavior).
+> -   **Modal Reproduction**: The "Summary View" will be implemented as a Modal, matching the `loc-Modal` behavior from the legacy `start-test` page.
 
 ## Proposed Changes
 
-### [Phase 0] Deep JavaScript & Logic Audit
-Goal: Map all client-side logic to its new modern equivalent.
+### 1. Test Conduct (OnlineTestRunner) - Logical Clone
+-   **Main View**:
+    -   Palette will show questions for the **active section only** (as per legacy behavior).
+    -   "Review & Submit" button will trigger a **Summary Modal**.
+-   **Summary Modal**:
+    -   Show Time Left.
+    -   Show counts for Attempted, Not-Attempted, and Marked for Review.
+    -   Provide a global list of all questions (across all sections) purely for overview.
+-   **Technical**: Refactor Timer to Alpine.js (`x-data`) for cleaner Livewire integration without changing its countdown behavior.
 
-#### [AUDIT] Client-side JavaScript
-- **[AJAX] Dependent Dropdowns**: Hits `/api/lookup/get-cities` for state/city selection. Replaced by Livewire's declarative state management.
-- **[AJAX] Mobile OTP**: Hits `InternalRequestsController::mobile_otp`. Replaced by `OtpService`.
-- **[UI] Bootstrap Toasts**: Replaced by MaryUI `x-toast`.
-- **[UI] Icons**: Feather icons replaced by MaryUI/Lucide icons.
+### 2. Package Management Migration
+-   **[NEW] [PackageDetails.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Packages/Details.php)**: 
+    -   Clone the grouping logic from `ExamsController@package_manage` (Tests, Materials, Videos, GK).
+    -   Maintain the same data structure passed to the view.
+-   **[MODIFY] [Purchased.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Packages/Purchased.php)**: 
+    -   Ensure it **excludes** free packages (`final_fees == 0`) to match `StudentPlanController@myPlan`.
 
-### [Phase 1] Infrastructure & Legacy Fallback (Est. 2-3 hrs)
-Goal: Setup the modern stack and secure the old version.
-- **[NEW]** Install and configure `tailwindcss`, `alpinejs`, `daisyui`, and `mary-ui/mary`.
-- **[NEW]** [mary.blade.php](file:///mnt/WebliesNew/test-and-notes-upgrading/resources/views/components/layouts/mary.blade.php): Create the base MaryUI layout.
-- **[NEW]** [old.php](file:///mnt/WebliesNew/test-and-notes-upgrading/routes/old.php): Wrap current student routes in `/old/student` group for legacy mirror.
+### 3. Remaining Page Migrations (1:1 Logic)
+-   **Instructions View**: Create a Livewire component for the test overview screen, inheriting the same authorization checks from `ExamsController@getTest`.
+-   **Feedback View**: Create a simple Livewire form for student reviews, replacing `ReviewController`.
 
-### [Phase 2] Navigation & Dashboard Migration (Est. 2-3 hrs)
-Goal: Convert the main landing page and sidebar.
-- **[NEW]** `App\Livewire\Student\Dashboard`: Create the primary Livewire component for the student home.
-- **[MODIFY]** `routes/student.php`: Update the main `/student/dashboard` route to point to the new Livewire component.
+### 4. Routing & Baseline
+-   **Baseline Commit**: `git commit -m "chore: strict 1:1 migration baseline for student dashboard"`
+-   **Route Sync**: Point `student.package_manage` and `student.feedback` to the new Livewire components in `routes/student.php`.
 
-### [Phase 3] Exams & Tests Migration (Est. 4-6 hrs)
-Goal: Convert the DataTable-based test listings to reactive Livewire components using MaryUI layouts.
-
-#### [NEW] `App\Livewire\Student\Exams\Index`
-- **Logic**: 
-    - Handle `type` (Tests vs Gyanology).
-    - Map `$cat` logic from existing URL parameters.
-    - Fetch tests filtered by student's `class` and `education_type`.
-- **UI**: 
-    - Premium MaryUI Table with custom slots for status (Attempted vs New).
-    - Searchable and Filterable by Category (`TestCat`).
-    - Responsive "Start Test" and "Show Result" buttons.
-
-### [Phase 4] Mock Test Flow & Results (Est. 6-8 hrs)
-Goal: Re-implement the actual test-taking interface and results visualization.
-#### [NEW] `App\Livewire\Student\Exams\TestRunner`
-- Stateful component to handle questions, timer, and auto-submission.
-- Legacy logic from `ExamsController@startTest` and `ExamsController@questionPaper`.
-
-### [Phase 5] Results & Analytics (Est. 2-3 hrs) - [DONE]
-Goal: Convert the Results summary screen to MaryUI.
-#### [NEW] `App\Livewire\Student\Tests\ShowResult`
-- [x] Modernized results dashboard from legacy Bootstrap `extends()`.
-- [x] Refactored legacy accordion into pure HTML `<details>` with MaryUI/Tailwind styling.
-- [x] Implemented responsive Tailwind Grid (`x-card`, `x-badge`) for marks, incorrect metrics, and review.
+## Open Questions
+-   None. We are proceeding with **Strict Parity**.
 
 ---
 
 ## Verification Plan
 
 ### Manual Verification
-- Access `/old/student/dashboard` to verify legacy UI is intact.
-- Access `/student/dashboard` to verify new MaryUI dashboard performance.
-- Roles: Must test with a valid `student` user account.
+1.  Compare `/old/student/test/start-test/{id}` side-by-side with the new version.
+2.  Verify the "Summary Modal" content matches exactly (counts and question grid).
+3.  Verify "Purchased Packages" list shows identical items to the old dashboard.
+4.  Verify homepage "Start" buttons open the new Livewire Package view.
