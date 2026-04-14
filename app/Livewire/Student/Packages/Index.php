@@ -14,10 +14,14 @@ class Index extends Component
     #[Url]
     public string $search = '';
 
-    #[Url]
     public string $type = 'premium'; // premium, free
 
     public array $sortBy = ['column' => 'id', 'direction' => 'desc'];
+
+    public function mount(string $type = 'premium'): void
+    {
+        $this->type = $type;
+    }
 
     #[Layout('components.layouts.student-mary')]
     public function render()
@@ -25,7 +29,7 @@ class Index extends Component
         $user = Auth::user();
         $student = \App\Models\UserDetails::where('user_id', $user->id)->first();
 
-        if (!$student) {
+        if (! $student) {
             return view('livewire.student.packages.index', ['rows' => collect(), 'headers' => []]);
         }
 
@@ -39,21 +43,21 @@ class Index extends Component
             ->select('gn__package_plans.*', 'franchise_details.institute_name as my_institute_name')
             ->where('gn__package_plans.status', 1)
             ->where('gn__package_plans.education_type', $student->education_type)
-            // ->where('gn__package_plans.class', $student->class)
-            ->where(function($q) use ($user) {
+            ->where('gn__package_plans.class', $student->class)
+            ->where(function ($q) use ($user) {
                 $q->where('franchise_details.branch_code', $user->franchise_code)
-                  ->orWhere('gn__package_plans.package_type', 0);
+                    ->orWhere('gn__package_plans.package_type', 0);
             })
-            ->when($this->type == 'premium', function($q) use ($active_plans) {
+            ->when($this->type == 'premium', function ($q) use ($active_plans) {
                 $q->where('gn__package_plans.final_fees', '>', 0)
-                  ->where('gn__package_plans.expire_date', '>=', date('Y-m-d'))
-                  ->whereNotIn('gn__package_plans.id', $active_plans);
+                    ->where('gn__package_plans.expire_date', '>=', date('Y-m-d'))
+                    ->whereNotIn('gn__package_plans.id', $active_plans);
             })
-            ->when($this->type == 'free', function($q) use ($active_plans) {
+            ->when($this->type == 'free', function ($q) use ($active_plans) {
                 $q->where('gn__package_plans.final_fees', '=', 0)
-                  ->whereNotIn('gn__package_plans.id', $active_plans);
+                    ->whereNotIn('gn__package_plans.id', $active_plans);
             })
-            ->when($this->search, function($q) {
+            ->when($this->search, function ($q) {
                 $q->where('plan_name', 'like', '%'.$this->search.'%');
             })
             ->orderBy($this->sortBy['column'], $this->sortBy['direction'])

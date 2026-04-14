@@ -1,0 +1,65 @@
+# Implementation Plan - Student Dashboard Migration & Test Conduct Alignment
+
+This plan addresses the migration of the student dashboard to Livewire while ensuring the "Test Conduct" feature preserves 100% parity with the legacy version. As requested, legacy controllers will be analyzed deeply, and only non-essential, redundant methods will be considered for removal, while preserving the old dashboard for potential future use.
+
+## 0. Pre-requisite: Commit Checkpoint
+Before any changes, we will perform a git commit to mark the current state.
+**Commit Message**: `chore: deep analysis of student controllers and preparation for Livewire migration v2`
+
+## 1. Deep Analysis Report (Controller Methods)
+
+| Controller | Method | Status | Reason |
+| :--- | :--- | :--- | :--- |
+| **DashboardController** | `index` | Keep (Legacy) | Root of old dashboard. |
+| | `profile` | Keep (Legacy) | Root of old profile. |
+| | `verifynumber` / `verifyotp` | **MUST KEEP** | Core OTP logic used by both old & new systems. |
+| | `manage_profile_process` | Keep | Old profile update logic. |
+| **ExamsController** | `index` | Keep (Legacy) | Test listing for old dashboard. |
+| | `package_manage` | **MUST KEEP** | Contains complex logic for package content grouping. |
+| | `getTest` | **MUST KEEP** | Setup logic for test overview. |
+| | `startTest` | Keep (Legacy) | Old test conduct entry point. |
+| | `showResult` | Keep (Legacy) | Old result view. |
+| | `testAttempt` | Keep (Legacy) | Old attempt history report. |
+| **StudentPlanController** | `index` / `myPlan` | Keep (Legacy) | DataTable based listings. |
+| | `checkout` / `finalCheckout` | **MUST KEEP** | Core Razorpay payment logic. |
+| **StudymaterialController** | `show*` (all show methods) | Keep (Legacy) | Legacy material views. |
+| | `download` / `viewMaterial` | **MUST KEEP** | Core file delivery logic. |
+
+> [!NOTE]
+> Based on the requirement to "preserve" the old dashboard, **no methods will be deleted at this stage**. They will stay active under the `/old` route prefix.
+
+## 2. Test Conduct Alignment (OnlineTestRunner)
+
+The following features from the old `start-test.blade.php` will be replicated in `OnlineTestRunner`:
+
+### Phase A: Instruction & Terms Enforcement
+-   [ ] Add `termsAccepted` and `privacyAccepted` properties to `OnlineTestRunner`.
+-   [ ] Modify Blade to wire these to checkboxes and disable "Start Test" until both are checked.
+
+### Phase B: Global Question Palette
+-   [ ] Re-implement the palette to show **ALL questions from ALL sections** in a single grid (standard in competitive exams).
+-   [ ] Color Coding logic:
+    -   **Gray (Base-300)**: Not Visited.
+    -   **Red (Error)**: Visited but not Answered.
+    -   **Green (Success)**: Answered.
+    -   **Warning/Star**: Marked for Review.
+-   [ ] Ensure clicking a question in the palette correctly switches both the section and the question index.
+
+### Phase C: Summary & Review Mode
+-   [ ] Implement a "Summary" view (replacing the old `loc-Modal`) that shows final counts before submission.
+-   [ ] Ensure "Save & Next" on the last question of a section automatically jumps to the next section OR the summary view.
+
+## 3. Preservation Strategy
+-   Maintain `routes/student_old.php` under the `/old` prefix defined in `bootstrap/app.php`.
+-   Rename classes or namespace them if they cause conflicts (though currently they are in separate namespaces: `App\Livewire\Student` vs `App\Http\Controllers\Student`).
+
+## Open Questions
+-   **Q**: Should I create a separate "Legacy" layout for the old pages if they are being preserved, or continue using `Layouts.frontend`?
+-   **Q**: The user mentioned "delete methods... which directly applied on the old student dashboard and nowhere else". Since we are preserving the old dashboard, do you mean we should delete them ONLY after we are 100% sure the new dashboard is stable and the old one is no longer needed at all?
+
+## Verification Plan
+
+### Manual Verification
+1.  Verify `/old/student` still works perfectly as a fallback.
+2.  Verify `/student/test/start-test/{id}` (new) now has the terms agreement logic.
+3.  Verify the palette in the new test conduct shows all questions and updates colors in real-time.

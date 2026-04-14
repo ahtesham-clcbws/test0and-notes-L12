@@ -44,6 +44,12 @@ class ShowResult extends Component
             return redirect()->route('student.dashboard');
         }
 
+        if ($this->test->show_result != 1) {
+            session()->flash('error', 'Result will be displayed soon...');
+
+            return redirect()->back();
+        }
+
         $this->calculateResult();
     }
 

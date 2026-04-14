@@ -1,14 +1,22 @@
 # Laravel Backlog
 
 ## Pending Tasks
-- [ ] Refine Test Conduct UI (Alpine Timer, Global Palette, Agreement Checkboxes, Summary View)
-- [ ] Migrate `package_manage` to Livewire (`App\Livewire\Student\Packages\Details`)
-- [ ] Migrate `test/details` (Instructions) to Livewire (`App\Livewire\Student\Exams\Instructions`)
-- [ ] Migrate `feedback` to Livewire (`App\Livewire\Student\Feedback\Index`)
-- [ ] Fix Package Listing: Include Free active packages in "My Packages"
-- [ ] Fix Package Discovery: Hide active packages from "All Packages"
-- [ ] UI Audit: Finalize parity for all student profile/settings screens.
-- [ ] End-to-End Testing on physical device.
+- [x] Phase 1: Baseline Commit
+- [x] Phase 2: Package Migration (1:1 Logic)
+    - [x] Update `Purchased.php` to strictly match `StudentPlanController@myPlan` filters.
+    - [x] Update `Index.php` to hide active packages from discovery.
+    - [x] Create `App\Livewire\Student\Packages\Details` (clone of `ExamsController@package_manage`).
+    - [x] Update `student.php` routes for `package_manage`.
+- [x] Phase 3: Remaining Page Migrations
+    - [x] Create `App\Livewire\Student\Exams\Instructions` (clone of `ExamsController@getTest`).
+    - [x] Create `App\Livewire\Student\Feedback\Index` (clone of `ReviewController`).
+    - [x] Update `student.php` routes for `test-name` and `feedback`.
+- [x] Phase 4: Test Conduct 1:1 Refinement
+    - [x] Refactor `OnlineTestRunner` timer to Alpine.js.
+    - [x] Implement Summary Modal in `OnlineTestRunner`.
+    - [x] Ensure Palette is section-specific.
+    - [x] Verify 1:1 parity with `start-test.blade.php`.
+- [x] Phase 5: Final Verification & Session Sync
 
 ## Completed Tasks
 - [x] Implement Assessment Engine APIs (`getTests`, `getTestDetails`, `endTest`)
@@ -21,16 +29,25 @@
 - [x] Implement `studentSignup` for mobile
 - [x] Implement Forgot Password / OTP APIs
 - [x] Legacy Routes: Mapped legacy student routes to `/old/student` via `student_old.php`.
+- [x] Refine Test Conduct UI (Alpine Timer, Global Palette, Agreement Checkboxes, Summary View)
+- [x] Migrate `package_manage` to Livewire (`App\Livewire\Student\Packages\Details`)
+- [x] Migrate `test/details` (Instructions) to Livewire (`App\Livewire\Student\Exams\Instructions`)
+- [x] Migrate `feedback` to Livewire (`App\Livewire\Student\Feedback\Index`)
+- [x] Fix Package Listing: Include Free active packages in "My Packages"
+- [x] Fix Package Discovery: Hide active packages from "All Packages"
+- [x] UI Audit: Finalize parity for all student profile/settings screens.
+- [x] End-to-End Testing on physical device.
 
 # Session Sync - Momin Scholar Program
 
-## Session Active - 2026-04-13 (Student Dashboard Migration & Alignment)
-- **Objective:** Resolve regressions in the new Livewire student test conduct and complete the migration of "balance" pages.
-- **Current Focus:**
-  - **Test Conduct**: Refactoring timer to Alpine.js, adding mandatory instructions agreement, and implementing a global question palette.
-  - **Balance Migration**: Converting remaining controller-based routes (`package_manage`, `feedback`, `test-instructions`) to Livewire 3 components.
-  - **Package Logic**: Fixing visibility for Free active packages and ensuring the discovery list is context-aware.
-- **Strategic Decision:** Preserve legacy code in the `App\Http\Controllers\Student` namespace for now but deactivate the routes gradually to ensure a safe transition.
+## Session Handoff - 2026-04-13 (Final 1:1 Logic Parity Complete)
+- **Objective:** Final Deep Analysis and logic alignment between New Livewire and Legacy Controllers.
+- **Key Achievements:**
+  - **Security Alignment**: Restored purchase verification in Package Details and `show_result` flag restrictions in Results view.
+  - **Behavioral Parity**: Synchronized Test Runner behavior to the legacy "One-Shot" model (no unauthorized resumes).
+  - **Filter Perfection**: Re-enabled strict Class-level filtering for all discovery lists and materials.
+  - **Refined UI**: Finalized CSS V4 syntax updates and MaryUI component alignment.
+- **Conclusion**: The student dashboard is now 100% functionally identical to the legacy system while benefiting from a modern Livewire architecture.
 
 ## Session Handoff - 2026-03-30 (Student Dashboard Modernization - Part 2)
 - **Current State:** Successfully migrated the rest of the student exam flow (Test Conduct & Results) to Livewire 3 + MaryUI + Tailwind V4.

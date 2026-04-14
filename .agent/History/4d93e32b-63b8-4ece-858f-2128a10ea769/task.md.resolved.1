@@ -1,0 +1,9 @@
+- [ ] **Phase 6: Final Logic Alignment**
+    - [ ] Enforce `show_result` restriction in `ShowResult.php` [/]
+    - [ ] Align Test Conduct to legacy "One-Shot" behavior in `OnlineTestRunner.php` [ ]
+    - [ ] Fix Material Class filter in `Material\Index.php` [ ]
+    - [ ] Replicate Purchase Verification in `Packages\Details.php` [ ]
+    - [ ] Verify Profile update logic in `Profile\Index.php` [ ]
+- [ ] **Phase 7: Final Cleanup & Regression Test**
+    - [ ] side-by-side verification with `/old` routes.
+    - [ ] Final `vendor/bin/pint` run.

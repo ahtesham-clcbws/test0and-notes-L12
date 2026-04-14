@@ -1,0 +1,53 @@
+# Implementation Plan - Final Student Dashboard Migration & Bug Fixes
+
+This plan details the final steps to achieve 100% Livewire migration for the student dashboard, addressing the "balance migration" pages, fixing the test conduct logic, and resolving package listing issues.
+
+## User Review Required
+
+> [!IMPORTANT]
+> -   **Balance Migration**: We will migrate the remaining controller-based pages (`package_manage`, `feedback`, and `test-instructions`) to Livewire 3 components.
+> -   **JS Refactor**: The Test Conduct timer will be moved to Alpine.js to minimize external JS as requested.
+> -   **Package Visibility**: Free active packages will now be visible in the "Purchased Packages" list.
+
+## Proposed Changes
+
+### 1. Test Conduct (OnlineTestRunner) Fixes
+-   **[MODIFY] [online-test-runner.blade.php](file:///mnt/WebliesNew/test-and-notes-upgrading/resources/views/livewire/student/tests/online-test-runner.blade.php)**:
+    -   Refactor the timer logic into an Alpine.js component (`x-data`).
+    -   Implement the **Mandatory Agreement** section (Instruction Acceptance).
+    -   Implement the **Global Question Palette** (all questions across all sections).
+    -   Implement the **Summary Review** view/modal.
+
+### 2. Balance Migration (New Components)
+-   **[NEW] [Details.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Packages/Details.php)**: Replaces `ExamsController@package_manage`.
+-   **[NEW] [Instructions.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Exams/Instructions.php)**: Replaces `ExamsController@getTest`.
+-   **[NEW] [FeedbackIndex.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Feedback/Index.php)**: Replaces `ReviewController`.
+
+### 3. Package Listing Fixes
+-   **[MODIFY] [Purchased.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Packages/Purchased.php)**: 
+    -   Remove `final_fees > 0` filter so that active free packages are listed in "My Packages".
+-   **[MODIFY] [Index.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Packages/Index.php)**: 
+    -   Ensure packages already in the student's transactions (active) are hidden from the "Discovery/All" list.
+
+### 4. Routing & Cleanup
+-   **[MODIFY] [student.php](file:///mnt/WebliesNew/test-and-notes-upgrading/routes/student.php)**:
+    -   Update `package_manage`, `test-name`, and `feedback` routes to point to the new Livewire components.
+-   **[MODIFY] [bootstrap/app.php](file:///mnt/WebliesNew/test-and-notes-upgrading/bootstrap/app.php)**:
+    -   Remove the "old" student route registration if confirmed stable. (Wait for final verification).
+
+## Documentation & Session Persistence
+-   Update `.agent/session_sync.md` with the Part 3 migration details.
+-   Update `.agent/backlog.md` with the new component tasks.
+
+## Open Questions
+-   Should the "Question Paper" view also be migrated to Livewire, or is the current Blade-only view sufficient?
+
+---
+
+## Verification Plan
+
+### Manual Verification
+1.  Verify "My Packages" contains free active packages.
+2.  Verify clicking "Start" on home redirects to the new Livewire Package View.
+3.  Verify the Test Conduct has a working Alpine.js timer and mandatory checkboxes.
+4.  Verify the Global Palette correctly navigates between all sections.

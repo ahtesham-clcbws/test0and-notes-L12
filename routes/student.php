@@ -4,12 +4,12 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Student\DashboardController;
 use App\Http\Controllers\Student\ExamsController;
-use App\Livewire\Student\Exams\Index as ExamsIndex;
+use App\Http\Controllers\Student\StudentPlanController;
+use App\Http\Controllers\StudymaterialController;
 use App\Http\Middleware\IsStudent;
 use App\Http\Middleware\IsStudentGuest;
 use App\Livewire\Student\Dashboard;
-use App\Http\Controllers\Student\StudentPlanController;
-use App\Http\Controllers\StudymaterialController;
+use App\Livewire\Student\Exams\Index as ExamsIndex;
 use Illuminate\Support\Facades\Route;
 
 Route::name('student.')->group(function () {
@@ -19,7 +19,7 @@ Route::name('student.')->group(function () {
         // Route::any('/forget-password', [AuthController::class, 'forgetPassword'])->middleware(['studentguest'])->name('forget_password');
         Route::middleware([IsStudent::class])->group(function () {
             Route::get('/', Dashboard::class)->name('dashboard');
-            Route::any('/package_manage/{id}', [ExamsController::class, 'package_manage'])->name('package_manage');
+            Route::any('/package_manage/{id}', \App\Livewire\Student\Packages\Details::class)->name('package_manage');
             Route::get('attempt', \App\Livewire\Student\Exams\Attempted::class)->name('test-attempt');
             // Route::any('/profile', [DashboardController::class, 'profile'])->name('profile');
             Route::get('/verifynumber/{mobile_number}', [DashboardController::class, 'verifynumber'])->name('verifynumber');
@@ -30,7 +30,9 @@ Route::name('student.')->group(function () {
 
             Route::prefix('test')->group(function () {
                 // Main Test Hub Redirect
-                Route::get('', function() { return redirect()->route('student.dashboard_tests_list'); });
+                Route::get('', function () {
+                    return redirect()->route('student.dashboard_tests_list');
+                });
 
                 // Institute tests (Coaching specific - the 2 tests you expect)
                 Route::get('institute-tests/{cat?}', ExamsIndex::class)->name('institute_tests');
@@ -40,7 +42,7 @@ Route::name('student.')->group(function () {
                 Route::get('gyanology/{cat?}', ExamsIndex::class)->name('dashboard_gyanology_list');
 
                 // Auxiliary routes
-                Route::get('details/{name}', [ExamsController::class, 'getTest'])->name('test-name');
+                Route::get('details/{name}', \App\Livewire\Student\Exams\Instructions::class)->name('test-name');
                 Route::get('start-test/{testId}', \App\Livewire\Student\Tests\OnlineTestRunner::class)->name('start-test');
                 // Route::get('conduct-test/{testId}', \App\Livewire\Student\Tests\OnlineTestRunner::class)->name('conduct-test');
                 Route::get('question-paper/{test_id}', [ExamsController::class, 'questionPaper'])->name('question-paper');
@@ -56,8 +58,8 @@ Route::name('student.')->group(function () {
             });
 
             Route::prefix('plan')->group(function () {
-                Route::get('', \App\Livewire\Student\Packages\Index::class)->name('plan');
                 Route::get('purchased', \App\Livewire\Student\Packages\Purchased::class)->name('my-plan');
+                Route::get('{type?}', \App\Livewire\Student\Packages\Index::class)->name('plan');
                 Route::post('checkout', [StudentPlanController::class, 'finalCheckout'])->name('package-checkout');
                 Route::any('checkout/{id}', [StudentPlanController::class, 'checkout'])->name('plan-checkout');
                 Route::get('payment-success', [StudentPlanController::class, 'paymentSuccess'])->name('payment-success');
@@ -77,8 +79,7 @@ Route::name('student.')->group(function () {
             });
 
             Route::prefix('feedback')->group(function () {
-                Route::get('', [App\Http\Controllers\Student\ReviewController::class, 'index'])->name('review.index');
-                Route::post('store', [App\Http\Controllers\Student\ReviewController::class, 'store'])->name('review.store');
+                Route::get('', \App\Livewire\Student\Feedback\Index::class)->name('review.index');
             });
 
         });

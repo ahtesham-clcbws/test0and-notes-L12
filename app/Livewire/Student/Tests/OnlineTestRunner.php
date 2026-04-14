@@ -35,10 +35,12 @@ class OnlineTestRunner extends Component
 
     public $attemptId;
 
-    // Set initial view state to instructions (Restore instructions page after terms)
-    public $currentView = 'instructions'; // 'instructions', 'testing', 'review'
+    // State for Summary Modal (Replaces 'review' view for 1:1 parity with old modal)
+    public bool $showSummaryModal = false;
 
-    public $endTimestamp; // Stable timestamp for JS to count down to
+    public $currentView = 'testing'; // Default to testing as instructions are now separate
+
+    public $endTimestamp;
 
     public function mount($testId)
     {
@@ -49,17 +51,9 @@ class OnlineTestRunner extends Component
             ->where('test_id', $testId)
             ->first();
 
-        if ($attempt && $attempt->status === 'completed') {
-            $responsesCount = Gn_Test_Response::where('student_id', Auth::id())
-                ->where('test_id', $testId)
-                ->count();
-
-            if ($responsesCount === 0) {
-                // False completion triggered by timing glitches: Reset to running with a fresh start
-                $attempt->update(['status' => 'running', 'created_at' => now()]);
-            } else {
-                return redirect()->route('student.show-result', [Auth::id(), $testId]);
-            }
+        if ($attempt) {
+            // Strict 1:1 Parity: Old system doesn't allow resume, it always redirects to results if an attempt exists.
+            return redirect()->route('student.show-result', [Auth::id(), $testId]);
         }
 
         if (! $attempt) {
@@ -298,12 +292,18 @@ class OnlineTestRunner extends Component
 
     public function startTest()
     {
+        // Instructions are now in a separate component, this might be redundant but kept for safety
         $this->currentView = 'testing';
+    }
+
+    public function toggleSummaryModal()
+    {
+        $this->showSummaryModal = ! $this->showSummaryModal;
     }
 
     public function goToReview()
     {
-        $this->currentView = 'review';
+        $this->showSummaryModal = true;
     }
 
     public function render()

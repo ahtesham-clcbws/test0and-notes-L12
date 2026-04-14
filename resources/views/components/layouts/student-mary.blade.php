@@ -25,35 +25,12 @@
                 <x-icon name="o-bars-3" class="cursor-pointer" />
             </label>
             <div class="hidden lg:block">
-                <img src="{{ asset('super/images/logo big size.png') }}" class="h-12 w-auto">
+                <img src="{{ asset('images/logo.png') }}" class="h-10 w-auto">
             </div>
         </x-slot:brand>
 
         <x-slot:actions>
-            {{-- INFO ITEMS (LEGACY) --}}
-            <div class="hidden gap-6 mr-6 lg:flex items-center text-sm font-medium opacity-70">
-                @if(auth()->user()->franchise_code)
-                    <div class="flex items-center">
-                        <x-icon name="o-building-office" class="w-4 h-4 mr-1" />
-                        <span>{{ auth()->user()->myInstitute->institute_name }}</span>
-                    </div>
-                @else
-                    <div class="flex items-center text-primary font-bold bg-primary/10 px-3 py-1 rounded-full">
-                        <x-icon name="o-star" class="w-4 h-4 mr-1" />
-                        <span>Premium Student</span>
-                    </div>
-                @endif
 
-                <div class="flex items-center">
-                    <x-icon name="o-calendar" class="w-4 h-4 mr-1" />
-                    <span>Sub: 17 March 2023</span>
-                </div>
-
-                <div class="flex items-center">
-                    <x-icon name="o-briefcase" class="w-4 h-4 mr-1" />
-                    <span>Packages: <span class="badge badge-sm badge-primary">21</span></span>
-                </div>
-            </div>
 
             {{-- USER MENU --}}
             <x-dropdown>

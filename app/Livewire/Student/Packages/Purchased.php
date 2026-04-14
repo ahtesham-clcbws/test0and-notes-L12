@@ -11,22 +11,41 @@ class Purchased extends Component
     use \Livewire\WithPagination;
 
     public string $search = '';
+
     public array $sortBy = ['direction' => 'desc', 'column' => 'id'];
 
     #[Layout('components.layouts.student-mary')]
     public function render()
     {
-        $rows = \App\Models\Gn_PackageTransaction::query()
+        $query = \App\Models\Gn_PackageTransaction::query()
             ->with(['plan'])
             ->where('student_id', Auth::id())
-            ->whereHas('plan', function($q) {
+            ->whereHas('plan', function ($q) {
                 $q->where('final_fees', '>', 0);
             })
             ->when($this->search, function ($query) {
                 $query->where('plan_name', 'like', '%'.$this->search.'%');
             })
-            ->latest()
-            ->paginate(10);
+            ->get()
+            ->sortBy(function ($item) {
+                // Sorting priority: Active (1) > Expired (2) > InQueue (0) > Inactive (3)
+                return match ((int) $item->plan_status) {
+                    1 => 0,
+                    2 => 1,
+                    0 => 2,
+                    3 => 3,
+                    default => 4
+                };
+            })
+            ->unique('plan_id');
+
+        $rows = new \Illuminate\Pagination\LengthAwarePaginator(
+            $query->forPage(\Illuminate\Pagination\Paginator::resolveCurrentPage(), 10),
+            $query->count(),
+            10,
+            \Illuminate\Pagination\Paginator::resolveCurrentPage(),
+            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath()]
+        );
 
         $headers = [
             ['key' => 'plan_name', 'label' => 'Package Name'],

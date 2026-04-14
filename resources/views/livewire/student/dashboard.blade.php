@@ -66,7 +66,7 @@
     </div>
 
     {{-- MOTIVATION FOOTER --}}
-    <div class="flex items-center justify-center p-8 rounded-3xl bg-linear-to-br from-primary/5 to-secondary/5 border border-primary/10">
+    <div class="flex items-center justify-center p-8 rounded-3xl bg-linear-to-br from-indigo-50 to-blue-50 border border-indigo-100">
         <div class="text-center">
             <p class="text-lg italic font-medium text-base-content/80">"{{ $quote }}"</p>
         </div>

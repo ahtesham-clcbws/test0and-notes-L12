@@ -1,0 +1,47 @@
+# Implementation Plan - Full Student Dashboard Migration & Bug Fixes
+
+This plan outlines the final steps to fully migrate the student dashboard to Livewire, fixing critical bugs in test conduct and package listing, and ensuring architectural consistency by minimizing external JS.
+
+## User Review Required
+
+> [!IMPORTANT]
+> -   The `package_manage` route will be migrated to a new Livewire component. This affects how package contents (tests/materials) are viewed.
+> -   The Test Conduct timer will be refactored to use Alpine.js for a more "Livewire-native" feel.
+
+## Proposed Changes
+
+### 1. Test Conduct (OnlineTestRunner) Refinement
+-   **Phase A: JS Refactoring**: Move the `countdown` logic from a raw `<script>` tag into an Alpine.js `x-data` component. This will use Livewire 3's bundled Alpine.js more effectively.
+-   **Phase B: Parity Fixes**:
+    -   Add mandatory Instructions & Terms agreement checkboxes.
+    -   Implement a **Global Question Palette** that shows all questions from all sections with color-coded status (Attempted, Visited, Marked).
+    -   Add a **Summary View** before final submission to show a breakdown of attempted/unattempted questions.
+
+### 2. Package Management Migration
+-   **[NEW] [View.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Packages/View.php)**: Create a new Livewire component to replace the legacy `package_manage` logic in `ExamsController`.
+-   **[MODIFY] [Purchased.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Packages/Purchased.php)**: Update the query to include both paid and free active packages (removing the `final_fees > 0` constraint).
+-   **[MODIFY] [student.php](file:///mnt/WebliesNew/test-and-notes-upgrading/routes/student.php)**: Update the `package_manage` route to point to the new Livewire `View` component.
+
+### 3. Balance Migration & Cleanup
+-   Review any remaining routes in `student_old.php` and ensure they are either redundant or have a Livewire equivalent.
+-   Update any hardcoded links in `resources/views/Frontend/home.blade.php` (if any, though they typically use `route()`).
+
+### 4. Git Checkpoint
+-   Perform a git commit before starting execution: `bash git commit -m "chore: baseline before student dashboard migration and test conduct fixes"`.
+
+## Documentation Sync (.agent)
+-   Update `session_sync.md` with the new migration status.
+-   Update `backlog.md` with the specific tasks for Test Conduct and Packages.
+
+## Open Questions
+-   Should the "Free" packages that were previously excluded from "My Plan" now be visible in the main "Purchased Packages" list, or should they have their own tab?
+
+---
+
+## Verification Plan
+
+### Manual Verification
+1.  Click "Start" on a purchased package from the homepage; verify it opens the new Livewire dashboard view.
+2.  Check the "Purchased Packages" list in the student panel; verify that active free packages now appear.
+3.  Conduct a test; verify that the timer is accurate (Alpine.js) and that the agreement checkboxes are mandatory.
+4.  Verify the summary view before final submission.

@@ -1,0 +1,65 @@
+# Implementation Plan - Student Dashboard Transition & Test Conduct Fixes
+
+The goal is to resolve issues in the new Livewire-based student test conduct and completely remove legacy Controller-based student dashboard components to ensure a clean, modern codebase.
+
+## User Review Required
+
+> [!IMPORTANT]
+> The legacy student routes (prefixed with `/old`) will be completely removed. Any users currently using those routes will need to use the new dashboard at `/student`.
+
+> [!WARNING]
+> We will delete the `DashboardController`, `ExamsController`, and `StudentPlanController` under `App\Http\Controllers\Student`. Ensure no other parts of the system (like Admin or Franchise) depend on these specific student controllers.
+
+## Proposed Changes
+
+### 1. Fix Test Conduct (Livewire)
+
+#### [MODIFY] [OnlineTestRunner.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Tests/OnlineTestRunner.php)
+-   Update `loadQuestionsStructure` to filter out deleted pivot records (respecting `deleted_at`).
+-   Add an `agreedToTerms` property and logic to prevent starting without agreement.
+-   Refine the `saveAndNext` logic to handle the transition to the Review screen more gracefully.
+
+#### [MODIFY] [online-test-runner.blade.php](file:///mnt/WebliesNew/test-and-notes-upgrading/resources/views/livewire/student/tests/online-test-runner.blade.php)
+-   Enforce the "I agree to all instructions and terms" checkbox by wiring it to Livewire state.
+-   Improve the Question Palette:
+    -   Add global question numbers (1 to Total).
+    -   Add color coding for "Not Visited" (Gray), "Visited but not Attempted" (Red), and "Attempted" (Green).
+    -   Allow switching between all sections from the palette.
+-   Improve the Review view summary layout.
+
+### 2. Cleanup Legacy Code
+
+#### [MODIFY] [bootstrap/app.php](file:///mnt/WebliesNew/test-and-notes-upgrading/bootstrap/app.php)
+-   Remove the "old" student route registration block.
+
+#### [DELETE] [student_old.php](file:///mnt/WebliesNew/test-and-notes-upgrading/routes/student_old.php)
+#### [DELETE] [old.php](file:///mnt/WebliesNew/test-and-notes-upgrading/routes/old.php)
+
+#### [DELETE] Student Controllers
+-   `app/Http/Controllers/Student/DashboardController.php`
+-   `app/Http/Controllers/Student/ExamsController.php`
+-   `app/Http/Controllers/Student/StudentPlanController.php`
+-   `app/Http/Controllers/StudymaterialController.php` (Verify if used by Admin/Franchise first).
+
+#### [DELETE] Legacy Student Views
+-   `resources/views/Dashboard/Student/` (Recursive)
+-   `resources/views/Frontend/online-test.blade.php`
+-   `resources/views/Frontend/start-test.blade.php`
+-   `resources/views/Frontend/show-result.blade.php`
+
+## Open Questions
+
+-   Is `StudymaterialController` used by Franchise or Admin? If so, I will only remove student-specific methods or move them.
+-   Are there any "Free" packages that were specifically handled by the old controller but not the new Livewire components? (I will verify the logic in `package_manage`).
+
+## Verification Plan
+
+### Automated Tests
+-   Run existing Feature tests if any (Check `tests/Feature/StudentTest.php`).
+-   `php artisan test --filter=OnlineTest`
+
+### Manual Verification
+-   Test the "Conduct Test" flow from Start to Finish.
+-   Verify that clicking "I agree" is mandatory.
+-   Verify color coding in the question palette.
+-   Verify that `/old/student` routes now returns 404.

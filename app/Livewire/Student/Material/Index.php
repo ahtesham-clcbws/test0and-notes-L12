@@ -12,7 +12,9 @@ class Index extends Component
     use \Livewire\WithPagination;
 
     public string $search = '';
+
     public string $category = 'Study Notes & E-Books'; // Default
+
     public array $sortBy = ['column' => 'id', 'direction' => 'desc'];
 
     #[Layout('components.layouts.student-mary')]
@@ -27,6 +29,7 @@ class Index extends Component
             default => 'Study Notes & E-Books'
         };
     }
+
     public function render()
     {
         $stud_id = Auth::id();
@@ -46,11 +49,11 @@ class Index extends Component
             ->where('study_material.material_seen', 1)
             ->where('study_material.category', $this->category)
             ->where('study_material.education_type', $userDetails->education_type)
-            // ->where('study_material.class', $userDetails->class) // Optional, some system layouts are different
+            ->where('study_material.class', $userDetails->class)
             ->whereIn('study_material.institute_id', [Auth::user()->myInstitute?->id, 0])
             ->when($this->search, function ($query) {
                 $query->where('study_material.title', 'like', '%'.$this->search.'%')
-                      ->orWhere('study_material.sub_title', 'like', '%'.$this->search.'%');
+                    ->orWhere('study_material.sub_title', 'like', '%'.$this->search.'%');
             })
             ->orderBy($this->sortBy['column'], $this->sortBy['direction'])
             ->paginate(10);
