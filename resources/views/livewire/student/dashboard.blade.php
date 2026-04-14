@@ -9,8 +9,9 @@
                 ['title' => 'Test Attempt', 'value' => $testAttemptCount, 'image' => 'student1/images/test_attempt.png', 'color' => '#fece5e', 'link' => route('student.test-attempt')],
                 ['title' => 'Institute Test', 'value' => $testInstitute, 'image' => 'student1/images/institute_test.png', 'color' => '#ace1f9', 'link' => route('student.institute_tests')],
             ];
-            foreach($test_cat as $item) {
-                $grid1[] = ['title' => $item->cat_name, 'value' => $testCount[$item->id] ?? 0, 'image' => 'storage/'.$item->cat_image, 'color' => '#dee9a2', 'link' => route('student.dashboard_gyanology_list', ['cat' => $item->id])];
+            foreach($this->test_cat as $item) {
+                $imgPath = str_starts_with($item->cat_image, 'student') ? $item->cat_image : 'storage/'.$item->cat_image;
+                $grid1[] = ['title' => $item->cat_name, 'value' => $this->testCount[$item->id] ?? 0, 'image' => $imgPath, 'color' => '#dee9a2', 'link' => route('student.dashboard_gyanology_list', ['cat' => $item->id])];
             }
         @endphp
 
@@ -38,9 +39,9 @@
         @php
             $grid2 = [
                 ['title' => 'Study Notes', 'value' => $notes_count, 'image' => 'student1/images/student_note.png', 'color' => '#facacb', 'link' => route('student.show')],
-                ['title' => 'Comprehensive', 'value' => $comprehensive_count, 'image' => 'student1/images/institute_test.png', 'color' => '#ace1f9', 'link' => route('student.showComprehensive')],
-                ['title' => 'Short Notes', 'value' => $short_notes_count, 'image' => 'student1/images/institute_test.png', 'color' => '#dee9a2', 'link' => route('student.showShortNotes')],
-                ['title' => 'Premium Notes', 'value' => $premium_count, 'image' => 'student1/images/institute_test.png', 'color' => '#facacb', 'link' => route('student.showPremium')],
+                ['title' => 'Comprehensive', 'value' => $comprehensive_count, 'image' => 'student1/images/5.png', 'color' => '#ace1f9', 'link' => route('student.showComprehensive')],
+                ['title' => 'Short Notes', 'value' => $short_notes_count, 'image' => 'student1/images/6.png', 'color' => '#dee9a2', 'link' => route('student.showShortNotes')],
+                ['title' => 'Premium Notes', 'value' => $premium_count, 'image' => 'student1/images/7.png', 'color' => '#facacb', 'link' => route('student.showPremium')],
                 ['title' => 'Live Classes', 'value' => $video_count, 'image' => 'student1/images/video_note.png', 'color' => '#fff466', 'link' => route('student.showvideo')],
                 ['title' => 'Current Affairs', 'value' => $gk_count, 'image' => 'student1/images/gk.png', 'color' => '#c6c4e1', 'link' => route('student.showgk')],
             ];
