@@ -9,9 +9,16 @@
                 ['title' => 'Test Attempt', 'value' => $testAttemptCount, 'image' => 'student1/images/test_attempt.png', 'color' => '#fece5e', 'link' => route('student.test-attempt')],
                 ['title' => 'Institute Test', 'value' => $testInstitute, 'image' => 'student1/images/institute_test.png', 'color' => '#ace1f9', 'link' => route('student.institute_tests')],
             ];
+            
             foreach($this->test_cat as $item) {
-                $imgPath = str_starts_with($item->cat_image, 'student') ? $item->cat_image : 'storage/'.$item->cat_image;
-                $grid1[] = ['title' => $item->cat_name, 'value' => $this->testCount[$item->id] ?? 0, 'image' => $imgPath, 'color' => '#dee9a2', 'link' => route('student.dashboard_gyanology_list', ['cat' => $item->id])];
+                $staticIcon = match($item->cat_name) {
+                    'New Test' => 'student1/images/1.png',
+                    'Original Test' => 'student1/images/2.png',
+                    'Previous Test' => 'student1/images/3.png',
+                    'Premium Test' => 'student1/images/4.png',
+                    default => 'student1/images/1.png'
+                };
+                $grid1[] = ['title' => $item->cat_name, 'value' => $this->testCount[$item->id] ?? 0, 'image' => $staticIcon, 'color' => '#dee9a2', 'link' => route('student.dashboard_gyanology_list', ['cat' => $item->id])];
             }
         @endphp
 
