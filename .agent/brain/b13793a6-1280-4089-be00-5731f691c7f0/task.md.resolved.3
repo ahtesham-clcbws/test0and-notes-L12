@@ -1,0 +1,15 @@
+- [ ] Implement UI for `instructions.blade.php` (Legend, Left-split white area, Right-split green area)
+- [ ] Implement Server-Side Security in `OnlineTestRunner.php`
+    - [ ] `selectQuestion` guard: restrict to `visitedQuestions` + current frontier
+    - [ ] New `reviewSelectQuestion` guard: restrict to `markedQuestions` (Yellow Star only)
+    - [ ] Ensure `visitedQuestions` is persisted correctly on "Save & Next" or skip
+- [ ] Implement UI and Timer fixes for `online-test-runner.blade.php`
+    - [ ] Absolute Timestamp Timer logic (JS countdown to Epoch with 00:00:00 protection)
+    - [ ] Sidebar Palette: Rigid HTML `disabled` state for locked questions
+    - [ ] Transform `review` view: Full-screen grid view (replacing `x-modal`)
+    - [ ] Re-styled Header/Tabs and Action Buttons (Mark for Review, Clear, Save & Next)
+- [ ] Implement Results Grid UI in `show-result.blade.php`
+    - [ ] Header summary row (Right, Wrong, Not Attempted)
+    - [ ] 10xN Grid of Bubbles (Red/Green/Grey)
+    - [ ] Interaction: Toggle modal/popover to view solution for clicked question
+- [ ] Final verification and walkthrough

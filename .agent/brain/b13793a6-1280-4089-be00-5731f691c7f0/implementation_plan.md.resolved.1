@@ -1,0 +1,63 @@
+# Test Conduct Deep UI Redesign & Navigation Restrictions
+
+This plan outlines the changes required to align the test conduct flow (Instructions, Testing, Review, Results) with the structural layouts and functionality provided in the screenshots. It includes the strict navigation rules requested.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Strict Navigation Rule**: 
+> In testing mode, the user will only be able to click on questions in the sidebar palette if they have already visited them. They cannot skip ahead by clicking future question numbers in the palette; they must use the "Save & Next", "Clear", or "Mark for Review" buttons to progress sequentially.
+> **Review Mode Rule**:
+> On the Review screen, clicking a question in the grid will *only* navigate back to the question if that question was marked for review (Yellow Star). Regular attempted/not attempted questions cannot be revisited.
+
+## Proposed Changes
+
+### Component: Instructions
+#### [MODIFY] [instructions.blade.php](file:///mnt/WebliesNew/test-and-notes-upgrading/resources/views/livewire/student/exams/instructions.blade.php)
+- Restructure the UI to match Screenshot 1.
+- Make the main area hold the instructions text with a newly added visual "Legend" showing the icons/colors for Attempted (Green), Not Attempted (Grey), and Mark for Review (Yellow Star/Green).
+- Move the profile card and "Start Test" button into a right-side panel with a light green background strip to match the mock.
+
+### Component: Test Runner (Conduct & Review)
+#### [MODIFY] [OnlineTestRunner.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Tests/OnlineTestRunner.php)
+- Update `selectQuestion` logic. It will reject attempts to select a question if the question is unvisited AND is not strictly the "next" question.
+- Update `saveAndNext` to accurately advance the "current" frontier index, adding questions to `visitedQuestions`.
+- Change navigation entirely for the Review page: create a `reviewModeQuestionClick($qId)` method that only allows navigation back if `in_array($qId, this->markedQuestions)`.
+
+#### [MODIFY] [online-test-runner.blade.php](file:///mnt/WebliesNew/test-and-notes-upgrading/resources/views/livewire/student/tests/online-test-runner.blade.php)
+- **Header & Info Bar:** Re-align text to match Screenshot 2. Green/Red text formatting.
+- **Section Tabs:** Flatten the tabs to simple green/grey boxes.
+- **Action Buttons:** Change buttons at the bottom of the question ("Mark for Review", "Clear Response", "Save & Next") to match the exact size and horizontal layout of the mock (using standard colors but removing heavy shadows/gradients). 
+- **Sidebar Palette:** Ensure circles are distinctly Grey, Green, or have a Yellow Star hovering near them. Disable clicking on locked/unvisited questions completely in the UI (`disabled` attribute).
+- **Review Page (Screenshot 3):** Remove the default Modal (`x-modal`). Replace it with a dedicated full-width `div` that triggers when `$showSummaryModal` (or `$currentView == 'review'`) is true.
+    - Show the horizontal stats blocks.
+    - Show the full test grid of circles.
+    - Ensure circles only have a `wire:click` attached if `isMarked` is true, enforcing the "only revisit reviewed questions" rule. Add a massive "Final Submit" button at the bottom.
+
+### Component: Test Results
+#### [MODIFY] [ShowResult.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Tests/ShowResult.php)
+- Add state variable `$selectedQuestionForSolution` and a method `viewSolution($questionId)` to wire up to an interactive grid.
+
+#### [MODIFY] [show-result.blade.php](file:///mnt/WebliesNew/test-and-notes-upgrading/resources/views/livewire/student/tests/show-result.blade.php)
+- Replace the current stacked collapsible list of solutions with the grid layout from Screenshot 4.
+- Create a top row showing "Right Answer" (Green list), "Wrong Answer" (Red list), "Not Attempted" (Grey list).
+- Create a large grid of circles colored Red/Green/Grey based on the student's answer.
+- Append a subtitle: "Click on each question for right answer & solutions".
+- When a student clicks a circle, pop up a minimalist modal showing the original question, options, the correct answer, and the solution text.
+
+## Open Questions
+
+> [!WARNING]
+> Regarding the Test Runner navigation: Currently, the old platform requires you to just click "Save & Next" to step through the test. If a student leaves a question completely blank and clicks "Save & Next", we will consider that "Skipped" (Not Attempted) but "Visited" (meaning they can go back to it via the sidebar because they unlocked it). Is this correct?
+
+## Verification Plan
+
+### Automated Tests
+- N/A - Visual UI layout restructuring.
+
+### Manual Verification
+1. Access the test instructions preview visually.
+2. Enter testing mode and attempt to click a future unvisited question in the palette (must be denied/disabled).
+3. Attempt to jump back to a *visited* question (must be allowed).
+4. Go to Review Mode. Attempt to click a green/grey circle (must be inert). Click a yellow star circle (must jump back to that question).
+5. Load result page, verify grid of Red/Green/Grey bubbles, and verify modal opens on click.

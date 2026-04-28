@@ -33,6 +33,16 @@ class ShowResult extends Component
 
     public $final_marks = 0;
 
+    public $selectedQuestionId = null;
+
+    public bool $showSolutionModal = false;
+
+    public function viewSolution($questionId)
+    {
+        $this->selectedQuestionId = $questionId;
+        $this->showSolutionModal = true;
+    }
+
     public function mount($student_id, $test_id)
     {
         $this->studentId = $student_id;

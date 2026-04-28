@@ -42,6 +42,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('testAndNotesTest', [ApiController::class, 'testAndNotesTest']);
     Route::post('startTestAndNotesTest', [ApiController::class, 'startTestAndNotesTest']);
     Route::post('attempttedtest', [ApiController::class, 'attempttedTest']);
+    Route::post('saveanswer', [ApiController::class, 'saveAnswer']);
     Route::post('endtest', [ApiController::class, 'endTest']);
 
     Route::post('createRazorpayOrder', [ApiController::class, 'createRazorpayOrder']);

@@ -69,6 +69,11 @@
                                     {{ auth()->user()->user_details->class_data?->name ?? '' }}
                                 </small>
                             @endif
+                            @if(auth()->user()->myInstitute)
+                                <br><small style="color: #6c757d; font-weight: normal;">
+                                    {{ auth()->user()->myInstitute->institute_name }}
+                                </small>
+                            @endif
                         </div>
                     </div>
                 </div>

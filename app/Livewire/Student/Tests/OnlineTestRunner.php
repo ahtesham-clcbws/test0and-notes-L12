@@ -166,13 +166,31 @@ class OnlineTestRunner extends Component
 
     public function selectQuestion($secIndex, $qIndex)
     {
+        $requestedQId = $this->questionsList[$secIndex][$qIndex] ?? null;
+
+        // SERVER-SIDE GUARD: Only allow if question is already visited
+        if (! in_array($requestedQId, $this->visitedQuestions)) {
+            // Check if it's the sequential "next" question (frontier)
+            // But usually we force use of "Save & Next" to advance.
+            // If we want to be strict: only allow already visited questions.
+            return;
+        }
+
         $this->currentSectionIndex = $secIndex;
         $this->currentQuestionIndex = $qIndex;
+    }
 
-        $currentQId = $this->getCurrentQuestionId();
-        if ($currentQId && ! in_array($currentQId, $this->visitedQuestions)) {
-            $this->visitedQuestions[] = $currentQId;
-            $this->updateDraftState();
+    /**
+     * Specialized selection for Review screen - only allowed for Marked questions
+     */
+    public function reviewSelectQuestion($secIndex, $qIndex)
+    {
+        $requestedQId = $this->questionsList[$secIndex][$qIndex] ?? null;
+
+        if (in_array($requestedQId, $this->markedQuestions)) {
+            $this->currentSectionIndex = $secIndex;
+            $this->currentQuestionIndex = $qIndex;
+            $this->showSummaryModal = false; // Close review view
         }
     }
 

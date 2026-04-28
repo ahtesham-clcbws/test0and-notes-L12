@@ -64,7 +64,10 @@
         </div>
         <hr>
         <div class="text-center">
-            <p>Copyright &copy; 2024 SQS Foundation. All rights reserved.</p>
+            <p class="mb-0">Copyright &copy; 2024 SQS Foundation. All rights reserved.</p>
+            <span style="font-size: 3px; color: #666; display: block; margin-top: -5px;">
+                v2.0.2
+            </span>
         </div>
     </div>
 </footer>

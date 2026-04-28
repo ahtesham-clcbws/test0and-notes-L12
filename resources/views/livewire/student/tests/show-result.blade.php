@@ -1,144 +1,137 @@
-<div>
-    <x-header title="{{ $test->title ?? 'Online Test' }}" subtitle="Completed & Evaluated" size="text-3xl" separator progress-indicator>
-        <x-slot:actions>
-            <x-button label="Back to Dashboard" icon="o-arrow-left" link="{{ route('student.dashboard_tests_list') }}" />
-            <x-button label="View Attempts History" icon="o-list-bullet" link="/student/attempt" class="btn-primary" />
-        </x-slot:actions>
-    </x-header>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        {{-- Sidebar Score Panel --}}
-        <div class="lg:col-span-1">
-            <x-card title="Test Result" class="shadow-sm border border-base-200 bg-base-100 sticky top-4">
-                
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center pb-3 border-b border-base-200">
-                        <span class="text-base-content/70">Total Questions</span>
-                        <span class="font-bold text-lg">{{ $test->total_questions ?? $total_question }}</span>
-                    </div>
-
-                    <div class="flex justify-between items-center pb-3 border-b border-base-200">
-                        <span class="text-base-content/70">Attempted</span>
-                        <x-badge value="{{ $total_question - $not_attempted }}" class="badge-success badge-lg font-bold" />
-                    </div>
-
-                    <div class="flex justify-between items-center pb-3 border-b border-base-200">
-                        <span class="text-base-content/70">Not Attempted</span>
-                        <x-badge value="{{ $not_attempted }}" class="badge-neutral badge-lg font-bold" />
-                    </div>
-
-                    <div class="flex justify-between items-center pb-3 border-b border-base-200">
-                        <div>
-                            <span class="text-success font-bold flex items-center gap-1"><x-icon name="o-check-circle" class="w-4 h-4" /> Right Answers</span>
-                        </div>
-                        <div class="text-right">
-                            <span class="font-bold text-success">{{ $correct_answer }}</span>
-                            <div class="text-xs text-base-content/50">{{ $out_of_marks }} Marks</div>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-between items-center pb-3 border-b border-base-200">
-                        <div>
-                            <span class="text-error font-bold flex items-center gap-1"><x-icon name="o-x-circle" class="w-4 h-4" /> Wrong Answers</span>
-                        </div>
-                        <div class="text-right">
-                            <span class="font-bold text-error">{{ $incorrect_answer }}</span>
-                            <div class="text-xs text-base-content/50">-{{ $negative_marks }} Marks</div>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-between items-center pt-2">
-                        <span class="font-bold text-xl">Final Score</span>
-                        <span class="font-bold text-4xl text-primary">{{ $final_marks }}</span>
-                    </div>
-                </div>
-            </x-card>
+<div class="max-w-7xl mx-auto p-6 md:p-12 bg-white min-h-screen">
+    
+    {{-- Header Section (Mock style) --}}
+    <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b-2 border-gray-100 pb-8">
+        <div>
+            <div class="text-error font-bold text-sm uppercase tracking-widest mb-2">Qs: {{ $total_question }}</div>
+            <h1 class="text-4xl font-bold text-success uppercase tracking-tighter">{{ $test->title }}</h1>
         </div>
-
-        {{-- Detailed Question Responses / Solutions --}}
-        <div class="lg:col-span-2">
-            @if ($test->show_answer == 1)
-                @foreach ($test->testSections as $secIndex => $section)
-                    <div class="mb-8">
-                        <h3 class="text-2xl font-bold text-primary mb-4 pb-2 border-b border-primary/20 flex items-center gap-2">
-                            <x-icon name="o-rectangle-stack" class="w-7 h-7" />
-                            {{ $section->sectionSubject->name }}
-                        </h3>
-                        
-                        <div class="space-y-4">
-                            @foreach ($section->getQuestions()->wherePivot('deleted_at', '=', null)->get() as $qIndex => $question)
-                                @php
-                                    $response = \App\Models\Gn_Test_Response::where('student_id', $studentId)
-                                        ->where('test_id', $testId)
-                                        ->where('question_id', $question->id)
-                                        ->first();
-                                    
-                                    $isCorrect = $response && $response->answer === $question->mcq_answer;
-                                    $isUnattempted = !$response || $response->answer === null || $response->answer === '';
-
-                                    $badgeClass = $isUnattempted ? 'badge-neutral' : ($isCorrect ? 'badge-success' : 'badge-error');
-                                    $badgeLabel = $isUnattempted ? 'Not Attempted' : ($isCorrect ? 'Correct' : 'Incorrect');
-                                @endphp
-
-                                <details class="collapse collapse-arrow bg-base-100 border border-base-200 shadow-sm" open>
-                                    <summary class="collapse-title text-lg font-medium flex items-center gap-3">
-                                        <span class="w-8 h-8 rounded-full bg-base-200 flex items-center justify-center text-sm font-bold">{{ $qIndex + 1 }}</span>
-                                        <span class="flex-1 line-clamp-1">{!! strip_tags($question->question) !!}</span>
-                                        <x-badge value="{{ $badgeLabel }}" class="{{ $badgeClass }}" />
-                                    </summary>
-                                    <div class="collapse-content px-6 pb-6 border-t border-base-200 pt-4">
-                                        <div class="prose max-w-none text-base-content mb-6">
-                                            {!! $question->question !!}
-                                        </div>
-
-                                        <div class="space-y-3 mb-6">
-                                            @for ($k = 1; $k <= $question->mcq_options; $k++)
-                                                @php 
-                                                    $optKey = 'ans_' . $k;
-                                                    $itemClass = 'bg-base-50 border-base-200';
-                                                    
-                                                    if ($question->mcq_answer === $optKey) {
-                                                        $itemClass = 'bg-success/10 border-success text-success-content';
-                                                    } elseif ($response && $response->answer === $optKey && !$isCorrect) {
-                                                        $itemClass = 'bg-error/10 border-error text-error-content';
-                                                    }
-                                                @endphp
-                                                <div class="p-3 rounded-lg border flex gap-3 {{ $itemClass }}">
-                                                    <span class="font-bold opacity-70">({{ chr(64 + $k) }})</span>
-                                                    <div class="prose max-w-none m-0 {!! $itemClass !!}">{!! $question->$optKey !!}</div>
-                                                </div>
-                                            @endfor
-                                        </div>
-
-                                        @if ($test->show_solution == 1 && ($question->solution || $question->explanation))
-                                            <div class="bg-primary/5 border border-primary/20 rounded-lg p-5 mt-4">
-                                                @if ($question->solution)
-                                                    <div class="mb-3">
-                                                        <h4 class="font-bold text-primary flex items-center gap-2 mb-2"><x-icon name="o-light-bulb" class="w-5 h-5"/> Solution</h4>
-                                                        <div class="prose max-w-none text-sm">{!! $question->solution !!}</div>
-                                                    </div>
-                                                @endif
-                                                @if ($question->explanation)
-                                                    <div>
-                                                        <h4 class="font-bold text-primary flex items-center gap-2 mb-2 mt-4 pt-4 border-t border-primary/10"><x-icon name="o-book-open" class="w-5 h-5"/> Explanation</h4>
-                                                        <div class="prose max-w-none text-sm">{!! $question->explanation !!}</div>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        @endif
-                                    </div>
-                                </details>
-                            @endforeach
-                        </div>
-                    </div>
-                @endforeach
-            @else
-                <div class="flex flex-col items-center justify-center p-12 bg-base-100 border border-base-200 rounded-xl text-center shadow-sm">
-                    <x-icon name="o-lock-closed" class="w-20 h-20 text-warning mb-4" />
-                    <h3 class="text-2xl font-bold mb-2">Detailed Review Locked</h3>
-                    <p class="text-base-content/70">Responses & solutions for this exam are currently hidden by the administrator.</p>
-                </div>
-            @endif
+        <div class="text-right">
+            <h2 class="text-5xl font-bold text-gray-900 leading-none">Result</h2>
         </div>
     </div>
+
+    {{-- Main Container (Mock Screenshot 4 Style) --}}
+    <div class="border-2 border-gray-100 rounded-[3rem] p-8 md:p-16 shadow-2xl shadow-gray-200/50 bg-white">
+        
+        {{-- Summary Stats Bars --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+            <div class="flex items-center gap-4 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+                <span class="w-8 h-8 rounded-full bg-success shrink-0"></span>
+                <div class="flex-1 flex items-center justify-between">
+                    <span class="font-bold text-gray-700 uppercase text-xs tracking-widest">Right Answer</span>
+                    <span class="text-2xl font-bold text-success">{{ $correct_answer }}</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+                <span class="w-8 h-8 rounded-full bg-error shrink-0"></span>
+                <div class="flex-1 flex items-center justify-between">
+                    <span class="font-bold text-gray-700 uppercase text-xs tracking-widest">Wrong Answer</span>
+                    <span class="text-2xl font-bold text-error">{{ $incorrect_answer }}</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+                <span class="w-8 h-8 rounded-full bg-gray-300 shrink-0"></span>
+                <div class="flex-1 flex items-center justify-between">
+                    <span class="font-bold text-gray-700 uppercase text-xs tracking-widest">Not Attempted</span>
+                    <span class="text-2xl font-bold text-gray-400">{{ $not_attempted }}</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Question Grid --}}
+        @if($test->show_answer == 1)
+            <div class="flex flex-wrap gap-4 justify-center mb-16 px-4">
+                @php 
+                    $globalIndex = 1;
+                    $responses = \App\Models\Gn_Test_Response::where('student_id', $studentId)
+                        ->where('test_id', $testId)
+                        ->get()
+                        ->keyBy('question_id');
+                    $allQuestions = $test->getQuestions()->get();
+                @endphp
+
+                @foreach ($allQuestions as $index => $question)
+                    @php
+                        $resp = $responses->get($question->id);
+                        $isCorrect = $resp && $resp->answer === $question->mcq_answer;
+                        $isUnattempted = !$resp || $resp->answer === null || $resp->answer === '';
+                        
+                        $bgColor = 'bg-gray-100 text-gray-400 border-gray-100'; // Not attempted
+                        if (!$isUnattempted) {
+                            $bgColor = $isCorrect ? 'bg-success text-white border-success shadow-lg shadow-success/20' : 'bg-error text-white border-error shadow-lg shadow-error/20';
+                        }
+                    @endphp
+                    <button 
+                        wire:click="viewSolution({{ $question->id }})"
+                        class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm border transition-all hover:scale-110 active:scale-95 {{ $bgColor }}"
+                    >
+                        {{ $globalIndex++ }}
+                    </button>
+                @endforeach
+            </div>
+
+            <div class="text-center">
+                <p class="text-gray-400 font-bold mb-8 uppercase tracking-widest text-xs">Click on each question for right answer & solutions</p>
+                <div class="text-4xl font-bold text-primary uppercase tracking-tighter">
+                    Total Marks : {{ $total_marks }}/{{ $final_marks }}
+                </div>
+            </div>
+        @else
+            <div class="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+                <x-icon name="o-lock-closed" class="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Detailed Results Locked</h3>
+                <p class="text-gray-500 font-medium">Administrator has disabled individual question review for this test.</p>
+            </div>
+        @endif
+    </div>
+
+    {{-- SOLUTION MODAL --}}
+    @if($showSolutionModal && $selectedQuestionId)
+        @php $q = \App\Models\QuestionBankModel::find($selectedQuestionId); @endphp
+        <x-modal wire:model="showSolutionModal" class="backdrop-blur">
+            <div class="space-y-6">
+                <div class="text-error font-bold text-xs uppercase tracking-widest">Question Details</div>
+                <div class="prose prose-lg max-w-none text-gray-900 font-bold">
+                    {!! $q->question !!}
+                </div>
+
+                <div class="grid grid-cols-1 gap-3">
+                    @for ($k = 1; $k <= $q->mcq_options; $k++)
+                        @php 
+                            $optKey = 'ans_' . $k;
+                            $resp = \App\Models\Gn_Test_Response::where('student_id', $studentId)->where('test_id', $testId)->where('question_id', $q->id)->first();
+                            $isCorrectOpt = $q->mcq_answer === $optKey;
+                            $isStudentOpt = $resp && $resp->answer === $optKey;
+                            
+                            $optClass = 'border-gray-100 bg-gray-50/50';
+                            if ($isCorrectOpt) $optClass = 'border-success bg-success/5 text-success';
+                            elseif ($isStudentOpt) $optClass = 'border-error bg-error/5 text-error';
+                        @endphp
+                        <div class="p-4 rounded-xl border-2 font-bold flex gap-4 {{ $optClass }}">
+                            <span class="opacity-50">({{ chr(64 + $k) }})</span>
+                            <div class="flex-1">{!! $q->$optKey !!}</div>
+                            @if($isCorrectOpt) <x-icon name="s-check-circle" class="w-5 h-5" /> @endif
+                            @if($isStudentOpt && !$isCorrectOpt) <x-icon name="s-x-circle" class="w-5 h-5" /> @endif
+                        </div>
+                    @endfor
+                </div>
+
+                @if($test->show_solution == 1 && ($q->solution || $q->explanation))
+                    <div class="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                        <h4 class="font-bold text-gray-900 uppercase text-xs tracking-widest mb-4 flex items-center gap-2">
+                            <x-icon name="o-light-bulb" class="w-4 h-4 text-warning" /> Solution & Explanation
+                        </h4>
+                        <div class="prose prose-sm max-w-none text-gray-600">
+                            @if($q->solution) {!! $q->solution !!} @endif
+                            @if($q->explanation) <div class="mt-4 pt-4 border-t border-gray-100">{!! $q->explanation !!}</div> @endif
+                        </div>
+                    </div>
+                @endif
+
+                <x-button label="Close" wire:click="$set('showSolutionModal', false)" class="w-full btn-ghost font-bold" />
+            </div>
+        </x-modal>
+    @endif
+
 </div>

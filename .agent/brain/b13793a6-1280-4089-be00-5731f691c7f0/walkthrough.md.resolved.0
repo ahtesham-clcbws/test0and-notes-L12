@@ -1,0 +1,34 @@
+# Dynamic Footer Versioning Walkthrough
+
+I have implemented a dynamic versioning system for the frontend footer and established a strict workflow for builds and deployments.
+
+## Changes Made
+
+### 1. Version Management
+- **`version.json`**: Created a source of truth for the application version.
+- **`config/app.php`**: Integrated the version into the Laravel configuration for easy access via `config('app.version')`.
+
+### 2. Automation Scripts & Workflows
+- **`.agent/scripts/increment-version.php`**: A utility script to increment either the patch (last) or minor (middle) constraint.
+- **`.agent/workflows/push.md`**: A new workflow tagged with `/push`. This workflow automates:
+    - Version incrementing.
+    - Frontend build (`npm run build`).
+    - Code linting (`pint`).
+    - Pre-push verification.
+
+### 3. Frontend Integration
+- **`footer.blade.php`**: Added the version display at the bottom of the footer.
+    - **Aesthetics**: Styled with a **4px font size** as requested, positioned subtly below the copyright notice.
+
+## Verification Results
+
+- **Version Increment**: Tested the script; version correctly advanced from `2.0.0` to `2.0.1`.
+- **Code Quality**: Ran `vendor/bin/pint --dirty` to ensure all changes match project standards.
+- **Footer Display**: Verified the blade template logic uses the dynamic version from config.
+
+## How to use the new workflow
+To prepare for your next push, simply use the following slash command:
+`/push`
+
+> [!IMPORTANT]
+> Always run the `/push` workflow before your actual `git push` command to ensure the footer version is updated and the latest assets are built.

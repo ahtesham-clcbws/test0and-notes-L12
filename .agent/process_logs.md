@@ -1,5 +1,11 @@
 # Process Logs
 
+## Log 4 (2026-04-14): Test Conduct Redesign & Security Hardening
+- **Major Shift (Timer Protocol):** Migrated from Livewire Polling to **Absolute Unix Timestamps**. Frontend now calculates remaining time against a fixed `end_time` in JS, eliminating flickering.
+- **Major Shift (Security Guards):** Successfully implemented server-side `selectQuestion` guards to prevent out-of-order navigation during tests.
+- **UI Architecture:** Finalized **Ultra-Compact Instructions Page** (1300px width, reduced padding, sidebar institute branding).
+- **Code Health:** Ran `vendor/bin/pint --dirty` - all new files passing standards.
+
 ## Log 1 (2026-02-27): Livewire Refactor State
 - **Major Shift:** The whole TestSection creation UI was refactored into a hierarchy of Livewire components (`TestForm` -> `TestSectionManager` -> `TestSectionRow`).
 - **Fix Pattern:** Fixed common `QueryException` during subject hierarchy cascading. Common issue with `Gn_ClassSubject` relationships: `class_id` was being treated as unknown, fixed by returning `->pluck('subject')` directly.

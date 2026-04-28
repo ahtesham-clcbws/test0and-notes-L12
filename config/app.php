@@ -28,6 +28,8 @@ return [
 
     'env' => env('APP_ENV', 'production'),
 
+    'version' => json_decode(file_get_contents(base_path('version.json')), true),
+
     /*
     |--------------------------------------------------------------------------
     | Application Debug Mode

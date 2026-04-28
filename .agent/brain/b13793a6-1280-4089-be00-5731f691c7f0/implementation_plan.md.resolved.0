@@ -1,0 +1,52 @@
+# Dynamic Footer Versioning and Workflow
+
+Add a version number to the frontend footer that updates automatically before each deployment/push. The version will follow a `major.minor.patch` format (v2 branch) and be managed via a JSON file and a custom increment script.
+
+## User Review Required
+
+> [!IMPORTANT]
+> The versioning script will increment the **patch** version (last digit) by default. You can specify a **minor** (middle digit) increment via a flag in the workflow script.
+> The version will be displayed in the footer with a font size of 4px as requested.
+
+## Proposed Changes
+
+### Version Management
+#### [NEW] [version.json](file:///mnt/WebliesNew/test-and-notes-upgrading/version.json)
+Create a `version.json` file in the root to store the current version state.
+```json
+{
+    "major": 2,
+    "minor": 0,
+    "patch": 0
+}
+```
+
+#### [MODIFY] [app.php](file:///mnt/WebliesNew/test-and-notes-upgrading/config/app.php)
+Expose the version to the application by reading it from `version.json`.
+```php
+'version' => json_decode(file_get_contents(base_path('version.json')), true),
+```
+
+### Scripting & Automation
+#### [NEW] [increment-version.php](file:///mnt/WebliesNew/test-and-notes-upgrading/.agent/scripts/increment-version.php)
+A PHP script to handle version increments (middle or last constraint).
+
+#### [NEW] [push.md](file:///mnt/WebliesNew/test-and-notes-upgrading/.agent/workflows/push.md)
+A new workflow to automate the update process:
+1. Increment version.
+2. Run `npm run build`.
+3. Run `vendor/bin/pint --dirty`.
+4. Inform user that the project is ready for `git push`.
+
+### Frontend
+#### [MODIFY] [footer.blade.php](file:///mnt/WebliesNew/test-and-notes-upgrading/resources/views/livewire/frontend/components/footer.blade.php)
+Add the version number to the bottom of the footer with the requested styling (4px).
+
+## Verification Plan
+
+### Automated Tests
+- Run the `increment-version.php` script and verify `version.json` update.
+- Run the `push` workflow steps manually to ensure they complete without errors.
+
+### Manual Verification
+- Check the footer in the browser to ensure the version is visible and correctly styled at 4px.

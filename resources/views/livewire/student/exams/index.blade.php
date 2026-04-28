@@ -71,7 +71,7 @@
                         <x-button
                             label="Start Test"
                             icon="o-play"
-                            link="{{ route('student.start-test', [$test->id]) }}"
+                            link="{{ route('student.test-name', [$test->id]) }}"
                             class="btn-sm btn-primary" />
                     @endif
                     <x-button

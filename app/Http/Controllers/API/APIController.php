@@ -98,7 +98,7 @@ class APIController extends Controller
     public function userDetails(Request $request)
     {
         $user = Auth::user();
-        
+
         return response()->json(['status' => 1, 'user_details' => $user]);
     }
 
@@ -329,55 +329,46 @@ class APIController extends Controller
         if (empty($test)) {
             return response()->json(['status' => 0, 'msg' => 'No test found']);
         }
-        $old_test_response = Gn_Test_Response::where('student_id', Auth::user()->id)->where('test_id', $request->test_id);
 
-        if (! empty($old_test_response->get())) {
-            $old_test_response->delete();
-        }
-
-        foreach ($request->attemted_questions as $value) {
-            $test_response = new Gn_Test_Response;
-            $test_response->student_id = Auth::user()->id;
-            $test_response->test_id = $request->test_id;
-            if ($value['answer'] == '') {
-                $test_response->question_id = $value['question_id'];
-            } else {
-                $test_response->question_id = $value['question_id'];
-                $test_response->answer = $value['answer'];
+        // 1. Process any final answers sent in the request (if any)
+        if ($request->has('attemted_questions')) {
+            foreach ($request->attemted_questions as $value) {
+                if ($value['answer'] == '') {
+                    Gn_Test_Response::where('student_id', Auth::id())
+                        ->where('test_id', $request->test_id)
+                        ->where('question_id', $value['question_id'])
+                        ->delete();
+                } else {
+                    Gn_Test_Response::updateOrCreate(
+                        ['student_id' => Auth::id(), 'test_id' => $request->test_id, 'question_id' => $value['question_id']],
+                        ['answer' => $value['answer']]
+                    );
+                }
             }
-            $test_response->save();
         }
 
-        $old_student_test = Gn_StudentTestAttempt::where('student_id', Auth::user()->id)->where('test_id', $request->test_id);
+        // 2. Update status to completed
+        $attempt = Gn_StudentTestAttempt::where('student_id', Auth::id())
+            ->where('test_id', $request->test_id)
+            ->first();
 
-        if (! empty($old_student_test->get())) {
-            $old_student_test->delete();
+        if ($attempt) {
+            $attempt->update(['status' => 'completed']);
+        } else {
+            // Fallback for edge cases where attempt wasn't initialized
+            $attempt = Gn_StudentTestAttempt::create([
+                'student_id' => Auth::id(),
+                'test_id' => $request->test_id,
+                'test_attempt' => 1,
+                'status' => 'completed',
+            ]);
         }
 
-        $student_test = new Gn_StudentTestAttempt;
-        $student_test->student_id = Auth::user()->id;
-        $student_test->test_id = $request->test_id;
-        $student_test->test_attempt = 1;
-        $student_test->save();
-
-        // if ($test == 1) {
-        //     return  response()->json(['status' => 1, 'msg' => 'Save Successfully']);
-        // } else {
-        //     return  response()->json(['status' => 1, 'msg' => 'Save Sucessfully']);
-        // }
-        $result = [];
-        foreach ($request->attemted_questions as $value) {
-            $solution = DB::table('question_bank')->where('id', $value['question_id'])->first()->solution;
-            $mcq_answer = DB::table('question_bank')->where('id', $value['question_id'])->first()->mcq_answer;
-            $result[] = [
-                'question_id' => $value['question_id'],
-                'answer' => $value['answer'],
-                'solution' => $solution,
-                'mcq_answer' => $mcq_answer,
-            ];
-        }
-
-        return response()->json(['status' => 1, 'msg' => 'Save Successfully', 'result' => $result]);
+        return response()->json([
+            'status' => 1,
+            'msg' => 'Test submitted successfully',
+            'test_attempt_id' => $attempt->id,
+        ]);
     }
 
     public function studentSignup(Request $request)
@@ -1083,10 +1074,10 @@ class APIController extends Controller
                 $test->dynamic_duration = $test->testSections->sum(function ($section) {
                     return ($section->number_of_questions ?? 0) * ($section->duration ?: 1);
                 });
-                
+
                 // Flag if this test matches student's class
                 $test->is_student_class = ($test->education_type_id == $education_type && $test->education_type_child_id == $class);
-                
+
                 unset($test->testSections); // Clean up response
             });
 
@@ -1140,14 +1131,170 @@ class APIController extends Controller
             // Ensure sections show duration
             $test->testSections->transform(function ($section) {
                 $section->duration = $section->duration ?: 1;
+
                 return $section;
             });
+
+            // Initialize/Fetch Attempt record (Mirroring OnlineTestRunner.php logic)
+            $attempt = Gn_StudentTestAttempt::where('student_id', Auth::id())
+                ->where('test_id', $request->test_id)
+                ->first();
+
+            if (! $attempt) {
+                $attempt = Gn_StudentTestAttempt::create([
+                    'student_id' => Auth::id(),
+                    'test_id' => $request->test_id,
+                    'test_attempt' => 1,
+                    'status' => 'running',
+                ]);
+            }
 
             return response()->json([
                 'status' => 1,
                 'data' => [
                     'test' => $test,
                     'sections' => $test->testSections,
+                    'questions' => $formatted_questions,
+                    'test_attempt_id' => $attempt->id,
+                    'status' => $attempt->status,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 0, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function saveAnswer(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'test_id' => 'required|exists:test,id',
+            'question_id' => 'required|exists:question_bank,id',
+            'answer' => 'nullable',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 0, 'message' => $validator->errors()->first()]);
+        }
+
+        try {
+            if ($request->answer === null || $request->answer === '') {
+                Gn_Test_Response::where('student_id', Auth::id())
+                    ->where('test_id', $request->test_id)
+                    ->where('question_id', $request->question_id)
+                    ->delete();
+            } else {
+                Gn_Test_Response::updateOrCreate(
+                    ['student_id' => Auth::id(), 'test_id' => $request->test_id, 'question_id' => $request->question_id],
+                    ['answer' => $request->answer]
+                );
+            }
+
+            return response()->json(['status' => 1, 'message' => 'Answer saved successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 0, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function getTestResult(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'test_id' => 'required|exists:test,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 0, 'message' => $validator->errors()->first()]);
+        }
+
+        try {
+            $student_id = Auth::id();
+            $test_id = $request->test_id;
+
+            $test = TestModal::with(['testSections'])->find($test_id);
+            if (! $test) {
+                return response()->json(['status' => 0, 'message' => 'Test not found']);
+            }
+
+            $responses = Gn_Test_Response::where('student_id', $student_id)
+                ->where('test_id', $test_id)
+                ->get()
+                ->keyBy('question_id');
+
+            $allQuestions = $test->getQuestions()->get();
+
+            $correct = 0;
+            $incorrect = 0;
+            $unattempted = 0;
+            $sections_stats = [];
+
+            // Initialize section stats
+            foreach ($test->testSections as $section) {
+                $sections_stats[$section->id] = [
+                    'id' => $section->id,
+                    'name' => $section->name,
+                    'correct' => 0,
+                    'incorrect' => 0,
+                    'unattempted' => 0,
+                    'total' => 0,
+                ];
+            }
+
+            $formatted_questions = [];
+            foreach ($allQuestions as $q) {
+                $resp = $responses->get($q->id);
+                $status = 'unattempted';
+                $user_answer = $resp ? $resp->answer : null;
+
+                if ($user_answer === null || $user_answer === '') {
+                    $unattempted++;
+                    $status = 'unattempted';
+                } elseif ($q->mcq_answer == $user_answer) {
+                    $correct++;
+                    $status = 'correct';
+                } else {
+                    $incorrect++;
+                    $status = 'incorrect';
+                }
+
+                $section_id = $q->pivot->section_id;
+                if (isset($sections_stats[$section_id])) {
+                    $sections_stats[$section_id][$status]++;
+                    $sections_stats[$section_id]['total']++;
+                }
+
+                $formatted_questions[] = [
+                    'id' => $q->id,
+                    'question' => $q->question,
+                    'options' => [
+                        $q->option_1,
+                        $q->option_2,
+                        $q->option_3,
+                        $q->option_4,
+                        $q->option_5,
+                    ],
+                    'correct_answer' => $q->mcq_answer,
+                    'user_answer' => $user_answer,
+                    'status' => $status,
+                    'solution' => $q->solution,
+                ];
+            }
+
+            $marks_per_q = $test->gn_marks_per_questions ?? 1;
+            $neg_rate = $test->negative_marks ?? 0;
+
+            $total_score = ($correct * $marks_per_q) - ($incorrect * ($neg_rate * $marks_per_q));
+            $max_score = $allQuestions->count() * $marks_per_q;
+
+            return response()->json([
+                'status' => 1,
+                'data' => [
+                    'test_name' => $test->title,
+                    'total_score' => round($total_score, 2),
+                    'max_score' => $max_score,
+                    'accuracy' => $allQuestions->count() > 0 ? round(($correct / $allQuestions->count()) * 100, 2) : 0,
+                    'correct' => $correct,
+                    'incorrect' => $incorrect,
+                    'unattempted' => $unattempted,
+                    'sections' => array_values($sections_stats),
                     'questions' => $formatted_questions,
                 ],
             ]);

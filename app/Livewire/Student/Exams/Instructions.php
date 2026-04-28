@@ -37,8 +37,8 @@ class Instructions extends Component
             return redirect()->route('student.dashboard');
         }
 
-        $this->test_duration = $this->test->duration;
-        $this->user_data = UserDetails::where('user_id', Auth::id())->first();
+        $this->test_duration = $this->test->time_to_complete ?: 60;
+        $this->user_data = UserDetails::with(['education_type_data', 'class_data'])->where('user_id', Auth::id())->first();
     }
 
     public function startTest()

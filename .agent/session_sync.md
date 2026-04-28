@@ -16,7 +16,13 @@
     - [x] Implement Summary Modal in `OnlineTestRunner`.
     - [x] Ensure Palette is section-specific.
     - [x] Verify 1:1 parity with `start-test.blade.php`.
-- [x] Phase 5: Final Verification & Session Sync
+- [x] Phase 5: Test Conduct Redesign & Security Hardening
+    - [x] Redesign Instructions page (Compact UI, Header dots, Sidebar card).
+    - [x] Implement Server-side guards for sequential navigation.
+    - [x] Switch to Absolute Timestamp Timer (Flicker-free).
+    - [x] Visual Question Bubble Grid in Results with Solution Modal.
+    - [x] Unify Global Sidebar Profile (Add Institute name).
+- [x] Phase 6: Final Verification & Session Sync
 
 ## Completed Tasks
 - [x] Implement Assessment Engine APIs (`getTests`, `getTestDetails`, `endTest`)
@@ -39,6 +45,16 @@
 - [x] End-to-End Testing on physical device.
 
 # Session Sync - Momin Scholar Program
+
+## Session Handoff - 2026-04-14 (Test Conduct Redesign & Security Hardening Complete)
+- **Objective:** Modernize the student test conduct interface, enforce strict sequential navigation, and unify global profile styling.
+- **Key Achievements:**
+  - **Ultra-Compact Instructions Page**: Redesigned the instructions page based on Screenshot 1/2 logic. Features a one-line header, dot-separated specs, and a center-aligned student card with Institute branding.
+  - **Security Hardening**: Implemented server-side guards in `OnlineTestRunner.php` to enforce sequential navigation. Skipping questions or out-of-order access is now strictly blocked at the controller level.
+  - **Absolute Timer Protocol**: Eliminated timer flicker by syncing with an absolute Unix timestamp. The UI performs high-precision JS countdowns independent of Livewire polling cycles.
+  - **Result Visuals**: Built a color-coded "bubble" grid on the results page with an interactive modal for reviewing solutions.
+  - **Global Profile Consistency**: Unified the sidebar profile display (Avatar, Name, Education Type, Class, and Institute) across the dashboard and test flow for 1:1 design continuity.
+- **Next Steps:** Proceed to production deployment (git push) after final verification.
 
 ## Session Handoff - 2026-04-13 (Final 1:1 Logic Parity Complete)
 - **Objective:** Final Deep Analysis and logic alignment between New Livewire and Legacy Controllers.

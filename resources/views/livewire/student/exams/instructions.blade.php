@@ -1,107 +1,104 @@
-<div class="py-6 px-4 md:px-8 max-w-7xl mx-auto">
-    {{-- Main Content and Sidebar --}}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="max-w-325 mx-auto py-2 px-2 min-h-screen">
+    <div class="flex flex-col lg:flex-row bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden min-h-[50vh]">
         
-        {{-- Instructions Section --}}
-        <div class="lg:col-span-2 space-y-8">
-            <x-card class="shadow-sm border-gray-100" title="{{ $test->title }}">
-                <div class="text-sm font-bold text-primary-600 bg-primary-50 px-4 py-3 rounded-xl inline-flex items-center gap-4 mb-6">
-                    <span class="flex items-center gap-1.5"><x-icon name="o-clock" class="w-4 h-4" /> {{ $test_duration }} Minutes</span>
-                    <span class="w-1 h-1 bg-primary-300 rounded-full"></span>
-                    <span class="flex items-center gap-1.5"><x-icon name="o-queue-list" class="w-4 h-4" /> {{ $test->sections }} Sections</span>
-                    <span class="w-1 h-1 bg-primary-300 rounded-full"></span>
-                    <span class="flex items-center gap-1.5"><x-icon name="o-question-mark-circle" class="w-4 h-4" /> {{ $test->total_questions }} Questions</span>
+        {{-- LEFT PANEL: INSTRUCTIONS --}}
+        <div class="flex-1 p-3 md:p-5 bg-white">
+            <div class="mb-4">
+                <h1 class="text-xl font-bold text-gray-900 uppercase tracking-tight mb-1">{{ $test->title }}</h1>
+                <div class="text-[10px] font-normal text-gray-600">
+                    ({{ $test->sections }} Sections) • Duration: {{ $test_duration }} Minutes • Questions: {{ $test->total_questions }}
                 </div>
-
-                <div class="prose prose-slate max-w-none">
-                    <h3 class="text-xl font-black text-gray-900 mb-4">Exam Instructions</h3>
-                    <div class="space-y-4 text-gray-600 leading-relaxed font-medium">
-                        <p>1. Please read the questions carefully before answering. Each question has a specific time limit and marking scheme.</p>
-                        <p>2. Ensure you have a stable internet connection. If the test is interrupted, your progress up to the last saved answer will be preserved.</p>
-                        <p>3. Do not refresh or close the browser window during the test. Use the "Save & Next" button to proceed through questions.</p>
-                        <p>4. You can use the "Mark for Review" feature to flag questions you want to return to later before final submission.</p>
-                    </div>
-
-                    <div class="mt-8 space-y-3 pt-6 border-t border-gray-50">
-                        <x-checkbox 
-                            label="I agree to all terms & conditions" 
-                            wire:model.live="termsAccepted" 
-                            class="checkbox-primary font-bold"
-                        />
-                        @error('termsAccepted') <span class="text-error text-xs font-bold block ml-8">{{ $message }}</span> @enderror
-
-                        <x-checkbox 
-                            label="I accept the privacy policy and data usage terms" 
-                            wire:model.live="privacyAccepted" 
-                            class="checkbox-primary font-bold"
-                        />
-                        @error('privacyAccepted') <span class="text-error text-xs font-bold block ml-8">{{ $message }}</span> @enderror
-                    </div>
+                <div class="text-[9px] font-bold text-gray-400 mt-1">
+                    {{ date('d M Y', strtotime($test->created_at)) }} <br>
+                    <span class="text-error uppercase tracking-widest font-bold">Live Test</span>
                 </div>
-            </x-card>
+            </div>
 
-            {{-- Section Breakdown (Optional but useful for parity if they want detailed info) --}}
-            <x-card class="shadow-sm border-gray-100" title="Section Distribution">
-                <div class="space-y-6">
-                    @foreach($test->getSection as $section)
-                        <div class="p-4 rounded-2xl bg-gray-50/50 border border-gray-100">
-                            <h5 class="font-black text-gray-800 mb-3 flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-primary-500"></span>
-                                {{ $section->sectionSubject->name }}
-                            </h5>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-bold uppercase tracking-widest text-gray-400">
-                                <div class="space-y-1">
-                                    <p class="text-[10px] opacity-70">Questions</p>
-                                    <p class="text-gray-700">{{ $section->number_of_questions }}</p>
-                                </div>
-                                <div class="space-y-1">
-                                    <p class="text-[10px] opacity-70">Type</p>
-                                    <p class="text-gray-700">{{ $section->question_type == '1' ? 'MCQ' : 'Text' }}</p>
-                                </div>
-                                <div class="space-y-1">
-                                    <p class="text-[10px] opacity-70">Part</p>
-                                    <p class="text-gray-700 truncate">{{ $section->sectionSubjectPart->name ?? 'N/A' }}</p>
-                                </div>
-                                <div class="space-y-1">
-                                    <p class="text-[10px] opacity-70">Lesson</p>
-                                    <p class="text-gray-700 truncate">{{ $section->sectionSubjectLesson->name ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </x-card>
-        </div>
-
-        {{-- Sidebar Section --}}
-        <div class="space-y-6">
-            <x-card class="shadow-sm border-gray-100 text-center">
-                <div class="flex flex-col items-center gap-4 py-4">
-                    <div class="relative">
-                        <x-avatar image="{{ '/storage/'.$user_data->photo_url }}" class="w-32! h-32! border-4 border-white shadow-xl" />
-                        <div class="absolute bottom-1 right-1 w-6 h-6 bg-green-500 border-4 border-white rounded-full"></div>
-                    </div>
-                    <div class="space-y-1">
-                        <h2 class="text-2xl font-black text-gray-900">{{ auth()->user()->name }}</h2>
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">{{ $user_data->educationType?->name }} • {{ $user_data->classType?->name }}</p>
+            <div class="mb-6">
+                <h3 class="text-xs font-bold text-gray-900 border-b border-gray-900 w-16 pb-0.5 mb-4">Instruction</h3>
+                
+                {{-- LEGEND BOX (Ultra-Compact) --}}
+                <div class="bg-gray-50/50 rounded-lg border border-gray-100 p-2 flex flex-row items-center justify-between mb-6 max-w-xl">
+                    <div class="flex items-center gap-2 flex-1 justify-center">
+                        <span class="w-6 h-6 rounded-full bg-success"></span>
+                        <span class="font-bold text-gray-700 text-[10px]">Attempted</span>
                     </div>
                     
-                    <div class="w-full pt-6">
-                        <x-button 
-                            label="Start Test Now" 
-                            icon="o-bolt" 
-                            wire:click="startTest" 
-                            class="btn-primary btn-lg btn-block rounded-2xl font-black text-lg shadow-lg shadow-primary-200"
-                            :disabled="!$termsAccepted || !$privacyAccepted"
-                        />
+                    <div class="w-px h-6 bg-gray-200"></div>
+                    
+                    <div class="flex items-center gap-2 flex-1 justify-center">
+                        <span class="w-6 h-6 rounded-full bg-gray-300"></span>
+                        <span class="font-bold text-gray-700 text-[10px]">Not Attempted</span>
+                    </div>
+                    
+                    <div class="w-px h-6 bg-gray-200"></div>
+                    
+                    <div class="flex items-center gap-3 flex-[1.5] justify-center">
+                        <div class="flex items-center gap-1">
+                            <span class="w-6 h-6">
+                                <x-icon name="s-star" class="w-6 h-6 text-warning" />
+                            </span>
+                            <div class="relative w-6 h-6">
+                                <span class="w-6 h-6 rounded-full bg-success block"></span>
+                                <x-icon name="s-star" class="w-4 h-4 text-warning absolute -top-1 -right-1" />
+                            </div>
+                            <div class="relative w-6 h-6">
+                                <span class="w-6 h-6 rounded-full bg-gray-300 block"></span>
+                                <x-icon name="s-star" class="w-4 h-4 text-warning absolute -top-1 -right-1" />
+                            </div>
+                        </div>
+                        <span class="font-bold text-gray-700 text-[10px]">Mark for Review</span>
                     </div>
                 </div>
-            </x-card>
 
-            <x-alert icon="o-exclamation-triangle" class="bg-amber-50 border-amber-200 text-amber-700 text-xs font-bold leading-relaxed">
-                Ensure you have finished all your preparations before starting. The timer will start immediately.
-            </x-alert>
+                <div class="space-y-2 text-gray-700 font-normal text-[10px] leading-tight max-w-2xl">
+                    <p>0.25% marks will be deducted for each wrong answer</p>
+                    <p>2 marks will be provided for each correct answer.</p>
+                    <p>Total time will be allotted / count for whole test, time will not be calculated for each question</p>
+                    <p>Time for test is set to according to the server.</p>
+                </div>
+            </div>
+
+            {{-- ACCEPTANCE --}}
+            <div class="space-y-1 pt-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" wire:model.live="termsAccepted" class="w-3.5 h-3.5 border-gray-300 rounded" />
+                    <span class="font-normal text-gray-700 text-[10px]">I have read and understood all instructions provided above.</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" wire:model.live="privacyAccepted" class="w-3.5 h-3.5 border-gray-300 rounded" />
+                    <span class="font-normal text-gray-700 text-[10px]">I understand that any attempt to use unfair means will lead to disqualification.</span>
+                </label>
+            </div>
         </div>
 
+        {{-- RIGHT PANEL Overlay Sidebar --}}
+        <div class="w-full lg:w-80 bg-[#edf5e1] flex flex-col p-3 items-center border-l border-gray-100">
+            <div class="w-full flex-1 flex flex-col items-center">
+                <div class="bg-white rounded-xl p-3 w-full flex flex-col items-center text-center shadow-sm">
+                    <x-avatar image="{{ '/storage/'.$user_data->photo_url }}" class="w-14! h-14! rounded-full border-2 border-gray-50 mb-2" />
+                    
+                    <h2 class="text-xs font-bold text-gray-900 mb-0.5">{{ auth()->user()->name }}</h2>
+                    <div class="font-normal truncate text-gray-500" style="font-size: 0.75rem;">
+                         {{ $user_data->education_type_data?->name ?? '' }} / {{ $user_data->class_data?->name ?? '' }}
+                    </div>
+                    
+                    @if(auth()->user()->myInstitute)
+                        <div class="font-normal truncate text-gray-500 mt-0.5" style="font-size: 0.7rem;">
+                            {{ auth()->user()->myInstitute->institute_name }}
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="w-full mt-auto flex justify-center pb-2">
+                <x-button 
+                    label="Start Test" 
+                    wire:click="startTest" 
+                    class="btn-success btn-sm px-6 text-white font-bold text-xs rounded transition-all"
+                    :disabled="!$termsAccepted || !$privacyAccepted"
+                />
+            </div>
+        </div>
     </div>
 </div>

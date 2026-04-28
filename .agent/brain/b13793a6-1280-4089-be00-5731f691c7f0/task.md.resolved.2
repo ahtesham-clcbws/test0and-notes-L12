@@ -1,0 +1,14 @@
+- [ ] Implement UI for `instructions.blade.php` (Legend, Sidebar split, light green accents)
+- [ ] Implement Server-Side Navigation Constraints in `OnlineTestRunner.php`
+    - [ ] `selectQuestion`: restrict to `visitedQuestions` or the next sequential question
+    - [ ] `reviewSelectQuestion` (new): restrict to `markedQuestions`
+    - [ ] Auto-submit validation ensuring time is not exceeded server-side
+- [ ] Implement UI and Timer fixes for `online-test-runner.blade.php`
+    - [ ] Fix Timer logic to use absolute `endTimestamp` countdown via JS
+    - [ ] Restyle Tabs, Header, and Action Buttons
+    - [ ] Build rigid Sidebar Palette reflecting state and restricting clicks entirely via HTML `disabled` state
+    - [ ] Implement `review` view state (fullscreen grid instead of modal)
+- [ ] Implement Results Grid UI in `show-result.blade.php`
+    - [ ] Summary counts at the top (Right, Wrong, Not Attempted)
+    - [ ] Grid of bubbles (Green/Red/Grey)
+    - [ ] Interactive modal/expand to view exact question/solution using Livewire state
