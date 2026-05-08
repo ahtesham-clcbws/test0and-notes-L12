@@ -1,32 +1,4 @@
-<div x-data="{ 
-        endTimestamp: {{ $endTimestamp }},
-        timeLeft: 0,
-        timer: '00:00:00',
-        init() {
-            this.updateCounter();
-            setInterval(() => this.updateCounter(), 1000);
-        },
-        updateCounter() {
-            let now = new Date().getTime();
-            this.timeLeft = Math.max(0, Math.floor((this.endTimestamp - now) / 1000));
-            
-            if (this.timeLeft <= 0) {
-                this.timer = '00:00:00';
-                {{-- Only trigger submit once --}}
-                if (!this.submitted) {
-                    this.submitted = true;
-                    $wire.submitTest();
-                }
-                return;
-            }
-
-            let h = Math.floor(this.timeLeft / 3600);
-            let m = Math.floor((this.timeLeft % 3600) / 60);
-            let s = this.timeLeft % 60;
-            this.timer = (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
-        },
-        submitted: false
-    }" class="min-h-screen bg-gray-50 flex flex-col">
+<div class="min-h-screen bg-gray-50 flex flex-col">
 
     {{-- 1. HEADER (Matches Screenshot 2/3 Style) --}}
     <div class="bg-white border-b border-gray-100 shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-40">
@@ -34,7 +6,33 @@
             <h2 class="text-2xl font-bold text-success uppercase tracking-tight">{{ $test->title }}</h2>
         </div>
         <div class="flex items-center gap-8 md:gap-16">
-            <div class="text-center">
+            <div class="text-center" wire:ignore x-data="{ 
+                endTimestamp: {{ $endTimestamp }},
+                timer: '00:00:00',
+                submitted: false,
+                init() {
+                    this.update();
+                    setInterval(() => this.update(), 1000);
+                },
+                update() {
+                    let now = Date.now();
+                    let diff = Math.max(0, Math.floor((this.endTimestamp - now) / 1000));
+                    
+                    if (diff <= 0) {
+                        this.timer = '00:00:00';
+                        if (!this.submitted) {
+                            this.submitted = true;
+                            $wire.submitTest();
+                        }
+                        return;
+                    }
+
+                    let h = Math.floor(diff / 3600);
+                    let m = Math.floor((diff % 3600) / 60);
+                    let s = diff % 60;
+                    this.timer = [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
+                }
+            }">
                 <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Time Left</div>
                 <div class="text-2xl font-bold text-error font-mono tracking-tighter" x-text="timer">00:00:00</div>
             </div>
@@ -229,11 +227,9 @@
                                 if ($isMarked) { $class = 'bg-warning text-white border-warning'; }
                             @endphp
                             <button 
-                                {{-- SERVER-SIDE GUARDED: Only clickable if Marked --}}
-                                @if(!$isMarked) disabled @endif
                                 wire:click="reviewSelectQuestion({{ $secIndex }}, {{ $loop->index }})"
-                                class="w-12 h-12 rounded-full flex items-center justify-center font-bold relative transition-all
-                                {{ $isMarked ? 'hover:scale-110 active:scale-95 shadow-lg shadow-warning/20' : 'opacity-50 cursor-default' }}
+                                class="w-12 h-12 rounded-full flex items-center justify-center font-bold relative transition-all hover:scale-110 active:scale-95
+                                {{ $isMarked ? 'shadow-lg shadow-warning/20' : '' }}
                                 {{ $class }}" 
                             >
                                 {{ $globalIndex++ }}

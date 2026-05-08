@@ -181,13 +181,13 @@ class OnlineTestRunner extends Component
     }
 
     /**
-     * Specialized selection for Review screen - only allowed for Marked questions
+     * Specialized selection for Review screen - allows selecting ANY question
      */
     public function reviewSelectQuestion($secIndex, $qIndex)
     {
         $requestedQId = $this->questionsList[$secIndex][$qIndex] ?? null;
 
-        if (in_array($requestedQId, $this->markedQuestions)) {
+        if ($requestedQId) {
             $this->currentSectionIndex = $secIndex;
             $this->currentQuestionIndex = $qIndex;
             $this->showSummaryModal = false; // Close review view

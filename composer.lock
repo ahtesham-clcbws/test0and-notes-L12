@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fe77832ad70511241e784e97c55aab80",
+    "content-hash": "1d1c1fb94e6e33f20d97ea0d97860616",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -284,6 +284,74 @@
                 }
             ],
             "time": "2024-02-09T16:56:22+00:00"
+        },
+        {
+            "name": "clcbws/laravel-schema-sentinel",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ahtesham-clcbws/laravel-schema-sentinel.git",
+                "reference": "5f81cc64bb39a3a28a5e13fe5af4c3dfd6014da6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ahtesham-clcbws/laravel-schema-sentinel/zipball/5f81cc64bb39a3a28a5e13fe5af4c3dfd6014da6",
+                "reference": "5f81cc64bb39a3a28a5e13fe5af4c3dfd6014da6",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "^13.0|^12.0|^11.0",
+                "illuminate/database": "^13.0|^12.0|^11.0",
+                "illuminate/support": "^13.0|^12.0|^11.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0|^10.0",
+                "phpunit/phpunit": "^10.0|^11.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Sentinel": "Sentinel\\SchemaSentinel\\Facades\\Sentinel"
+                    },
+                    "providers": [
+                        "Sentinel\\SchemaSentinel\\SentinelServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Sentinel\\SchemaSentinel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ahtesham",
+                    "email": "ahtesham@clcbws.com",
+                    "homepage": "https://www.clcbws.com"
+                }
+            ],
+            "description": "Detect and fix database schema drift in Laravel by comparing migrations with the live database state.",
+            "keywords": [
+                "clcbws",
+                "database",
+                "drift",
+                "laravel",
+                "migration",
+                "schema",
+                "sentinel"
+            ],
+            "support": {
+                "issues": "https://github.com/ahtesham-clcbws/laravel-schema-sentinel/issues",
+                "source": "https://github.com/ahtesham-clcbws/laravel-schema-sentinel/tree/v1.1.9"
+            },
+            "time": "2026-04-28T11:30:23+00:00"
         },
         {
             "name": "composer/pcre",
@@ -10732,8 +10800,10 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": {},
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "clcbws/laravel-schema-sentinel": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

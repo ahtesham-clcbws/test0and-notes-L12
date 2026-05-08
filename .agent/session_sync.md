@@ -23,10 +23,16 @@
     - [x] Visual Question Bubble Grid in Results with Solution Modal.
     - [x] Unify Global Sidebar Profile (Add Institute name).
 - [x] Phase 6: Final Verification & Session Sync
+- [x] Phase 7: Database Integrity Hardening
+    - [x] Install `clcbws/laravel-schema-sentinel`.
+    - [x] Publish Sentinel configuration.
+    - [x] Verify environment with `schema:sentinel-doctor`.
 
 ## Completed Tasks
 - [x] Implement Assessment Engine APIs (`getTests`, `getTestDetails`, `endTest`)
 - [x] Implement Razorpay Order & Verification APIs
+- [x] DB Integration: Laravel Schema Sentinel (v1.0) for drift detection and migration integrity.
+- [x] Verification: PHPUnit (Unit/Feature tests), Sentinel Doctor.
 - [x] Restore Instructions page in Test Conduct flow
 - [x] Fix Test Runner Timer flickering
 - [x] Added `getHomepageData` endpoint
