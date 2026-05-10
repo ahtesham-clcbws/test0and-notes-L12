@@ -14,6 +14,8 @@ class Gn_Test_Response extends Model
         'test_id',
         'question_id',
         'answer',
+        'is_visited',
+        'is_marked',
     ];
 
     public function questions()

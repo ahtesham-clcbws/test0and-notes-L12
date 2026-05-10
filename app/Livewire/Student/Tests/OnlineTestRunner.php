@@ -38,10 +38,7 @@ class OnlineTestRunner extends Component
 
     public $attemptId;
 
-    // State for Summary Modal (Replaces 'review' view for 1:1 parity with old modal)
     public bool $showSummaryModal = false;
-
-    public $currentView = 'testing'; // Default to testing as instructions are now separate
 
     public $endTimestamp;
 
@@ -65,16 +62,14 @@ class OnlineTestRunner extends Component
                 'test_id' => $testId,
                 'test_attempt' => 1,
                 'status' => 'running',
+                'is_in_review' => 0,
                 'draft_state' => json_encode([
-                    'visited' => [], 
-                    'marked_for_review' => [],
                     'current_section' => 0,
                     'current_question' => 0
                 ]),
             ]);
         } else {
-            // STALE ATTEMPT PROTECTION:
-            // If the attempt is 'running' but has ZERO answers, reset the created_at to now.
+            // STALE ATTEMPT PROTECTION
             $responsesCount = Gn_Test_Response::where('student_id', Auth::id())
                 ->where('test_id', $testId)
                 ->count();
@@ -86,28 +81,37 @@ class OnlineTestRunner extends Component
 
         $this->attemptId = $attempt->id;
 
-        // Load existing answers
+        // Load existing answers and states directly from DB tracking table
         $existingResponses = Gn_Test_Response::where('student_id', Auth::id())
             ->where('test_id', $this->testId)
             ->get();
 
         foreach ($existingResponses as $response) {
-            $this->answers[$response->question_id] = $response->answer;
+            if ($response->answer) {
+                $this->answers[$response->question_id] = $response->answer;
+            }
+            if ($response->is_visited) {
+                $this->visitedQuestions[] = $response->question_id;
+            }
+            if ($response->is_marked) {
+                $this->markedQuestions[] = $response->question_id;
+            }
         }
 
-        // Load draft_state (Markers, Visited, and Position)
+        // Restore Position
         if ($attempt->draft_state) {
             $draft = json_decode($attempt->draft_state, true);
-            $this->markedQuestions = $draft['marked_for_review'] ?? [];
-            $this->visitedQuestions = $draft['visited'] ?? [];
-            
-            // Restore position from DB if not provided in URL
             if (!request()->has('currentSectionIndex')) {
                 $this->currentSectionIndex = $draft['current_section'] ?? 0;
             }
             if (!request()->has('currentQuestionIndex')) {
                 $this->currentQuestionIndex = $draft['current_question'] ?? 0;
             }
+        }
+
+        // Restore Review State
+        if ($attempt->is_in_review) {
+            $this->showSummaryModal = true;
         }
 
         // Calculate Timer
@@ -126,13 +130,11 @@ class OnlineTestRunner extends Component
         }
 
         if (! $totalDuration || $totalDuration <= 0) {
-            $totalDuration = 60; // 60 minutes safety default
+            $totalDuration = 60; // 60 minutes default
         }
 
-        // Check if the test has already expired
         $expiryTime = $attempt->created_at->timestamp + ($totalDuration * 60);
         if (now()->timestamp >= $expiryTime) {
-            // Test expired while student was away
             return $this->submitTest();
         }
 
@@ -140,11 +142,11 @@ class OnlineTestRunner extends Component
 
         $this->loadQuestionsStructure();
         
-        // Ensure current question is marked as visited
         $currentQId = $this->getCurrentQuestionId();
         if ($currentQId && ! in_array($currentQId, $this->visitedQuestions)) {
             $this->visitedQuestions[] = $currentQId;
-            $this->updateDraftState();
+            $this->syncQuestionState($currentQId);
+            $this->updatePosition();
         }
     }
 
@@ -169,9 +171,10 @@ class OnlineTestRunner extends Component
         $currentQId = $this->getCurrentQuestionId();
         if ($currentQId && ! in_array($currentQId, $this->visitedQuestions)) {
             $this->visitedQuestions[] = $currentQId;
+            $this->syncQuestionState($currentQId);
         }
         
-        $this->updateDraftState();
+        $this->updatePosition();
     }
 
     public function getCurrentQuestionId()
@@ -179,32 +182,34 @@ class OnlineTestRunner extends Component
         return $this->questionsList[$this->currentSectionIndex][$this->currentQuestionIndex] ?? null;
     }
 
-    public function saveSelection($questionId, $answer)
+    public function syncQuestionState($questionId)
     {
-        $this->answers[$questionId] = $answer;
-
         Gn_Test_Response::updateOrCreate(
             [
                 'student_id' => Auth::id(),
                 'test_id' => $this->testId,
                 'question_id' => $questionId,
             ],
-            ['answer' => $answer]
+            [
+                'answer' => $this->answers[$questionId] ?? null,
+                'is_visited' => in_array($questionId, $this->visitedQuestions) ? 1 : 0,
+                'is_marked' => in_array($questionId, $this->markedQuestions) ? 1 : 0,
+            ]
         );
-        
-        $this->updateDraftState();
+    }
+
+    public function saveSelection($questionId, $answer)
+    {
+        $this->answers[$questionId] = $answer;
+        $this->syncQuestionState($questionId);
+        $this->updatePosition();
     }
 
     public function clearResponse($questionId)
     {
         unset($this->answers[$questionId]);
-
-        Gn_Test_Response::where('student_id', Auth::id())
-            ->where('test_id', $this->testId)
-            ->where('question_id', $questionId)
-            ->delete();
-            
-        $this->updateDraftState();
+        $this->syncQuestionState($questionId);
+        $this->updatePosition();
     }
 
     public function toggleMarkForReview($questionId)
@@ -215,17 +220,16 @@ class OnlineTestRunner extends Component
             $this->markedQuestions[] = $questionId;
         }
 
-        $this->updateDraftState();
+        $this->syncQuestionState($questionId);
+        $this->updatePosition();
     }
 
-    public function updateDraftState()
+    public function updatePosition()
     {
         $attempt = Gn_StudentTestAttempt::find($this->attemptId);
         if ($attempt) {
             $attempt->update([
                 'draft_state' => json_encode([
-                    'visited' => $this->visitedQuestions,
-                    'marked_for_review' => $this->markedQuestions,
                     'current_section' => $this->currentSectionIndex,
                     'current_question' => $this->currentQuestionIndex,
                 ]),
@@ -250,8 +254,7 @@ class OnlineTestRunner extends Component
             }
 
             if ($nextSecIndex >= count($this->sections)) {
-                $this->showSummaryModal = true;
-                $this->updateDraftState();
+                $this->goToReview();
                 return;
             }
         }
@@ -259,16 +262,20 @@ class OnlineTestRunner extends Component
         $currentQId = $this->getCurrentQuestionId();
         if ($currentQId && ! in_array($currentQId, $this->visitedQuestions)) {
             $this->visitedQuestions[] = $currentQId;
+            $this->syncQuestionState($currentQId);
         }
         
-        $this->updateDraftState();
+        $this->updatePosition();
     }
 
     public function submitTest()
     {
         $attempt = Gn_StudentTestAttempt::find($this->attemptId);
         if ($attempt) {
-            $attempt->update(['status' => 'completed']);
+            $attempt->update([
+                'status' => 'completed',
+                'submitted_at' => now(),
+            ]);
         }
 
         return redirect()->route('student.show-result', [Auth::id(), $this->testId]);
@@ -277,13 +284,23 @@ class OnlineTestRunner extends Component
     public function toggleSummaryModal()
     {
         $this->showSummaryModal = ! $this->showSummaryModal;
-        $this->updateDraftState();
+        
+        $attempt = Gn_StudentTestAttempt::find($this->attemptId);
+        if ($attempt) {
+            $attempt->update(['is_in_review' => $this->showSummaryModal ? 1 : 0]);
+        }
     }
 
     public function goToReview()
     {
         $this->showSummaryModal = true;
-        $this->updateDraftState();
+        
+        $attempt = Gn_StudentTestAttempt::find($this->attemptId);
+        if ($attempt) {
+            $attempt->update(['is_in_review' => 1]);
+        }
+        
+        $this->updatePosition();
     }
 
     public function render()

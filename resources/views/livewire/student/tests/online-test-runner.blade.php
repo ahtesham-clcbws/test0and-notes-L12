@@ -93,7 +93,7 @@
                     </div>
 
                     {{-- Action Buttons --}}
-                    <div class="pt-4 flex items-center justify-between border-t border-gray-200 mt-auto">
+                    <div class="pt-4 flex items-center justify-between border-t border-gray-200 mt-6">
                         <div class="flex gap-2">
                             <button 
                                 wire:click="toggleMarkForReview({{ $currentQuestion->id }})"

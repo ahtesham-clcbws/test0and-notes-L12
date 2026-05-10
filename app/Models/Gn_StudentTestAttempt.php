@@ -19,6 +19,8 @@ class Gn_StudentTestAttempt extends Model
         'test_attempt',
         'status',
         'draft_state',
+        'is_in_review',
+        'submitted_at',
     ];
 
     public function test()
