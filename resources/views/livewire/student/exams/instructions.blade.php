@@ -62,13 +62,14 @@
 
             {{-- ACCEPTANCE --}}
             <div class="space-y-4 pt-10 border-t border-gray-50">
+                <div class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Declaration</div>
                 <label class="flex items-start gap-3 cursor-pointer group">
                     <input type="checkbox" wire:model.live="termsAccepted" class="mt-1 w-4 h-4 text-success border-gray-300 rounded focus:ring-success" />
-                    <span class="font-bold text-gray-600 text-xs group-hover:text-gray-900 transition-colors">I Agree</span>
+                    <span class="font-bold text-gray-600 text-xs group-hover:text-gray-900 transition-colors">I have read and understood all instructions provided above and agree to follow them.</span>
                 </label>
                 <label class="flex items-start gap-3 cursor-pointer group">
                     <input type="checkbox" wire:model.live="privacyAccepted" class="mt-1 w-4 h-4 text-success border-gray-300 rounded focus:ring-success" />
-                    <span class="font-bold text-gray-600 text-xs group-hover:text-gray-900 transition-colors">I Agree sjfv kjlkwas;f kjlq Skhsdj,ghld sd;lgjs</span>
+                    <span class="font-bold text-gray-600 text-xs group-hover:text-gray-900 transition-colors">I understand that any attempt to use unfair means will lead to disqualification and further action.</span>
                 </label>
             </div>
         </div>
