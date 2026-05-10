@@ -126,7 +126,7 @@ class OnlineTestRunner extends Component
             $this->questionsList[$index] = $this->test->getQuestions()
                 ->where('section_id', $section['id'])
                 ->distinct()
-                ->pluck('questions.id')
+                ->pluck('question_bank.id')
                 ->toArray();
         }
     }
