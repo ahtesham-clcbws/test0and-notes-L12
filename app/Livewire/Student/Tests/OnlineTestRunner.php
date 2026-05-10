@@ -8,6 +8,7 @@ use App\Models\QuestionBankModel;
 use App\Models\TestModal;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 #[Layout('components.layouts.student-exam-mary')]
@@ -19,8 +20,10 @@ class OnlineTestRunner extends Component
 
     public $sections = [];
 
+    #[Url]
     public $currentSectionIndex = 0;
 
+    #[Url]
     public $currentQuestionIndex = 0;
 
     public $questionsList = []; // Array of Question IDs for the current view/section
@@ -51,8 +54,8 @@ class OnlineTestRunner extends Component
             ->where('test_id', $testId)
             ->first();
 
-        if ($attempt) {
-            // Strict 1:1 Parity: Old system doesn't allow resume, it always redirects to results if an attempt exists.
+        // RESUME LOGIC: Only redirect to result if the attempt is NOT 'running'
+        if ($attempt && $attempt->status !== 'running') {
             return redirect()->route('student.show-result', [Auth::id(), $testId]);
         }
 
@@ -64,20 +67,11 @@ class OnlineTestRunner extends Component
                 'status' => 'running',
                 'draft_state' => json_encode(['visited' => [], 'marked_for_review' => []]),
             ]);
-        } else {
-            // If already exists but no answers yet, reset created_at to now() to give full time for fresh starts/tests
-            $responsesCount = Gn_Test_Response::where('student_id', Auth::id())
-                ->where('test_id', $testId)
-                ->count();
-
-            if ($responsesCount === 0 && $attempt->status === 'running') {
-                $attempt->update(['created_at' => now()]);
-            }
         }
 
         $this->attemptId = $attempt->id;
 
-        // Load existing answers on re-hydration
+        // Load existing answers on re-hydration (Persistence)
         $existingResponses = Gn_Test_Response::where('student_id', Auth::id())
             ->where('test_id', $this->testId)
             ->get();
@@ -93,7 +87,7 @@ class OnlineTestRunner extends Component
             $this->visitedQuestions = $draft['visited'] ?? [];
         }
 
-        // Calculate Timer
+        // Calculate Timer based on original start time
         $totalDuration = $this->test->time_to_complete;
         if (! $totalDuration) {
             $section_time = $this->test->testSections()
@@ -105,57 +99,47 @@ class OnlineTestRunner extends Component
             foreach ($section_time as $section) {
                 $timeArray[] = $section['number_of_questions'] * $section['duration'];
             }
-            $totalDuration = array_sum($timeArray); // Assuming minutes
+            $totalDuration = array_sum($timeArray);
         }
 
-        // Safety Fallback to prevent immediate auto-submission on 0 duration
         if (! $totalDuration || $totalDuration <= 0) {
-            $totalDuration = 60; // 60 minutes default for test configurations missing durations
+            $totalDuration = 60; // 60 minutes safety default
         }
 
-        // timeRemaining = (created_at + duration_mins) - now()
-        $startedAt = $attempt->created_at;
-        $expiryTime = $startedAt->addMinutes($totalDuration ?? 0);
-        $this->timeLeft = max(0, now()->diffInSeconds($expiryTime, false));
-        $this->endTimestamp = $expiryTime->timestamp * 1000; // Milliseconds for JS
+        $this->endTimestamp = ($attempt->created_at->timestamp + ($totalDuration * 60)) * 1000;
 
-        if ($this->timeLeft <= 0) {
-            $this->submitTest();
-
-            return;
-        }
-
-        // Load Sections & Questions Grouped
         $this->loadQuestionsStructure();
+        
+        // Ensure current question is marked as visited
+        $currentQId = $this->getCurrentQuestionId();
+        if ($currentQId && ! in_array($currentQId, $this->visitedQuestions)) {
+            $this->visitedQuestions[] = $currentQId;
+            $this->updateDraftState();
+        }
     }
 
-    protected function loadQuestionsStructure(): void
+    public function loadQuestionsStructure()
     {
         $this->sections = $this->test->testSections()->with('sectionSubject')->get()->toArray();
 
-        $questions = $this->test->getQuestions()->distinct()->get()->groupBy('pivot.section_id');
-
-        foreach ($this->sections as $key => $section) {
-            $sectionId = $section['id'];
-            $this->questionsList[$key] = $questions->has($sectionId)
-                ? $questions[$sectionId]->pluck('id')->toArray()
-                : [];
+        foreach ($this->sections as $index => $section) {
+            $this->questionsList[$index] = $this->test->getQuestions()
+                ->where('section_id', $section['id'])
+                ->distinct()
+                ->pluck('questions.id')
+                ->toArray();
         }
+    }
 
-        // Safety: Start at the first section that actually has questions
-        foreach ($this->questionsList as $key => $qIds) {
-            if (! empty($qIds)) {
-                $this->currentSectionIndex = $key;
-                break;
-            }
-        }
+    public function selectQuestion($sectionIndex, $questionIndex)
+    {
+        $this->currentSectionIndex = $sectionIndex;
+        $this->currentQuestionIndex = $questionIndex;
 
-        if (! empty($this->questionsList)) {
-            $currentQId = $this->getCurrentQuestionId();
-            if ($currentQId && ! in_array($currentQId, $this->visitedQuestions)) {
-                $this->visitedQuestions[] = $currentQId;
-                $this->updateDraftState();
-            }
+        $currentQId = $this->getCurrentQuestionId();
+        if ($currentQId && ! in_array($currentQId, $this->visitedQuestions)) {
+            $this->visitedQuestions[] = $currentQId;
+            $this->updateDraftState();
         }
     }
 
@@ -164,42 +148,16 @@ class OnlineTestRunner extends Component
         return $this->questionsList[$this->currentSectionIndex][$this->currentQuestionIndex] ?? null;
     }
 
-    public function selectQuestion($secIndex, $qIndex)
-    {
-        $requestedQId = $this->questionsList[$secIndex][$qIndex] ?? null;
-
-        // SERVER-SIDE GUARD: Only allow if question is already visited
-        if (! in_array($requestedQId, $this->visitedQuestions)) {
-            // Check if it's the sequential "next" question (frontier)
-            // But usually we force use of "Save & Next" to advance.
-            // If we want to be strict: only allow already visited questions.
-            return;
-        }
-
-        $this->currentSectionIndex = $secIndex;
-        $this->currentQuestionIndex = $qIndex;
-    }
-
-    /**
-     * Specialized selection for Review screen - allows selecting ANY question
-     */
-    public function reviewSelectQuestion($secIndex, $qIndex)
-    {
-        $requestedQId = $this->questionsList[$secIndex][$qIndex] ?? null;
-
-        if ($requestedQId) {
-            $this->currentSectionIndex = $secIndex;
-            $this->currentQuestionIndex = $qIndex;
-            $this->showSummaryModal = false; // Close review view
-        }
-    }
-
     public function saveSelection($questionId, $answer)
     {
         $this->answers[$questionId] = $answer;
 
         Gn_Test_Response::updateOrCreate(
-            ['student_id' => Auth::id(), 'test_id' => $this->testId, 'question_id' => $questionId],
+            [
+                'student_id' => Auth::id(),
+                'test_id' => $this->testId,
+                'question_id' => $questionId,
+            ],
             ['answer' => $answer]
         );
     }
@@ -221,10 +179,11 @@ class OnlineTestRunner extends Component
         } else {
             $this->markedQuestions[] = $questionId;
         }
+
         $this->updateDraftState();
     }
 
-    protected function updateDraftState(): void
+    public function updateDraftState()
     {
         $attempt = Gn_StudentTestAttempt::find($this->attemptId);
         if ($attempt) {
@@ -255,9 +214,8 @@ class OnlineTestRunner extends Component
             }
 
             if ($nextSecIndex >= count($this->sections)) {
-                // Absolute end of test: Increment index beyond questions length to trigger Summary view!
-                $this->currentQuestionIndex = count($secQuestions);
-
+                // Absolute end of test: Show Summary Modal
+                $this->showSummaryModal = true;
                 return;
             }
         }
@@ -269,35 +227,6 @@ class OnlineTestRunner extends Component
         }
     }
 
-    public function verifyTimerStatus()
-    {
-        $attempt = Gn_StudentTestAttempt::find($this->attemptId);
-        $totalDuration = $this->test->time_to_complete;
-        if (! $totalDuration) {
-            $section_time = $this->test->testSections()
-                ->select('number_of_questions', 'duration')
-                ->get()
-                ->toArray();
-
-            $timeArray = [];
-            foreach ($section_time as $section) {
-                $timeArray[] = $section['number_of_questions'] * $section['duration'];
-            }
-            $totalDuration = array_sum($timeArray);
-        }
-
-        if (! $totalDuration || $totalDuration <= 0) {
-            $totalDuration = 60; // 60 minutes safety default
-        }
-
-        $expiryTime = $attempt->created_at->addMinutes($totalDuration ?? 0);
-        $this->timeLeft = max(0, now()->diffInSeconds($expiryTime, false));
-
-        if ($this->timeLeft <= 0) {
-            $this->submitTest();
-        }
-    }
-
     public function submitTest()
     {
         $attempt = Gn_StudentTestAttempt::find($this->attemptId);
@@ -306,12 +235,6 @@ class OnlineTestRunner extends Component
         }
 
         return redirect()->route('student.show-result', [Auth::id(), $this->testId]);
-    }
-
-    public function startTest()
-    {
-        // Instructions are now in a separate component, this might be redundant but kept for safety
-        $this->currentView = 'testing';
     }
 
     public function toggleSummaryModal()
