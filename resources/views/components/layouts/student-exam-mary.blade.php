@@ -10,19 +10,17 @@
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..900&display=swap" rel="stylesheet">
 
     {{-- Vite --}}
     @vite(['resources/css/mary.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen font-sans antialiased bg-base-200/50">
+<body class="min-h-screen font-sans antialiased bg-white">
 
-    {{-- MAIN CONTENT ONLY --}}
-    <x-main full-width>
-        <x-slot:content>
-            {{ $slot }}
-        </x-slot:content>
-    </x-main>
+    {{-- FULL WIDTH CONTENT --}}
+    <main class="w-full">
+        {{ $slot }}
+    </main>
 
     {{-- TOAST --}}
     <x-toast />
