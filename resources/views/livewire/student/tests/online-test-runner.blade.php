@@ -1,14 +1,14 @@
-<div class="min-h-screen bg-white flex flex-col font-sans" wire:ignore.self>
+<div class="min-h-screen bg-white font-sans text-gray-800 flex flex-col" wire:ignore.self>
 
-    {{-- 1. TOP HEADER (100% Mockup Match) --}}
-    <div class="bg-white px-10 py-8 flex justify-between items-center border-b border-gray-100 sticky top-0 z-50">
+    {{-- 1. TOP HEADER --}}
+    <div class="px-8 py-5 flex justify-between items-center border-b border-gray-200 sticky top-0 z-50 bg-white">
         <div class="flex items-center">
-            <h1 class="text-4xl font-black text-success uppercase tracking-tighter">{{ $test->title }}</h1>
+            <h1 class="text-2xl font-bold text-[#16a34a]">{{ $test->title }}</h1>
         </div>
-        <div class="flex items-center gap-20">
-            <div class="flex items-center gap-4">
-                <div class="text-3xl font-black text-error">Time Left :</div>
-                <div class="text-4xl font-black text-error font-mono" x-data="{ 
+        <div class="flex items-center gap-12">
+            <div class="flex items-center gap-2 text-[#dc2626] font-bold text-xl">
+                <span>Time Left :</span>
+                <span class="font-bold" x-data="{ 
                     endTimestamp: {{ $endTimestamp }},
                     timer: '00:00:00',
                     submitted: false,
@@ -34,49 +34,49 @@
                         let s = diff % 60;
                         this.timer = [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
                     }
-                }" x-text="timer">00:00:00</div>
+                }" x-text="timer">00:00:00</span>
             </div>
-            <div class="flex items-center gap-4">
-                <div class="text-3xl font-black text-gray-900">Qs:</div>
-                <div class="text-4xl font-black text-gray-900">{{ $totalQuestions }}</div>
+            <div class="font-bold text-xl text-black">
+                Qs: {{ $totalQuestions }}
             </div>
         </div>
     </div>
 
     @if(!$showSummaryModal)
         {{-- VIEW A: TESTING CONDUCT --}}
-        <div class="flex-1 px-10 py-8 grid grid-cols-1 lg:grid-cols-4 gap-12 w-full">
+        <div class="flex-1 flex px-8 py-6 gap-8 w-full max-w-[1600px] mx-auto">
             
             {{-- Left Column: Question Area --}}
-            <div class="lg:col-span-3 flex flex-col">
+            <div class="flex-1 flex flex-col">
                 @if ($currentQuestion)
-                    <div class="text-2xl font-black text-error uppercase tracking-tight mb-8">Question No {{ $currentQuestionIndex + 1 }}</div>
+                    <h2 class="text-[#dc2626] font-bold text-lg mb-4">Question No {{ $currentQuestionIndex + 1 }}</h2>
                     
                     {{-- Section Tabs --}}
-                    <div class="flex flex-wrap gap-4 mb-10">
+                    <div class="flex items-center gap-2 mb-6 border-b border-gray-200 pb-2">
                         @foreach ($sections as $i => $section)
                             <button 
                                 wire:key="sec-{{ $i }}"
-                                class="px-10 py-3 rounded-md font-black text-xl transition-all {{ $currentSectionIndex == $i ? 'bg-success text-white shadow-md' : 'bg-[#74b38a] text-white opacity-80' }}" 
+                                class="px-4 py-2 font-bold text-sm transition-colors {{ $currentSectionIndex == $i ? 'bg-[#16a34a] text-white' : 'bg-[#94b4a4] text-gray-800 hover:bg-[#7fa391]' }}" 
                                 wire:click="selectQuestion({{ $i }}, 0)"
                             >
                                 {{ $section['section_subject']['name'] }}
                             </button>
                         @endforeach
-                        <div class="ml-auto flex items-center">
-                            <input type="checkbox" class="w-8 h-8 border-2 border-gray-400 rounded-sm" />
+                        <div class="ml-auto">
+                            <input type="checkbox" class="w-6 h-6 border-gray-400 rounded-sm cursor-not-allowed opacity-50" disabled />
                         </div>
                     </div>
 
-                    <div class="flex-1">
-                        <div class="prose prose-2xl max-w-none text-gray-900 mb-12 font-bold leading-relaxed">
+                    {{-- Question Content --}}
+                    <div class="flex-1 overflow-y-auto pr-4 mb-6">
+                        <div class="text-base text-gray-800 mb-6 leading-relaxed">
                             Qs {{ $currentQuestionIndex + 1 }}- {!! $currentQuestion->question !!}
                         </div>
 
-                        <div class="grid grid-cols-1 gap-6 mb-20" wire:key="options-{{ $currentQuestion->id }}">
+                        <div class="flex flex-col gap-3" wire:key="options-{{ $currentQuestion->id }}">
                             @for ($k = 1; $k <= $currentQuestion->mcq_options; $k++)
                                 @php $optKey = 'ans_' . $k; @endphp
-                                <label class="flex items-center gap-6 cursor-pointer group">
+                                <label class="flex items-start gap-3 cursor-pointer group">
                                     <input 
                                         type="radio" 
                                         name="q_{{ $currentQuestion->id }}" 
@@ -84,67 +84,68 @@
                                         value="{{ $optKey }}" 
                                         {{ ($answers[$currentQuestion->id] ?? '') == $optKey ? 'checked' : '' }} 
                                         wire:click="saveSelection({{ $currentQuestion->id }}, '{{ $optKey }}')"
-                                        class="radio radio-success radio-lg border-2 border-gray-400" 
+                                        class="mt-1 w-4 h-4 text-[#16a34a] border-gray-400 focus:ring-[#16a34a]" 
                                     />
-                                    <div class="text-2xl font-bold text-gray-700 group-hover:text-gray-900">{!! $currentQuestion->$optKey !!}</div>
+                                    <div class="text-sm text-gray-700 leading-snug pt-0.5">{!! $currentQuestion->$optKey !!}</div>
                                 </label>
                             @endfor
                         </div>
+                    </div>
 
-                        {{-- Action Buttons --}}
-                        <div class="flex flex-wrap items-center gap-6 pt-10 border-t border-gray-100">
+                    {{-- Action Buttons --}}
+                    <div class="pt-4 flex items-center justify-between border-t border-gray-200 mt-auto">
+                        <div class="flex gap-2">
                             <button 
                                 wire:click="toggleMarkForReview({{ $currentQuestion->id }})"
-                                class="flex items-center gap-3 px-10 py-3 rounded-md bg-success text-white font-black text-2xl hover:bg-success/90 transition-all shadow-md"
+                                class="bg-[#16a34a] text-white px-5 py-2 font-bold text-sm flex items-center gap-2 hover:bg-[#15803d] transition-colors"
                             >
-                                <x-icon name="s-star" class="w-8 h-8 text-warning" />
+                                <x-icon name="s-star" class="w-5 h-5 text-yellow-300" />
                                 Mark for Review
                             </button>
                             
                             <button 
                                 wire:click="clearResponse({{ $currentQuestion->id }})" 
-                                class="flex items-center gap-3 px-10 py-3 rounded-md bg-success text-white font-black text-2xl hover:bg-success/90 transition-all shadow-md"
+                                class="bg-[#94b4a4] text-white px-5 py-2 font-bold text-sm flex items-center gap-2 hover:bg-[#7fa391] transition-colors"
                             >
-                                <x-icon name="o-trash" class="w-8 h-8" />
+                                <x-icon name="o-trash" class="w-5 h-5 text-red-500" />
                                 Clear Response
                             </button>
-
-                            <button 
-                                wire:click="saveAndNext"
-                                class="flex items-center gap-3 px-10 py-3 rounded-md bg-success text-white font-black text-2xl hover:bg-success/90 transition-all shadow-md ml-auto"
-                            >
-                                <x-icon name="o-arrow-right-circle" class="w-8 h-8" />
-                                Save & Next
-                            </button>
                         </div>
+
+                        <button 
+                            wire:click="saveAndNext"
+                            class="bg-[#16a34a] text-white px-6 py-2 font-bold text-sm flex items-center gap-2 hover:bg-[#15803d] transition-colors"
+                        >
+                            <x-icon name="o-arrow-right-circle" class="w-5 h-5" />
+                            Save & Next
+                        </button>
                     </div>
                 @endif
             </div>
 
-            {{-- Right Column: Sidebar (100% Mockup Structure) --}}
-            <div class="border-2 border-gray-100 flex flex-col h-fit sticky top-32 rounded-xl shadow-xl overflow-hidden bg-white">
+            {{-- Right Column: Sidebar (Exact Mockup Match) --}}
+            <div class="w-80 border border-[#16a34a] flex flex-col h-fit self-start shrink-0 bg-white">
+                
                 {{-- Profile Section --}}
-                <div class="flex items-stretch">
-                    <div class="bg-gray-100 p-4 flex items-center justify-center border-r border-gray-200">
-                        <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-white shadow-sm">
-                             <img src="{{ '/storage/' . auth()->user()->user_details->photo_url }}" class="w-full h-full object-cover">
-                        </div>
+                <div class="flex bg-[#a7d6b4]">
+                    <div class="w-20 h-20 flex items-center justify-center border-r border-white p-2">
+                        <img src="{{ '/storage/' . auth()->user()->user_details->photo_url }}" class="w-14 h-14 rounded-full object-cover">
                     </div>
-                    <div class="flex-1 bg-[#f8f9fa] flex items-center px-6 border-b border-gray-200">
-                        <div class="text-3xl font-black text-gray-900 leading-tight uppercase tracking-tight">{{ auth()->user()->name }}</div>
+                    <div class="flex-1 flex items-center justify-center text-center px-3">
+                        <div class="font-bold text-gray-900 text-lg leading-tight">{{ auth()->user()->name }}</div>
                     </div>
                 </div>
 
                 {{-- Section Title Banner --}}
-                <div class="bg-success py-4 px-6 text-center">
-                    <span class="text-white text-3xl font-black uppercase tracking-widest">
+                <div class="bg-[#16a34a] text-white text-center py-2">
+                    <span class="font-bold text-lg">
                         {{ $sections[$currentSectionIndex]['section_subject']['name'] }}
                     </span>
                 </div>
 
                 {{-- Palette Grid --}}
-                <div class="p-8">
-                    <div class="grid grid-cols-5 gap-4 mb-10">
+                <div class="p-4 bg-white">
+                    <div class="grid grid-cols-5 gap-2 mb-8">
                         @foreach ($questionsList[$currentSectionIndex] ?? [] as $qIndex => $qId)
                             @php
                                 $hasAnswer = isset($answers[$qId]);
@@ -152,29 +153,36 @@
                                 $isVisited = in_array($qId, $this->visitedQuestions);
                                 $isCurrent = ($currentQuestion && $currentQuestion->id == $qId);
                                 
-                                $class = 'bg-white text-gray-900 border-gray-300'; 
+                                // Default (Not Visited): Gray border, white background
+                                $class = 'bg-white text-gray-800 border-gray-400'; 
+                                
                                 if ($hasAnswer) {
-                                    $class = 'bg-success text-white border-success';
+                                    // Answered: Solid Green
+                                    $class = 'bg-[#16a34a] text-white border-[#16a34a]';
+                                } elseif ($isVisited && !$hasAnswer) {
+                                    // Visited but not answered: White background with red border? 
+                                    // Based on standard test UI, visited and unanswered is usually red.
+                                    // Wait, mockup shows mostly white circles with grey border. Let's stick to gray.
+                                    $class = 'bg-white text-gray-800 border-gray-400';
                                 }
-                                if ($isMarked) {
-                                    $class = 'bg-success/20 text-success border-success/30';
-                                }
+
                                 if ($isCurrent) {
-                                    $class .= ' ring-4 ring-success/20 ring-offset-4';
+                                    // Add subtle ring for current
+                                    $class .= ' ring-2 ring-[#16a34a]/30';
                                 }
                             @endphp
                             <button 
                                 wire:key="pal-{{ $qId }}"
-                                @if(!$isVisited) disabled @endif
-                                class="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-black border transition-all relative
-                                {{ $isVisited ? 'hover:bg-success/5' : 'opacity-40 cursor-not-allowed' }} 
-                                {{ $class }}" 
+                                @if(!$isVisited && !$isCurrent && !$hasAnswer && !$isMarked) 
+                                    {{-- Allow clicking anything based on requirement? Most exams allow free navigation. --}}
+                                @endif
+                                class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border transition-all relative {{ $class }}" 
                                 wire:click="selectQuestion({{ $currentSectionIndex }}, {{ $qIndex }})"
                             >
                                 {{ $qIndex + 1 }}
                                 @if($isMarked)
-                                    <div class="absolute -top-2 -right-2 text-warning filter drop-shadow-sm">
-                                        <x-icon name="s-star" class="w-6 h-6" />
+                                    <div class="absolute -top-1 -right-1">
+                                        <x-icon name="s-star" class="w-4 h-4 text-yellow-400 filter drop-shadow-sm" />
                                     </div>
                                 @endif
                             </button>
@@ -182,67 +190,64 @@
                     </div>
 
                     {{-- Navigation Links --}}
-                    <div class="flex justify-between items-center border-t border-gray-100 pt-6">
-                        <button class="text-success font-black text-xl hover:underline uppercase tracking-tight">Questions List</button>
-                        <button class="text-success font-black text-xl hover:underline uppercase tracking-tight">Instructions</button>
+                    <div class="flex justify-between items-center border-t border-gray-200 pt-3 px-2">
+                        <button class="text-[#16a34a] font-bold text-xs hover:underline">Questions List</button>
+                        <button class="text-[#16a34a] font-bold text-xs hover:underline">Instructions</button>
                     </div>
                 </div>
 
                 {{-- Submit Block --}}
-                <div class="p-6 bg-white border-t border-gray-100">
-                    <button 
-                        wire:click="goToReview"
-                        class="w-full bg-success text-white py-5 rounded-md font-black text-3xl shadow-xl hover:bg-success/90 transition-all uppercase tracking-tighter"
-                    >
-                        Review & Submit
-                    </button>
-                </div>
+                <button 
+                    wire:click="goToReview"
+                    class="w-full bg-[#16a34a] text-white py-3 font-bold text-lg hover:bg-[#15803d] transition-colors"
+                >
+                    Review & Submit
+                </button>
             </div>
         </div>
     @else
         {{-- VIEW B: SUMMARY MODAL --}}
-        <div class="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-6">
-            <div class="bg-white rounded-[4rem] w-full max-w-5xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
-                <div class="bg-success p-12 text-white flex justify-between items-center">
+        <div class="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-6">
+            <div class="bg-white rounded-lg w-full max-w-4xl overflow-hidden shadow-2xl">
+                <div class="bg-[#16a34a] p-6 text-white flex justify-between items-center">
                     <div>
-                        <h2 class="text-6xl font-black uppercase tracking-tighter mb-4">Summary</h2>
-                        <p class="text-2xl font-bold opacity-80 uppercase tracking-widest">{{ $test->title }}</p>
+                        <h2 class="text-3xl font-bold mb-1">Final Summary</h2>
+                        <p class="text-lg opacity-90">{{ $test->title }}</p>
                     </div>
-                    <x-icon name="o-clipboard-document-check" class="w-32 h-32 opacity-20" />
                 </div>
 
-                <div class="p-16">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-16">
-                        <div class="bg-gray-50 p-10 rounded-3xl border border-gray-100 text-center">
-                            <div class="text-6xl font-black text-gray-900 mb-2">{{ $totalQuestions }}</div>
-                            <div class="text-sm font-black text-gray-400 uppercase tracking-widest">Total Qs</div>
+                <div class="p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
+                            <div class="text-4xl font-bold text-gray-900 mb-2">{{ $totalQuestions }}</div>
+                            <div class="text-xs font-bold text-gray-500 uppercase tracking-widest">Total Qs</div>
                         </div>
-                        <div class="bg-success/10 p-10 rounded-3xl border border-success/20 text-center">
-                            <div class="text-6xl font-black text-success mb-2">{{ count($answers) }}</div>
-                            <div class="text-sm font-black text-success uppercase tracking-widest">Attempted</div>
+                        <div class="bg-green-50 p-6 rounded-lg border border-green-200 text-center">
+                            <div class="text-4xl font-bold text-[#16a34a] mb-2">{{ count($answers) }}</div>
+                            <div class="text-xs font-bold text-[#16a34a] uppercase tracking-widest">Attempted</div>
                         </div>
-                        <div class="bg-error/10 p-10 rounded-3xl border border-error/20 text-center">
-                            <div class="text-6xl font-black text-error mb-2">{{ $totalQuestions - count($answers) }}</div>
-                            <div class="text-sm font-black text-error uppercase tracking-widest">Not Attempted</div>
+                        <div class="bg-red-50 p-6 rounded-lg border border-red-200 text-center">
+                            <div class="text-4xl font-bold text-red-600 mb-2">{{ $totalQuestions - count($answers) }}</div>
+                            <div class="text-xs font-bold text-red-600 uppercase tracking-widest">Not Attempted</div>
                         </div>
-                        <div class="bg-warning/10 p-10 rounded-3xl border border-warning/20 text-center">
-                            <div class="text-6xl font-black text-warning mb-2">{{ count($markedQuestions) }}</div>
-                            <div class="text-sm font-black text-warning uppercase tracking-widest">For Review</div>
+                        <div class="bg-yellow-50 p-6 rounded-lg border border-yellow-200 text-center">
+                            <div class="text-4xl font-bold text-yellow-600 mb-2">{{ count($markedQuestions) }}</div>
+                            <div class="text-xs font-bold text-yellow-600 uppercase tracking-widest">For Review</div>
                         </div>
                     </div>
 
-                    <div class="flex gap-6">
+                    <div class="flex gap-4">
                         <button 
                             wire:click="$set('showSummaryModal', false)"
-                            class="flex-1 bg-gray-100 text-gray-700 py-8 rounded-3xl font-black text-2xl hover:bg-gray-200 transition-all uppercase tracking-tight"
+                            class="flex-1 bg-gray-200 text-gray-800 py-4 rounded-md font-bold text-lg hover:bg-gray-300 transition-colors"
                         >
-                            Back
+                            Return to Test
                         </button>
                         <button 
                             wire:click="submitTest"
-                            class="flex-[2] bg-success text-white py-8 rounded-3xl font-black text-3xl shadow-2xl hover:bg-success/90 transition-all uppercase tracking-tight"
+                            class="flex-[2] bg-[#16a34a] text-white py-4 rounded-md font-bold text-xl shadow-md hover:bg-[#15803d] transition-colors"
                         >
-                            Confirm Submit
+                            Submit Test Now
                         </button>
                     </div>
                 </div>
