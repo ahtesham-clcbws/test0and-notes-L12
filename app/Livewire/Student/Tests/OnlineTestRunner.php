@@ -65,12 +65,16 @@ class OnlineTestRunner extends Component
                 'test_id' => $testId,
                 'test_attempt' => 1,
                 'status' => 'running',
-                'draft_state' => json_encode(['visited' => [], 'marked_for_review' => []]),
+                'draft_state' => json_encode([
+                    'visited' => [], 
+                    'marked_for_review' => [],
+                    'current_section' => 0,
+                    'current_question' => 0
+                ]),
             ]);
         } else {
             // STALE ATTEMPT PROTECTION:
             // If the attempt is 'running' but has ZERO answers, reset the created_at to now.
-            // This prevents students from being locked out if they accidentally started a test long ago.
             $responsesCount = Gn_Test_Response::where('student_id', Auth::id())
                 ->where('test_id', $testId)
                 ->count();
@@ -82,7 +86,7 @@ class OnlineTestRunner extends Component
 
         $this->attemptId = $attempt->id;
 
-        // Load existing answers on re-hydration (Persistence)
+        // Load existing answers
         $existingResponses = Gn_Test_Response::where('student_id', Auth::id())
             ->where('test_id', $this->testId)
             ->get();
@@ -91,14 +95,22 @@ class OnlineTestRunner extends Component
             $this->answers[$response->question_id] = $response->answer;
         }
 
-        // Load draft_state (Markers, Visited)
+        // Load draft_state (Markers, Visited, and Position)
         if ($attempt->draft_state) {
             $draft = json_decode($attempt->draft_state, true);
             $this->markedQuestions = $draft['marked_for_review'] ?? [];
             $this->visitedQuestions = $draft['visited'] ?? [];
+            
+            // Restore position from DB if not provided in URL
+            if (!request()->has('currentSectionIndex')) {
+                $this->currentSectionIndex = $draft['current_section'] ?? 0;
+            }
+            if (!request()->has('currentQuestionIndex')) {
+                $this->currentQuestionIndex = $draft['current_question'] ?? 0;
+            }
         }
 
-        // Calculate Timer based on original start time
+        // Calculate Timer
         $totalDuration = $this->test->time_to_complete;
         if (! $totalDuration) {
             $section_time = $this->test->testSections()
@@ -117,7 +129,14 @@ class OnlineTestRunner extends Component
             $totalDuration = 60; // 60 minutes safety default
         }
 
-        $this->endTimestamp = ($attempt->created_at->timestamp + ($totalDuration * 60)) * 1000;
+        // Check if the test has already expired
+        $expiryTime = $attempt->created_at->timestamp + ($totalDuration * 60);
+        if (now()->timestamp >= $expiryTime) {
+            // Test expired while student was away
+            return $this->submitTest();
+        }
+
+        $this->endTimestamp = $expiryTime * 1000;
 
         $this->loadQuestionsStructure();
         
@@ -150,8 +169,9 @@ class OnlineTestRunner extends Component
         $currentQId = $this->getCurrentQuestionId();
         if ($currentQId && ! in_array($currentQId, $this->visitedQuestions)) {
             $this->visitedQuestions[] = $currentQId;
-            $this->updateDraftState();
         }
+        
+        $this->updateDraftState();
     }
 
     public function getCurrentQuestionId()
@@ -171,6 +191,8 @@ class OnlineTestRunner extends Component
             ],
             ['answer' => $answer]
         );
+        
+        $this->updateDraftState();
     }
 
     public function clearResponse($questionId)
@@ -181,6 +203,8 @@ class OnlineTestRunner extends Component
             ->where('test_id', $this->testId)
             ->where('question_id', $questionId)
             ->delete();
+            
+        $this->updateDraftState();
     }
 
     public function toggleMarkForReview($questionId)
@@ -202,6 +226,8 @@ class OnlineTestRunner extends Component
                 'draft_state' => json_encode([
                     'visited' => $this->visitedQuestions,
                     'marked_for_review' => $this->markedQuestions,
+                    'current_section' => $this->currentSectionIndex,
+                    'current_question' => $this->currentQuestionIndex,
                 ]),
             ]);
         }
@@ -213,7 +239,6 @@ class OnlineTestRunner extends Component
         if ($this->currentQuestionIndex < count($secQuestions) - 1) {
             $this->currentQuestionIndex++;
         } else {
-            // Must jump to next section that HAS questions
             $nextSecIndex = $this->currentSectionIndex + 1;
             while ($nextSecIndex < count($this->sections)) {
                 if (! empty($this->questionsList[$nextSecIndex] ?? [])) {
@@ -225,8 +250,8 @@ class OnlineTestRunner extends Component
             }
 
             if ($nextSecIndex >= count($this->sections)) {
-                // Absolute end of test: Show Summary Modal
                 $this->showSummaryModal = true;
+                $this->updateDraftState();
                 return;
             }
         }
@@ -234,8 +259,9 @@ class OnlineTestRunner extends Component
         $currentQId = $this->getCurrentQuestionId();
         if ($currentQId && ! in_array($currentQId, $this->visitedQuestions)) {
             $this->visitedQuestions[] = $currentQId;
-            $this->updateDraftState();
         }
+        
+        $this->updateDraftState();
     }
 
     public function submitTest()
@@ -251,11 +277,13 @@ class OnlineTestRunner extends Component
     public function toggleSummaryModal()
     {
         $this->showSummaryModal = ! $this->showSummaryModal;
+        $this->updateDraftState();
     }
 
     public function goToReview()
     {
         $this->showSummaryModal = true;
+        $this->updateDraftState();
     }
 
     public function render()
@@ -263,7 +291,6 @@ class OnlineTestRunner extends Component
         $currentQId = $this->getCurrentQuestionId();
         $currentQuestion = $currentQId ? QuestionBankModel::find($currentQId) : null;
 
-        // Calculate counts for Review View
         $totalQuestions = 0;
         foreach ($this->questionsList as $qIds) {
             $totalQuestions += count($qIds);
