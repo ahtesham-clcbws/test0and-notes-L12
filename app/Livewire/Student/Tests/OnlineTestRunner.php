@@ -67,6 +67,17 @@ class OnlineTestRunner extends Component
                 'status' => 'running',
                 'draft_state' => json_encode(['visited' => [], 'marked_for_review' => []]),
             ]);
+        } else {
+            // STALE ATTEMPT PROTECTION:
+            // If the attempt is 'running' but has ZERO answers, reset the created_at to now.
+            // This prevents students from being locked out if they accidentally started a test long ago.
+            $responsesCount = Gn_Test_Response::where('student_id', Auth::id())
+                ->where('test_id', $testId)
+                ->count();
+
+            if ($responsesCount === 0 && $attempt->status === 'running') {
+                $attempt->update(['created_at' => now()]);
+            }
         }
 
         $this->attemptId = $attempt->id;

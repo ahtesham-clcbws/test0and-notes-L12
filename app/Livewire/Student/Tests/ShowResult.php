@@ -54,6 +54,14 @@ class ShowResult extends Component
             return redirect()->route('student.dashboard');
         }
 
+        $attempt = \App\Models\Gn_StudentTestAttempt::where('student_id', $this->studentId)
+            ->where('test_id', $this->testId)
+            ->first();
+
+        if ($attempt && $attempt->status === 'running') {
+            return redirect()->route('student.start-test', [$this->testId]);
+        }
+
         if ($this->test->show_result != 1) {
             session()->flash('error', 'Result will be displayed soon...');
 
