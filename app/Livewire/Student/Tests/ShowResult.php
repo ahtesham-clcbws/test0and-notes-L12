@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('components.layouts.student-mary')]
+#[Layout('components.layouts.student-exam-mary')]
 class ShowResult extends Component
 {
     public $testId;
