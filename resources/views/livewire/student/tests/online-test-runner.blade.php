@@ -1,54 +1,79 @@
-<div class="min-h-screen bg-gray-50 flex flex-col">
+<div class="min-h-screen bg-white flex flex-col font-sans" wire:ignore.self>
 
-    <div class="bg-white border-b border-gray-100 shadow-sm px-6 py-3 flex justify-between items-center sticky top-0 z-40">
-        <div class="flex items-center gap-6">
-            <h2 class="text-3xl font-extrabold text-success uppercase tracking-tighter">{{ $test->title }}</h2>
+    {{-- 1. TOP HEADER (Screenshot Match) --}}
+    <div class="bg-white px-8 py-6 flex justify-between items-center border-b border-gray-50 sticky top-0 z-50">
+        <div class="flex items-center">
+            <h2 class="text-4xl font-black text-success uppercase tracking-tighter">{{ $test->title }}</h2>
         </div>
-        <div class="flex items-center gap-10">
-            <div class="flex items-center gap-2">
-                <div class="text-lg font-bold text-gray-900">Time Left :</div>
-                <div class="text-2xl font-bold text-error font-mono" x-text="timer">00:00:00</div>
+        <div class="flex items-center gap-12">
+            <div class="flex items-center gap-3">
+                <div class="text-2xl font-black text-gray-900">Time Left :</div>
+                <div class="text-3xl font-black text-error font-mono" x-data="{ 
+                    endTimestamp: {{ $endTimestamp }},
+                    timer: '00:00:00',
+                    submitted: false,
+                    init() {
+                        this.update();
+                        setInterval(() => this.update(), 1000);
+                    },
+                    update() {
+                        let now = Date.now();
+                        let diff = Math.max(0, Math.floor((this.endTimestamp - now) / 1000));
+                        
+                        if (diff <= 0) {
+                            this.timer = '00:00:00';
+                            if (!this.submitted) {
+                                this.submitted = true;
+                                $wire.submitTest();
+                            }
+                            return;
+                        }
+
+                        let h = Math.floor(diff / 3600);
+                        let m = Math.floor((diff % 3600) / 60);
+                        let s = diff % 60;
+                        this.timer = [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
+                    }
+                }" x-text="timer">00:00:00</div>
             </div>
-            <div class="flex items-center gap-2">
-                <div class="text-lg font-bold text-gray-900">Qs:</div>
-                <div class="text-2xl font-bold text-gray-900">{{ $totalQuestions }}</div>
+            <div class="flex items-center gap-3">
+                <div class="text-2xl font-black text-gray-900">Qs:</div>
+                <div class="text-3xl font-black text-gray-900">{{ $totalQuestions }}</div>
             </div>
         </div>
     </div>
 
-    {{-- CONDITIONAL VIEW: Testing vs Review --}}
     @if(!$showSummaryModal)
         {{-- VIEW A: TESTING CONDUCT --}}
-        <div class="flex-1 max-w-400 mx-auto w-full p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div class="flex-1 p-8 grid grid-cols-1 lg:grid-cols-4 gap-12">
             
-            {{-- Main Panel --}}
+            {{-- Main Question Area --}}
             <div class="lg:col-span-3 flex flex-col gap-6">
-                {{-- Section Tabs --}}
-                <div class="flex flex-wrap gap-2">
-                    @foreach ($sections as $i => $section)
-                        <button 
-                            wire:key="section-{{ $i }}"
-                            class="px-6 py-2 rounded-md font-bold text-sm transition-all {{ $currentSectionIndex == $i ? 'bg-success text-white shadow-md' : 'bg-success/20 text-success hover:bg-success/30' }}" 
-                            wire:click="selectQuestion({{ $i }}, 0)"
-                        >
-                            {{ $section['section_subject']['name'] }}
-                        </button>
-                    @endforeach
-                </div>
+                @if ($currentQuestion)
+                    <div class="text-2xl font-black text-error mb-2 uppercase">Question No {{ $currentQuestionIndex + 1 }}</div>
+                    
+                    {{-- Section Tabs --}}
+                    <div class="flex flex-wrap gap-3 mb-4">
+                        @foreach ($sections as $i => $section)
+                            <button 
+                                wire:key="sec-tab-{{ $i }}"
+                                class="px-8 py-3 rounded-md font-black text-lg transition-all {{ $currentSectionIndex == $i ? 'bg-success text-white shadow-md' : 'bg-[#74b38a] text-white' }}" 
+                                wire:click="selectQuestion({{ $i }}, 0)"
+                            >
+                                {{ $section['section_subject']['name'] }}
+                            </button>
+                        @endforeach
+                    </div>
 
-                {{-- Question Card --}}
-                <div class="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 md:p-12 flex-1">
-                    @if ($currentQuestion)
-                        <div class="text-error font-bold text-sm uppercase tracking-widest mb-6">Question No {{ $currentQuestionIndex + 1 }}</div>
-                        
-                        <div class="prose prose-xl max-w-none text-gray-800 mb-12 font-medium">
-                            {!! $currentQuestion->question !!}
+                    <div class="flex-1">
+                        <div class="prose prose-2xl max-w-none text-gray-800 mb-10 font-bold leading-snug">
+                            Qs {{ $currentQuestionIndex + 1 }}- {!! $currentQuestion->question !!}
                         </div>
 
-                        <div class="grid grid-cols-1 gap-3 mb-10" wire:key="q-options-{{ $currentQuestion->id }}">
+                        <div class="grid grid-cols-1 gap-4 mb-10" wire:key="opts-{{ $currentQuestion->id }}">
                             @for ($k = 1; $k <= $currentQuestion->mcq_options; $k++)
                                 @php $optKey = 'ans_' . $k; @endphp
-                                <label class="flex items-center gap-3 p-3 rounded-xl border-2 transition-all cursor-pointer {{ ($answers[$currentQuestion->id] ?? '') == $optKey ? 'border-success bg-success/5 shadow-sm' : 'border-gray-50 bg-gray-50/20 hover:bg-gray-50/50' }}">
+                                <label class="flex items-center gap-4 cursor-pointer group">
                                     <input 
                                         type="radio" 
                                         name="q_{{ $currentQuestion->id }}" 
@@ -56,59 +81,62 @@
                                         value="{{ $optKey }}" 
                                         {{ ($answers[$currentQuestion->id] ?? '') == $optKey ? 'checked' : '' }} 
                                         wire:click="saveSelection({{ $currentQuestion->id }}, '{{ $optKey }}')"
-                                        class="radio radio-success radio-md" 
+                                        class="radio radio-success radio-lg border-2 border-gray-400" 
                                     />
-                                    <div class="text-gray-700 font-semibold">{!! $currentQuestion->$optKey !!}</div>
+                                    <div class="text-xl font-bold text-gray-700 group-hover:text-gray-900">{!! $currentQuestion->$optKey !!}</div>
                                 </label>
                             @endfor
                         </div>
 
-                        {{-- Action Buttons --}}
-                        <div class="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-gray-100">
-                            <div class="flex gap-3">
-                                <button 
-                                    wire:click="toggleMarkForReview({{ $currentQuestion->id }})"
-                                    class="flex items-center gap-2 px-5 py-2.5 rounded-md font-bold transition-all {{ in_array($currentQuestion->id, $markedQuestions) ? 'bg-warning text-white' : 'bg-success text-white' }}"
-                                >
-                                    <x-icon name="{{ in_array($currentQuestion->id, $markedQuestions) ? 's-star' : 'o-star' }}" class="w-4 h-4" />
-                                    Mark for Review
-                                </button>
-                                
-                                <button 
-                                    wire:click="clearResponse({{ $currentQuestion->id }})" 
-                                    class="flex items-center gap-2 px-5 py-2.5 rounded-md bg-success text-white font-bold transition-all hover:bg-success/90"
-                                >
-                                    <x-icon name="o-trash" class="w-4 h-4" />
-                                    Clear Response
-                                </button>
-                            </div>
+                        {{-- Action Buttons (Screenshot Bottom Bar Match) --}}
+                        <div class="flex flex-wrap items-center gap-4 pt-10 border-t border-gray-100">
+                            <button 
+                                wire:click="toggleMarkForReview({{ $currentQuestion->id }})"
+                                class="flex items-center gap-2 px-8 py-3 rounded-md bg-success text-white font-black text-xl hover:bg-success/90 transition-all shadow-md"
+                            >
+                                <x-icon name="s-star" class="w-6 h-6 text-warning" />
+                                Mark for Review
+                            </button>
                             
                             <button 
-                                wire:click="saveAndNext"
-                                class="bg-success text-white px-8 py-2.5 rounded-md font-bold text-lg shadow-md hover:bg-success/90 flex items-center gap-2"
+                                wire:click="clearResponse({{ $currentQuestion->id }})" 
+                                class="flex items-center gap-2 px-8 py-3 rounded-md bg-success text-white font-black text-xl hover:bg-success/90 transition-all shadow-md"
                             >
-                                <x-icon name="o-arrow-right-circle" class="w-5 h-5" />
+                                <x-icon name="o-trash" class="w-6 h-6" />
+                                Clear Response
+                            </button>
+
+                            <button 
+                                wire:click="saveAndNext"
+                                class="flex items-center gap-2 px-8 py-3 rounded-md bg-success text-white font-black text-xl hover:bg-success/90 transition-all shadow-md ml-auto"
+                            >
+                                <x-icon name="o-arrow-right-circle" class="w-6 h-6" />
                                 Save & Next
                             </button>
                         </div>
-                    @endif
-                </div>
+                    </div>
+                @endif
             </div>
 
-            {{-- Sidebar Status Palette --}}
-            <div class="bg-white border-2 border-success/30 flex flex-col h-fit sticky top-24 overflow-hidden rounded-md">
-                <div class="p-4 bg-success/10 flex items-center gap-3 border-b-2 border-success/20">
-                    <x-avatar image="{{ '/storage/' . auth()->user()->user_details->photo_url }}" class="w-14! h-14! border-2 border-white shadow rounded-full" />
+            {{-- Sidebar (Screenshot Match) --}}
+            <div class="bg-white border-2 border-success/30 flex flex-col h-fit sticky top-24 rounded-md shadow-lg overflow-hidden">
+                <div class="p-4 bg-white flex items-center gap-4">
+                    <div class="w-20 h-20 rounded-full border-2 border-gray-50 shadow-sm overflow-hidden bg-gray-100">
+                         <img src="{{ '/storage/' . auth()->user()->user_details->photo_url }}" class="w-full h-full object-cover">
+                    </div>
                     <div class="flex-1">
-                        <div class="font-extrabold text-gray-900 leading-none mb-1">{{ auth()->user()->name }}</div>
-                        <div class="bg-success text-white text-[10px] font-bold px-2 py-0.5 rounded inline-block uppercase tracking-wider">
-                            {{ $sections[$currentSectionIndex]['section_subject']['name'] }}
-                        </div>
+                        <div class="text-2xl font-black text-gray-900 leading-tight uppercase">{{ auth()->user()->name }}</div>
                     </div>
                 </div>
 
-                <div class="p-4 flex-1">
-                    <div class="grid grid-cols-5 gap-2.5 max-h-[400px] overflow-y-auto pr-1">
+                <div class="bg-success py-2 px-4 text-center">
+                    <span class="text-white text-2xl font-black uppercase tracking-widest">
+                        {{ $sections[$currentSectionIndex]['section_subject']['name'] }}
+                    </span>
+                </div>
+
+                <div class="p-6">
+                    <div class="grid grid-cols-5 gap-3 mb-8">
                         @foreach ($questionsList[$currentSectionIndex] ?? [] as $qIndex => $qId)
                             @php
                                 $hasAnswer = isset($answers[$qId]);
@@ -116,55 +144,45 @@
                                 $isVisited = in_array($qId, $this->visitedQuestions);
                                 $isCurrent = ($currentQuestion && $currentQuestion->id == $qId);
                                 
-                                $class = 'bg-white text-gray-600 border-gray-300'; 
+                                $class = 'bg-white text-gray-900 border-gray-400'; 
                                 if ($hasAnswer) {
                                     $class = 'bg-success text-white border-success';
-                                } elseif ($isVisited) {
-                                    $class = 'bg-gray-100 text-gray-400 border-gray-200';
                                 }
                                 if ($isMarked) {
-                                    $class = 'bg-success/20 text-success border-success/40';
+                                    $class = 'bg-success/20 text-success border-success/30';
                                 }
                                 if ($isCurrent) {
-                                    $class .= ' ring-2 ring-success ring-offset-1';
+                                    $class .= ' ring-4 ring-success/20 ring-offset-2';
                                 }
                             @endphp
                             <button 
-                                wire:key="palette-{{ $qId }}"
+                                wire:key="pal-{{ $qId }}"
                                 @if(!$isVisited) disabled @endif
-                                class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all relative
-                                {{ $isVisited ? 'hover:bg-success/10' : 'opacity-40 cursor-not-allowed' }} 
+                                class="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold border transition-all relative
+                                {{ $isVisited ? 'hover:bg-success/5' : 'opacity-40 cursor-not-allowed' }} 
                                 {{ $class }}" 
                                 wire:click="selectQuestion({{ $currentSectionIndex }}, {{ $qIndex }})"
                             >
                                 {{ $qIndex + 1 }}
                                 @if($isMarked)
                                     <div class="absolute -top-1.5 -right-1.5 text-warning filter drop-shadow-sm">
-                                        <x-icon name="s-star" class="w-4 h-4" />
+                                        <x-icon name="s-star" class="w-5 h-5" />
                                     </div>
                                 @endif
                             </button>
                         @endforeach
                     </div>
 
-                    <div class="mt-6 flex flex-wrap gap-x-4 gap-y-2 border-t border-gray-100 pt-4">
-                        <button class="text-[11px] font-bold text-success hover:underline">Questions List</button>
-                        <button class="text-[11px] font-bold text-success hover:underline">Instructions</button>
+                    <div class="flex justify-between items-center border-t border-success/20 pt-4">
+                        <button class="text-success font-black text-lg hover:underline uppercase">Questions List</button>
+                        <button class="text-success font-black text-lg hover:underline uppercase">Instructions</button>
                     </div>
                 </div>
 
-                {{-- Legend & Submit --}}
-                <div class="p-4 border-t-2 border-success/20 bg-gray-50/50">
-                    <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-[10px] font-bold uppercase mb-4 text-gray-600">
-                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-success"></span> Ans</div>
-                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-white border border-gray-300"></span> Not Ans</div>
-                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-success/20 border border-success/40"></span> Review</div>
-                        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gray-100 border border-gray-200"></span> Not Visited</div>
-                    </div>
-                    
+                <div class="p-4 bg-white">
                     <button 
                         wire:click="goToReview"
-                        class="w-full bg-success text-white py-3 rounded-md font-extrabold text-xl shadow-lg hover:bg-success/90 transition-all uppercase tracking-tight"
+                        class="w-full bg-success text-white py-4 rounded-md font-black text-2xl shadow-xl hover:bg-success/90 transition-all uppercase tracking-tighter"
                     >
                         Review & Submit
                     </button>
@@ -172,84 +190,54 @@
             </div>
         </div>
     @else
-        {{-- VIEW B: REVIEW PAGE (Screenshot 3 Style) --}}
-        <div class="flex-1 max-w-5xl mx-auto w-full p-12 bg-white flex flex-col items-center">
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-12">
-                <div class="bg-gray-50 p-6 rounded-3xl border border-gray-100 flex items-center justify-between">
+        {{-- VIEW B: SUMMARY MODAL --}}
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl animate-in zoom-in duration-300">
+                <div class="bg-success p-10 text-white flex justify-between items-center">
                     <div>
-                        <div class="text-[10px] font-bold text-gray-400 uppercase leading-none mb-2">Attempted</div>
-                        <div class="text-3xl font-bold text-success">{{ $attemptedCount }}</div>
+                        <h2 class="text-5xl font-black uppercase tracking-tighter mb-2">Test Summary</h2>
+                        <p class="text-xl font-bold opacity-80 uppercase tracking-widest">{{ $test->title }}</p>
                     </div>
-                    <span class="w-5 h-5 rounded-full bg-success"></span>
+                    <x-icon name="o-clipboard-document-check" class="w-24 h-24 opacity-20" />
                 </div>
-                <div class="bg-gray-50 p-6 rounded-3xl border border-gray-100 flex items-center justify-between">
-                    <div>
-                        <div class="text-[10px] font-bold text-gray-400 uppercase leading-none mb-2">Not Attempted</div>
-                        <div class="text-3xl font-bold text-gray-400">{{ $notAttemptedCount }}</div>
+
+                <div class="p-10">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                        <div class="bg-gray-50 p-8 rounded-2xl border border-gray-100 text-center">
+                            <div class="text-5xl font-black text-gray-900 mb-2">{{ $totalQuestions }}</div>
+                            <div class="text-xs font-black text-gray-400 uppercase tracking-widest">Total Qs</div>
+                        </div>
+                        <div class="bg-success/10 p-8 rounded-2xl border border-success/20 text-center">
+                            <div class="text-5xl font-black text-success mb-2">{{ count($answers) }}</div>
+                            <div class="text-xs font-black text-success uppercase tracking-widest">Attempted</div>
+                        </div>
+                        <div class="bg-error/10 p-8 rounded-2xl border border-error/20 text-center">
+                            <div class="text-5xl font-black text-error mb-2">{{ $totalQuestions - count($answers) }}</div>
+                            <div class="text-xs font-black text-error uppercase tracking-widest">Not Attempted</div>
+                        </div>
+                        <div class="bg-warning/10 p-8 rounded-2xl border border-warning/20 text-center">
+                            <div class="text-5xl font-black text-warning mb-2">{{ count($markedQuestions) }}</div>
+                            <div class="text-xs font-black text-warning uppercase tracking-widest">For Review</div>
+                        </div>
                     </div>
-                    <span class="w-5 h-5 rounded-full bg-gray-300"></span>
-                </div>
-                <div class="bg-gray-50 p-6 rounded-3xl border border-gray-100 flex items-center justify-between">
-                    <div>
-                        <div class="text-[10px] font-bold text-gray-400 uppercase leading-none mb-2">For Review</div>
-                        <div class="text-3xl font-bold text-warning">{{ $reviewCount }}</div>
+
+                    <div class="flex gap-4">
+                        <button 
+                            wire:click="$set('showSummaryModal', false)"
+                            class="flex-1 bg-gray-100 text-gray-700 py-6 rounded-2xl font-black text-xl hover:bg-gray-200 transition-all uppercase tracking-tight"
+                        >
+                            Return to Test
+                        </button>
+                        <button 
+                            wire:click="submitTest"
+                            class="flex-[2] bg-success text-white py-6 rounded-2xl font-black text-2xl shadow-xl hover:bg-success/90 transition-all uppercase tracking-tight"
+                        >
+                            Submit Test Now
+                        </button>
                     </div>
-                    <div class="text-warning"><x-icon name="s-star" class="w-5 h-5" /></div>
                 </div>
             </div>
-
-            <div class="w-full border-2 border-gray-100 rounded-[2.5rem] p-12 mb-12 overflow-hidden shadow-inner">
-                <div class="flex flex-wrap gap-4 justify-center">
-                    @php $globalIndex = 1; @endphp
-                    @foreach ($questionsList as $secIndex => $qIds)
-                        @foreach($qIds as $qId)
-                            @php
-                                $hasAnswer = isset($answers[$qId]);
-                                $isMarked = in_array($qId, $markedQuestions);
-                                
-                                $class = 'bg-gray-100 text-gray-300 border-gray-100'; 
-                                if ($hasAnswer) { $class = 'bg-success text-white border-success'; }
-                                if ($isMarked) { $class = 'bg-warning text-white border-warning'; }
-                            @endphp
-                            <button 
-                                wire:click="reviewSelectQuestion({{ $secIndex }}, {{ $loop->index }})"
-                                class="w-12 h-12 rounded-full flex items-center justify-center font-bold relative transition-all hover:scale-110 active:scale-95
-                                {{ $isMarked ? 'shadow-lg shadow-warning/20' : '' }}
-                                {{ $class }}" 
-                            >
-                                {{ $globalIndex++ }}
-                                @if($isMarked)
-                                    <div class="absolute -top-1 -right-1 text-white filter drop-shadow">
-                                        <x-icon name="s-star" class="w-4 h-4" />
-                                    </div>
-                                @endif
-                            </button>
-                        @endforeach
-                    @endforeach
-                </div>
-            </div>
-
-            <button 
-                wire:click="submitTest"
-                class="bg-success text-white px-20 py-4 rounded-2xl font-bold text-2xl shadow-2xl shadow-success/20 hover:scale-105 active:scale-95 transition-all"
-            >
-                Final Submit
-            </button>
-            <button wire:click="toggleSummaryModal" class="mt-6 text-gray-400 font-bold hover:text-gray-900">Back to test</button>
         </div>
     @endif
 
-    {{-- Anti-cheat Script --}}
-    @script
-    <script>
-        window.onbeforeunload = function() {
-            return "Are you sure you want to leave? Your progress is saved!";
-        };
-        history.pushState(null, null, location.href);
-        window.onpopstate = function () {
-            history.go(1);
-        };
-    </script>
-    @endscript
 </div>
