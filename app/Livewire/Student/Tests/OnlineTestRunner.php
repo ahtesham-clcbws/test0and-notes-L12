@@ -133,7 +133,7 @@ class OnlineTestRunner extends Component
     {
         $this->sections = $this->test->testSections()->with('sectionSubject')->get()->toArray();
 
-        $questions = $this->test->getQuestions()->get()->groupBy('pivot.section_id');
+        $questions = $this->test->getQuestions()->distinct()->get()->groupBy('pivot.section_id');
 
         foreach ($this->sections as $key => $section) {
             $sectionId = $section['id'];

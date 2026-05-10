@@ -19,15 +19,15 @@
             <div class="flex items-center gap-4 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
                 <span class="w-8 h-8 rounded-full bg-success shrink-0"></span>
                 <div class="flex-1 flex items-center justify-between">
-                    <span class="font-bold text-gray-700 uppercase text-xs tracking-widest">Right Answer</span>
-                    <span class="text-2xl font-bold text-success">{{ $correct_answer }}</span>
+                    <span class="font-bold text-gray-700 uppercase text-xs tracking-widest">Right Answer {{ $correct_answer }}</span>
+                    <span class="text-xl font-bold text-success">Marks - {{ number_format($out_of_marks, 1) }}</span>
                 </div>
             </div>
             <div class="flex items-center gap-4 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
                 <span class="w-8 h-8 rounded-full bg-error shrink-0"></span>
                 <div class="flex-1 flex items-center justify-between">
-                    <span class="font-bold text-gray-700 uppercase text-xs tracking-widest">Wrong Answer</span>
-                    <span class="text-2xl font-bold text-error">{{ $incorrect_answer }}</span>
+                    <span class="font-bold text-gray-700 uppercase text-xs tracking-widest">Wrong Answer {{ $incorrect_answer }}</span>
+                    <span class="text-xl font-bold text-error">Marks = -{{ number_format($negative_marks, 1) }}</span>
                 </div>
             </div>
             <div class="flex items-center gap-4 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
@@ -48,7 +48,7 @@
                         ->where('test_id', $testId)
                         ->get()
                         ->keyBy('question_id');
-                    $allQuestions = $test->getQuestions()->get();
+                    $allQuestions = $test->getQuestions()->distinct()->get();
                 @endphp
 
                 @foreach ($allQuestions as $index => $question)
@@ -71,11 +71,11 @@
                 @endforeach
             </div>
 
-            <div class="text-center">
-                <p class="text-gray-400 font-bold mb-8 uppercase tracking-widest text-xs">Click on each question for right answer & solutions</p>
-                <div class="text-4xl font-bold text-primary uppercase tracking-tighter">
-                    Total Marks : {{ $total_marks }}/{{ $final_marks }}
+            <div class="text-center pt-8 border-t border-gray-100">
+                <div class="text-3xl font-extrabold text-success uppercase tracking-tighter">
+                    Total Marks = {{ number_format($final_marks, 1) }} / {{ $total_marks }}
                 </div>
+                <p class="text-gray-400 font-bold mt-4 uppercase tracking-widest text-xs">Review your answers below</p>
             </div>
         @else
             <div class="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">

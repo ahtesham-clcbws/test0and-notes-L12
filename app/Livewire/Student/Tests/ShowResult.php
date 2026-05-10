@@ -71,7 +71,7 @@ class ShowResult extends Component
             ->keyBy('question_id');
 
         // Fetch ALL questions for this test to calculate total correctly
-        $allQuestions = $this->test->getQuestions()->get();
+        $allQuestions = $this->test->getQuestions()->distinct()->get();
         $this->total_question = $allQuestions->count();
 
         foreach ($allQuestions as $question) {
