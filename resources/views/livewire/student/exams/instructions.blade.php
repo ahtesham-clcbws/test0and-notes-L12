@@ -1,57 +1,58 @@
-<div class="max-w-325 mx-auto py-2 px-2 min-h-screen">
-    <div class="flex flex-col lg:flex-row bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden min-h-[50vh]">
+<div class="max-w-7xl mx-auto py-4 px-4 min-h-screen">
+    <div class="flex flex-col lg:flex-row bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden min-h-[600px]">
         
         {{-- LEFT PANEL: INSTRUCTIONS --}}
-        <div class="flex-1 p-3 md:p-5 bg-white">
-            <div class="mb-4">
-                <h1 class="text-xl font-bold text-gray-900 uppercase tracking-tight mb-1">{{ $test->title }}</h1>
-                <div class="text-[10px] font-normal text-gray-600">
-                    ({{ $test->sections }} Sections) • Duration: {{ $test_duration }} Minutes • Questions: {{ $test->total_questions }}
+        <div class="flex-1 p-8 md:p-10 bg-white">
+            <div class="mb-8">
+                <h1 class="text-3xl font-extrabold text-gray-900 uppercase tracking-tighter mb-2">{{ $test->title }}</h1>
+                <div class="text-sm font-medium text-gray-500 flex items-center gap-2">
+                    <span>({{ $test->sections ?? 1 }} Sections)</span>
+                    <span>•</span>
+                    <span>Duration: {{ $test_duration }} Minutes</span>
+                    <span>•</span>
+                    <span>Questions: {{ $test->total_questions }}</span>
                 </div>
-                <div class="text-[9px] font-bold text-gray-400 mt-1">
+                <div class="text-xs font-bold text-gray-400 mt-2">
                     {{ date('d M Y', strtotime($test->created_at)) }} <br>
-                    <span class="text-error uppercase tracking-widest font-bold">Live Test</span>
+                    <span class="text-error uppercase tracking-widest font-black text-[10px]">Live Test</span>
                 </div>
             </div>
 
-            <div class="mb-6">
-                <h3 class="text-xs font-bold text-gray-900 border-b border-gray-900 w-16 pb-0.5 mb-4">Instruction</h3>
+            <div class="mb-10">
+                <h3 class="text-sm font-black text-gray-900 border-b-2 border-gray-900 inline-block pb-1 mb-6 uppercase tracking-wider">Instruction</h3>
                 
-                {{-- LEGEND BOX (Ultra-Compact) --}}
-                <div class="bg-gray-50/50 rounded-lg border border-gray-100 p-2 flex flex-row items-center justify-between mb-6 max-w-xl">
-                    <div class="flex items-center gap-2 flex-1 justify-center">
-                        <span class="w-6 h-6 rounded-full bg-success"></span>
-                        <span class="font-bold text-gray-700 text-[10px]">Attempted</span>
+                {{-- LEGEND BOX (Screenshot Match) --}}
+                <div class="bg-gray-50/30 rounded-xl border border-gray-100 p-4 flex flex-row items-center justify-around mb-10 max-w-2xl shadow-inner">
+                    <div class="flex items-center gap-3">
+                        <span class="w-7 h-7 rounded-full bg-success shadow-sm"></span>
+                        <span class="font-bold text-gray-800 text-xs">Attempted</span>
                     </div>
                     
-                    <div class="w-px h-6 bg-gray-200"></div>
+                    <div class="w-px h-8 bg-gray-200"></div>
                     
-                    <div class="flex items-center gap-2 flex-1 justify-center">
-                        <span class="w-6 h-6 rounded-full bg-gray-300"></span>
-                        <span class="font-bold text-gray-700 text-[10px]">Not Attempted</span>
+                    <div class="flex items-center gap-3">
+                        <span class="w-7 h-7 rounded-full bg-gray-300 shadow-sm"></span>
+                        <span class="font-bold text-gray-800 text-xs">Not Attempted</span>
                     </div>
                     
-                    <div class="w-px h-6 bg-gray-200"></div>
+                    <div class="w-px h-8 bg-gray-200"></div>
                     
-                    <div class="flex items-center gap-3 flex-[1.5] justify-center">
-                        <div class="flex items-center gap-1">
-                            <span class="w-6 h-6">
-                                <x-icon name="s-star" class="w-6 h-6 text-warning" />
-                            </span>
-                            <div class="relative w-6 h-6">
-                                <span class="w-6 h-6 rounded-full bg-success block"></span>
-                                <x-icon name="s-star" class="w-4 h-4 text-warning absolute -top-1 -right-1" />
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center -space-x-2">
+                            <div class="relative">
+                                <x-icon name="s-star" class="w-5 h-5 text-warning absolute -top-2 -left-1 z-10" />
+                                <span class="w-7 h-7 rounded-full bg-success block shadow-sm"></span>
                             </div>
-                            <div class="relative w-6 h-6">
-                                <span class="w-6 h-6 rounded-full bg-gray-300 block"></span>
-                                <x-icon name="s-star" class="w-4 h-4 text-warning absolute -top-1 -right-1" />
+                            <div class="relative">
+                                <x-icon name="s-star" class="w-5 h-5 text-warning absolute -top-2 right-0 z-10" />
+                                <span class="w-7 h-7 rounded-full bg-gray-300 block shadow-sm"></span>
                             </div>
                         </div>
-                        <span class="font-bold text-gray-700 text-[10px]">Mark for Review</span>
+                        <span class="font-bold text-gray-800 text-xs">Mark for Review</span>
                     </div>
                 </div>
 
-                <div class="space-y-2 text-gray-700 font-normal text-[10px] leading-tight max-w-2xl">
+                <div class="space-y-3 text-gray-700 font-semibold text-xs leading-relaxed max-w-3xl">
                     <p>0.25% marks will be deducted for each wrong answer</p>
                     <p>2 marks will be provided for each correct answer.</p>
                     <p>Total time will be allotted / count for whole test, time will not be calculated for each question</p>
@@ -60,44 +61,47 @@
             </div>
 
             {{-- ACCEPTANCE --}}
-            <div class="space-y-1 pt-4">
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" wire:model.live="termsAccepted" class="w-3.5 h-3.5 border-gray-300 rounded" />
-                    <span class="font-normal text-gray-700 text-[10px]">I have read and understood all instructions provided above.</span>
+            <div class="space-y-4 pt-10 border-t border-gray-50">
+                <label class="flex items-start gap-3 cursor-pointer group">
+                    <input type="checkbox" wire:model.live="termsAccepted" class="mt-1 w-4 h-4 text-success border-gray-300 rounded focus:ring-success" />
+                    <span class="font-bold text-gray-600 text-xs group-hover:text-gray-900 transition-colors">I Agree</span>
                 </label>
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" wire:model.live="privacyAccepted" class="w-3.5 h-3.5 border-gray-300 rounded" />
-                    <span class="font-normal text-gray-700 text-[10px]">I understand that any attempt to use unfair means will lead to disqualification.</span>
+                <label class="flex items-start gap-3 cursor-pointer group">
+                    <input type="checkbox" wire:model.live="privacyAccepted" class="mt-1 w-4 h-4 text-success border-gray-300 rounded focus:ring-success" />
+                    <span class="font-bold text-gray-600 text-xs group-hover:text-gray-900 transition-colors">I Agree sjfv kjlkwas;f kjlq Skhsdj,ghld sd;lgjs</span>
                 </label>
             </div>
         </div>
 
-        {{-- RIGHT PANEL Overlay Sidebar --}}
-        <div class="w-full lg:w-80 bg-[#edf5e1] flex flex-col p-3 items-center border-l border-gray-100">
-            <div class="w-full flex-1 flex flex-col items-center">
-                <div class="bg-white rounded-xl p-3 w-full flex flex-col items-center text-center shadow-sm">
-                    <x-avatar image="{{ '/storage/'.$user_data->photo_url }}" class="w-14! h-14! rounded-full border-2 border-gray-50 mb-2" />
-                    
-                    <h2 class="text-xs font-bold text-gray-900 mb-0.5">{{ auth()->user()->name }}</h2>
-                    <div class="font-normal truncate text-gray-500" style="font-size: 0.75rem;">
-                         {{ $user_data->education_type_data?->name ?? '' }} / {{ $user_data->class_data?->name ?? '' }}
+        {{-- RIGHT PANEL (Blue Sidebar from Screenshot) --}}
+        <div class="w-full lg:w-96 bg-[#00AEEF] flex flex-col p-6 items-center shadow-2xl relative">
+            <div class="w-full pt-10">
+                <div class="bg-white rounded-md p-8 w-full flex flex-col items-center text-center shadow-2xl">
+                    <div class="relative mb-4">
+                        <x-avatar image="{{ '/storage/'.$user_data->photo_url }}" class="w-20! h-20! rounded-full border-4 border-white shadow-xl" />
                     </div>
                     
-                    @if(auth()->user()->myInstitute)
-                        <div class="font-normal truncate text-gray-500 mt-0.5" style="font-size: 0.7rem;">
-                            {{ auth()->user()->myInstitute->institute_name }}
-                        </div>
-                    @endif
+                    <h2 class="text-lg font-black text-gray-900 mb-1 uppercase tracking-tight">{{ auth()->user()->name }}</h2>
+                    <div class="font-bold text-gray-400 text-xs uppercase tracking-widest">
+                         {{ $user_data->education_type_data?->name ?? 'SSC-CGL' }} / {{ $user_data->class_data?->name ?? 'SSC' }}
+                    </div>
                 </div>
             </div>
 
-            <div class="w-full mt-auto flex justify-center pb-2">
-                <x-button 
-                    label="Start Test" 
+            <div class="w-full mt-auto flex justify-center pb-10">
+                <button 
                     wire:click="startTest" 
-                    class="btn-success btn-sm px-6 text-white font-bold text-xs rounded transition-all"
-                    :disabled="!$termsAccepted || !$privacyAccepted"
-                />
+                    @if(!$termsAccepted || !$privacyAccepted) disabled @endif
+                    class="bg-[#4CAF50] hover:bg-[#45a049] disabled:bg-gray-400 disabled:opacity-50 text-white font-black text-xl py-4 px-12 rounded-lg shadow-2xl transition-all active:scale-95 transform {{ (!$termsAccepted || !$privacyAccepted) ? 'cursor-not-allowed' : 'cursor-pointer hover:-translate-y-1' }}"
+                >
+                    Start Test
+                </button>
+            </div>
+            
+            {{-- Activate Windows Mock (Just for 100% parity visual check) --}}
+            <div class="absolute bottom-4 right-4 text-white/30 text-[10px] text-right pointer-events-none font-mono">
+                Activate Windows <br>
+                Go to Settings to activate Windows.
             </div>
         </div>
     </div>
