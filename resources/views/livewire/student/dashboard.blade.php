@@ -23,7 +23,7 @@
         @endphp
 
         @foreach($grid1 as $card)
-            <a href="{{ $card['link'] }}" class="group flex flex-col h-full transition-all bg-white border border-base-200 rounded-2xl shadow-sm hover:shadow-md hover:border-primary-300">
+            <a href="{{ $card['link'] }}" class="dashboard-card group flex flex-col h-full transition-all bg-white border border-base-200 rounded-2xl shadow-sm hover:shadow-md hover:border-primary-300">
                 <div class="flex items-center p-4 gap-4 flex-1">
                     <div class="p-2 rounded-xl" style="background-color: {{ $card['color'] }}">
                         <img src="{{ asset($card['image']) }}" class="w-12 h-10 object-contain" alt="{{ $card['title'] }}" />
@@ -55,7 +55,7 @@
         @endphp
 
         @foreach($grid2 as $card)
-            <a href="{{ $card['link'] }}" class="group flex flex-col h-full transition-all bg-white border border-base-200 rounded-2xl shadow-sm hover:shadow-md hover:border-primary-300">
+            <a href="{{ $card['link'] }}" class="dashboard-card group flex flex-col h-full transition-all bg-white border border-base-200 rounded-2xl shadow-sm hover:shadow-md hover:border-primary-300">
                 <div class="flex items-center p-4 gap-4 flex-1">
                     <div class="p-2 rounded-xl" style="background-color: {{ $card['color'] }}">
                         <img src="{{ asset($card['image']) }}" class="w-12 h-10 object-contain" alt="{{ $card['title'] }}" />

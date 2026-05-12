@@ -9,6 +9,8 @@ use Livewire\Component;
 class Purchased extends Component
 {
     use \Livewire\WithPagination;
+    
+    protected $paginationTheme = 'tailwind';
 
     public string $search = '';
 

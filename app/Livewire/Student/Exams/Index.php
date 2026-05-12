@@ -17,6 +17,8 @@ use Livewire\WithPagination;
 class Index extends Component
 {
     use WithPagination;
+    
+    protected $paginationTheme = 'tailwind';
 
     #[Url]
     public string $search = '';
@@ -110,11 +112,12 @@ class Index extends Component
         // Map attempt status
         $attempts = TestAttempt::where('student_id', $stud_id)
             ->whereIn('test_id', $tests->pluck('id'))
-            ->pluck('test_id')
-            ->toArray();
+            ->get()
+            ->keyBy('test_id');
 
         foreach ($tests as $test) {
-            $test->is_attempted = in_array($test->id, $attempts);
+            $attempt = $attempts->get($test->id);
+            $test->attempt_status = $attempt ? $attempt->status : 'not_started';
             $cat = $this->categories->firstWhere('id', $test->test_cat);
             $test->category_name = $cat['name'] ?? 'Uncategorized';
         }

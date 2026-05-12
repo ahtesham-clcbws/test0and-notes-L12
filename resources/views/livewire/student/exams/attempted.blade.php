@@ -5,8 +5,8 @@
         </x-slot:actions>
     </x-header>
 
-    <x-card shadow separator>
-        <x-table :headers="$headers" :rows="$attempts" :sort-by="$sortBy" with-pagination>
+    <x-card shadow separator class="mt-4">
+        <x-table :headers="$headers" :rows="$attempts" :sort-by="$sortBy" with-pagination hover>
             @scope('cell_created_at', $attempt)
                 {{ $attempt->created_at->format('M d, Y') }}
             @endscope
@@ -21,19 +21,21 @@
 
             @scope('cell_actions', $attempt)
                 <div class="flex justify-end gap-2">
-                    @if($attempt->test->show_result)
+                    @if($attempt->status === 'running')
+                        <x-button 
+                            label="Resume" 
+                            icon="o-play" 
+                            link="{{ route('student.start-test', [$attempt->test->id]) }}" 
+                            class="btn-sm btn-warning" />
+                    @elseif($attempt->test->show_result)
                         <x-button 
                             label="View Result" 
-                            icon="o-presentation-chart-line" 
+                            icon="o-chart-bar" 
                             link="{{ route('student.show-result', [auth()->id(), $attempt->test->id]) }}" 
-                            class="btn-sm btn-warning" 
+                            class="btn-sm btn-outline btn-success" 
                             no-wire-navigate />
                     @else
-                        <x-button 
-                            label="Pending" 
-                            icon="o-clock" 
-                            class="btn-sm" 
-                            disabled />
+                        <x-badge value="RESULT PENDING" class="badge-ghost text-[10px]" />
                     @endif
                 </div>
             @endscope

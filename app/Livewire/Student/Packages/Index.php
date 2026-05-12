@@ -10,6 +10,8 @@ use Livewire\Component;
 class Index extends Component
 {
     use \Livewire\WithPagination;
+    
+    protected $paginationTheme = 'tailwind';
 
     #[Url]
     public string $search = '';

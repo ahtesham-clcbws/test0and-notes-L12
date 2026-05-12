@@ -72,7 +72,7 @@ class ExamsController extends Controller
             return json_encode($result);
         }
 
-        return view('Dashboard/Admin/Exam/teststable')->with('data', $this->data);
+        return view('Dashboard.Admin.Exam.teststable')->with('data', $this->data);
     }
 
     public function gettestpackage(Request $request)
@@ -330,7 +330,7 @@ class ExamsController extends Controller
         $this->data['creators'] = $creators;
 
         // $this->data['pagename'] = 'Test Sections';
-        return view('Dashboard/Admin/Exam/savetest')->with('data', $this->data);
+        return view('Dashboard.Admin.Exam.savetest')->with('data', $this->data);
     }
 
     public function publishTest(Request $req, $test_id)
@@ -373,10 +373,10 @@ class ExamsController extends Controller
             $inputs = $req->all();
             if ($inputs['form_name'] == 'publish_test') {
                 $publish_test = TestModal::find($test_id);
-                $publish_test->show_result = isset($inputs['show_result']) ? $inputs['show_result'] == 'on' ? 1 : 0 : 0;
-                $publish_test->show_rank = isset($inputs['show_rank']) ? $inputs['show_rank'] == 'on' ? 1 : 0 : 0;
-                $publish_test->show_answer = isset($inputs['show_answer']) ? $inputs['show_answer'] == 'on' ? 1 : 0 : 0;
-                $publish_test->show_solution = isset($inputs['show_solution']) ? $inputs['show_solution'] == 'on' ? 1 : 0 : 0;
+                $publish_test->show_result = isset($inputs['show_result']) ? ($inputs['show_result'] == 'on' ? 1 : 0) : 0;
+                $publish_test->show_rank = isset($inputs['show_rank']) ? ($inputs['show_rank'] == 'on' ? 1 : 0) : 0;
+                $publish_test->show_answer = isset($inputs['show_answer']) ? ($inputs['show_answer'] == 'on' ? 1 : 0) : 0;
+                $publish_test->show_solution = isset($inputs['show_solution']) ? ($inputs['show_solution'] == 'on' ? 1 : 0) : 0;
                 $publish_test->test_type = isset($inputs['test_type']) ? $inputs['test_type'] : null;
                 $publish_test->package = isset($inputs['package']) ? implode(',', $inputs['package']) : null;
                 $publish_test->test_cat = isset($inputs['test_cat']) ? $inputs['test_cat'] : null;
@@ -395,13 +395,13 @@ class ExamsController extends Controller
         $this->data['agency_boards'] = Gn_EducationClassExamAgencyBoardUniversity::where('education_type_id', $this->data['test']->education_type_id)->where('classes_group_exams_id', $this->data['test']->education_type_child_id)->get();
         $this->data['other_exams'] = Gn_OtherExamClassDetailModel::where('education_type_id', $this->data['test']->education_type_id)->where('classes_group_exams_id', $this->data['test']->education_type_child_id)->where('agency_board_university_id', $this->data['test']->board_state_agency)->get();
 
-        return view('Dashboard/Admin/Exam/publish_test')->with('data', $this->data);
+        return view('Dashboard.Admin.Exam.publish_test')->with('data', $this->data);
 
     }
 
     public function testSections(Request $req, $test_id)
     {
-        return view('Dashboard/Admin/Exam/sections', ['test_id' => $test_id]);
+        return view('Dashboard.Admin.Exam.sections', ['test_id' => $test_id]);
     }
 
     public function eductaion_type(Request $req)
@@ -620,7 +620,7 @@ class ExamsController extends Controller
                         foreach ($new_insert_data_diff_name as $value) {
                             $assign_class_group = new Gn_AssignClassGroupExamName;
                             $assign_class_group->education_type_id = $inputs['exam_education_type_id'];
-                            $assign_class_group->classes_group_exams_id = $examMd->id;
+                            $assign_class_group->classes_group_exams_id = $value;
                             $assign_class_group->save();
                         }
 
@@ -1146,7 +1146,7 @@ class ExamsController extends Controller
         $this->data['gn_other_exam_classes'] = Gn_OtherExamClassDetailModel::get();
         $this->data['other_exam_classes'] = Gn_DisplayOtherExamClassDetail::get();
 
-        return view('Dashboard/Admin/Exam/educationtypes')->with('data', $this->data);
+        return view('Dashboard.Admin.Exam.educationtypes')->with('data', $this->data);
     }
 
     public function subjects(Request $req)
@@ -1551,7 +1551,7 @@ class ExamsController extends Controller
         // ->leftJoin('subjects','gn__class_subjects.subject_id','subjects.id')
         // ->distinct()
         // ->get();
-        return view('Dashboard/Admin/Exam/subjects')->with('data', $this->data);
+        return view('Dashboard.Admin.Exam.subjects')->with('data', $this->data);
     }
 
     public function section(Request $req, $test_id = 0)
@@ -1581,7 +1581,7 @@ class ExamsController extends Controller
 
         // return;
 
-        return view('Dashboard/Admin/Exam/section_questions')->with('data', $this->data);
+        return view('Dashboard.Admin.Exam.section_questions')->with('data', $this->data);
     }
 
     public function section_question_add(Request $req, $test_id, $section_id)
@@ -1591,7 +1591,7 @@ class ExamsController extends Controller
         $this->data['section'] = $thisSection;
         // return;
 
-        return view('Dashboard/Admin/Exam/section_questions')->with('data', $this->data);
+        return view('Dashboard.Admin.Exam.section_questions')->with('data', $this->data);
     }
 
     public function attemptTest(Request $req)
@@ -1751,7 +1751,7 @@ class ExamsController extends Controller
             return json_encode($json_data);
         }
 
-        return view('Dashboard/Admin/Exam/teststable')->with('data', $this->data);
+        return view('Dashboard.Admin.Exam.teststable')->with('data', $this->data);
     }
 
     public function studentList(Request $req, $test_id)
@@ -1773,7 +1773,7 @@ class ExamsController extends Controller
 
             if (! empty($search_value)) {
 
-                $studentListData = TestAttempt::select(['test_attempts.id', 'users.name as username', 'test.title as title', 'test_attempts.created_at as created_at', 'test.created_at as test_create'])
+                $studentListData = TestAttempt::select(['test_attempts.id', 'users.name as username', 'test.title as title', 'test_attempts.created_at as created_at', 'test.created_at as test_create', 'test_attempts.status', 'test_attempts.is_in_review'])
                     ->leftJoin('users', function ($join) {
                         $join->on('users.id', 'test_attempts.student_id')
                             ->whereNull('users.deleted_at');
@@ -1790,7 +1790,7 @@ class ExamsController extends Controller
                 //     ->orderBy('id', 'desc')->skip($start)->take($length)->get();
                 $count = TestAttempt::get()->count();
             } else {
-                $studentListData = TestAttempt::select(['test_attempts.id', 'users.name as username', 'test.title as title', 'test_attempts.created_at as test_attempt', 'test.created_at as test_create'])
+                $studentListData = TestAttempt::select(['test_attempts.id', 'users.name as username', 'test.title as title', 'test_attempts.created_at as test_attempt', 'test.created_at as test_create', 'test_attempts.status', 'test_attempts.is_in_review'])
                     ->leftJoin('users', function ($join) {
                         $join->on('users.id', 'test_attempts.student_id')
                             ->whereNull('users.deleted_at');
@@ -1805,12 +1805,17 @@ class ExamsController extends Controller
             }
 
             foreach ($studentListData as $key => $testData) {
-
                 $studentListData[$key]['username'] = $testData->username;
                 $studentListData[$key]['title'] = $testData->title;
                 $studentListData[$key]['test_attempt_date'] = date('d-m-Y', strtotime($testData->test_attempt));
                 $studentListData[$key]['class_name'] = date('d-m-Y', strtotime($testData->test_create));
-
+                
+                // Add status for admin visibility
+                $status = $testData->status === 'completed' ? 'Completed' : 'Running';
+                if ($testData->is_in_review) {
+                    $status .= ' (Reviewing)';
+                }
+                $studentListData[$key]['status'] = $status;
             }
 
             $json_data = [
@@ -1823,7 +1828,7 @@ class ExamsController extends Controller
             return json_encode($json_data);
         }
 
-        return view('/Dashboard/Admin/Exam/student_list')->with('data', $this->data);
+        return view('Dashboard.Admin.Exam.student_list')->with('data', $this->data);
     }
 
     public function getpackage(Request $req, $education_type_id, $class_group_exam_id, $value)
@@ -1841,7 +1846,7 @@ class ExamsController extends Controller
 
         $result['test_cat'] = DB::table('test_cat')->get();
 
-        return view('/Dashboard/Admin/Exam/test_category_list', $result);
+        return view('Dashboard.Admin.Exam.test_category_list', $result);
     }
 
     public function manage_test_category(Request $req, $id = '')
@@ -1858,7 +1863,7 @@ class ExamsController extends Controller
             $result['id'] = '';
         }
 
-        return view('/Dashboard/Admin/Exam/test_category_add', $result);
+        return view('Dashboard.Admin.Exam.test_category_add', $result);
     }
 
     public function manage_test_cat_process(Request $req)

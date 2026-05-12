@@ -14,6 +14,29 @@
 
     {{-- Vite --}}
     @vite(['resources/css/mary.css', 'resources/js/app.js'])
+
+    <style>
+        /* Fix for pagination links that might escape Tailwind/MaryUI components */
+        .pagination, nav[role="navigation"] ul { @apply flex flex-wrap gap-1 items-center justify-center mt-6 mb-2; }
+        .pagination li, nav[role="navigation"] ul li { @apply list-none; }
+        .pagination li a, .pagination li span, nav[role="navigation"] ul li a, nav[role="navigation"] ul li span { 
+            @apply btn btn-sm btn-ghost border border-base-300 min-w-8 h-8 p-0 flex items-center justify-center font-bold text-xs transition-all; 
+        }
+        .pagination li.active span, nav[role="navigation"] ul li [aria-current="page"] span { 
+            @apply btn-primary text-primary-content border-primary shadow-sm; 
+        }
+        .pagination li.disabled span, nav[role="navigation"] ul li [aria-disabled="true"] span {
+            @apply opacity-30 cursor-not-allowed;
+        }
+        
+        /* Sidebar Polish */
+        .mary-menu-item { @apply rounded-xl transition-all duration-200; }
+        .mary-menu-item:hover { @apply bg-primary/5 translate-x-1; }
+        .mary-menu-item.active { @apply bg-primary/10 text-primary font-bold shadow-xs; }
+
+        /* Dashboard Card Polish */
+        .dashboard-card { @apply transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]; }
+    </style>
 </head>
 <body class="min-h-screen font-sans antialiased bg-base-200/50">
 
@@ -64,15 +87,15 @@
                         <div class="font-bold truncate text-base-content">{{ auth()->user()->name }}</div>
                         <div class="font-semibold tracking-wider text-base-content/50 truncate">
                            @if(auth()->user()->user_details)
-                                <small style="font-size: 0.75rem; color: #6c757d;">
+                                <div class="text-[10px] text-base-content/60 font-medium">
                                     {{ auth()->user()->user_details->education_type_data?->name ?? '' }} / 
                                     {{ auth()->user()->user_details->class_data?->name ?? '' }}
-                                </small>
+                                </div>
                             @endif
                             @if(auth()->user()->myInstitute)
-                                <br><small style="color: #6c757d; font-weight: normal;">
+                                <div class="text-[10px] text-primary font-bold">
                                     {{ auth()->user()->myInstitute->institute_name }}
-                                </small>
+                                </div>
                             @endif
                         </div>
                     </div>

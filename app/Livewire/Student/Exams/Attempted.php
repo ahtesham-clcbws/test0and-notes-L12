@@ -9,6 +9,8 @@ use Livewire\Component;
 class Attempted extends Component
 {
     use \Livewire\WithPagination;
+    
+    protected $paginationTheme = 'tailwind';
 
     public string $search = '';
     public array $sortBy = ['column' => 'id', 'direction' => 'desc'];

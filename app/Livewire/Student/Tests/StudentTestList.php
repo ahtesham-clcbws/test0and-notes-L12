@@ -24,7 +24,7 @@ class StudentTestList extends Component
 
     public $perPage = 10;
 
-    protected $paginationTheme = 'bootstrap';
+    protected $paginationTheme = 'tailwind';
 
     protected $queryString = [
         'search' => ['except' => ''],

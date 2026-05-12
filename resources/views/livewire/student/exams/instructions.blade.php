@@ -1,5 +1,5 @@
 <div class="max-w-7xl mx-auto py-4 px-4 min-h-screen">
-    <div class="flex flex-col lg:flex-row bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden min-h-[600px]">
+    <div class="flex flex-col lg:flex-row bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden min-h-150">
         
         {{-- LEFT PANEL: INSTRUCTIONS --}}
         <div class="flex-1 p-8 md:p-10 bg-white">
@@ -22,7 +22,7 @@
                 <h3 class="text-sm font-black text-gray-900 border-b-2 border-gray-900 inline-block pb-1 mb-6 uppercase tracking-wider">Instruction</h3>
                 
                 {{-- LEGEND BOX (Screenshot Match) --}}
-                <div class="bg-gray-50/30 rounded-xl border border-gray-100 p-4 flex flex-row items-center justify-around mb-10 max-w-2xl shadow-inner">
+                <div class="p-6 bg-gray-50 rounded-2xl shadow-inner border border-gray-100 flex flex-row items-center justify-around mb-10 max-w-2xl">
                     <div class="flex items-center gap-3">
                         <span class="w-7 h-7 rounded-full bg-success shadow-sm"></span>
                         <span class="font-bold text-gray-800 text-xs">Attempted</span>

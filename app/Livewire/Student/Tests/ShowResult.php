@@ -13,9 +13,8 @@ use Livewire\Component;
 class ShowResult extends Component
 {
     public $testId;
-
     public $studentId;
-
+    public $attemptId;
     public $test;
 
     public $total_question = 0;
@@ -79,7 +78,9 @@ class ShowResult extends Component
             return;
         }
 
-        $test_response = TestAttemptAnswer::where('test_attempt_id', $attempt->id)
+        $this->attemptId = $attempt->id;
+
+        $test_response = TestAttemptAnswer::where('test_attempt_id', $this->attemptId)
             ->get()
             ->keyBy('question_id');
 

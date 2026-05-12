@@ -39,6 +39,8 @@ class OnlineTestRunner extends Component
     public $attemptId;
 
     public bool $showSummaryModal = false;
+    public bool $showQuestionsModal = false;
+    public bool $showInstructionsModal = false;
 
     public $endTimestamp;
 
@@ -148,7 +150,7 @@ class OnlineTestRunner extends Component
 
     public function loadQuestionsStructure()
     {
-        $this->sections = $this->test->testSections()->with('sectionSubject')->get()->toArray();
+        $this->sections = $this->test->testSections()->with(['sectionSubject', 'sectionSubjectPart'])->get()->toArray();
 
         foreach ($this->sections as $index => $section) {
             $this->questionsList[$index] = $this->test->getQuestions()
