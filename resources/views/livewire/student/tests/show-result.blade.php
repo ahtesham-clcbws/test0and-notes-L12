@@ -110,7 +110,11 @@
                         @else
                             <div class="py-12 text-center">
                                 <x-icon name="o-lock-closed" class="w-16 h-16 text-gray-200 mx-auto mb-4" />
-                                <p class="text-gray-400 font-bold">Answers are currently locked by the administrator.</p>
+                                @if(($correct_answer + $incorrect_answer) == 0)
+                                    <p class="text-gray-400 font-bold">Answers are currently locked because you did not attempt any questions.</p>
+                                @else
+                                    <p class="text-gray-400 font-bold">Answers are currently locked by the administrator.</p>
+                                @endif
                             </div>
                         @endif
                     </div>
