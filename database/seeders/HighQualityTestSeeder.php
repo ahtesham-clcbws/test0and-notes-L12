@@ -81,7 +81,6 @@ class HighQualityTestSeeder extends Seeder
                 'show_result' => 1,
                 'gn_marks_per_questions' => 2,
                 'negative_marks' => 0.5,
-                'status' => 'active',
             ]);
 
             $sectionNames = [
