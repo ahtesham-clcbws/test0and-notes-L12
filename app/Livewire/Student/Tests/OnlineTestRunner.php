@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Student\Tests;
 
-use App\Models\Gn_StudentTestAttempt;
-use App\Models\Gn_Test_Response;
+use App\Models\TestAttempt;
+use App\Models\TestAttemptAnswer;
 use App\Models\QuestionBankModel;
 use App\Models\TestModal;
 use Illuminate\Support\Facades\Auth;
@@ -47,7 +47,7 @@ class OnlineTestRunner extends Component
         $this->testId = $testId;
         $this->test = TestModal::findOrFail($testId);
 
-        $attempt = Gn_StudentTestAttempt::where('student_id', Auth::id())
+        $attempt = TestAttempt::where('student_id', Auth::id())
             ->where('test_id', $testId)
             ->first();
 
@@ -57,7 +57,7 @@ class OnlineTestRunner extends Component
         }
 
         if (! $attempt) {
-            $attempt = Gn_StudentTestAttempt::create([
+            $attempt = TestAttempt::create([
                 'student_id' => Auth::id(),
                 'test_id' => $testId,
                 'test_attempt' => 1,
@@ -70,9 +70,7 @@ class OnlineTestRunner extends Component
             ]);
         } else {
             // STALE ATTEMPT PROTECTION
-            $responsesCount = Gn_Test_Response::where('student_id', Auth::id())
-                ->where('test_id', $testId)
-                ->count();
+            $responsesCount = TestAttemptAnswer::where('test_attempt_id', $attempt->id)->count();
 
             if ($responsesCount === 0 && $attempt->status === 'running') {
                 $attempt->update(['created_at' => now()]);
@@ -82,9 +80,7 @@ class OnlineTestRunner extends Component
         $this->attemptId = $attempt->id;
 
         // Load existing answers and states directly from DB tracking table
-        $existingResponses = Gn_Test_Response::where('student_id', Auth::id())
-            ->where('test_id', $this->testId)
-            ->get();
+        $existingResponses = TestAttemptAnswer::where('test_attempt_id', $this->attemptId)->get();
 
         foreach ($existingResponses as $response) {
             if ($response->answer) {
@@ -93,7 +89,7 @@ class OnlineTestRunner extends Component
             if ($response->is_visited) {
                 $this->visitedQuestions[] = $response->question_id;
             }
-            if ($response->is_marked) {
+            if ($response->is_marked_for_review) {
                 $this->markedQuestions[] = $response->question_id;
             }
         }
@@ -184,16 +180,15 @@ class OnlineTestRunner extends Component
 
     public function syncQuestionState($questionId)
     {
-        Gn_Test_Response::updateOrCreate(
+        TestAttemptAnswer::updateOrCreate(
             [
-                'student_id' => Auth::id(),
-                'test_id' => $this->testId,
+                'test_attempt_id' => $this->attemptId,
                 'question_id' => $questionId,
             ],
             [
                 'answer' => $this->answers[$questionId] ?? null,
                 'is_visited' => in_array($questionId, $this->visitedQuestions) ? 1 : 0,
-                'is_marked' => in_array($questionId, $this->markedQuestions) ? 1 : 0,
+                'is_marked_for_review' => in_array($questionId, $this->markedQuestions) ? 1 : 0,
             ]
         );
     }
@@ -226,9 +221,14 @@ class OnlineTestRunner extends Component
 
     public function updatePosition()
     {
-        $attempt = Gn_StudentTestAttempt::find($this->attemptId);
+        $attempt = TestAttempt::find($this->attemptId);
         if ($attempt) {
+            $currentQId = $this->getCurrentQuestionId();
+            $currentSecId = $this->sections[$this->currentSectionIndex]['id'] ?? null;
+            
             $attempt->update([
+                'last_section_id' => $currentSecId,
+                'last_question_id' => $currentQId,
                 'draft_state' => json_encode([
                     'current_section' => $this->currentSectionIndex,
                     'current_question' => $this->currentQuestionIndex,
@@ -270,7 +270,7 @@ class OnlineTestRunner extends Component
 
     public function submitTest()
     {
-        $attempt = Gn_StudentTestAttempt::find($this->attemptId);
+        $attempt = TestAttempt::find($this->attemptId);
         if ($attempt) {
             $attempt->update([
                 'status' => 'completed',
@@ -285,7 +285,7 @@ class OnlineTestRunner extends Component
     {
         $this->showSummaryModal = ! $this->showSummaryModal;
         
-        $attempt = Gn_StudentTestAttempt::find($this->attemptId);
+        $attempt = TestAttempt::find($this->attemptId);
         if ($attempt) {
             $attempt->update(['is_in_review' => $this->showSummaryModal ? 1 : 0]);
         }
@@ -295,7 +295,7 @@ class OnlineTestRunner extends Component
     {
         $this->showSummaryModal = true;
         
-        $attempt = Gn_StudentTestAttempt::find($this->attemptId);
+        $attempt = TestAttempt::find($this->attemptId);
         if ($attempt) {
             $attempt->update(['is_in_review' => 1]);
         }

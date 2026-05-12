@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\Count;
-use App\Models\Gn_StudentTestAttempt;
+use App\Models\TestAttempt;
 use App\Models\OtpVerifications;
 use App\Models\Studymaterial;
 use App\Models\TestCat;
@@ -38,7 +38,7 @@ class DashboardController extends Controller
         $User = UserDetails::get()->where('user_id', Auth::user()->id)->first();
         $class = $User->class;
         $education_type = $User->education_type;
-        $testAttempt = Gn_StudentTestAttempt::where('student_id', $stud_id)->get();
+        $testAttempt = TestAttempt::where('student_id', $stud_id)->get();
         $testAttemptCount = $testAttempt->count();
 
         $testTotal = TestModal::where('published', 1)

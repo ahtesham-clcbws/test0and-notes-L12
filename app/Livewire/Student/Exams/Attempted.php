@@ -16,7 +16,7 @@ class Attempted extends Component
     #[Layout('components.layouts.student-mary')]
     public function render()
     {
-        $attempts = \App\Models\Gn_StudentTestAttempt::query()
+        $attempts = \App\Models\TestAttempt::query()
             ->with(['test.EducationClass', 'test.institude'])
             ->where('student_id', Auth::id())
             ->when($this->search, function ($query) {

@@ -2,7 +2,8 @@
 
 namespace App\Livewire\Student\Tests;
 
-use App\Models\Gn_Test_Response;
+use App\Models\TestAttempt;
+use App\Models\TestAttemptAnswer;
 use App\Models\TestModal;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -54,7 +55,7 @@ class ShowResult extends Component
             return redirect()->route('student.dashboard');
         }
 
-        $attempt = \App\Models\Gn_StudentTestAttempt::where('student_id', $this->studentId)
+        $attempt = TestAttempt::where('student_id', $this->studentId)
             ->where('test_id', $this->testId)
             ->first();
 
@@ -68,13 +69,17 @@ class ShowResult extends Component
             return redirect()->back();
         }
 
-        $this->calculateResult();
+        $this->calculateResult($attempt);
     }
 
-    protected function calculateResult(): void
+    protected function calculateResult(?TestAttempt $attempt): void
     {
-        $test_response = Gn_Test_Response::where('student_id', $this->studentId)
-            ->where('test_id', $this->testId)
+        if (!$attempt) {
+            $this->not_attempted = $this->test->getQuestions()->distinct()->count();
+            return;
+        }
+
+        $test_response = TestAttemptAnswer::where('test_attempt_id', $attempt->id)
             ->get()
             ->keyBy('question_id');
 
@@ -98,12 +103,13 @@ class ShowResult extends Component
         }
 
         $marksPerQ = $this->test->gn_marks_per_questions ?? 1;
-        $this->total_marks = $this->total_question * $marksPerQ;
+        $negMarksPerQ = $this->test->gn_negative_marks_per_questions ?? 0;
 
-        $negativeMarkRate = (($this->test->negative_marks ?? 0) * $marksPerQ);
-        $this->negative_marks = $this->incorrect_answer * $negativeMarkRate;
-        $this->out_of_marks = $this->correct_answer * $marksPerQ;
-        $this->final_marks = $this->out_of_marks - $this->negative_marks;
+        $this->total_marks = $this->correct_answer * $marksPerQ;
+        $this->negative_marks = $this->incorrect_answer * $negMarksPerQ;
+
+        $this->final_marks = $this->total_marks - $this->negative_marks;
+        $this->out_of_marks = $this->total_question * $marksPerQ;
     }
 
     public function render()

@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\Educationtype;
-use App\Models\Gn_StudentTestAttempt;
-use App\Models\Gn_Test_Response;
+use App\Models\TestAttempt;
+use App\Models\TestAttemptAnswer;
 use App\Models\OtherCategoryClass;
 use App\Models\QuestionBankModel;
 use App\Models\TestModal;
@@ -224,7 +224,7 @@ class ExamsController extends Controller
             return redirect('/');
         }
 
-        $student_test_attempt = Gn_StudentTestAttempt::where('student_id', Auth::user()->id)->where('test_id', $name)->first();
+        $student_test_attempt = TestAttempt::where('student_id', Auth::user()->id)->where('test_id', $name)->first();
         if ($student_test_attempt) {
             return redirect()->route('student.show-result', [Auth::user()->id, $name]);
         }
@@ -260,7 +260,7 @@ class ExamsController extends Controller
             return redirect('/student');
         }
 
-        $test_response = Gn_Test_Response::where('student_id', $name)->where('test_id', $test_id)->orderBy('question_id', 'asc')->get();
+        $test_response = TestAttemptAnswer::where('student_id', $name)->where('test_id', $test_id)->orderBy('question_id', 'asc')->get();
         $questions = QuestionBankModel::whereIn('id', $test_response->pluck('question_id')->toArray())->orderBy('id', 'asc')->get();
         $correct_answer = 0;
         $incorrect_answer = 0;

@@ -10,8 +10,8 @@ use App\Models\CorporateEnquiry;
 use App\Models\FranchiseDetails;
 use App\Models\Gn_PackagePlan;
 use App\Models\Gn_PackageTransaction;
-use App\Models\Gn_StudentTestAttempt;
-use App\Models\Gn_Test_Response;
+use App\Models\TestAttempt;
+use App\Models\TestAttemptAnswer;
 use App\Models\OtpVerifications;
 use App\Models\QuestionBankModel;
 use App\Models\Studymaterial;
@@ -193,7 +193,7 @@ class APIController extends Controller
             // right, wrong counts
             if ($testData->test->show_result == 1) {
                 $r['result_status'] = 1;
-                $test_response = Gn_Test_Response::where('student_id', $testTableData[$key]['student_id'])->where('test_id', $testTableData[$key]['test_id'])->orderBy('question_id', 'asc')->get();
+                $test_response = TestAttemptAnswer::where('student_id', $testTableData[$key]['student_id'])->where('test_id', $testTableData[$key]['test_id'])->orderBy('question_id', 'asc')->get();
                 $questions = QuestionBankModel::whereIn('id', $test_response->pluck('question_id')->toArray())->orderBy('id', 'asc')->get();
                 $correct_answer = 0;
                 $incorrect_answer = 0;
@@ -334,12 +334,12 @@ class APIController extends Controller
         if ($request->has('attemted_questions')) {
             foreach ($request->attemted_questions as $value) {
                 if ($value['answer'] == '') {
-                    Gn_Test_Response::where('student_id', Auth::id())
+                    TestAttemptAnswer::where('student_id', Auth::id())
                         ->where('test_id', $request->test_id)
                         ->where('question_id', $value['question_id'])
                         ->delete();
                 } else {
-                    Gn_Test_Response::updateOrCreate(
+                    TestAttemptAnswer::updateOrCreate(
                         ['student_id' => Auth::id(), 'test_id' => $request->test_id, 'question_id' => $value['question_id']],
                         ['answer' => $value['answer']]
                     );
@@ -348,7 +348,7 @@ class APIController extends Controller
         }
 
         // 2. Update status to completed
-        $attempt = Gn_StudentTestAttempt::where('student_id', Auth::id())
+        $attempt = TestAttempt::where('student_id', Auth::id())
             ->where('test_id', $request->test_id)
             ->first();
 
@@ -356,7 +356,7 @@ class APIController extends Controller
             $attempt->update(['status' => 'completed']);
         } else {
             // Fallback for edge cases where attempt wasn't initialized
-            $attempt = Gn_StudentTestAttempt::create([
+            $attempt = TestAttempt::create([
                 'student_id' => Auth::id(),
                 'test_id' => $request->test_id,
                 'test_attempt' => 1,
@@ -1136,12 +1136,12 @@ class APIController extends Controller
             });
 
             // Initialize/Fetch Attempt record (Mirroring OnlineTestRunner.php logic)
-            $attempt = Gn_StudentTestAttempt::where('student_id', Auth::id())
+            $attempt = TestAttempt::where('student_id', Auth::id())
                 ->where('test_id', $request->test_id)
                 ->first();
 
             if (! $attempt) {
-                $attempt = Gn_StudentTestAttempt::create([
+                $attempt = TestAttempt::create([
                     'student_id' => Auth::id(),
                     'test_id' => $request->test_id,
                     'test_attempt' => 1,
@@ -1178,12 +1178,12 @@ class APIController extends Controller
 
         try {
             if ($request->answer === null || $request->answer === '') {
-                Gn_Test_Response::where('student_id', Auth::id())
+                TestAttemptAnswer::where('student_id', Auth::id())
                     ->where('test_id', $request->test_id)
                     ->where('question_id', $request->question_id)
                     ->delete();
             } else {
-                Gn_Test_Response::updateOrCreate(
+                TestAttemptAnswer::updateOrCreate(
                     ['student_id' => Auth::id(), 'test_id' => $request->test_id, 'question_id' => $request->question_id],
                     ['answer' => $request->answer]
                 );
@@ -1214,7 +1214,7 @@ class APIController extends Controller
                 return response()->json(['status' => 0, 'message' => 'Test not found']);
             }
 
-            $responses = Gn_Test_Response::where('student_id', $student_id)
+            $responses = TestAttemptAnswer::where('student_id', $student_id)
                 ->where('test_id', $test_id)
                 ->get()
                 ->keyBy('question_id');
@@ -1323,7 +1323,7 @@ class APIController extends Controller
     public function getAttemptedTests(Request $request)
     {
         try {
-            $attempts = Gn_StudentTestAttempt::where('student_id', Auth::id())
+            $attempts = TestAttempt::where('student_id', Auth::id())
                 ->with(['test'])
                 ->latest()
                 ->get();

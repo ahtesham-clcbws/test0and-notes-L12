@@ -139,7 +139,7 @@ class TestModal extends Model
 
     public function testAttempts()
     {
-        return $this->hasMany(Gn_StudentTestAttempt::class, 'test_id', 'id');
+        return $this->hasMany(TestAttempt::class, 'test_id', 'id');
     }
     // public function Reviewer()
     // {

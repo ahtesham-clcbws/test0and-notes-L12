@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Gn_StudentTestAttempt;
-use App\Models\Gn_Test_Response;
+use App\Models\TestAttempt;
+use App\Models\TestAttemptAnswer;
 use App\Models\QuestionBankModel;
 use App\Models\TestModal;
 use App\Models\User;
@@ -93,14 +93,14 @@ class TestController extends Controller
         if (empty($test)) {
             return redirect('/');
         }
-        $old_test_response = Gn_Test_Response::where('student_id', Auth::user()->id)->where('test_id', $name);
+        $old_test_response = TestAttemptAnswer::where('student_id', Auth::user()->id)->where('test_id', $name);
 
         if (! empty($old_test_response->get())) {
             $old_test_response->delete();
         }
 
         foreach ($request->attemted_questions as $key => $value) {
-            $test_response = new Gn_Test_Response;
+            $test_response = new TestAttemptAnswer;
             $test_response->student_id = Auth::user()->id;
             $test_response->test_id = $name;
             if ($value == 1) {
@@ -112,13 +112,13 @@ class TestController extends Controller
             $test_response->save();
         }
 
-        $old_student_test = Gn_StudentTestAttempt::where('student_id', Auth::user()->id)->where('test_id', $name)->first();
+        $old_student_test = TestAttempt::where('student_id', Auth::user()->id)->where('test_id', $name)->first();
 
         if ($old_student_test) {
             return redirect('show-result/'.Auth::user()->id.'/'.$name)->withErrors(['testError' => 'You have already submitted this test.']);
         }
 
-        $student_test = new Gn_StudentTestAttempt;
+        $student_test = new TestAttempt;
         $student_test->student_id = Auth::user()->id;
         $student_test->test_id = $name;
         $student_test->test_attempt = 1;
@@ -162,7 +162,7 @@ class TestController extends Controller
             return response()->json(['status' => 0, 'message' => 'Test not found']);
         }
 
-        $test_responses = Gn_Test_Response::where('student_id', $student_id)
+        $test_responses = TestAttemptAnswer::where('student_id', $student_id)
             ->where('test_id', $test_id)
             ->orderBy('question_id', 'asc')
             ->get();
@@ -276,7 +276,7 @@ class TestController extends Controller
     public function showTestResponse($name, $test_id)
     {
         return redirect('/');
-        // $test_response      = Gn_Test_Response::where('student_id',$name)->where('test_id',$test_id)->orderBy('question_id','asc')->get();
+        // $test_response      = TestAttemptAnswer::where('student_id',$name)->where('test_id',$test_id)->orderBy('question_id','asc')->get();
         // $questions          = QuestionBankModel::whereIn('id',$test_response->pluck('question_id')->toArray())->orderBy('id','asc')->get();
         // $test               = TestModal::find($test_id);
         // $answer['correct_answer']     = [];

@@ -19,7 +19,7 @@ use App\Models\Gn_DisplaySubjectPartChapter;
 use App\Models\Gn_EducationClassExamAgencyBoardUniversity;
 use App\Models\Gn_OtherExamClassDetailModel;
 use App\Models\Gn_PackagePlanTest;
-use App\Models\Gn_StudentTestAttempt;
+use App\Models\TestAttempt;
 use App\Models\Gn_SubjectPartLessionNew;
 use App\Models\OtherCategoryClass;
 use App\Models\QuestionBankModel;
@@ -1757,10 +1757,10 @@ class ExamsController extends Controller
     public function studentList(Request $req, $test_id)
     {
         $this->data['pagename'] = 'Student List';
-        // $studentListData = Gn_StudentTestAttempt::select(['gn__student_test_attempts.id','users.name as username','test.title'])
-        //         ->leftJoin('users','users.id','gn__student_test_attempts.student_id')
-        //         ->leftJoin('test','test.id','gn__student_test_attempts.test_id')
-        //         ->orderBy('gn__student_test_attempts.id', 'desc')->get();
+        // $studentListData = TestAttempt::select(['test_attempts.id','users.name as username','test.title'])
+        //         ->leftJoin('users','users.id','test_attempts.student_id')
+        //         ->leftJoin('test','test.id','test_attempts.test_id')
+        //         ->orderBy('test_attempts.id', 'desc')->get();
         if ($req->isMethod('post')) {
             $params['draw'] = $_REQUEST['draw'];
             $start = $_REQUEST['start'];
@@ -1773,35 +1773,35 @@ class ExamsController extends Controller
 
             if (! empty($search_value)) {
 
-                $studentListData = Gn_StudentTestAttempt::select(['gn__student_test_attempts.id', 'users.name as username', 'test.title as title', 'gn__student_test_attempts.created_at as created_at', 'test.created_at as test_create'])
+                $studentListData = TestAttempt::select(['test_attempts.id', 'users.name as username', 'test.title as title', 'test_attempts.created_at as created_at', 'test.created_at as test_create'])
                     ->leftJoin('users', function ($join) {
-                        $join->on('users.id', 'gn__student_test_attempts.student_id')
+                        $join->on('users.id', 'test_attempts.student_id')
                             ->whereNull('users.deleted_at');
                     })
                     ->leftJoin('test', function ($join) {
-                        $join->on('test.id', 'gn__student_test_attempts.test_id')
+                        $join->on('test.id', 'test_attempts.test_id')
                             ->whereNull('test.deleted_at');
                     })
                     ->where('test.id', '=', $test_id)
-                    ->orderBy('gn__student_test_attempts.id', 'desc')->skip($start)->take($length)->get();
+                    ->orderBy('test_attempts.id', 'desc')->skip($start)->take($length)->get();
                 // $testTableData = TestModal::select(['id', 'title', 'sections', 'total_questions', 'questions_submitted', 'questions_approved', 'reviewed', 'reviewed_status', 'published','created_at','education_type_child_id','published_status'])
                 //     ->where('user_id',Auth::user()->id)->orderBy('id', 'desc')
                 //     ->where("title", "like", "%" . $search_value . "%")
                 //     ->orderBy('id', 'desc')->skip($start)->take($length)->get();
-                $count = Gn_StudentTestAttempt::get()->count();
+                $count = TestAttempt::get()->count();
             } else {
-                $studentListData = Gn_StudentTestAttempt::select(['gn__student_test_attempts.id', 'users.name as username', 'test.title as title', 'gn__student_test_attempts.created_at as test_attempt', 'test.created_at as test_create'])
+                $studentListData = TestAttempt::select(['test_attempts.id', 'users.name as username', 'test.title as title', 'test_attempts.created_at as test_attempt', 'test.created_at as test_create'])
                     ->leftJoin('users', function ($join) {
-                        $join->on('users.id', 'gn__student_test_attempts.student_id')
+                        $join->on('users.id', 'test_attempts.student_id')
                             ->whereNull('users.deleted_at');
                     })
                     ->leftJoin('test', function ($join) {
-                        $join->on('test.id', 'gn__student_test_attempts.test_id')
+                        $join->on('test.id', 'test_attempts.test_id')
                             ->whereNull('test.deleted_at');
                     })
                     ->where('test.id', '=', $test_id)
-                    ->orderBy('gn__student_test_attempts.id', 'desc')->skip($start)->take($length)->get();
-                $count = Gn_StudentTestAttempt::count();
+                    ->orderBy('test_attempts.id', 'desc')->skip($start)->take($length)->get();
+                $count = TestAttempt::count();
             }
 
             foreach ($studentListData as $key => $testData) {

@@ -76,7 +76,7 @@ class User extends Authenticatable
 
     public function testAttempt()
     {
-        return $this->hasMany(Gn_StudentTestAttempt::class, 'student_id', 'id');
+        return $this->hasMany(TestAttempt::class, 'student_id', 'id');
     }
 
     public function role()

@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Student\Exams;
 
-use App\Models\Gn_StudentTestAttempt;
+use App\Models\TestAttempt;
 use App\Models\TestCat;
 use App\Models\TestModal;
 use App\Models\UserDetails;
@@ -108,7 +108,7 @@ class Index extends Component
         $tests = $query->orderBy($this->sortBy['column'], $this->sortBy['direction'])->paginate(10);
 
         // Map attempt status
-        $attempts = Gn_StudentTestAttempt::where('student_id', $stud_id)
+        $attempts = TestAttempt::where('student_id', $stud_id)
             ->whereIn('test_id', $tests->pluck('id'))
             ->pluck('test_id')
             ->toArray();

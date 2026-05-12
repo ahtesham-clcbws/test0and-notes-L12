@@ -50,7 +50,7 @@ class Dashboard extends Component
         $education_type = $userDetails->education_type;
 
         // Corrected legacy logic from DashboardController
-        $this->testAttemptCount = \App\Models\Gn_StudentTestAttempt::where('student_id', $stud_id)->count();
+        $this->testAttemptCount = \App\Models\TestAttempt::where('student_id', $stud_id)->count();
 
         $testTotal = \App\Models\TestModal::where('published', 1)
             ->where('education_type_id', $education_type)
