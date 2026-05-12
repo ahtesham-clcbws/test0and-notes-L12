@@ -84,6 +84,8 @@ class HighQualityTestSeeder extends Seeder
                     'reviewed' => 1,
                     'reviewed_status' => 'approved',
                     'show_result' => 1,
+                    'show_answer' => 1,
+                    'show_solution' => 1,
                     'gn_marks_per_questions' => 2,
                     'negative_marks' => 0.5,
                     // 'status' column removed as it doesn't exist
