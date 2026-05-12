@@ -122,7 +122,7 @@
                         <x-icon name="o-home" class="w-5 h-5" />
                         Back to Dashboard
                     </a>
-                    <a href="{{ route('student.tests.list') }}" class="flex-1 bg-[#16a34a] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-[#15803d] transition-colors shadow-lg shadow-green-200">
+                    <a href="{{ route('student.dashboard_tests_list') }}" class="flex-1 bg-[#16a34a] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-[#15803d] transition-colors shadow-lg shadow-green-200">
                         <x-icon name="o-arrow-path" class="w-5 h-5" />
                         Try Another Test
                     </a>
