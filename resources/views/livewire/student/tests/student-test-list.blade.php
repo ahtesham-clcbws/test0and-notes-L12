@@ -33,8 +33,12 @@
                                         @endphp
 
                                         @if (!$attempt)
-                                            <a class="btn btn-sm btn-info" href="{{ route('start-test', [$test->id]) }}" title="Start Test">
+                                            <a class="btn btn-sm btn-info" href="{{ route('student.start-test', [$test->id]) }}" title="Start Test">
                                                 <i class="bi bi-pencil-square me-2"></i>Start Test
+                                            </a>
+                                        @elseif ($attempt->status === 'running')
+                                            <a class="btn btn-sm btn-warning" href="{{ route('student.start-test', [$test->id]) }}" title="Resume Test">
+                                                <i class="bi bi-play-circle me-2"></i>Resume Test
                                             </a>
                                         @else
                                             <a class="btn btn-sm btn-secondary" href="javascript:void(0)" onClick="alert('Test Already submitted')" title="Test Submitted">
