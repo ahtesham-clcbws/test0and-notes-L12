@@ -33,6 +33,7 @@ class TestSections extends Model
         'publishing_date',
         'section_instruction',
         'gn_subject_part_lesson',
+        'is_published',
     ];
 
     public function Belongto()

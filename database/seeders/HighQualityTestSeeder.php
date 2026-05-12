@@ -69,7 +69,7 @@ class HighQualityTestSeeder extends Seeder
             $test = TestModal::create([
                 'title' => $tt['title'],
                 'test_cat' => DB::table('test_cat')->where('cat_name', $tt['cat'])->value('id') ?? 1,
-                'duration' => 60,
+                'time_to_complete' => 60,
                 'education_type_id' => $eduTypeId,
                 'education_type_child_id' => $eduChildId,
                 'sections' => 4,
@@ -79,7 +79,7 @@ class HighQualityTestSeeder extends Seeder
                 'reviewed' => 1,
                 'reviewed_status' => 'approved',
                 'show_result' => 1,
-                'marks_per_question' => 2,
+                'gn_marks_per_questions' => 2,
                 'negative_marks' => 0.5,
                 'status' => 'active',
             ]);
