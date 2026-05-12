@@ -17,6 +17,7 @@ class HighQualityTestSeeder extends Seeder
 {
     public function run()
     {
+        // 1. Identify the Target User
         $studentEmail = 'gyanesh@kumar.com';
         $user = User::where('email', $studentEmail)->first();
 
@@ -29,6 +30,7 @@ class HighQualityTestSeeder extends Seeder
         $eduTypeId = $userDetails->education_type;
         $eduChildId = $userDetails->class;
 
+        // 2. High-Quality Content Snippets
         $englishPassage = "The relentless acceleration of technological advancement, while ostensibly liberating, has engendered a profound ontological insecurity within modern society. We find ourselves in an epoch where the velocity of innovation has outstripped our cognitive and ethical capacities to assimilate its implications. The digital panopticon, constructed under the guise of convenience and connectivity, has fundamentally altered the architecture of human autonomy. Algorithms, once conceived as neutral tools of optimization, now function as architects of preference, subtly colonizing the inner landscape of individual choice.";
 
         $templates = [
@@ -60,87 +62,102 @@ class HighQualityTestSeeder extends Seeder
             ]
         ];
 
-        $testTypes = [
+        // 3. Create Tests
+        $testConfigs = [
             ['title' => 'PRODUCTION: SSC CGL Ultra Mock #01', 'cat' => 'Original Test'],
             ['title' => 'PRODUCTION: Elite Scholar Program #15', 'cat' => 'New Test'],
         ];
 
-        foreach ($testTypes as $tt) {
-            $test = TestModal::create([
-                'title' => $tt['title'],
-                'test_cat' => DB::table('test_cat')->where('cat_name', $tt['cat'])->value('id') ?? 1,
-                'time_to_complete' => 60,
-                'education_type_id' => $eduTypeId,
-                'education_type_child_id' => $eduChildId,
-                'sections' => 4,
-                'total_questions' => 100,
-                'published' => 0,
-                'published_status' => 'published',
-                'reviewed' => 1,
-                'reviewed_status' => 'approved',
-                'show_result' => 1,
-                'gn_marks_per_questions' => 2,
-                'negative_marks' => 0.5,
-            ]);
-
-            $sectionNames = [
-                'English Comprehension' => 'English',
-                'Quantitative Aptitude' => 'Quant',
-                'General Intelligence' => 'Reasoning',
-                'General Awareness' => 'GA'
-            ];
-
-            $idx = 1;
-            foreach ($sectionNames as $fullName => $shortName) {
-                $baseSubject = Subject::firstOrCreate(['name' => 'General Syllabus']);
-                $subjectPart = SubjectPart::firstOrCreate([
-                    'name' => $fullName,
-                    'classes_group_exams_id' => $eduChildId,
-                    'subject_id' => $baseSubject->id
+        foreach ($testConfigs as $config) {
+            DB::beginTransaction();
+            try {
+                $test = TestModal::create([
+                    'title' => $config['title'],
+                    'test_cat' => DB::table('test_cat')->where('cat_name', $config['cat'])->value('id') ?? 1,
+                    'time_to_complete' => 60,
+                    'education_type_id' => $eduTypeId,
+                    'education_type_child_id' => $eduChildId,
+                    'sections' => 4,
+                    'total_questions' => 100,
+                    'published' => 0,
+                    'published_status' => 'published',
+                    'reviewed' => 1,
+                    'reviewed_status' => 'approved',
+                    'show_result' => 1,
+                    'gn_marks_per_questions' => 2,
+                    'negative_marks' => 0.5,
+                    // 'status' column removed as it doesn't exist
                 ]);
 
-                $section = TestSections::create([
-                    'test_id' => $test->id,
-                    'subject' => $baseSubject->id,
-                    'subject_part' => $subjectPart->id,
-                    'section_index' => $idx++,
-                    'number_of_questions' => 25,
-                    'mcq_options' => 4,
-                    'difficulty_level' => 3,
-                    'is_published' => 1,
-                ]);
+                $sectionNames = [
+                    'English Comprehension' => 'English',
+                    'Quantitative Aptitude' => 'Quant',
+                    'General Intelligence' => 'Reasoning',
+                    'General Awareness' => 'GA'
+                ];
 
-                $pool = $templates[$shortName]['qs'] ?? $templates['English']['qs'];
+                $sIdx = 1;
+                foreach ($sectionNames as $fullName => $shortName) {
+                    $baseSubject = Subject::firstOrCreate(['name' => 'General Syllabus']);
+                    
+                    // NOTE: subject_parts table uses 'classes_group_exams_id'
+                    $subjectPart = SubjectPart::firstOrCreate([
+                        'name' => $fullName,
+                        'classes_group_exams_id' => $eduChildId,
+                        'subject_id' => $baseSubject->id
+                    ]);
 
-                for ($i = 0; $i < 25; $i++) {
-                    $t = $pool[$i % count($pool)];
-                    $qb = QuestionBankModel::create([
-                        'education_type_id' => $eduTypeId,
-                        'class_group_exam_id' => $eduChildId,
+                    $section = TestSections::create([
+                        'test_id' => $test->id,
                         'subject' => $baseSubject->id,
                         'subject_part' => $subjectPart->id,
-                        'question' => $t['q'] . " (ID: ".($i+100).")",
-                        'ans_1' => $t['a1'],
-                        'ans_2' => $t['a2'],
-                        'ans_3' => $t['a3'],
-                        'ans_4' => $t['a4'],
+                        'section_index' => $sIdx++,
+                        'number_of_questions' => 25,
                         'mcq_options' => 4,
-                        'mcq_answer' => $t['ans'],
-                        'status' => 'approved',
-                        'question_type' => 1,
+                        'difficulty_level' => 3,
+                        'is_published' => 1,
                     ]);
 
-                    TestQuestions::create([
-                        'test_id' => $test->id,
-                        'section_id' => $section->id,
-                        'question_id' => $qb->id,
-                    ]);
+                    $pool = $templates[$shortName]['qs'] ?? $templates['English']['qs'];
+
+                    for ($i = 0; $i < 25; $i++) {
+                        $t = $pool[$i % count($pool)];
+                        
+                        // NOTE: question_bank table uses 'class_group_exam_id'
+                        $qb = QuestionBankModel::create([
+                            'education_type_id' => $eduTypeId,
+                            'class_group_exam_id' => $eduChildId,
+                            'subject' => $baseSubject->id,
+                            'subject_part' => $subjectPart->id,
+                            'question' => $t['q'] . " (REF: " . ($i+1) . ")",
+                            'ans_1' => $t['a1'],
+                            'ans_2' => $t['a2'],
+                            'ans_3' => $t['a3'],
+                            'ans_4' => $t['a4'],
+                            'mcq_options' => 4,
+                            'mcq_answer' => $t['ans'],
+                            'status' => 'approved',
+                            'question_type' => 1,
+                        ]);
+
+                        TestQuestions::create([
+                            'test_id' => $test->id,
+                            'section_id' => $section->id,
+                            'question_id' => $qb->id,
+                        ]);
+                    }
                 }
-            }
 
-            $test->published = 1;
-            $test->saveQuietly();
-            echo "Seeded Test: " . $test->title . "\n";
+                // Finalize publication bypass
+                $test->published = 1;
+                $test->saveQuietly();
+                
+                DB::commit();
+                echo "Successfully Seeded: " . $test->title . "\n";
+            } catch (\Exception $e) {
+                DB::rollBack();
+                echo "Failed to Seed " . $config['title'] . ": " . $e->getMessage() . "\n";
+            }
         }
     }
 }
