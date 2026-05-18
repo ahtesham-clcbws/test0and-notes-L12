@@ -44,7 +44,7 @@
                                             <a class="btn btn-sm btn-secondary" href="javascript:void(0)" onClick="alert('Test Already submitted')" title="Test Submitted">
                                                 <i class="bi bi-check-circle me-2"></i>Submitted
                                             </a>
-                                            <a class="btn btn-sm btn-outline-info" href="{{ route('student.show-result', [Auth::user()->id, $test->id]) }}">
+                                            <a class="btn btn-sm btn-outline-info" href="{{ route('student.show-result', ['payload' => \Illuminate\Support\Facades\Crypt::encrypt(['student_id' => Auth::user()->id, 'test_id' => $test->id, 'mode' => 'result'])]) }}">
                                                 View Result
                                             </a>
                                         @endif

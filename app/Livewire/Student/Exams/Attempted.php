@@ -9,10 +9,11 @@ use Livewire\Component;
 class Attempted extends Component
 {
     use \Livewire\WithPagination;
-    
+
     protected $paginationTheme = 'tailwind';
 
     public string $search = '';
+
     public array $sortBy = ['column' => 'id', 'direction' => 'desc'];
 
     #[Layout('components.layouts.student-mary')]
@@ -27,6 +28,12 @@ class Attempted extends Component
                 });
             })
             ->paginate(10);
+
+        foreach ($attempts as $attempt) {
+            if ($attempt->status === 'running') {
+                $attempt->checkAndHandleExpiry();
+            }
+        }
 
         $headers = [
             ['key' => 'id', 'label' => '#', 'class' => 'w-1'],

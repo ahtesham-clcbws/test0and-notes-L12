@@ -171,3 +171,35 @@ function sendSMS($mobileNumber, $message)
     curl_close($ch);
     $response = json_decode($response);
 }
+
+function verifyOtp($otp, $credential = null)
+{
+    // 1. Check Default OTP from DB
+    $isDefault = \App\Models\DefaultOtp::where('otp', $otp)->where('is_active', 1)->exists();
+    if ($isDefault) {
+        return true;
+    }
+
+    // 2. Check in database if credential is provided
+    if ($credential) {
+        $timeLimit = now()->subMinutes(15);
+
+        $otpVerification = \App\Models\OtpVerifications::where('credential', $credential)
+            ->where('otp', $otp)
+            ->where('created_at', '>=', $timeLimit)
+            ->whereIn('status', ['pending', 'verified']) // Allow verified if recently checked (anti-double-tap)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($otpVerification) {
+            if ($otpVerification->status === 'pending') {
+                $otpVerification->status = 'verified';
+                $otpVerification->save();
+            }
+
+            return true;
+        }
+    }
+
+    return false;
+}

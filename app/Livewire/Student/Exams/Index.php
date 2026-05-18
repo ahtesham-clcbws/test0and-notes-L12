@@ -7,7 +7,6 @@ use App\Models\TestCat;
 use App\Models\TestModal;
 use App\Models\UserDetails;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -17,7 +16,7 @@ use Livewire\WithPagination;
 class Index extends Component
 {
     use WithPagination;
-    
+
     protected $paginationTheme = 'tailwind';
 
     #[Url]
@@ -27,6 +26,7 @@ class Index extends Component
     public ?int $category = null;
 
     public int $type = 1;
+
     public string $source = 'global'; // global, institute
 
     public array $sortBy = ['column' => 'id', 'direction' => 'desc'];
@@ -34,13 +34,14 @@ class Index extends Component
     #[Layout('components.layouts.student-mary')]
     public function mount(): void
     {
-        $routeName = Route::currentRouteName();
+        $route = request()->route();
+        $routeName = ($route instanceof \Illuminate\Routing\Route) ? (string) $route->getName() : '';
         $path = request()->path();
 
         if (str_contains($routeName, 'gyanology')) {
             $this->type = 0;
         }
-        
+
         // Ensure source is strictly matched to provide legacy parity
         if (str_contains($routeName, 'institute_tests') || str_contains($path, 'coaching-tests')) {
             $this->source = 'institute';
@@ -48,15 +49,15 @@ class Index extends Component
             $this->source = 'global';
         }
 
-        if (request()->route('cat')) {
-            $this->category = (int) request()->route('cat');
+        if ($route instanceof \Illuminate\Routing\Route && $route->parameter('cat')) {
+            $this->category = (int) $route->parameter('cat');
         }
     }
 
     #[Computed]
     public function categories()
     {
-        return TestCat::orderBy('cat_name')->get()->map(fn($c) => ['id' => $c->id, 'name' => $c->cat_name]);
+        return TestCat::orderBy('cat_name')->get()->map(fn ($c) => ['id' => $c->id, 'name' => $c->cat_name]);
     }
 
     public function headers(): array
@@ -106,7 +107,6 @@ class Index extends Component
             $query->where('title', 'like', '%'.$this->search.'%');
         }
 
-
         $tests = $query->orderBy($this->sortBy['column'], $this->sortBy['direction'])->paginate(10);
 
         // Map attempt status
@@ -117,6 +117,9 @@ class Index extends Component
 
         foreach ($tests as $test) {
             $attempt = $attempts->get($test->id);
+            if ($attempt && $attempt->status === 'running') {
+                $attempt->checkAndHandleExpiry();
+            }
             $test->attempt_status = $attempt ? $attempt->status : 'not_started';
             $cat = $this->categories->firstWhere('id', $test->test_cat);
             $test->category_name = $cat['name'] ?? 'Uncategorized';

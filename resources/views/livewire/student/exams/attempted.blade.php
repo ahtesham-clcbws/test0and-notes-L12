@@ -31,7 +31,7 @@
                         <x-button 
                             label="View Result" 
                             icon="o-chart-bar" 
-                            link="{{ route('student.show-result', [auth()->id(), $attempt->test->id]) }}" 
+                            link="{{ route('student.show-result', ['payload' => \Illuminate\Support\Facades\Crypt::encrypt(['student_id' => auth()->id(), 'test_id' => $attempt->test->id, 'mode' => 'result'])]) }}" 
                             class="btn-sm btn-outline btn-success" 
                             no-wire-navigate />
                     @else

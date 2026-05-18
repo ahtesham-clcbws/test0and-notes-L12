@@ -12,45 +12,78 @@ use Livewire\Component;
 #[Layout('components.layouts.student-exam-mary')]
 class ShowResult extends Component
 {
-    public $testId;
-    public $studentId;
-    public $attemptId;
-    public $test;
+    public int $testId;
 
-    public $total_question = 0;
+    public int $studentId;
 
-    public $total_marks = 0;
+    public ?int $attemptId = null;
 
-    public $correct_answer = 0;
+    public ?TestModal $test = null;
 
-    public $incorrect_answer = 0;
+    public int $total_question = 0;
 
-    public $not_attempted = 0;
+    public int|float $total_marks = 0;
 
-    public $negative_marks = 0;
+    public int $correct_answer = 0;
 
-    public $out_of_marks = 0;
+    public int $incorrect_answer = 0;
 
-    public $final_marks = 0;
+    public int $not_attempted = 0;
 
-    public $selectedQuestionId = null;
+    public int|float $negative_marks = 0;
+
+    public int|float $out_of_marks = 0;
+
+    public int|float $final_marks = 0;
+
+    public ?int $selectedQuestionId = null;
 
     public bool $showSolutionModal = false;
 
-    public function viewSolution($questionId)
+    public string $mode = 'result';
+
+    public ?string $selectedAnswer = null;
+
+    public int $attemptedCount = 0;
+
+    public int $unattemptedCount = 0;
+
+    public int $reviewCount = 0;
+
+    public int $visitedCount = 0;
+
+    public function viewSolution(int|string $questionId): void
     {
-        $this->selectedQuestionId = $questionId;
-        $this->showSolutionModal = true;
+        $this->selectedQuestionId = (int) $questionId;
+
+        $attempt = TestAttempt::find($this->attemptId);
+
+        if ($attempt) {
+            $resp = TestAttemptAnswer::where('test_attempt_id', $attempt->id)
+                ->where('question_id', $this->selectedQuestionId)
+                ->first();
+
+            $this->selectedAnswer = $resp ? $resp->answer : null;
+            $this->showSolutionModal = true;
+        } else {
+            $this->selectedAnswer = null;
+        }
     }
 
-    public function mount($student_id, $test_id)
+    public function mount(string $payload)
     {
-        $this->studentId = $student_id;
-        $this->testId = $test_id;
+        try {
+            $decrypted = \Illuminate\Support\Facades\Crypt::decrypt($payload);
+            $this->studentId = (int) $decrypted['student_id'];
+            $this->testId = (int) $decrypted['test_id'];
+            $this->mode = $decrypted['mode'] ?? 'result';
+        } catch (\Exception $e) {
+            return redirect()->route('student.dashboard');
+        }
 
         $this->test = TestModal::find($this->testId);
 
-        if (empty($this->test) || Auth::id() != $this->studentId) {
+        if (! $this->test || Auth::id() != $this->studentId) {
             return redirect()->route('student.dashboard');
         }
 
@@ -58,8 +91,15 @@ class ShowResult extends Component
             ->where('test_id', $this->testId)
             ->first();
 
+        // Safe-guard: if attempt is still running/active, redirect to dedicated review screen!
         if ($attempt && $attempt->status === 'running') {
-            return redirect()->route('student.start-test', [$this->testId]);
+            $revPayload = \Illuminate\Support\Facades\Crypt::encrypt([
+                'student_id' => $this->studentId,
+                'test_id' => $this->testId,
+                'mode' => 'review',
+            ]);
+
+            return redirect()->route('student.test-review', ['payload' => $revPayload]);
         }
 
         if ($this->test->show_result != 1) {
@@ -73,8 +113,9 @@ class ShowResult extends Component
 
     protected function calculateResult(?TestAttempt $attempt): void
     {
-        if (!$attempt) {
+        if (! $attempt) {
             $this->not_attempted = $this->test->getQuestions()->distinct()->count();
+
             return;
         }
 
@@ -84,9 +125,16 @@ class ShowResult extends Component
             ->get()
             ->keyBy('question_id');
 
-        // Fetch ALL questions for this test to calculate total correctly
         $allQuestions = $this->test->getQuestions()->distinct()->get();
         $this->total_question = $allQuestions->count();
+
+        $this->correct_answer = 0;
+        $this->incorrect_answer = 0;
+        $this->not_attempted = 0;
+        $this->attemptedCount = 0;
+        $this->unattemptedCount = 0;
+        $this->reviewCount = 0;
+        $this->visitedCount = 0;
 
         foreach ($allQuestions as $question) {
             $response = $test_response->get($question->id);
@@ -98,10 +146,23 @@ class ShowResult extends Component
                     $this->incorrect_answer++;
                 }
             } else {
-                // No response or empty answer = Not Attempted!
                 $this->not_attempted++;
             }
+
+            if ($response) {
+                if ($response->answer !== null && $response->answer !== '') {
+                    $this->attemptedCount++;
+                }
+                if ($response->is_marked_for_review) {
+                    $this->reviewCount++;
+                }
+                if ($response->is_visited) {
+                    $this->visitedCount++;
+                }
+            }
         }
+
+        $this->unattemptedCount = $this->total_question - $this->attemptedCount;
 
         $marksPerQ = $this->test->gn_marks_per_questions ?? 1;
         $negMarksPerQ = $this->test->gn_negative_marks_per_questions ?? 0;

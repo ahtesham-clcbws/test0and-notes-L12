@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Student\Tests;
 
+use App\Models\QuestionBankModel;
 use App\Models\TestAttempt;
 use App\Models\TestAttemptAnswer;
-use App\Models\QuestionBankModel;
 use App\Models\TestModal;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -14,61 +14,74 @@ use Livewire\Component;
 #[Layout('components.layouts.student-exam-mary')]
 class OnlineTestRunner extends Component
 {
-    public $testId;
+    public int $testId;
 
-    public $test;
+    public ?TestModal $test = null;
 
-    public $sections = [];
-
-    #[Url]
-    public $currentSectionIndex = 0;
+    public array $sections = [];
 
     #[Url]
-    public $currentQuestionIndex = 0;
+    public int $currentSectionIndex = 0;
 
-    public $questionsList = []; // Array of Question IDs for the current view/section
+    #[Url]
+    public int $currentQuestionIndex = 0;
 
-    public $answers = []; // ['question_id' => 'answer']
+    public array $questionsList = []; // Array of Question IDs for the current view/section
 
-    public $markedQuestions = []; // ['question_id']
+    public array $answers = []; // ['question_id' => 'answer']
 
-    public $visitedQuestions = []; // ['question_id']
+    public array $markedQuestions = []; // ['question_id']
 
-    public $timeLeft = 0;
+    public array $visitedQuestions = []; // ['question_id']
 
-    public $attemptId;
+    public int|string $timeLeft = 0;
+
+    public ?int $attemptId = null;
 
     public bool $showSummaryModal = false;
+
     public bool $showQuestionsModal = false;
+
     public bool $showInstructionsModal = false;
 
-    public $endTimestamp;
+    public bool $showSkipConfirmationModal = false;
 
-    public function mount($testId)
+    public int $endTimestamp = 0;
+
+    public function mount(int|string $testId)
     {
-        $this->testId = $testId;
-        $this->test = TestModal::findOrFail($testId);
+        $this->testId = (int) $testId;
+        $this->test = TestModal::findOrFail($this->testId);
 
         $attempt = TestAttempt::where('student_id', Auth::id())
-            ->where('test_id', $testId)
+            ->where('test_id', $this->testId)
             ->first();
 
         // RESUME LOGIC: Only redirect to result if the attempt is NOT 'running'
-        if ($attempt && $attempt->status !== 'running') {
-            return redirect()->route('student.show-result', [Auth::id(), $testId]);
+        if ($attempt) {
+            $attempt->checkAndHandleExpiry();
+            if ($attempt->status !== 'running') {
+                $payload = \Illuminate\Support\Facades\Crypt::encrypt([
+                    'student_id' => Auth::id(),
+                    'test_id' => $this->testId,
+                    'mode' => 'result',
+                ]);
+
+                return redirect()->route('student.show-result', ['payload' => $payload]);
+            }
         }
 
         if (! $attempt) {
             $attempt = TestAttempt::create([
                 'student_id' => Auth::id(),
-                'test_id' => $testId,
+                'test_id' => $this->testId,
                 'test_attempt' => 1,
                 'status' => 'running',
                 'is_in_review' => 0,
-                'draft_state' => json_encode([
+                'draft_state' => [
                     'current_section' => 0,
-                    'current_question' => 0
-                ]),
+                    'current_question' => 0,
+                ],
             ]);
         } else {
             // STALE ATTEMPT PROTECTION
@@ -97,13 +110,13 @@ class OnlineTestRunner extends Component
         }
 
         // Restore Position
-        if ($attempt->draft_state) {
-            $draft = json_decode($attempt->draft_state, true);
-            if (!request()->has('currentSectionIndex')) {
-                $this->currentSectionIndex = $draft['current_section'] ?? 0;
+        if ($attempt->draft_state && is_array($attempt->draft_state)) {
+            $draft = $attempt->draft_state;
+            if (! request()->has('currentSectionIndex')) {
+                $this->currentSectionIndex = (int) ($draft['current_section'] ?? 0);
             }
-            if (!request()->has('currentQuestionIndex')) {
-                $this->currentQuestionIndex = $draft['current_question'] ?? 0;
+            if (! request()->has('currentQuestionIndex')) {
+                $this->currentQuestionIndex = (int) ($draft['current_question'] ?? 0);
             }
         }
 
@@ -139,7 +152,7 @@ class OnlineTestRunner extends Component
         $this->endTimestamp = $expiryTime * 1000;
 
         $this->loadQuestionsStructure();
-        
+
         $currentQId = $this->getCurrentQuestionId();
         if ($currentQId && ! in_array($currentQId, $this->visitedQuestions)) {
             $this->visitedQuestions[] = $currentQId;
@@ -148,7 +161,7 @@ class OnlineTestRunner extends Component
         }
     }
 
-    public function loadQuestionsStructure()
+    public function loadQuestionsStructure(): void
     {
         $this->sections = $this->test->testSections()->with(['sectionSubject', 'sectionSubjectPart'])->get()->toArray();
 
@@ -161,80 +174,80 @@ class OnlineTestRunner extends Component
         }
     }
 
-    public function selectQuestion($sectionIndex, $questionIndex)
+    public function selectQuestion(int|string $sectionIndex, int|string $questionIndex): void
     {
-        $this->currentSectionIndex = $sectionIndex;
-        $this->currentQuestionIndex = $questionIndex;
+        $this->currentSectionIndex = (int) $sectionIndex;
+        $this->currentQuestionIndex = (int) $questionIndex;
 
         $currentQId = $this->getCurrentQuestionId();
         if ($currentQId && ! in_array($currentQId, $this->visitedQuestions)) {
             $this->visitedQuestions[] = $currentQId;
             $this->syncQuestionState($currentQId);
         }
-        
+
         $this->updatePosition();
     }
 
-    public function getCurrentQuestionId()
+    public function getCurrentQuestionId(): ?int
     {
         return $this->questionsList[$this->currentSectionIndex][$this->currentQuestionIndex] ?? null;
     }
 
-    public function syncQuestionState($questionId)
+    public function syncQuestionState(int|string $questionId): void
     {
         TestAttemptAnswer::updateOrCreate(
             [
                 'test_attempt_id' => $this->attemptId,
-                'question_id' => $questionId,
+                'question_id' => (int) $questionId,
             ],
             [
-                'answer' => $this->answers[$questionId] ?? null,
-                'is_visited' => in_array($questionId, $this->visitedQuestions) ? 1 : 0,
-                'is_marked_for_review' => in_array($questionId, $this->markedQuestions) ? 1 : 0,
+                'answer' => $this->answers[(int) $questionId] ?? null,
+                'is_visited' => in_array((int) $questionId, $this->visitedQuestions) ? 1 : 0,
+                'is_marked_for_review' => in_array((int) $questionId, $this->markedQuestions) ? 1 : 0,
             ]
         );
     }
 
-    public function saveSelection($questionId, $answer)
+    public function saveSelection(int|string $questionId, string $answer): void
     {
-        $this->answers[$questionId] = $answer;
-        $this->syncQuestionState($questionId);
+        $this->answers[(int) $questionId] = $answer;
+        $this->syncQuestionState((int) $questionId);
         $this->updatePosition();
     }
 
-    public function clearResponse($questionId)
+    public function clearResponse(int|string $questionId): void
     {
-        unset($this->answers[$questionId]);
-        $this->syncQuestionState($questionId);
+        unset($this->answers[(int) $questionId]);
+        $this->syncQuestionState((int) $questionId);
         $this->updatePosition();
     }
 
-    public function toggleMarkForReview($questionId)
+    public function toggleMarkForReview(int|string $questionId): void
     {
-        if (in_array($questionId, $this->markedQuestions)) {
-            $this->markedQuestions = array_values(array_diff($this->markedQuestions, [$questionId]));
+        if (in_array((int) $questionId, $this->markedQuestions)) {
+            $this->markedQuestions = array_values(array_diff($this->markedQuestions, [(int) $questionId]));
         } else {
-            $this->markedQuestions[] = $questionId;
+            $this->markedQuestions[] = (int) $questionId;
         }
 
-        $this->syncQuestionState($questionId);
+        $this->syncQuestionState((int) $questionId);
         $this->updatePosition();
     }
 
-    public function updatePosition()
+    public function updatePosition(): void
     {
         $attempt = TestAttempt::find($this->attemptId);
         if ($attempt) {
             $currentQId = $this->getCurrentQuestionId();
             $currentSecId = $this->sections[$this->currentSectionIndex]['id'] ?? null;
-            
+
             $attempt->update([
                 'last_section_id' => $currentSecId,
                 'last_question_id' => $currentQId,
-                'draft_state' => json_encode([
+                'draft_state' => [
                     'current_section' => $this->currentSectionIndex,
                     'current_question' => $this->currentQuestionIndex,
-                ]),
+                ],
             ]);
         }
     }
@@ -257,6 +270,7 @@ class OnlineTestRunner extends Component
 
             if ($nextSecIndex >= count($this->sections)) {
                 $this->goToReview();
+
                 return;
             }
         }
@@ -266,7 +280,7 @@ class OnlineTestRunner extends Component
             $this->visitedQuestions[] = $currentQId;
             $this->syncQuestionState($currentQId);
         }
-        
+
         $this->updatePosition();
     }
 
@@ -280,29 +294,35 @@ class OnlineTestRunner extends Component
             ]);
         }
 
-        return redirect()->route('student.show-result', [Auth::id(), $this->testId]);
+        $payload = \Illuminate\Support\Facades\Crypt::encrypt([
+            'student_id' => Auth::id(),
+            'test_id' => $this->testId,
+            'mode' => 'result',
+        ]);
+
+        return redirect()->route('student.show-result', ['payload' => $payload]);
     }
 
-    public function toggleSummaryModal()
+    public function confirmSkipAndNext(): void
     {
-        $this->showSummaryModal = ! $this->showSummaryModal;
-        
-        $attempt = TestAttempt::find($this->attemptId);
-        if ($attempt) {
-            $attempt->update(['is_in_review' => $this->showSummaryModal ? 1 : 0]);
-        }
+        $this->showSkipConfirmationModal = false;
+        $this->saveAndNext();
     }
 
     public function goToReview()
     {
-        $this->showSummaryModal = true;
-        
         $attempt = TestAttempt::find($this->attemptId);
         if ($attempt) {
             $attempt->update(['is_in_review' => 1]);
         }
-        
-        $this->updatePosition();
+
+        $payload = \Illuminate\Support\Facades\Crypt::encrypt([
+            'student_id' => Auth::id(),
+            'test_id' => $this->testId,
+            'mode' => 'review',
+        ]);
+
+        return redirect()->route('student.test-review', ['payload' => $payload]);
     }
 
     public function render()

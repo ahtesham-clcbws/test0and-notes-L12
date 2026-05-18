@@ -5,19 +5,21 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
 use App\Mail\NotifyAdminStudentSignup;
+use App\Mail\OTPMail;
 use App\Mail\sendFranchiseEmail;
 use App\Models\CorporateEnquiry;
 use App\Models\FranchiseDetails;
 use App\Models\Gn_PackagePlan;
 use App\Models\Gn_PackageTransaction;
-use App\Models\TestAttempt;
-use App\Models\TestAttemptAnswer;
 use App\Models\OtpVerifications;
 use App\Models\QuestionBankModel;
 use App\Models\Studymaterial;
+use App\Models\TestAttempt;
+use App\Models\TestAttemptAnswer;
 use App\Models\TestModal;
 use App\Models\User;
 use App\Models\UserDetails;
+use App\Services\Msg91Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +32,7 @@ use Razorpay\Api\Api;
 
 class APIController extends Controller
 {
-    public $returnResponse;
+    public array $returnResponse;
 
     public function __construct()
     {
@@ -373,6 +375,12 @@ class APIController extends Controller
 
     public function studentSignup(Request $request)
     {
+        // Verify OTP if provided
+        if ($request->has('otp')) {
+            if (! verifyOtp($request->otp, $request->input('mobile_number'))) {
+                return response()->json(['status' => 0, 'message' => 'Invalid or expired OTP']);
+            }
+        }
 
         // return json_encode($request->all());
         $userDb = new User;
@@ -513,21 +521,38 @@ class APIController extends Controller
         $otp = rand(100000, 999999);
 
         // Store in otp_verifications table
-        DB::table('otp_verifications')->updateOrInsert(
-            ['mobile' => $user->mobile],
+        OtpVerifications::updateOrCreate(
+            ['credential' => $user->mobile],
             [
+                'type' => 'mobile',
                 'otp' => $otp,
-                'created_at' => now(),
                 'status' => 'pending',
+                'created_at' => now(),
             ]
         );
 
-        // In a real app, send SMS/Email here.
-        // For now, returning status 1.
+        // Send OTP via Email if available
+        if ($user->email) {
+            try {
+                Mail::to($user->email)->send(new OTPMail($otp));
+            } catch (\Exception $e) {
+                Log::error('Error sending OTP email: '.$e->getMessage());
+            }
+        }
+
+        // Send SMS OTP via MSG91
+        if ($user->mobile) {
+            try {
+                app(Msg91Service::class)->sendSms($user->mobile, $otp);
+            } catch (\Exception $e) {
+                Log::error('Error sending ForgotPassword OTP SMS: '.$e->getMessage());
+            }
+        }
+
         return response()->json([
             'status' => 1,
             'message' => 'OTP sent successfully',
-            'otp' => $otp, // REMOVE THIS in production, added for testing as requested
+            'otp' => $otp, // Comment out in production
         ]);
     }
 
@@ -577,6 +602,7 @@ class APIController extends Controller
 
     public function getOTP(Request $request)
     {
+        $returnResponse = $this->returnResponse;
         $mobileNumber = $request->input('mobile');
         // check for unique
         $query = User::where('mobile', $mobileNumber)->first();
@@ -600,31 +626,36 @@ class APIController extends Controller
         }
 
         $otp = mt_rand(100000, 999999);
-        // $mobileMessage  = 'Dear user, Your OTP for sign up to Test and Notes portal is ' . $otp . '. Valid for 10 minutes. Please do not share this OTP. Regards, Test and Notes Team';
-        // $templateId     = 1207163026060776390;
-        // $url            = 'http://198.24.149.4/API/pushsms.aspx?loginID=rajji1&password=kanpureduup78&mobile=' . $mobileNumber . '&text=' . $mobileMessage . '&senderid=GYNLGY&route_id=2&Unicode=0&Template_id=' . $templateId;
-        // $response       = Http::get($url);
 
-        // $message    = rawurlencode('Dear user%nYour OTP for sign up to Test and Notes portal is ' . $otp . '.%nValid for 10 minutes. Please do not share this OTP.%nRegards%nTest and Notes Team');
-        // $sender     = urlencode("GYNLGY");
-        // $apikey     = urlencode("MzQ0YzZhMzU2ZTY2NjI0YjU4Mzc0NDMxNmU3MjYzNmM=");
-        // $url        = 'https://api.textlocal.in/send/?apikey=' . $apikey . '&numbers=' . $mobileNumber . '&sender=' . $sender . '&message=' . $message;
-
-        // $ch         = curl_init($url);
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        // $response   = curl_exec($ch);
-        // curl_close($ch);
-        // $response   = json_decode($response);
-        // if ($response) {
         $otpVerifications = new OtpVerifications;
-        $otpVerifications->type = 'mobile';
+        $otpVerifications->type = 'mobile'; // Default type for this endpoint
         $otpVerifications->credential = $mobileNumber;
         $otpVerifications->otp = $otp;
+        $otpVerifications->status = 'pending';
         $saveToDb = $otpVerifications->save();
 
-        // if ($saveToDb && $response->status == 'success') {
         if ($saveToDb) {
+            // If the user already exists, try to send to their email as well
+            $user = User::where('mobile', $mobileNumber)->first();
+            if ($user && $user->email) {
+                try {
+                    Mail::to($user->email)->send(new OTPMail($otp));
+                } catch (\Exception $e) {
+                    Log::error('Error sending OTP email in getOTP: '.$e->getMessage());
+                }
+            }
+
+            // Send SMS OTP via MSG91
+            if ($mobileNumber) {
+                try {
+                    app(Msg91Service::class)->sendSms($mobileNumber, $otp);
+                } catch (\Exception $e) {
+                    Log::error('Error sending Signup OTP SMS: '.$e->getMessage());
+                }
+            }
+
             $returnResponse['success'] = true;
+            $returnResponse['otp'] = $otp; // Added for development/testing as requested in other methods
         }
 
         return json_encode($returnResponse);
@@ -699,22 +730,9 @@ class APIController extends Controller
     public function verifyOTP(Request $request)
     {
         $mobile = $request->input('mobile');
-        if (defaultNumberCheck($mobile)) {
-            return response()->json(['status' => 1, 'message' => 'OTP verified (Default)']);
-        }
-
         $otp = $request->input('otp');
-        $type = $request->input('type') ?? 'mobile'; // Default to mobile
-        $time = date('Y-m-d H:i:s', strtotime('-11 minutes'));
 
-        $otpData = OtpVerifications::where([
-            ['type', '=', $type],
-            ['credential', '=', $mobile],
-            ['otp', '=', $otp],
-            ['created_at', '>', $time],
-        ])->first();
-
-        if ($otpData) {
+        if (verifyOtp($otp, $mobile)) {
             return response()->json(['status' => 1, 'message' => 'OTP verified successfully']);
         }
 
@@ -1140,6 +1158,10 @@ class APIController extends Controller
                 ->where('test_id', $request->test_id)
                 ->first();
 
+            if ($attempt) {
+                $attempt->checkAndHandleExpiry();
+            }
+
             if (! $attempt) {
                 $attempt = TestAttempt::create([
                     'student_id' => Auth::id(),
@@ -1327,6 +1349,12 @@ class APIController extends Controller
                 ->with(['test'])
                 ->latest()
                 ->get();
+
+            foreach ($attempts as $attempt) {
+                if ($attempt->status === 'running') {
+                    $attempt->checkAndHandleExpiry();
+                }
+            }
 
             return response()->json([
                 'status' => 1,

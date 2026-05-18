@@ -42,8 +42,6 @@
         </div>
     </div>
 
-    @if(!$showSummaryModal)
-        {{-- VIEW A: TESTING CONDUCT --}}
         <div class="flex-1 flex px-8 py-6 gap-8 w-full max-w-400 mx-auto">
             
             {{-- Left Column: Question Area --}}
@@ -124,13 +122,23 @@
                             </button>
                         </div>
 
-                        <button 
-                            wire:click="saveAndNext"
-                            class="bg-[#16a34a] text-white px-6 py-2 font-bold text-sm flex items-center gap-2 hover:bg-[#15803d] transition-colors cursor-pointer"
-                        >
-                            <x-icon name="o-arrow-right-circle" class="w-5 h-5" />
-                            Save & Next
-                        </button>
+                        @if (empty($answers[$currentQuestion->id]))
+                            <button 
+                                wire:click="$set('showSkipConfirmationModal', true)"
+                                class="bg-gray-500 text-white px-6 py-2 font-bold text-sm flex items-center gap-2 hover:bg-gray-600 transition-colors cursor-pointer"
+                            >
+                                <x-icon name="o-chevron-double-right" class="w-5 h-5" />
+                                Skip & Next
+                            </button>
+                        @else
+                            <button 
+                                wire:click="saveAndNext"
+                                class="bg-[#16a34a] text-white px-6 py-2 font-bold text-sm flex items-center gap-2 hover:bg-[#15803d] transition-colors cursor-pointer"
+                            >
+                                <x-icon name="o-arrow-right-circle" class="w-5 h-5" />
+                                Save & Next
+                            </button>
+                        @endif
                     </div>
                 @endif
             </div>
@@ -166,11 +174,17 @@
                                 $isCurrent = ($currentQuestionIndex == $index);
                                 $isLocked = !$isVisited && !$isAnswered && !$isMarked && !$isCurrent;
 
-                                $bgClass = 'bg-white border-gray-300 text-gray-400';
-                                if ($isAnswered) $bgClass = 'bg-[#16a34a] border-[#16a34a] text-white';
-                                if ($isMarked) $bgClass = 'bg-yellow-400 border-yellow-400 text-white';
-                                if ($isVisited && !$isAnswered && !$isMarked) $bgClass = 'bg-white border-[#16a34a] text-[#16a34a]';
-                                if ($isCurrent) $bgClass = 'ring-2 ring-blue-500 ring-offset-1 ' . $bgClass;
+                                if ($isAnswered) {
+                                    $bgClass = 'bg-[#16a34a] text-white ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-[#16a34a]');
+                                } elseif ($isVisited) {
+                                    $bgClass = 'bg-gray-400 text-white ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-gray-400');
+                                } else {
+                                    $bgClass = 'bg-white text-gray-400 ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-gray-300');
+                                }
+
+                                if ($isCurrent) {
+                                    $bgClass = 'ring-2 ring-blue-500 ring-offset-1 ' . $bgClass;
+                                }
                             @endphp
                             
                             @if($isLocked)
@@ -185,14 +199,9 @@
                                 <button 
                                     wire:key="pal-{{ $qId }}"
                                     wire:click="selectQuestion({{ $currentSectionIndex }}, {{ $index }})"
-                                    class="h-10 w-10 rounded-full border flex items-center justify-center text-sm font-bold transition-all hover:scale-110 {{ $bgClass }}" 
+                                    class="h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold transition-all hover:scale-110 {{ $bgClass }}" 
                                 >
                                     {{ $index + 1 }}
-                                    @if($isMarked)
-                                        <div class="absolute -top-1 -right-1">
-                                            <x-icon name="s-star" class="w-4 h-4 text-yellow-400 filter drop-shadow-sm" />
-                                        </div>
-                                    @endif
                                 </button>
                             @endif
                         @endforeach
@@ -251,11 +260,17 @@
                                             $isCurrent = ($currentSectionIndex == $sIdx && $currentQuestionIndex == $qIdx);
                                             $isLocked = !$isVisited && !$isAnswered && !$isMarked && !$isCurrent;
                                             
-                                            $bgClass = 'bg-white border-gray-300 text-gray-400';
-                                            if ($isAnswered) $bgClass = 'bg-[#16a34a] border-[#16a34a] text-white';
-                                            if ($isMarked) $bgClass = 'bg-yellow-400 border-yellow-400 text-white';
-                                            if ($isVisited && !$isAnswered && !$isMarked) $bgClass = 'bg-white border-[#16a34a] text-[#16a34a]';
-                                            if ($isCurrent) $bgClass = 'ring-2 ring-blue-500 ring-offset-1 ' . $bgClass;
+                                            if ($isAnswered) {
+                                                $bgClass = 'bg-[#16a34a] text-white ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-[#16a34a]');
+                                            } elseif ($isVisited) {
+                                                $bgClass = 'bg-gray-400 text-white ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-gray-400');
+                                            } else {
+                                                $bgClass = 'bg-white text-gray-400 ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-gray-300');
+                                            }
+
+                                            if ($isCurrent) {
+                                                $bgClass = 'ring-2 ring-blue-500 ring-offset-1 ' . $bgClass;
+                                            }
                                         @endphp
 
                                         @if($isLocked)
@@ -265,7 +280,7 @@
                                         @else
                                             <button 
                                                 wire:click="selectQuestion({{ $sIdx }}, {{ $qIdx }}); $set('showQuestionsModal', false);"
-                                                class="h-10 w-full rounded-md border flex items-center justify-center text-sm font-bold transition-all hover:scale-105 {{ $bgClass }}"
+                                                class="h-10 w-full rounded-md flex items-center justify-center text-sm font-bold transition-all hover:scale-105 {{ $bgClass }}"
                                             >
                                                 {{ $qIdx + 1 }}
                                             </button>
@@ -313,86 +328,37 @@
             </div>
         @endif
 
-    @else
-        {{-- VIEW B: SUMMARY MODAL --}}
-        <div class="fixed inset-0 bg-black/70 z-[120] flex items-center justify-center p-6 backdrop-blur-md">
-            <div class="bg-white rounded-[2rem] w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-                <div class="bg-gray-900 p-8 text-white flex justify-between items-center">
-                    <div>
-                        <h2 class="text-3xl font-black tracking-tight mb-1">Final Submission Review</h2>
-                        <p class="text-gray-400 font-bold uppercase text-xs tracking-widest">{{ $test->title }}</p>
+        {{-- MODAL: SKIP CONFIRMATION --}}
+        @if($showSkipConfirmationModal)
+            <div class="fixed inset-0 bg-black/60 z-[130] flex items-center justify-center p-6 backdrop-blur-sm">
+                <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col">
+                    <div class="bg-[#16a34a] p-4 text-white flex justify-between items-center">
+                        <h3 class="text-lg font-bold">Confirm Skip</h3>
+                        <button wire:click="$set('showSkipConfirmationModal', false)" class="text-white hover:text-gray-200">
+                            <x-icon name="o-x-mark" class="w-6 h-6" />
+                        </button>
                     </div>
-                    <div class="text-right">
-                        <div class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Time Expired</div>
-                        <div class="text-2xl font-black text-[#16a34a]">{{ $timeLeft }}</div>
-                    </div>
-                </div>
-
-                <div class="p-10 overflow-y-auto">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                        {{-- Circular Progress --}}
-                        <div class="md:col-span-1 bg-gray-50 rounded-3xl p-8 flex flex-col items-center justify-center border border-gray-100">
-                            @php 
-                                $totalQs = $totalQuestions;
-                                $attempted = count($answers);
-                                $p = $totalQs > 0 ? ($attempted / $totalQs) * 100 : 0; 
-                            @endphp
-                            <div class="relative inline-flex items-center justify-center mb-4">
-                                <svg class="w-24 h-24 transform -rotate-90">
-                                    <circle cx="48" cy="48" r="42" stroke="currentColor" stroke-width="6" fill="transparent" class="text-gray-200" />
-                                    <circle cx="48" cy="48" r="42" stroke="currentColor" stroke-width="6" fill="transparent" stroke-dasharray="{{ 263.8 }}" stroke-dashoffset="{{ 263.8 - (263.8 * $p / 100) }}" class="text-[#16a34a]" />
-                                </svg>
-                                <span class="absolute text-xl font-black text-gray-900">{{ round($p) }}%</span>
-                            </div>
-                            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Completion</div>
-                        </div>
-
-                        {{-- Stats Cards --}}
-                        <div class="md:col-span-2 grid grid-cols-2 gap-4">
-                            <div class="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm">
-                                <div class="text-3xl font-black text-gray-900">{{ count($answers) }}</div>
-                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Attempted</div>
-                            </div>
-                            <div class="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm">
-                                <div class="text-3xl font-black text-red-500">{{ $totalQuestions - count($answers) }}</div>
-                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Unattempted</div>
-                            </div>
-                            <div class="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm">
-                                <div class="text-3xl font-black text-yellow-500">{{ count($markedQuestions) }}</div>
-                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">For Review</div>
-                            </div>
-                            <div class="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm">
-                                <div class="text-3xl font-black text-blue-500">{{ count($visitedQuestions) }}</div>
-                                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Visited</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-10 flex gap-4 items-center">
-                        <x-icon name="o-information-circle" class="w-8 h-8 text-blue-600" />
-                        <p class="text-blue-800 text-sm font-medium leading-relaxed">
-                            Please review your attempted questions carefully. Once you click "Submit Test Now," you will no longer be able to change your answers. Your result will be calculated based on the responses recorded above.
+                    <div class="p-6">
+                        <p class="text-gray-700 text-sm leading-relaxed mb-6">
+                            You have not selected any option for this question. Do you want to skip it and proceed to the next question?
                         </p>
-                    </div>
-
-                    <div class="flex gap-4">
-                        <button 
-                            wire:click="$set('showSummaryModal', false)"
-                            class="flex-1 bg-white border border-gray-200 text-gray-700 py-5 rounded-2xl font-bold text-lg hover:bg-gray-50 transition-all cursor-pointer"
-                        >
-                            Back to Exam
-                        </button>
-                        <button 
-                            wire:click="submitTest"
-                            class="flex-[2] bg-[#16a34a] text-white py-5 rounded-2xl font-black text-xl shadow-xl shadow-green-100 hover:bg-[#15803d] transition-all cursor-pointer flex items-center justify-center gap-3"
-                        >
-                            Submit Test Now
-                            <x-icon name="o-paper-airplane" class="w-6 h-6" />
-                        </button>
+                        <div class="flex gap-4">
+                            <button 
+                                wire:click="$set('showSkipConfirmationModal', false)"
+                                class="flex-1 bg-white border border-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm hover:bg-gray-50 transition-all cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                wire:click="confirmSkipAndNext"
+                                class="flex-1 bg-[#16a34a] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#15803d] transition-all cursor-pointer"
+                            >
+                                Yes, Skip
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    @endif
+        @endif
 
 </div>

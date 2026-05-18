@@ -30,4 +30,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'msg91' => [
+        'auth_key' => env('MSG91_AUTH_KEY'),
+        'sender_id' => env('MSG91_SENDER_ID', 'TSTNTS'),
+        'template_id' => env('MSG91_OTP_TEMPLATE_ID'),
+        'dlt_template_id' => env('MSG91_DLT_TEMPLATE_ID', '1707177540051977802'),
+    ],
+
 ];

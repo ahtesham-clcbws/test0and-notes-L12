@@ -73,7 +73,7 @@
                         <x-button
                             label="View Results"
                             icon="o-chart-bar"
-                            link="{{ route('student.show-result', [Auth::id(), $test->id]) }}"
+                            link="{{ route('student.show-result', ['payload' => \Illuminate\Support\Facades\Crypt::encrypt(['student_id' => Auth::id(), 'test_id' => $test->id, 'mode' => 'result'])]) }}"
                             class="btn-sm btn-outline btn-success" />
                     @elseif($test->attempt_status === 'running')
                         <x-button

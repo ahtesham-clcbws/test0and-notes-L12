@@ -46,7 +46,8 @@ Route::name('student.')->group(function () {
                 Route::get('start-test/{testId}', \App\Livewire\Student\Tests\OnlineTestRunner::class)->name('start-test');
                 // Route::get('conduct-test/{testId}', \App\Livewire\Student\Tests\OnlineTestRunner::class)->name('conduct-test');
                 Route::get('question-paper/{test_id}', [ExamsController::class, 'questionPaper'])->name('question-paper');
-                Route::get('show-result/{student_id}/{test_id}', \App\Livewire\Student\Tests\ShowResult::class)->name('show-result');
+                Route::get('show-result/{payload}', \App\Livewire\Student\Tests\ShowResult::class)->name('show-result');
+                Route::get('test-review/{payload}', \App\Livewire\Student\Tests\TestReview::class)->name('test-review');
                 // Route::get('attempt/{student_id}/{test_id}', [ExamsController::class, 'testAttempt'])->name('test-attempt');
 
                 Route::prefix('section')->group(function () {

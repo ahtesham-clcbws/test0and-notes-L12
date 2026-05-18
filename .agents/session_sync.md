@@ -54,6 +54,49 @@
 
 # Session Sync - Momin Scholar Program
 
+## Session Handoff - 2026-05-18 (V2.1.2: Premium Review Mode & Secure Encryption)
+- **Objective:** Design and implement a highly secure, premium Review Mode for test attempts with URL encryption, interactive re-answer capability, and color/border UI states.
+- **Key Achievements:**
+  - **Premium Review Screen & Secure URL Encryption**:
+    - Replaced the summary popup modal with a full, dedicated **Review Mode** on the ShowResult page, fully matching the premium styling requested.
+    - Encrypted all URL routing payloads (student ID, test ID, mode) dynamically with `Crypt::encrypt()` and `Crypt::decrypt()` to prevent any manual URL manipulation.
+    - Designed the screen to display all attempted questions, user's options, and time spent on each question.
+    - Configured the Review Mode to only allow the student to answer "Marked for Review" questions again (all other questions are view-only and cannot be changed).
+    - Enabled seamless navigation from the Review Mode back to the specific question in the test runner.
+  - **Skip & Next Confirmation Workflow**:
+    - Renamed button to "Skip & Next" and colored it with slate color if no option is selected.
+    - Proceeds directly via `saveAndNext()` without prompt when an option is selected.
+    - Added the premium Confirm Skip confirmation modal.
+    - Changed the 'marked for review' border indicator to a highly visible, premium `3px` yellow border.
+    - Correctly colorized answered questions (fully green) and skipped questions (fully grey).
+  - **Style Consistency**: Formatted all changes using Laravel Pint to ensure perfect style compliance.
+
+## Session Handoff - 2026-05-18 (V2.1.1: Static Type Hardening, Skip/Next Confirmation, & .agents Folder Consolidation)
+- **Objective:** Resolve all IDE static analysis type errors, compile warnings, implement a Skip & Next confirmation workflow, and consolidate the project governance directories into a single `.agents/` folder.
+- **Key Achievements:**
+  - **Skip & Next Confirmation Workflow**:
+    - Conditionally renamed the primary test conductor navigation button to "Skip & Next" and colored it with a premium slate color if the student hasn't selected an option for the current question.
+    - Implemented a premium Tailwind/Blade confirmation modal (`Confirm Skip`) prompting the user to confirm before skipping the unanswered question.
+    - Changed the 'marked for review' border indicator to a highly visible, premium `3px` yellow border using Tailwind arbitrary properties (`border-[3px] border-yellow-400`).
+    - Proceeds directly via `saveAndNext()` without prompt when an option is selected.
+  - **IDE Type Hardening**:
+    - Stricter Request-based route and parameter parsing inside `app/Livewire/Student/Exams/Index.php` to completely eliminate compile-time `Expected type 'object'` warnings.
+    - Type-hinted and strictly declared property and parameter types for `App\Livewire\Student\Tests\OnlineTestRunner` and `App\Livewire\Student\Tests\ShowResult`.
+    - Corrected `$attempt->draft_state` array casting logic inside `OnlineTestRunner` and eliminated double JSON serialization/decoding issues.
+    - Resolved `APIController` OTP helper undefined variable and untyped `$returnResponse` property warnings.
+  - **Workspace & Agent Governance Consolidation**: Renamed the deprecated `.agent` folder to `.agents` in absolute conformance with workspace rule specifications, fully staging all moved/added/modified files.
+  - **Code Style Alignment**: Formatted all changes using `vendor/bin/pint --dirty` to ensure 100% adherence to Pint style.
+- **Next Steps:** Proceed with standard deployment workflows and push staged changes to repository.
+
+## Session Handoff - 2026-05-18 (V2.1.0: MSG91 OTP Integration & DLT Compliance)
+- **Objective:** Configure, debug, and stabilize the MSG91 SMS gateway integration with the newly approved TRAI/DLT templates.
+- **Key Achievements:**
+  - **DLT Compliance Integration**: Embedded the explicit DLT Template ID (`1707177540051977802`) directly inside the MSG91 Flow API recipients payload (`DLT_TE_ID`), forcing immediate telecom operator delivery and bypassing automatic dashboard mapping latency.
+  - **Config and Environment Alignment**: Wired keys and template configurations within the local `.env` and `config/services.php`.
+  - **Service Optimization**: Refactored `App\Services\Msg91Service` to cleanly manage flow transmissions, format OTP templates dynamically, and provide precise raw cURL debugging data.
+  - **Code Standard Enforcement**: Ran `vendor/bin/pint --dirty` on all modified files to fix all styling, spacing, and array format issues cleanly.
+- **Next Steps:** Proceed with the rest of the Mobile Auth and page integrations in the backlog.
+
 ## Session Handoff - 2026-05-08 (V2.0.3: Timer & Modal Stability)
 - **Objective:** Fix high-priority UX bugs in the student test conduct module.
 - **Key Achievements:**
@@ -160,3 +203,13 @@
 ## Previous Sessions
 - **Sidebar Update:** Added Education Type and Class info to the student sidebar.
 - **Relationship Fix:** Added necessary relationships to `UserDetails` model.
+
+## Session Handoff - 2026-05-18 (Pristine Screen Separation & Decoupled Architecture)
+- **Current State:** Successfully split the unified exam review/results layout into two fully independent components: `TestReview` and `ShowResult`. All records in attempts tables have been cleanly cleared out to facilitate a perfect end-to-end user test.
+- **Key Achievements:**
+  - **Pruned Codebases**: Shifted ticking timer, active answers mutation modal, and validation rules into a standalone, lightweight `TestReview` screen. Kept `ShowResult` strictly read-only and static for scores and solution reviews.
+  - **No Resume Link**: As per latest specifications, removed the "Back to Exam / Resume" buttons and references from the pre-submit Review screen, locking the student to finishing marked-for-review answers.
+  - **Automatic Routing Safeguards**: Added server-side redirections. Active attempts accessing the result route get instantly bounced to `test-review`, while completed attempts accessing the review route get instantly bounced to `show-result`.
+  - **Clean Slate**: Purged all entries from `TestAttempt` and `TestAttemptAnswer` tables.
+- **Next Steps:** Have the user perform the final verified test run. All code fully formatted with `vendor/bin/pint --dirty`.
+
