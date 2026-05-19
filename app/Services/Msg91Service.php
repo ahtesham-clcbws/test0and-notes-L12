@@ -99,11 +99,6 @@ class Msg91Service
                        (isset($body['type']) && $body['type'] === 'error') ||
                        (isset($body['status']) && $body['status'] === 'fail');
 
-            echo "\n--- MSG91 DEBUG INFO ---\n";
-            echo 'HTTP Status: '.$httpCode."\n";
-            echo 'Response Body: '.$responseBody."\n";
-            echo "------------------------\n";
-
             if ($isError) {
                 Log::error('MSG91 API Error', [
                     'status' => $httpCode,
