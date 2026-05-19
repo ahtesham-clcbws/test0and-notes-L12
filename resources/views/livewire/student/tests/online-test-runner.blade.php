@@ -42,12 +42,12 @@
         </div>
     </div>
 
-        <div class="flex-1 flex px-8 py-6 gap-8 w-full max-w-400 mx-auto">
+    <div class="flex-1 flex px-8 py-6 gap-8 w-full max-w-none mx-auto">
             
             {{-- Left Column: Question Area --}}
             <div class="flex-1 flex flex-col">
                 @if ($currentQuestion)
-                    <h2 class="text-[#dc2626] font-bold text-lg mb-4">Question No {{ $currentQuestionIndex + 1 }}</h2>
+                    <h2 class="text-black font-bold text-lg mb-4">Question No {{ $currentQuestionIndex + 1 }}</h2>
                     
                     {{-- Section Tabs --}}
                     <div class="flex items-center gap-2 mb-6 border-b border-gray-200 pb-2">
@@ -77,7 +77,7 @@
                                     class="flex items-start gap-4 p-3 rounded-md transition-all cursor-pointer group hover:bg-gray-50 border {{ $isSelected ? 'border-[#16a34a]/30 bg-[#16a34a]/5' : 'border-transparent' }}"
                                     wire:click="saveSelection({{ $currentQuestion->id }}, '{{ $optKey }}')"
                                 >
-                                    <div class="relative flex-shrink-0 mt-0.5">
+                                    <div class="relative shrink-0 mt-0.5">
                                         <input 
                                             type="radio" 
                                             name="q_{{ $currentQuestion->id }}" 
@@ -144,7 +144,7 @@
             </div>
 
             {{-- Right Column: Sidebar (Exact Mockup Match) --}}
-            <div class="w-80 border border-[#16a34a] flex flex-col h-fit self-start shrink-0 bg-white">
+            <div class="w-120 border border-[#16a34a] flex flex-col h-fit self-start shrink-0 bg-white">
                 
                 {{-- Profile Section --}}
                 <div class="flex bg-[#a7d6b4]">
@@ -165,7 +165,7 @@
 
                 {{-- Palette Grid --}}
                 <div class="p-4 bg-white">
-                    <div class="grid grid-cols-5 gap-2 mb-8">
+                    <div class="flex flex-wrap gap-1.25 mb-8 justify-start">
                         @foreach($questionsList[$currentSectionIndex] as $index => $qId)
                             @php
                                 $isAnswered = isset($answers[$qId]);
@@ -177,9 +177,9 @@
                                 if ($isAnswered) {
                                     $bgClass = 'bg-[#16a34a] text-white ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-[#16a34a]');
                                 } elseif ($isVisited) {
-                                    $bgClass = 'bg-gray-400 text-white ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-gray-400');
+                                    $bgClass = 'bg-gray-200 text-black ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-gray-300');
                                 } else {
-                                    $bgClass = 'bg-white text-gray-400 ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-gray-300');
+                                    $bgClass = 'bg-white text-black ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-gray-300');
                                 }
 
                                 if ($isCurrent) {
@@ -190,7 +190,7 @@
                             @if($isLocked)
                                 <div 
                                     wire:key="pal-{{ $qId }}"
-                                    class="h-10 w-10 rounded-full border border-gray-100 flex items-center justify-center text-sm font-bold opacity-30 cursor-not-allowed bg-gray-50"
+                                    class="h-10 w-10 rounded-full border border-gray-100 flex items-center justify-center text-sm font-bold opacity-30 cursor-not-allowed bg-gray-50 text-black"
                                     title="Question Locked"
                                 >
                                     {{ $index + 1 }}
@@ -236,7 +236,7 @@
 
         {{-- MODAL: QUESTIONS LIST --}}
         @if($showQuestionsModal)
-            <div class="fixed inset-0 bg-black/60 z-[110] flex items-center justify-center p-6">
+            <div class="fixed inset-0 bg-black/60 z-110 flex items-center justify-center p-6">
                 <div class="bg-white rounded-lg w-full max-w-5xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
                     <div class="bg-[#16a34a] p-4 text-white flex justify-between items-center">
                         <h3 class="text-xl font-bold">All Questions List</h3>
@@ -263,7 +263,7 @@
                                             if ($isAnswered) {
                                                 $bgClass = 'bg-[#16a34a] text-white ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-[#16a34a]');
                                             } elseif ($isVisited) {
-                                                $bgClass = 'bg-gray-400 text-white ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-gray-400');
+                                                $bgClass = 'bg-gray-200 text-gray-700 ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-gray-300');
                                             } else {
                                                 $bgClass = 'bg-white text-gray-400 ' . ($isMarked ? 'border-[3px] border-yellow-400' : 'border-gray-300');
                                             }
@@ -296,7 +296,7 @@
 
         {{-- MODAL: INSTRUCTIONS --}}
         @if($showInstructionsModal)
-            <div class="fixed inset-0 bg-black/60 z-[110] flex items-center justify-center p-6">
+            <div class="fixed inset-0 bg-black/60 z-110 flex items-center justify-center p-6">
                 <div class="bg-white rounded-lg w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[80vh]">
                     <div class="bg-[#16a34a] p-4 text-white flex justify-between items-center">
                         <h3 class="text-xl font-bold">Test Instructions</h3>
@@ -330,7 +330,7 @@
 
         {{-- MODAL: SKIP CONFIRMATION --}}
         @if($showSkipConfirmationModal)
-            <div class="fixed inset-0 bg-black/60 z-[130] flex items-center justify-center p-6 backdrop-blur-sm">
+            <div class="fixed inset-0 bg-black/60 z-130 flex items-center justify-center p-6 backdrop-blur-sm">
                 <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col">
                     <div class="bg-[#16a34a] p-4 text-white flex justify-between items-center">
                         <h3 class="text-lg font-bold">Confirm Skip</h3>

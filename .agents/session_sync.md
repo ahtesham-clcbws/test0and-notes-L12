@@ -247,3 +247,47 @@
   - **Validation Toast Hooks:** Wrapped email/mobile OTP send and verification functions in the student profile component with try-catch blocks to catch `ValidationException` and display it as an error toast.
   - **Auto-Formatting:** Formatted all changed code with `vendor/bin/pint --dirty`.
 - **Next Steps:** Proceed to git push.
+
+## Session Handoff - 2026-05-19 (V2.4.0: Universal Review Re-attempts & Soft Gray Color Scheme)
+- **Objective:** Enable students to re-answer all questions on the review screen and change the skipped gray color to bg-gray-200.
+- **Key Achievements:**
+  - **Universal Re-attempts:** Removed the filter restricting review mode to marked-for-review questions. Clicking any bubble on the review screen now launches the re-attempt modal.
+  - **Safe Database Mutators:** Modified the backend save review answer code to utilize `updateOrCreate` to support answering unvisited/skipped questions directly.
+  - **Soft Gray Theme:** Replaced `bg-gray-400` with `bg-gray-200` (text-gray-700) for all skipped/visited-but-unanswered bubbles in the review layout, active test runner, and the results legend.
+  - **Compliance Check:** Ran Pint formatting checks on all changed files successfully.
+
+
+## Session Handoff - 2026-05-19 (V2.5.0: Attempt Screen Full Width & Flexible Sidebar)
+- **Objective:** Adapt attempt screen (OnlineTestRunner) layout to be full width like the header, widen the sidebar, reduce question bubble size, and wrap bubbles up to 10 per row.
+- **Key Achievements:**
+  - **Header Alignment:** Replaced the `max-w-400` container wrapper class with `max-w-none` to make the question layout match the full horizontal span of the top header.
+  - **Sidebar Expansion:** Widened the sidebar component from `w-80` (320px) to `w-96` (384px).
+  - **Flexible Wrapping Layout:** Refactored the hardcoded `grid-cols-5` columns to a wrapping flex container (`flex flex-wrap gap-1.5 justify-start`).
+  - **Sized Down Bubbles:** Shrunk question bubbles by 20% (to `w-8 h-8` and `text-xs`).
+  - **Code Health:** Verified clean style checks with `vendor/bin/pint --dirty`.
+
+
+## Session Handoff - 2026-05-19 (V2.6.0: Full Size Circles, 10 Per Row Sidebar Grid & Lint Refactoring)
+- **Objective:** Revert circles back to full size (`h-10 w-10 text-sm`) while keeping 10 per row by expanding sidebar width, make question header black, and resolve all @[current_problems] warning indicators.
+- **Key Achievements:**
+  - **Reverted Bubble Dimensions:** Restored `h-10 w-10` dimensions and font size to `text-sm` for sidebar question bubbles.
+  - **Wider Sidebar canvas:** Expanded sidebar width to `w-120` (equivalent to `w-[480px]`) to hold 10 full-sized bubbles horizontally.
+  - **Tailwind Warn Resolving:** Changed `flex-shrink-0` to `shrink-0` across three view files, replaced custom bracket sizes with standard Tailwind 4 variables (`w-120`, `gap-1.25`, `min-h-22.5`, `min-h-35`, `border-2`, `z-100`, `z-110`, `z-130`), fixing all current Tailwind linters warnings.
+  - **Type Declaration Checks:** Added type hints (`mixed $value`) and return types (`void`) in `Register.php`.
+  - **Solid Black contrasting numbers:** Swapped `text-[#dc2626]` in the main content header to `text-black`. Changed bubble text colors to `text-black` (for visited/unvisited/locked) to maximize number legibility.
+  - **Code Health:** Formatted codebase with `vendor/bin/pint --dirty`.
+
+
+## Session Handoff - 2026-05-19 (V2.7.0: Re-attempt Modal Button Layout Adjustments)
+- **Objective:** Improve button alignment and remove redundancy in the review re-attempt modal.
+- **Key Achievements:**
+  - **Cancel Button Removal:** Deleted the redundant "Cancel & Close" button from the footer.
+  - **Save & Update Alignment:** Moved the "Save & Update Answer" button to the right end of the footer (`flex justify-end`).
+  - **Formatting**: Verified clean styling using `vendor/bin/pint --dirty`.
+
+
+## Session Handoff - 2026-05-19 (V2.8.0: Modal Backdrop Dismissal Integration)
+- **Objective:** Allow dismissing the re-attempt modal by clicking outside.
+- **Key Achievements:**
+  - **Backdrop Clicks**: Appended `wire:click.self` to the outer modal backdrop div to safely reset `showSolutionModal` to false.
+  - **Formatting**: Cleaned code files.

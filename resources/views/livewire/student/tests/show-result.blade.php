@@ -29,8 +29,8 @@
         {{-- Result Mode Stats Grid: Premium Color-Coded 5 Boxes matching template exactly --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-10">
             {{-- Box 1: Total Questions --}}
-            <div class="bg-[#f5d0b9] border border-[#c7936f] p-5 rounded-2xl flex items-center gap-4 shadow-sm min-h-[90px]">
-                <div class="w-10 h-10 rounded-full border border-[#bc8c69] bg-[#e5b493] flex-shrink-0"></div>
+            <div class="bg-[#f5d0b9] border border-[#c7936f] p-5 rounded-2xl flex items-center gap-4 shadow-sm min-h-22.5">
+                <div class="w-10 h-10 rounded-full border border-[#bc8c69] bg-[#e5b493] shrink-0"></div>
                 <div class="flex-1 font-semibold text-xs text-[#3d2e24] leading-normal">
                     <div class="flex justify-between items-center">
                         <span>Total Questions</span>
@@ -44,8 +44,8 @@
             </div>
 
             {{-- Box 2: Correct Answers --}}
-            <div class="bg-[#f3a88a] border border-[#c57e62] p-5 rounded-2xl flex items-center gap-4 shadow-sm min-h-[90px]">
-                <div class="w-10 h-10 rounded-full border border-[#aa5c40] bg-[#e09477] flex-shrink-0"></div>
+            <div class="bg-[#f3a88a] border border-[#c57e62] p-5 rounded-2xl flex items-center gap-4 shadow-sm min-h-22.5">
+                <div class="w-10 h-10 rounded-full border border-[#aa5c40] bg-[#e09477] shrink-0"></div>
                 <div class="flex-1 font-semibold text-xs text-[#4c1c0a] leading-normal">
                     <div class="flex justify-between items-center">
                         <span>Correct Answers</span>
@@ -59,8 +59,8 @@
             </div>
 
             {{-- Box 3: Wrong Answers --}}
-            <div class="bg-[#fecaca] border border-[#f87171] p-5 rounded-2xl flex items-center gap-4 shadow-sm min-h-[90px]">
-                <div class="w-10 h-10 rounded-full border border-[#ef4444] bg-[#fee2e2] flex-shrink-0"></div>
+            <div class="bg-[#fecaca] border border-[#f87171] p-5 rounded-2xl flex items-center gap-4 shadow-sm min-h-22.5">
+                <div class="w-10 h-10 rounded-full border border-[#ef4444] bg-[#fee2e2] shrink-0"></div>
                 <div class="flex-1 font-semibold text-xs text-[#7f1d1d] leading-normal">
                     <div class="flex justify-between items-center">
                         <span>Wrong Answers</span>
@@ -74,8 +74,8 @@
             </div>
 
             {{-- Box 4: Left Questions --}}
-            <div class="bg-[#f3f4f6] border border-[#d1d5db] p-5 rounded-2xl flex items-center gap-4 shadow-sm min-h-[90px]">
-                <div class="w-10 h-10 rounded-full border border-[#9ca3af] bg-[#e5e7eb] flex-shrink-0"></div>
+            <div class="bg-[#f3f4f6] border border-[#d1d5db] p-5 rounded-2xl flex items-center gap-4 shadow-sm min-h-22.5">
+                <div class="w-10 h-10 rounded-full border border-[#9ca3af] bg-[#e5e7eb] shrink-0"></div>
                 <div class="flex-1 font-semibold text-xs text-[#374151] leading-normal">
                     <div class="flex justify-between items-center">
                         <span>Left Questions</span>
@@ -89,8 +89,8 @@
             </div>
 
             {{-- Box 5: Final Score --}}
-            <div class="bg-[#f0fdf4] border border-[#86efac] p-5 rounded-2xl flex items-center gap-4 shadow-sm min-h-[90px]">
-                <div class="w-10 h-10 rounded-full border border-[#22c55e] bg-[#dcfce7] flex-shrink-0"></div>
+            <div class="bg-[#f0fdf4] border border-[#86efac] p-5 rounded-2xl flex items-center gap-4 shadow-sm min-h-22.5">
+                <div class="w-10 h-10 rounded-full border border-[#22c55e] bg-[#dcfce7] shrink-0"></div>
                 <div class="flex-1 font-semibold text-xs text-[#14532d] leading-normal">
                     <div class="flex justify-between items-center">
                         <span>Final Score</span>
@@ -122,7 +122,7 @@
                             <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Wrong
                         </span>
                         <span class="px-3 py-1 bg-gray-50 text-gray-600 rounded-lg text-xs font-bold border border-gray-100 flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-gray-400"></span> Unattempted
+                            <span class="w-2.5 h-2.5 rounded-full bg-gray-200 border border-gray-300"></span> Unattempted
                         </span>
                     </div>
                 </div>
@@ -211,7 +211,7 @@
             $q = \App\Models\QuestionBankModel::find($selectedQuestionId); 
             $studentResp = \App\Models\TestAttemptAnswer::where('test_attempt_id', $attemptId)->where('question_id', $q->id)->first();
         @endphp
-        <div class="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-6 backdrop-blur-sm">
+        <div class="fixed inset-0 bg-black/60 z-100 flex items-center justify-center p-6 backdrop-blur-sm">
             <div class="bg-white rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
                 <div class="bg-white border-b border-gray-100 p-6 flex justify-between items-center">
                     <div class="flex items-center gap-3">
@@ -254,7 +254,7 @@
                             @endphp
                             
                             <div class="flex items-start gap-4 p-4 rounded-xl border transition-all {{ $boxClass }}">
-                                <div class="w-6 h-6 border flex-shrink-0 mt-0.5 flex items-center justify-center {{ $indicatorClass }}">
+                                <div class="w-6 h-6 border shrink-0 mt-0.5 flex items-center justify-center {{ $indicatorClass }}">
                                     @if($isCorrectOpt)
                                         <x-icon name="s-check" class="w-4 h-4" />
                                     @elseif($isStudentOpt)

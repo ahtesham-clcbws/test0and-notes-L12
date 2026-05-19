@@ -71,8 +71,31 @@
 - **Security Hardening**: Enforced registration guardrails in `register()` to block registration attempts if the OTP has not been verified.
 - **Code Health & pint**: Formatted all changed files using `vendor/bin/pint --dirty` to ensure strict compliance.
 
-## Log 11 (2026-05-19): Role-Based Guest Routing & Redirect Safeguards
-- **Major Shift (Role-Based Dynamic Redirection):** Modified all guest-facing auth middleware (`IsStudentGuest`, `IsAdminGuest`, `IsFranchiseGuest`, and `IsManagementGuest`) to intercept authenticated sessions and redirect them dynamically to their respective dashboard portals (Admin, Franchise, Management, or Student) instead of performing a hard logout or letting them access guest pages.
+- **Role-Based Guest Routing & Redirect Safeguards:** Modified all guest-facing auth middleware (`IsStudentGuest`, `IsAdminGuest`, `IsFranchiseGuest`, and `IsManagementGuest`) to intercept authenticated sessions and redirect them dynamically to their respective dashboard portals (Admin, Franchise, Management, or Student) instead of performing a hard logout or letting them access guest pages.
 - **Unified Routing Bindings:** Applied `studentguest` middleware to `login`, `registration`, `forgot-password`, and `corporate-signup` in `routes/web.php`, and `contributor-signup` in `routes/franchise.php` to prevent logged-in users from accessing them.
 - **Robust Student Profile OTP Validation:** Refactored OTP and password update methods in `App\Livewire\Student\Profile\Index` to capture `ValidationException` and display it as an error toast notification to the user, ensuring a premium user experience.
 - **Code Formatting:** Cleaned and verified all changes with `vendor/bin/pint --dirty`.
+
+## Log 12 (2026-05-19): Universal Question Re-attempts & Light Gray Skipped Color
+- **Major Shift (Pre-submit Re-attempt for All Questions):** Lifted the check restricting review mode to only "marked for review" questions. Students can now open and answer/re-answer *any* question from the review screen.
+- **Dynamic Database Update/Create:** Switched to using `updateOrCreate` inside `saveReviewAnswer()` to safely handle cases where an unattempted/unvisited question is answered for the first time directly from the review page.
+- **Light Gray Skipped Color Scheme:** Changed the background color of visited-but-unanswered (skipped) questions from dark gray (`bg-gray-400 text-white`) to a soft light gray (`bg-gray-200 text-gray-700`) across `test-review.blade.php`, `online-test-runner.blade.php`, and the `show-result.blade.php` legend.
+- **Formatted & Tested:** Formatted code using `vendor/bin/pint --dirty` and ensured zero errors.
+
+## Log 13 (2026-05-19): Attempt Screen Width Expansion & Sidebar Bubble Layout Refactoring
+- **Layout Expansion:** Removed the `max-w-400` constraint from the test runner wrapper, replacing it with `max-w-none` to make the content page expand to full width matching the header.
+- **Sidebar Widened:** Increased the sidebar container width from `w-80` (320px) to `w-96` (384px) to afford more horizontal canvas space.
+- **Compact Question Bubbles:** Reduced the question bubble circle size by 20% (from `h-10 w-10 text-sm` to `h-8 w-8 text-xs`) for both locked divs and active buttons.
+- **Flexible Grid Wrapping:** Converted the rigid grid layout (`grid grid-cols-5`) to a flexible, self-wrapping flexbox structure (`flex flex-wrap gap-1.5 justify-start`) enabling up to 10 bubbles per row dynamically wrapping as screen real estate dictates.
+
+## Log 14 (2026-05-19): Sidebar Circle Size Reversion, Width Expansion & Black Text Indicators
+- **Circle Size Reversion:** Reverted the question bubble circles inside the attempt screen sidebar back to their original size (`h-10 w-10 text-sm`) as requested.
+- **Width Expansion:** Increased the sidebar container width further to `w-120` (equivalent to `w-[480px]`) to support rendering exactly 10 questions per row at their original size.
+- **Micro Spacing:** Optimized bubble packing with a custom compact gap spacing of `gap-1.25` (equivalent to `gap-[5px]`) in the wrapping flexbox container to fit exactly 10 full-sized bubbles horizontally.
+- **Question Number Contrast & Header Color:** Changed the text color of the main question header ("Question No X") from red to black (`text-black`). Updated the unvisited, visited, and locked bubble text colors to solid black/black opacity to ensure maximum contrast and clear numbers.
+- **Tailwind warning cleanup:** Changed `flex-shrink-0` to `shrink-0`, bracket custom spacing to standard variables (`w-120`, `gap-1.25`, `min-h-22.5`, `min-h-35`, `border-2`, `z-100`, `z-110`, `z-130`) across `online-test-runner.blade.php`, `show-result.blade.php`, and `test-review.blade.php` to clean all current Tailwind warnings. Added type declarations in `Register.php`.
+
+## Log 15 (2026-05-19): Review Re-attempt Modal Button Placement & Close Flow Refinements
+- **Remove Redundant Cancel Button:** Removed the redundant "Cancel & Close" button from the re-attempt modal footer since the modal already supports modal backdrop clicks to close and has an "X" button in the header.
+- **Footer Button Alignment:** Aligned the "Save & Update Answer" button to the right side of the footer using `flex justify-end`.## Log 16 (2026-05-19): Backdrop Click Outside Dismissal for Re-attempt Modal
+- **Added Backdrop Click dismissal:** Added `wire:click.self="$set('showSolutionModal', false)"` on the backdrop outer container of the re-attempt modal to close it when the user clicks outside.

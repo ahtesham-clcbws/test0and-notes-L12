@@ -51,12 +51,7 @@ class TestReview extends Component
                 ->where('question_id', $this->selectedQuestionId)
                 ->first();
 
-            // Secure Review Mode: only allow viewing if marked for review
-            if (! $resp || ! $resp->is_marked_for_review) {
-                return;
-            }
-
-            $this->selectedAnswer = $resp->answer;
+            $this->selectedAnswer = $resp ? $resp->answer : null;
             $this->showSolutionModal = true;
         } else {
             $this->selectedAnswer = null;
@@ -76,21 +71,22 @@ class TestReview extends Component
             return;
         }
 
-        $resp = TestAttemptAnswer::where('test_attempt_id', $attempt->id)
-            ->where('question_id', $this->selectedQuestionId)
-            ->first();
-
-        if ($resp && $resp->is_marked_for_review) {
-            $resp->update([
+        TestAttemptAnswer::updateOrCreate(
+            [
+                'test_attempt_id' => $attempt->id,
+                'question_id' => $this->selectedQuestionId,
+            ],
+            [
                 'answer' => $this->selectedAnswer,
                 'is_marked_for_review' => false,
-            ]);
+                'is_visited' => true,
+            ]
+        );
 
-            $this->calculateCounts($attempt);
+        $this->calculateCounts($attempt);
 
-            session()->flash('message', 'Answer updated successfully!');
-            $this->showSolutionModal = false;
-        }
+        session()->flash('message', 'Answer updated successfully!');
+        $this->showSolutionModal = false;
     }
 
     public function submitTest()

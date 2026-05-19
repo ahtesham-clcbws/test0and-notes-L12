@@ -37,12 +37,12 @@ class Register extends Component
         $this->form->required_check_registration = true;
     }
 
-    public function updatedFormEducationTypeId($value)
+    public function updatedFormEducationTypeId(mixed $value): void
     {
         $this->form->class_group_exam_id = null;
     }
 
-    public function updatedFormState($value)
+    public function updatedFormState(mixed $value): void
     {
         $this->form->city = null;
         if ($value) {
