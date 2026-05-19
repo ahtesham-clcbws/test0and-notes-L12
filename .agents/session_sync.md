@@ -54,6 +54,15 @@
 
 # Session Sync - Momin Scholar Program
 
+## Session Handoff - 2026-05-19 (V2.2.1: Premium Interactive OTP Verification UI)
+- **Objective:** Fix button states, disable inputs correctly upon OTP transmission/verification, display contextual status messages below inputs, trigger error toasts, and block registration bypasses.
+- **Key Achievements:**
+  - **Interactive State Bindings**: Configured mobile inputs and "Get OTP" buttons to disable and go readonly upon successful SMS sending. Configured OTP inputs and "Verify" buttons to remain disabled until SMS is sent, and disable completely with a "Verified" badge once verified.
+  - **Contextual Status Helper Tags**: Added status/info texts directly below the inputs (e.g. "OTP successfully sent to your mobile number." and "Mobile number verified.").
+  - **Exception & Toast Synchronization**: Intercepted validation exceptions on `getOtp()` and `verifyOtp()` to automatically trigger SweetAlert2 error toasts using the global `error()` JS function.
+  - **Security Guardrails**: Enforced backend validation checks in `register()` to block registration attempts if the OTP has not been verified.
+  - **Pre-Push Automation**: Incremented version to `v2.0.6`, ran `npm run build` to compile production assets, and ran `vendor/bin/pint --dirty`.
+
 ## Session Handoff - 2026-05-19 (V2.2.0: MSG91 Signup & Profile OTP Integration)
 - **Objective:** Fix the OTP flow in the portal's sign-up pages and user profile pages where the OTP verification records were being generated in the database but never transmitted to the user's phone number.
 - **Key Achievements:**
@@ -66,6 +75,7 @@
     - **Student Dashboard Controller**: Integrated SMS dispatch into `App\Http\Controllers\Student\DashboardController` mobile verification.
     - **Legacy AJAX Route**: Integrated SMS dispatch into `App\Http\Controllers\InternalRequests\InternalRequestsController`.
   - **Code Quality & Type Hardening**: Resolved multiple static analysis type warnings (`Expected type 'object'. Found 'array<string, mixed>'`) across the controllers by converting `request()` calls to utilize typed request parameters, initialized `$returnResponse` inside `app_login` to solve the undefined variable warning, and formatted all changes with `vendor/bin/pint --dirty`.
+  - **Livewire AJAX Payload Fix**: Resolved the loading state lockup ("Sending OTP...") by removing debug `echo` outputs from `Msg91Service::sendSms` that were corrupting JSON response structures.
 
 ## Session Handoff - 2026-05-18 (V2.1.2: Premium Review Mode & Secure Encryption)
 - **Objective:** Design and implement a highly secure, premium Review Mode for test attempts with URL encryption, interactive re-answer capability, and color/border UI states.

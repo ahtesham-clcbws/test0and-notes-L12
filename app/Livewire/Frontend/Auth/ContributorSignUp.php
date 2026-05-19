@@ -102,7 +102,8 @@ class ContributorSignUp extends Component
                 $otpData = OtpVerifications::where([['type', '=', 'mobile'], ['credential', '=', $this->mobile], ['created_at', '>', $time]])->first();
                 $otp = getMobileOtp($this->mobile);
                 if ($otpData) {
-                    $this->addError('mobile', 'OTP already sent');
+                    $this->isOtpSend = true;
+                    $this->js('success("OTP already sent to this mobile number.")');
                 } else {
                     OtpVerifications::create([
                         'type' => 'mobile',
@@ -114,18 +115,32 @@ class ContributorSignUp extends Component
 
                     // Send SMS OTP via MSG91
                     try {
-                        app(\App\Services\Msg91Service::class)->sendSms($this->mobile, $otp);
+                        $smsSent = app(\App\Services\Msg91Service::class)->sendSms($this->mobile, $otp);
+                        if ($smsSent) {
+                            $this->isOtpSend = true;
+                            $this->js('success("OTP sent successfully to your mobile number.")');
+                        } else {
+                            $this->isOtpSend = false;
+                            $this->addError('mobile', 'Failed to send OTP.');
+                            $this->js('error("Failed to send OTP. Please try again.")');
+                        }
                     } catch (\Exception $e) {
                         \Illuminate\Support\Facades\Log::error('Error sending contributor signup OTP SMS: '.$e->getMessage());
+                        $this->isOtpSend = false;
+                        $this->addError('mobile', 'Error sending OTP.');
+                        $this->js('error("Error sending OTP. Please try again.")');
                     }
                 }
-                $this->isOtpSend = true;
-                $this->js('success("OTP sent successfully.")');
             } else {
                 $this->addError('mobile', 'Invalid mobile number');
                 $this->isOtpSend = false;
             }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->isOtpSend = false;
+            $this->js('error("'.$e->validator->errors()->first('mobile').'")');
+            throw $e;
         } catch (\Throwable $th) {
+            $this->isOtpSend = false;
             throw $th;
         }
     }
@@ -160,19 +175,32 @@ class ContributorSignUp extends Component
         try {
             if ($this->validateOnly('mobile_otp')) {
                 $time = date('Y-m-d H:i:s', strtotime('-10 minutes'));
-                $otpData = OtpVerifications::where([['type', '=', 'mobile'], ['credential', '=', $this->mobile], ['created_at', '>', $time]])->first();
+                $otpData = OtpVerifications::where([
+                    ['type', '=', 'mobile'],
+                    ['credential', '=', $this->mobile],
+                    ['otp', '=', $this->mobile_otp],
+                    ['created_at', '>', $time],
+                ])->first();
+
                 if ($otpData) {
                     $this->otpVerificationStatus = true;
                     $this->resetValidation('mobile_otp');
                     $this->resetValidation('mobile');
+                    $this->js('success("OTP verified successfully.")');
                 } else {
-                    $this->addError('mobile_otp', 'Invalid OTP');
                     $this->otpVerificationStatus = false;
+                    $this->addError('mobile_otp', 'Invalid OTP or expired.');
+                    $this->js('error("Invalid OTP or expired.")');
                 }
             } else {
                 $this->otpVerificationStatus = false;
             }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->otpVerificationStatus = false;
+            $this->js('error("'.$e->validator->errors()->first('mobile_otp').'")');
+            throw $e;
         } catch (\Throwable $th) {
+            $this->otpVerificationStatus = false;
             throw $th;
         }
     }
@@ -184,6 +212,14 @@ class ContributorSignUp extends Component
 
     public function register()
     {
+        // first verify if mobile otp is verified
+        if (! $this->otpVerificationStatus) {
+            $this->addError('mobile_otp', 'Please verify your mobile number first.');
+            $this->js('error("Please verify your mobile number first.")');
+
+            return;
+        }
+
         $this->validate();
         try {
 

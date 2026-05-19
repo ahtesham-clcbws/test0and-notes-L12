@@ -58,46 +58,54 @@
                                 </div>
 
                                 <div class="col-md-6 col-12">
-                                    <div class="form-group mb-3">
-                                        <div class="input-group">
-                                            <span class="input-group-text">
-                                                <i class="ti-mobile"></i>
-                                            </span>
-                                            <input class="form-control" type="number" wire:model="form.mobile_number"
-                                                minlength="10" maxlength="10" placeholder="Mobile"
-                                                {{ $otpVerificationStatus && $isOtpSend ? ' readonly ' : '' }}>
-                                            <button class="btn theme-bg append text-white" type="button"
-                                                style="min-width: 70px;" wire:click="getOtp">
-                                                <span wire:target="getOtp" wire:loading>Sending OTP...</span>
-                                                <span wire:target="getOtp" wire:loading.remove>Get OTP</span>
-                                            </button>
-                                        </div>
-                                        @error('form.mobile_number')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
+                                     <div class="form-group mb-3">
+                                         <div class="input-group">
+                                             <span class="input-group-text">
+                                                 <i class="ti-mobile"></i>
+                                             </span>
+                                             <input class="form-control" type="number" wire:model="form.mobile_number"
+                                                 minlength="10" maxlength="10" placeholder="Mobile"
+                                                 {{ $isOtpSend ? ' readonly disabled ' : '' }}>
+                                             <button class="btn theme-bg append text-white" type="button"
+                                                 style="min-width: 70px;" wire:click="getOtp"
+                                                 {{ $isOtpSend ? ' disabled ' : '' }}>
+                                                 <span wire:target="getOtp" wire:loading>Sending OTP...</span>
+                                                 <span wire:target="getOtp" wire:loading.remove>{{ $isOtpSend ? 'Sent' : 'Get OTP' }}</span>
+                                             </button>
+                                         </div>
+                                         @if ($isOtpSend && !$otpVerificationStatus)
+                                             <div class="text-success small mt-1" style="font-size: 13px;">OTP successfully sent to your mobile number.</div>
+                                         @endif
+                                         @if ($otpVerificationStatus)
+                                             <div class="text-success small mt-1" style="font-size: 13px;">Mobile number verified.</div>
+                                         @endif
+                                         @error('form.mobile_number')
+                                             <div class="invalid-feedback d-block">{{ $message }}</div>
+                                         @enderror
+                                     </div>
+                                 </div>
 
-                                <div class="col-md-6 col-12">
-                                    <div class="form-group mb-3">
-                                        <div class="input-group">
-                                            <span class="input-group-text">
-                                                <i class="ti-key"></i>
-                                            </span>
-                                            <input class="form-control" type="number" wire:model="form.mobile_otp"
-                                                minlength="6" maxlength="6" placeholder="Input OTP"
-                                                {{ $otpVerificationStatus && $isOtpSend ? ' readonly ' : '' }}>
-                                            <button class="btn theme-bg append text-white" type="button"
-                                                style="min-width: 70px;" wire:click="verifyOtp">
-                                                <span wire:target="verifyOtp" wire:loading>Verifying OTP...</span>
-                                                <span wire:target="verifyOtp" wire:loading.remove>{{ $otpVerificationStatus && $isOtpSend ? 'Verified' : 'Verify' }}</span>
-                                            </button>
-                                        </div>
-                                        @error('form.mobile_otp')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
+                                 <div class="col-md-6 col-12">
+                                     <div class="form-group mb-3">
+                                         <div class="input-group">
+                                             <span class="input-group-text">
+                                                 <i class="ti-key"></i>
+                                             </span>
+                                             <input class="form-control" type="number" wire:model="form.mobile_otp"
+                                                 minlength="6" maxlength="6" placeholder="Input OTP"
+                                                 {{ !$isOtpSend || $otpVerificationStatus ? ' readonly disabled ' : '' }}>
+                                             <button class="btn theme-bg append text-white" type="button"
+                                                 style="min-width: 70px;" wire:click="verifyOtp"
+                                                 {{ !$isOtpSend || $otpVerificationStatus ? ' disabled ' : '' }}>
+                                                 <span wire:target="verifyOtp" wire:loading>Verifying OTP...</span>
+                                                 <span wire:target="verifyOtp" wire:loading.remove>{{ $otpVerificationStatus ? 'Verified' : 'Verify' }}</span>
+                                             </button>
+                                         </div>
+                                         @error('form.mobile_otp')
+                                             <div class="invalid-feedback d-block">{{ $message }}</div>
+                                         @enderror
+                                     </div>
+                                 </div>
 
                                 <div class="col-md-6 col-12">
                                     <div class="form-group mb-3">

@@ -71,7 +71,8 @@ class Register extends Component
                 $otpData = OtpVerifications::where([['type', '=', 'mobile'], ['credential', '=', $this->form->mobile_number], ['created_at', '>', $time]])->first();
                 $otp = getMobileOtp($this->form->mobile_number);
                 if ($otpData) {
-                    $this->addError('form.mobile_number', 'OTP already sent');
+                    $this->isOtpSend = true;
+                    $this->js('success("OTP already sent to this mobile number.")');
                 } else {
                     OtpVerifications::create([
                         'type' => 'mobile',
@@ -83,17 +84,32 @@ class Register extends Component
 
                     // Send SMS OTP via MSG91
                     try {
-                        app(\App\Services\Msg91Service::class)->sendSms($this->form->mobile_number, $otp);
+                        $smsSent = app(\App\Services\Msg91Service::class)->sendSms($this->form->mobile_number, $otp);
+                        if ($smsSent) {
+                            $this->isOtpSend = true;
+                            $this->js('success("OTP sent successfully to your mobile number.")');
+                        } else {
+                            $this->isOtpSend = false;
+                            $this->addError('form.mobile_number', 'Failed to send OTP.');
+                            $this->js('error("Failed to send OTP. Please try again.")');
+                        }
                     } catch (\Exception $e) {
                         \Illuminate\Support\Facades\Log::error('Error sending signup OTP SMS: '.$e->getMessage());
+                        $this->isOtpSend = false;
+                        $this->addError('form.mobile_number', 'Error sending OTP.');
+                        $this->js('error("Error sending OTP. Please try again.")');
                     }
                 }
-                $this->isOtpSend = true;
             } else {
                 $this->addError('form.mobile_number', 'Invalid mobile number');
                 $this->isOtpSend = false;
             }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->isOtpSend = false;
+            $this->js('error("'.$e->validator->errors()->first('form.mobile_number').'")');
+            throw $e;
         } catch (\Throwable $th) {
+            $this->isOtpSend = false;
             throw $th;
         }
     }
@@ -121,19 +137,32 @@ class Register extends Component
         try {
             if ($this->form->validateOnly('mobile_otp')) {
                 $time = date('Y-m-d H:i:s', strtotime('-10 minutes'));
-                $otpData = OtpVerifications::where([['type', '=', 'mobile'], ['credential', '=', $this->form->mobile_number], ['created_at', '>', $time]])->first();
+                $otpData = OtpVerifications::where([
+                    ['type', '=', 'mobile'],
+                    ['credential', '=', $this->form->mobile_number],
+                    ['otp', '=', $this->form->mobile_otp],
+                    ['created_at', '>', $time],
+                ])->first();
+
                 if ($otpData) {
                     $this->otpVerificationStatus = true;
                     $this->resetValidation('form.mobile_otp');
                     $this->resetValidation('form.mobile_number');
+                    $this->js('success("OTP verified successfully.")');
                 } else {
-                    $this->addError('form.mobile_otp', 'Invalid OTP');
                     $this->otpVerificationStatus = false;
+                    $this->addError('form.mobile_otp', 'Invalid OTP or expired.');
+                    $this->js('error("Invalid OTP or expired.")');
                 }
             } else {
                 $this->otpVerificationStatus = false;
             }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->otpVerificationStatus = false;
+            $this->js('error("'.$e->validator->errors()->first('form.mobile_otp').'")');
+            throw $e;
         } catch (\Throwable $th) {
+            $this->otpVerificationStatus = false;
             throw $th;
         }
     }
@@ -141,6 +170,13 @@ class Register extends Component
     public function register()
     {
         // first verify if mobile otp is verified
+        if (! $this->otpVerificationStatus) {
+            $this->addError('form.mobile_otp', 'Please verify your mobile number first.');
+            $this->js('error("Please verify your mobile number first.")');
+
+            return;
+        }
+
         if ($this->form->validate()) {
             $registerUser = $this->form->register();
 

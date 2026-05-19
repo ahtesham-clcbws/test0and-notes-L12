@@ -62,5 +62,14 @@
   - `App\Http\Controllers\Frontend\Franchise\UserController` (Franchise profile update controller)
 - **Code Health:** Automatically formatted all modified files using `vendor/bin/pint --dirty`.
 - **Type Checking Optimization:** Resolved multiple IDE/static analysis type-checking errors (e.g. `Expected type 'object'. Found 'array<string, mixed>'`) inside `UserController`, `InternalRequestsController`, and `DashboardController` by replacing direct `request()` helper calls with class-level `$request` or `$req` parameters, as well as fixing a namespace type-error for the `Log` facade in `DashboardController`.
+- **Livewire AJAX Payload Fix:** Fixed a critical bug where the OTP button got stuck on "Sending OTP..." on the frontend. The issue was caused by debug `echo` statements in `Msg91Service` printing directly to stdout during the API response phase, which corrupted the Livewire JSON payload structure and crashed the browser's JSON parser. Removing these `echo` statements resolved the loading state lockup.
+
+## Log 10 (2026-05-19): Premium Interactive OTP Verification UI
+- **Major Shift (Interactive State Bindings):** Bound inputs and button states directly to the OTP lifecycle variables (`$isOtpSend` and `$otpVerificationStatus`). The mobile input and "Get OTP" button are marked readonly/disabled as soon as the SMS is sent. The OTP field and "Verify" button remain disabled until the SMS is sent, and go readonly/disabled once verified.
+- **Contextual UI Feedbacks**: Integrated clear success information messages below the input grouping (e.g. "OTP successfully sent to your mobile number." and "Mobile number verified.") to guide the user.
+- **Unified Validation Exception Hooks**: Modified `getOtp()` and `verifyOtp()` on both Student and Contributor registration components to intercept `ValidationException` and display the error message as a SweetAlert2 error toast via the global `error()` JS function.
+- **Security Hardening**: Enforced registration guardrails in `register()` to block registration attempts if the OTP has not been verified.
+- **Code Health & pint**: Formatted all changed files using `vendor/bin/pint --dirty` to ensure strict compliance.
+
 
 
