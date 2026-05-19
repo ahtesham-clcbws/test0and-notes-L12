@@ -17,26 +17,28 @@ class IsManagementGuest
     public function handle(Request $request, Closure $next)
     {
         if (Auth::check()) {
-            // dd('hello');
-            $user_role_type = Auth::user()->role->pluck('role_id')->toArray();
-            // manager
-            if (empty(array_diff($user_role_type, [6])) || count($user_role_type) >= 2) {
-                return redirect()->route('franchise.management.manager.dashboard');
-            }
-            // publisher
-            if (empty(array_diff($user_role_type, [7]))) {
-                return redirect()->route('franchise.management.publisher.dashboard');
-            }
-            // creater
-            if (empty(array_diff($user_role_type, [8]))) {
-                return redirect()->route('franchise.management.creater.dashboard');
-            }
+            $user = Auth::user();
+            if ($user->isAdminAllowed == 1) {
+                return redirect()->route('administrator.dashboard');
+            } elseif ($user->is_franchise == 1) {
+                return redirect()->route('franchise.dashboard');
+            } elseif ($user->is_staff == 1 && $user->in_franchise == 1) {
+                $user_role_type = $user->role->pluck('role_id')->toArray();
+                if (empty(array_diff($user_role_type, [6])) || count($user_role_type) >= 2) {
+                    return redirect()->route('franchise.management.manager.dashboard');
+                }
+                if (empty(array_diff($user_role_type, [7]))) {
+                    return redirect()->route('franchise.management.publisher.dashboard');
+                }
+                if (empty(array_diff($user_role_type, [8]))) {
+                    return redirect()->route('franchise.management.creater.dashboard');
+                }
 
-            // Auth::logout();
-            return redirect()->route('management_login');
-            // return redirect()->route('franchise.management.dashboard');
+                return redirect()->route('management_login');
+            } else {
+                return redirect()->route('student.dashboard');
+            }
         }
-        Auth::logout();
 
         return $next($request);
     }

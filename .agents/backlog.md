@@ -15,6 +15,9 @@
 - [x] Rename deprecated `.agent` folder to `.agents` folder in absolute compliance with workspace standards.
 
 ## Completed Tasks
+- [x] Role-Based Guest Routing Redirect Safeguards (V2.3.0)
+- [x] Guest Signup/Login/Forgot-Password Middleware Protection
+- [x] Student Profile Validation Exception Toasts Hook
 - [x] Premium Interactive OTP Verification UI for Student & Contributor Registration
 - [x] Toast Notification synchronization for validation exceptions
 - [x] MSG91 DLT compliant SMS OTP Integration (V2.2.0)

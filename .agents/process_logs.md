@@ -71,5 +71,8 @@
 - **Security Hardening**: Enforced registration guardrails in `register()` to block registration attempts if the OTP has not been verified.
 - **Code Health & pint**: Formatted all changed files using `vendor/bin/pint --dirty` to ensure strict compliance.
 
-
-
+## Log 11 (2026-05-19): Role-Based Guest Routing & Redirect Safeguards
+- **Major Shift (Role-Based Dynamic Redirection):** Modified all guest-facing auth middleware (`IsStudentGuest`, `IsAdminGuest`, `IsFranchiseGuest`, and `IsManagementGuest`) to intercept authenticated sessions and redirect them dynamically to their respective dashboard portals (Admin, Franchise, Management, or Student) instead of performing a hard logout or letting them access guest pages.
+- **Unified Routing Bindings:** Applied `studentguest` middleware to `login`, `registration`, `forgot-password`, and `corporate-signup` in `routes/web.php`, and `contributor-signup` in `routes/franchise.php` to prevent logged-in users from accessing them.
+- **Robust Student Profile OTP Validation:** Refactored OTP and password update methods in `App\Livewire\Student\Profile\Index` to capture `ValidationException` and display it as an error toast notification to the user, ensuring a premium user experience.
+- **Code Formatting:** Cleaned and verified all changes with `vendor/bin/pint --dirty`.

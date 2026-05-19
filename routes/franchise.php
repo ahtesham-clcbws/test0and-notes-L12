@@ -20,7 +20,7 @@ use App\Livewire\Frontend\Auth\ContributorSignUp;
 use Illuminate\Support\Facades\Route;
 
 // Route::any('contributor-signup', [FormsController::class, 'instituteUser'])->name('contributor');
-Route::any('contributor-signup', ContributorSignUp::class)->name('contributor');
+Route::any('contributor-signup', ContributorSignUp::class)->middleware(['studentguest'])->name('contributor');
 Route::any('/contributor-login', [AuthController::class, 'franchiseManagementLogin'])->middleware(['managementguest'])->name('management_login');
 
 Route::name('franchise.')->group(function () {

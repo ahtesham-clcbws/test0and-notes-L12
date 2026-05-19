@@ -113,11 +113,11 @@ class Index extends Component
      */
     public function sendEmailOtp(): void
     {
-        $this->validate(['email' => 'required|email|unique:users,email,'.Auth::id()]);
-
-        $otp = mt_rand(100000, 999999);
-
         try {
+            $this->validate(['email' => 'required|email|unique:users,email,'.Auth::id()]);
+
+            $otp = mt_rand(100000, 999999);
+
             Mail::raw('Your OTP for Email Verification is '.$otp, function ($message) {
                 $message->to($this->email)->subject('OTP Verification');
             });
@@ -130,6 +130,9 @@ class Index extends Component
 
             $this->email_otp_sent = true;
             $this->success('OTP sent to your new email.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->error($e->validator->errors()->first('email'));
+            throw $e;
         } catch (\Exception $e) {
             $this->error('Failed to send OTP. Please try again.');
         }
@@ -140,22 +143,27 @@ class Index extends Component
      */
     public function verifyEmail(): void
     {
-        $this->validate(['email_otp' => 'required|numeric|digits:6']);
+        try {
+            $this->validate(['email_otp' => 'required|numeric|digits:6']);
 
-        $otpData = OtpVerifications::where([
-            ['type', '=', 'email'],
-            ['credential', '=', $this->email],
-            ['otp', '=', $this->email_otp],
-            ['created_at', '>', now()->subMinutes(11)],
-        ])->first();
+            $otpData = OtpVerifications::where([
+                ['type', '=', 'email'],
+                ['credential', '=', $this->email],
+                ['otp', '=', $this->email_otp],
+                ['created_at', '>', now()->subMinutes(11)],
+            ])->first();
 
-        if ($otpData) {
-            User::find(Auth::id())->update(['email' => $this->email]);
-            $this->email_otp_sent = false;
-            $this->email_otp = '';
-            $this->success('Email updated successfully!');
-        } else {
-            $this->error('Invalid or expired OTP.');
+            if ($otpData) {
+                User::find(Auth::id())->update(['email' => $this->email]);
+                $this->email_otp_sent = false;
+                $this->email_otp = '';
+                $this->success('Email updated successfully!');
+            } else {
+                $this->error('Invalid or expired OTP.');
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->error($e->validator->errors()->first('email_otp'));
+            throw $e;
         }
     }
 
@@ -164,25 +172,30 @@ class Index extends Component
      */
     public function sendMobileOtp(): void
     {
-        $this->validate(['mobile' => 'required|numeric|digits:10|unique:users,mobile,'.Auth::id()]);
-
-        $otp = mt_rand(100000, 999999);
-
-        OtpVerifications::create([
-            'type' => 'mobile',
-            'credential' => $this->mobile,
-            'otp' => $otp,
-        ]);
-
-        // Send SMS OTP via MSG91
         try {
-            app(\App\Services\Msg91Service::class)->sendSms($this->mobile, $otp);
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Error sending profile mobile update OTP SMS: '.$e->getMessage());
-        }
+            $this->validate(['mobile' => 'required|numeric|digits:10|unique:users,mobile,'.Auth::id()]);
 
-        $this->mobile_otp_sent = true;
-        $this->success('OTP sent to '.$this->mobile);
+            $otp = mt_rand(100000, 999999);
+
+            OtpVerifications::create([
+                'type' => 'mobile',
+                'credential' => $this->mobile,
+                'otp' => $otp,
+            ]);
+
+            // Send SMS OTP via MSG91
+            try {
+                app(\App\Services\Msg91Service::class)->sendSms($this->mobile, $otp);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error sending profile mobile update OTP SMS: '.$e->getMessage());
+            }
+
+            $this->mobile_otp_sent = true;
+            $this->success('OTP sent to '.$this->mobile);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->error($e->validator->errors()->first('mobile'));
+            throw $e;
+        }
     }
 
     /**
@@ -190,22 +203,27 @@ class Index extends Component
      */
     public function verifyMobile(): void
     {
-        $this->validate(['mobile_otp' => 'required|numeric|digits:6']);
+        try {
+            $this->validate(['mobile_otp' => 'required|numeric|digits:6']);
 
-        $otpData = OtpVerifications::where([
-            ['type', '=', 'mobile'],
-            ['credential', '=', $this->mobile],
-            ['otp', '=', $this->mobile_otp],
-            ['created_at', '>', now()->subMinutes(11)],
-        ])->first();
+            $otpData = OtpVerifications::where([
+                ['type', '=', 'mobile'],
+                ['credential', '=', $this->mobile],
+                ['otp', '=', $this->mobile_otp],
+                ['created_at', '>', now()->subMinutes(11)],
+            ])->first();
 
-        if ($otpData) {
-            User::find(Auth::id())->update(['mobile' => $this->mobile]);
-            $this->mobile_otp_sent = false;
-            $this->mobile_otp = '';
-            $this->success('Mobile number updated successfully!');
-        } else {
-            $this->error('Invalid or expired OTP.');
+            if ($otpData) {
+                User::find(Auth::id())->update(['mobile' => $this->mobile]);
+                $this->mobile_otp_sent = false;
+                $this->mobile_otp = '';
+                $this->success('Mobile number updated successfully!');
+            } else {
+                $this->error('Invalid or expired OTP.');
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->error($e->validator->errors()->first('mobile_otp'));
+            throw $e;
         }
     }
 
@@ -214,17 +232,22 @@ class Index extends Component
      */
     public function updatePassword(): void
     {
-        $this->validate([
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed', Password::min(8)],
-        ]);
+        try {
+            $this->validate([
+                'current_password' => ['required', 'current_password'],
+                'password' => ['required', 'confirmed', Password::min(8)],
+            ]);
 
-        User::find(Auth::id())->update([
-            'password' => Hash::make($this->password),
-        ]);
+            User::find(Auth::id())->update([
+                'password' => Hash::make($this->password),
+            ]);
 
-        $this->reset(['current_password', 'password', 'password_confirmation']);
-        $this->success('Password changed successfully!');
+            $this->reset(['current_password', 'password', 'password_confirmation']);
+            $this->success('Password changed successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $this->error($e->validator->errors()->first());
+            throw $e;
+        }
     }
 
     public function render()

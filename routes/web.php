@@ -40,16 +40,16 @@ Route::post('/', [InternalRequestsController::class, 'index']);
 Route::get('demoemail', [InternalRequestsController::class, 'demoemail']);
 Route::any('corporate-enquiry', [FormsController::class, 'businessEnquiry'])->name('bussines_enquiry');
 // Route::any('corporate-signup', [FormsController::class, 'instituteSignup'])->name('corporate_signup');
-Route::any('corporate-signup', CorporateSignupPage::class)->name('corporate_signup');
+Route::any('corporate-signup', CorporateSignupPage::class)->middleware(['studentguest'])->name('corporate_signup');
 Route::any('reset-password/{studentid}/{resetid}', [FormsController::class, 'studentPasswordReset'])->name('student_recover_password');
 Route::get('start-test', [HomeController::class, 'startTest'])->name('start_test');
 Route::get('about-us', [HomeController::class, 'aboutUs'])->name('about_us');
 Route::any('contact-us', ContactUsPage::class)->name('contact_us');
 Route::get('plans', [HomeController::class, 'subscribePlan'])->name('plans');
 
-Route::any('login', Login::class)->name('login');
-Route::any('registration', Register::class)->name('register');
-Route::any('forgot-password', ForgotPassword::class)->name('forgot_password');
+Route::any('login', Login::class)->middleware(['studentguest'])->name('login');
+Route::any('registration', Register::class)->middleware(['studentguest'])->name('register');
+Route::any('forgot-password', ForgotPassword::class)->middleware(['studentguest'])->name('forgot_password');
 
 Route::get('faq', Faq::class)->name('faqs');
 Route::get('important-links', ImportantLinksWebsitePage::class)->name('important_links');

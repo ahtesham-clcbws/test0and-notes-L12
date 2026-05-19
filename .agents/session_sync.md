@@ -238,3 +238,12 @@
   - **Clean Slate**: Purged all entries from `TestAttempt` and `TestAttemptAnswer` tables.
 - **Next Steps:** Have the user perform the final verified test run. All code fully formatted with `vendor/bin/pint --dirty`.
 
+
+## Session Handoff - 2026-05-19 (V2.3.0: Guest Safeguards & Profile Validation)
+- **Objective:** Secure guest routes with middleware redirects and ensure profile OTP changes display proper validation error messages.
+- **Key Achievements:**
+  - **Dynamic Portal Redirects:** Updated `IsStudentGuest`, `IsAdminGuest`, `IsFranchiseGuest`, and `IsManagementGuest` middleware to dynamically route logged-in users to their role-specific dashboard (Admin, Franchise, Management, or Student) without logging them out.
+  - **Protected Entry Routes:** Applied `studentguest` middleware to guest pages (`login`, `registration`, `forgot-password`, `corporate-signup`, and `contributor-signup`) to block access for active sessions.
+  - **Validation Toast Hooks:** Wrapped email/mobile OTP send and verification functions in the student profile component with try-catch blocks to catch `ValidationException` and display it as an error toast.
+  - **Auto-Formatting:** Formatted all changed code with `vendor/bin/pint --dirty`.
+- **Next Steps:** Proceed to git push.
