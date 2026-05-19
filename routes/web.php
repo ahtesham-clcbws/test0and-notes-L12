@@ -53,6 +53,7 @@ Route::any('forgot-password', ForgotPassword::class)->middleware(['studentguest'
 
 Route::get('faq', Faq::class)->name('faqs');
 Route::get('important-links', ImportantLinksWebsitePage::class)->name('important_links');
+Route::get('app-download', \App\Livewire\Frontend\AppDownloadPage::class)->name('app.download');
 
 // ----------------------Test--------------------//
 Route::get('test', [TestController::class, 'onlineTest'])->name('online_test');
