@@ -305,19 +305,26 @@
                 didOpen: (toast) => {
                     toast.onmouseenter = Swal.stopTimer;
                     toast.onmouseleave = Swal.resumeTimer;
+                    toast.addEventListener('click', Swal.close);
                 }
             });
 
             function success(messasge) {
                 return Toast2.fire({
                     icon: "success",
-                    title: messasge
+                    title: messasge,
+                    background: '#16a34a',
+                    color: '#ffffff',
+                    iconColor: '#ffffff'
                 });
             }
             function error(messasge) {
                 return Toast2.fire({
                     icon: "error",
-                    title: messasge
+                    title: messasge,
+                    background: '#dc2626',
+                    color: '#ffffff',
+                    iconColor: '#ffffff'
                 });
             }
         </script>

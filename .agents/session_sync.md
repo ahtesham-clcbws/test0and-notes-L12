@@ -55,13 +55,15 @@
 # Session Sync - Momin Scholar Program
 
 ## Session Handoff - 2026-05-19 (V2.2.1: Premium Interactive OTP Verification UI)
-- **Objective:** Fix button states, disable inputs correctly upon OTP transmission/verification, display contextual status messages below inputs, trigger error toasts, and block registration bypasses.
+- **Objective:** Fix button states, disable inputs correctly upon OTP transmission/verification, display contextual status messages below inputs, trigger error toasts, make success toasts fully green, ensure toasts close on click, and block registration bypasses.
 - **Key Achievements:**
+  - **Premium SweetAlert2 Toast Formatting**: Styled the success toast to be fully green (background `#16a34a`, white icon/text) and error toast to be fully red (background `#dc2626`, white icon/text).
+  - **Toast Dismissal on Click**: Added click event listener (`toast.addEventListener('click', Swal.close)`) to standard SweetAlert2 toasts to enable instant closing on click.
   - **Interactive State Bindings**: Configured mobile inputs and "Get OTP" buttons to disable and go readonly upon successful SMS sending. Configured OTP inputs and "Verify" buttons to remain disabled until SMS is sent, and disable completely with a "Verified" badge once verified.
   - **Contextual Status Helper Tags**: Added status/info texts directly below the inputs (e.g. "OTP successfully sent to your mobile number." and "Mobile number verified.").
   - **Exception & Toast Synchronization**: Intercepted validation exceptions on `getOtp()` and `verifyOtp()` to automatically trigger SweetAlert2 error toasts using the global `error()` JS function.
   - **Security Guardrails**: Enforced backend validation checks in `register()` to block registration attempts if the OTP has not been verified.
-  - **Pre-Push Automation**: Incremented version to `v2.0.6`, ran `npm run build` to compile production assets, and ran `vendor/bin/pint --dirty`.
+  - **Pre-Push Automation**: Incremented version to `v2.0.7`, ran `npm run build` to compile production assets, and ran `vendor/bin/pint --dirty`.
 
 ## Session Handoff - 2026-05-19 (V2.2.0: MSG91 Signup & Profile OTP Integration)
 - **Objective:** Fix the OTP flow in the portal's sign-up pages and user profile pages where the OTP verification records were being generated in the database but never transmitted to the user's phone number.
