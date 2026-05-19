@@ -111,6 +111,13 @@ class ContributorSignUp extends Component
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
+
+                    // Send SMS OTP via MSG91
+                    try {
+                        app(\App\Services\Msg91Service::class)->sendSms($this->mobile, $otp);
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('Error sending contributor signup OTP SMS: '.$e->getMessage());
+                    }
                 }
                 $this->isOtpSend = true;
                 $this->js('success("OTP sent successfully.")');

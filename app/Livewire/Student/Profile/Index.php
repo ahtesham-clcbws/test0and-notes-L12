@@ -20,28 +20,38 @@ use Mary\Traits\Toast;
 #[Layout('components.layouts.student-mary')]
 class Index extends Component
 {
-    use WithFileUploads, Toast;
+    use Toast, WithFileUploads;
 
     // Profile Info
     public string $name = '';
+
     public ?string $photo_url = null;
-    public $photo; 
-    
+
+    public $photo;
+
     // Geographical Info
     public ?int $state_id = null;
+
     public ?int $city_id = null;
 
     // Contact Info
     public string $email = '';
+
     public string $mobile = '';
+
     public string $email_otp = '';
+
     public string $mobile_otp = '';
+
     public bool $email_otp_sent = false;
+
     public bool $mobile_otp_sent = false;
 
     // Security Info (Password Reset)
     public string $current_password = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
 
     public function mount(): void
@@ -50,7 +60,7 @@ class Index extends Component
         $this->name = $user->name;
         $this->email = $user->email;
         $this->mobile = $user->mobile;
-        
+
         $details = $user->user_details;
         if ($details) {
             $this->photo_url = $details->photo_url;
@@ -73,7 +83,7 @@ class Index extends Component
             'name' => 'required|string|max:255',
             'state_id' => 'nullable|integer',
             'city_id' => 'nullable|integer',
-            'photo' => 'nullable|image|max:1024', 
+            'photo' => 'nullable|image|max:1024',
         ]);
 
         $user = User::find(Auth::id());
@@ -89,7 +99,7 @@ class Index extends Component
 
         if ($this->photo) {
             $imageService = app(ImageService::class);
-            $imageName = $imageService->handleUpload($this->photo, 'student_uploads/' . $user->id, 400);
+            $imageName = $imageService->handleUpload($this->photo, 'student_uploads/'.$user->id, 400);
             $details->update(['photo_url' => $imageName]);
             $this->photo_url = $imageName;
             $this->photo = null;
@@ -103,19 +113,19 @@ class Index extends Component
      */
     public function sendEmailOtp(): void
     {
-        $this->validate(['email' => 'required|email|unique:users,email,' . Auth::id()]);
+        $this->validate(['email' => 'required|email|unique:users,email,'.Auth::id()]);
 
         $otp = mt_rand(100000, 999999);
-        
+
         try {
-            Mail::raw('Your OTP for Email Verification is ' . $otp, function ($message) {
+            Mail::raw('Your OTP for Email Verification is '.$otp, function ($message) {
                 $message->to($this->email)->subject('OTP Verification');
             });
-            
+
             OtpVerifications::create([
                 'type' => 'email',
                 'credential' => $this->email,
-                'otp' => $otp
+                'otp' => $otp,
             ]);
 
             $this->email_otp_sent = true;
@@ -136,7 +146,7 @@ class Index extends Component
             ['type', '=', 'email'],
             ['credential', '=', $this->email],
             ['otp', '=', $this->email_otp],
-            ['created_at', '>', now()->subMinutes(11)]
+            ['created_at', '>', now()->subMinutes(11)],
         ])->first();
 
         if ($otpData) {
@@ -154,22 +164,25 @@ class Index extends Component
      */
     public function sendMobileOtp(): void
     {
-        $this->validate(['mobile' => 'required|numeric|digits:10|unique:users,mobile,' . Auth::id()]);
+        $this->validate(['mobile' => 'required|numeric|digits:10|unique:users,mobile,'.Auth::id()]);
 
         $otp = mt_rand(100000, 999999);
-        
-        // Note: Real SMS sending would happen here using an SMS service.
-        // For now, we store it so the user can verify it (consistent with legacy behavior).
+
         OtpVerifications::create([
             'type' => 'mobile',
             'credential' => $this->mobile,
-            'otp' => $otp
+            'otp' => $otp,
         ]);
 
+        // Send SMS OTP via MSG91
+        try {
+            app(\App\Services\Msg91Service::class)->sendSms($this->mobile, $otp);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error sending profile mobile update OTP SMS: '.$e->getMessage());
+        }
+
         $this->mobile_otp_sent = true;
-        // In a real app, you'd send this via SMS API. 
-        // We'll show a success message for now.
-        $this->success('OTP sent to ' . $this->mobile);
+        $this->success('OTP sent to '.$this->mobile);
     }
 
     /**
@@ -183,7 +196,7 @@ class Index extends Component
             ['type', '=', 'mobile'],
             ['credential', '=', $this->mobile],
             ['otp', '=', $this->mobile_otp],
-            ['created_at', '>', now()->subMinutes(11)]
+            ['created_at', '>', now()->subMinutes(11)],
         ])->first();
 
         if ($otpData) {

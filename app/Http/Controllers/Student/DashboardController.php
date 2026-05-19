@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\Count;
-use App\Models\TestAttempt;
 use App\Models\OtpVerifications;
 use App\Models\Studymaterial;
+use App\Models\TestAttempt;
 use App\Models\TestCat;
 use App\Models\TestModal;
 use App\Models\User;
@@ -143,8 +143,12 @@ class DashboardController extends Controller
         $otpVerifications->otp = $otp;
         $saveToDb = $otpVerifications->save();
 
-        // if ($saveToDb && $response->status == 'success') {
         if ($saveToDb) {
+            try {
+                app(\App\Services\Msg91Service::class)->sendSms($mobileNumber, $otp);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error sending Student Dashboard mobile OTP SMS: '.$e->getMessage());
+            }
             $this->returnResponse['success'] = true;
         }
         // }

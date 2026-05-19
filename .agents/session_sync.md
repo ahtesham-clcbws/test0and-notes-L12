@@ -54,6 +54,19 @@
 
 # Session Sync - Momin Scholar Program
 
+## Session Handoff - 2026-05-19 (V2.2.0: MSG91 Signup & Profile OTP Integration)
+- **Objective:** Fix the OTP flow in the portal's sign-up pages and user profile pages where the OTP verification records were being generated in the database but never transmitted to the user's phone number.
+- **Key Achievements:**
+  - **Integrated MSG91 SMS Service**: Wired the `Msg91Service` gateway to automatically trigger SMS transmissions whenever a new mobile OTP is requested and saved.
+  - **Wired 6 Flow Endpoints**:
+    - **Student Registration**: Integrated SMS dispatch into `App\Livewire\Frontend\Auth\Register`.
+    - **Contributor Registration**: Integrated SMS dispatch into `App\Livewire\Frontend\Auth\ContributorSignUp`.
+    - **Student Profile**: Integrated SMS dispatch into `App\Livewire\Student\Profile\Index` mobile updates.
+    - **Franchise Profile**: Integrated SMS dispatch into `App\Http\Controllers\Frontend\Franchise\UserController` mobile verification.
+    - **Student Dashboard Controller**: Integrated SMS dispatch into `App\Http\Controllers\Student\DashboardController` mobile verification.
+    - **Legacy AJAX Route**: Integrated SMS dispatch into `App\Http\Controllers\InternalRequests\InternalRequestsController`.
+  - **Code Quality & Type Hardening**: Resolved multiple static analysis type warnings (`Expected type 'object'. Found 'array<string, mixed>'`) across the controllers by converting `request()` calls to utilize typed request parameters, initialized `$returnResponse` inside `app_login` to solve the undefined variable warning, and formatted all changes with `vendor/bin/pint --dirty`.
+
 ## Session Handoff - 2026-05-18 (V2.1.2: Premium Review Mode & Secure Encryption)
 - **Objective:** Design and implement a highly secure, premium Review Mode for test attempts with URL encryption, interactive re-answer capability, and color/border UI states.
 - **Key Achievements:**

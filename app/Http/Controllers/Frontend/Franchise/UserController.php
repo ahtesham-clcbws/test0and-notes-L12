@@ -88,16 +88,18 @@ class UserController extends Controller
 
     public function show($id)
     {
+        /** @var \Illuminate\Http\Request $request */
+        $request = request();
         $user = User::find($id);
         $data['user'] = $user;
         $data['details'] = [];
         $data['details'] = UserDetails::where('user_id', $id)->first();
 
-        if (request()->isMethod('post')) {
-            $requestData = request()->all();
+        if ($request->isMethod('post')) {
+            $requestData = $request->all();
             $role_id = [];
-            if (! empty(request()->role)) {
-                foreach (request()->role as $key => $value) {
+            if (! empty($request->role)) {
+                foreach ($request->role as $key => $value) {
                     switch ($value) {
                         case 'manager'   : $role_id[$key] = 6;
                             break;
@@ -120,25 +122,25 @@ class UserController extends Controller
                 }
             }
 
-            if (request()->input('form_name') == 'set_user') {
+            if ($request->input('form_name') == 'set_user') {
                 // $userDb = new User();
                 $userDb = User::find($id);
 
                 // $userDb->id =  $id;
-                $userDb->name = htmlspecialchars(request()->input('name'));
+                $userDb->name = htmlspecialchars($request->input('name'));
 
-                if (request()->input('is_staff') == 0) {
+                if ($request->input('is_staff') == 0) {
                     $userDb->roles = 'student';
                     $userDb->is_staff = 0;
                     $userDb->franchise_roles = null;
                 } else {
                     if ($userDb->franchise_code) {
-                        $userDb->roles = implode(',', request()->input('role'));
+                        $userDb->roles = implode(',', $request->input('role'));
                         $userDb->is_staff = 1;
-                        $userDb->franchise_roles = json_encode(request()->input('role'));
+                        $userDb->franchise_roles = json_encode($request->input('role'));
                     } else {
                         $userDb->isAdminAllowed = 1;
-                        $userDb->roles = json_encode(request()->input('role'));
+                        $userDb->roles = json_encode($request->input('role'));
                         $userDb->franchise_roles = null;
                     }
                 }
@@ -165,10 +167,10 @@ class UserController extends Controller
                     }
                 }
 
-                if (request()->input('password')) {
-                    $userDb->password = Hash::make(request()->input('password'));
+                if ($request->input('password')) {
+                    $userDb->password = Hash::make($request->input('password'));
                 }
-                $userDb->status = request()->input('status');
+                $userDb->status = $request->input('status');
 
                 $diff_role_id = array_diff($userDb->role->pluck('role_id')->toArray(), $role_id);
 
@@ -283,6 +285,8 @@ class UserController extends Controller
 
     public function myProfile()
     {
+        /** @var \Illuminate\Http\Request $request */
+        $request = request();
         $id = Auth::user()->id;
         $user = User::find($id);
         $details = null;
@@ -309,7 +313,7 @@ class UserController extends Controller
             }
         }
 
-        if (request()->isMethod('post')) {
+        if ($request->isMethod('post')) {
             // Ensure details record exists before processing
             if (! $details) {
                 if (str_contains($user['roles'], 'franchise')) {
@@ -324,35 +328,35 @@ class UserController extends Controller
                 }
             }
 
-            $inputs = request()->all();
-            if (request()->input('name') && $inputs['name'] !== $user['name']) {
+            $inputs = $request->all();
+            if ($request->input('name') && $inputs['name'] !== $user['name']) {
                 $user['name'] = $inputs['name'];
             }
-            if (request()->input('password')) {
+            if ($request->input('password')) {
                 $user['password'] = Hash::make($inputs['password']);
             }
 
             // Image uploads
-            if ($file = request()->file('user_image')) {
-                $details->photo_url = $this->imageService->handleUpload(request()->file('user_image'), 'institute/avatar', 400);
+            if ($file = $request->file('user_image')) {
+                $details->photo_url = $this->imageService->handleUpload($request->file('user_image'), 'institute/avatar', 400);
             }
             if (str_contains($user['roles'], 'franchise')) {
-                if ($file = request()->file('logo')) {
-                    $details->logo = $this->imageService->handleUpload(request()->file('logo'), 'institute/logo', 400);
+                if ($file = $request->file('logo')) {
+                    $details->logo = $this->imageService->handleUpload($request->file('logo'), 'institute/logo', 400);
                 }
             }
 
             // Address fields
-            if (request()->input('address') && $inputs['address'] !== $details['address']) {
+            if ($request->input('address') && $inputs['address'] !== $details['address']) {
                 $details->address = $inputs['address'];
             }
-            if (request()->input('pincode') && $inputs['pincode'] !== $details['pincode']) {
+            if ($request->input('pincode') && $inputs['pincode'] !== $details['pincode']) {
                 $details->pincode = $inputs['pincode'];
             }
-            if (request()->input('city') && $inputs['city'] !== $details['city']) {
+            if ($request->input('city') && $inputs['city'] !== $details['city']) {
                 $details->city = $inputs['city'];
             }
-            if (request()->input('state') && $inputs['state'] !== $details['state']) {
+            if ($request->input('state') && $inputs['state'] !== $details['state']) {
                 $details->state = $inputs['state'];
             }
 
@@ -382,6 +386,8 @@ class UserController extends Controller
 
     public function myProfile_creater_publisher()
     {
+        /** @var \Illuminate\Http\Request $request */
+        $request = request();
         $id = Auth::user()->id;
         $user = User::find($id);
         $details = UserDetails::where('user_id', $id)->first();
@@ -391,30 +397,30 @@ class UserController extends Controller
             $detailsDb->save();
             $details = UserDetails::where('user_id', $id)->first();
         }
-        if (request()->isMethod('post')) {
-            $inputs = request()->all();
-            if (request()->input('name') && $inputs['name'] !== $user['name']) {
+        if ($request->isMethod('post')) {
+            $inputs = $request->all();
+            if ($request->input('name') && $inputs['name'] !== $user['name']) {
                 $user['name'] = $inputs['name'];
             }
-            if (request()->input('password')) {
+            if ($request->input('password')) {
                 $user['password'] = Hash::make($inputs['password']);
             }
-            if (request()->input('email')) {
+            if ($request->input('email')) {
                 $user['email'] = $inputs['email'];
             }
-            if ($file = request()->file('user_image')) {
-                $details->photo_url = $this->imageService->handleUpload(request()->file('user_image'), 'admin/'.$id, 400);
+            if ($file = $request->file('user_image')) {
+                $details->photo_url = $this->imageService->handleUpload($request->file('user_image'), 'admin/'.$id, 400);
             }
-            if (request()->input('address') && $inputs['address'] !== $details['address']) {
+            if ($request->input('address') && $inputs['address'] !== $details['address']) {
                 $details->address = $inputs['address'];
             }
-            if (request()->input('pincode') && $inputs['pincode'] !== $details['pincode']) {
+            if ($request->input('pincode') && $inputs['pincode'] !== $details['pincode']) {
                 $details->pincode = $inputs['pincode'];
             }
-            if (request()->input('city') && $inputs['city'] !== $details['city']) {
+            if ($request->input('city') && $inputs['city'] !== $details['city']) {
                 $details->city = $inputs['city'];
             }
-            if (request()->input('state') && $inputs['state'] !== $details['state']) {
+            if ($request->input('state') && $inputs['state'] !== $details['state']) {
                 $details->state = $inputs['state'];
             }
             $user->save();
@@ -439,8 +445,8 @@ class UserController extends Controller
         // dd($franchiseCodes,Auth::user()->franchise_code);
         // return print_r($franchiseCodes);
 
-        if (request()->isMethod('post')) {
-            $request = request()->all();
+        if ($req->isMethod('post')) {
+            $request = $req->all();
             // dd($req->all());
             // return print_r($request);
             $usernameError = false;
@@ -546,8 +552,8 @@ class UserController extends Controller
                     }
 
                     $userDetailsDb->user_id = $userDb->id;
-                    if ($file = request()->file('user_logo')) {
-                        $userDetailsDb->photo_url = $this->imageService->handleUpload(request()->file('user_logo'), 'student_uploads/'.$userDb->id, 400);
+                    if ($file = $req->file('user_logo')) {
+                        $userDetailsDb->photo_url = $this->imageService->handleUpload($req->file('user_logo'), 'student_uploads/'.$userDb->id, 400);
                     }
                     $userDetailsDb->save();
                     User::generateCounts();
@@ -626,8 +632,12 @@ class UserController extends Controller
         $otpVerifications->otp = $otp;
         $saveToDb = $otpVerifications->save();
 
-        // if ($saveToDb && $response->status == 'success') {
         if ($saveToDb) {
+            try {
+                app(\App\Services\Msg91Service::class)->sendSms($mobileNumber, $otp);
+            } catch (\Exception $e) {
+                Log::error('Error sending Franchise User mobile OTP SMS: '.$e->getMessage());
+            }
             $this->returnResponse['success'] = true;
         }
         // }

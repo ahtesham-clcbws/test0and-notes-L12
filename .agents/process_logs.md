@@ -50,3 +50,17 @@
 - **Removed Resume Navigation:** Completely removed the "Back to Exam / Resume" button and guide links from the pre-submit Review screen as per the latest requirements, locking the user strictly to marked-for-review answers.
 - **Database Sanitization:** Cleared out all records in `test_attempts` and `test_attempt_answers` in the database, allowing for pure, isolated, clean-slate testing.
 - **Code Density Standards:** Achieved <230 line components for both classes, fully complying with standard 5 of our Global standards. All style checks formatted with `vendor/bin/pint --dirty`.
+
+## Log 9 (2026-05-19): MSG91 Signup & Profile OTP Integration
+- **Major Shift (OTP SMS Integration):** Integrated `Msg91Service` into all signup and mobile profile update flows where OTPs were being saved to the database but never transmitted to the user's phone.
+- **Wired Components:**
+  - `App\Livewire\Frontend\Auth\Register` (Student registration form)
+  - `App\Livewire\Frontend\Auth\ContributorSignUp` (Contributor registration form)
+  - `App\Livewire\Student\Profile\Index` (Student profile edit screen)
+  - `App\Http\Controllers\InternalRequests\InternalRequestsController` (Legacy signup AJAX controller)
+  - `App\Http\Controllers\Student\DashboardController` (Student mobile update controller)
+  - `App\Http\Controllers\Frontend\Franchise\UserController` (Franchise profile update controller)
+- **Code Health:** Automatically formatted all modified files using `vendor/bin/pint --dirty`.
+- **Type Checking Optimization:** Resolved multiple IDE/static analysis type-checking errors (e.g. `Expected type 'object'. Found 'array<string, mixed>'`) inside `UserController`, `InternalRequestsController`, and `DashboardController` by replacing direct `request()` helper calls with class-level `$request` or `$req` parameters, as well as fixing a namespace type-error for the `Log` facade in `DashboardController`.
+
+

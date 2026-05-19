@@ -14,7 +14,6 @@ use App\Models\ClassGoupExamModel;
 use App\Models\CorporateEnquiry;
 use App\Models\DefaultOtp;
 use App\Models\Educationtype;
-use App\Models\OtpVerifications;
 use App\Models\FranchiseDetails;
 use App\Models\Gn_AssignClassGroupExamName;
 use App\Models\Gn_DisplayClassGroupExamName;
@@ -27,6 +26,7 @@ use App\Models\Gn_EducationClassExamAgencyBoardUniversity;
 use App\Models\Gn_OtherExamClassDetailModel;
 use App\Models\Gn_PackagePlan;
 use App\Models\Gn_SubjectPartLessionNew;
+use App\Models\OtpVerifications;
 use App\Models\PasswordResetModel;
 use App\Models\QuestionBankModel;
 use App\Models\Studymaterial;
@@ -251,9 +251,14 @@ class InternalRequestsController extends Controller
                     $otpVerifications->otp = $otp;
                     $saveToDb = $otpVerifications->save();
 
-                    // if ($saveToDb && $response->status == 'success') {
-                    $this->returnResponse['success'] = true;
-                    //     }
+                    if ($saveToDb) {
+                        try {
+                            app(\App\Services\Msg91Service::class)->sendSms($mobileNumber, $otp);
+                        } catch (\Exception $e) {
+                            Log::error('Error sending legacy mobile signup OTP SMS: '.$e->getMessage());
+                        }
+                        $this->returnResponse['success'] = true;
+                    }
                     // }
                 }
 
@@ -522,7 +527,7 @@ class InternalRequestsController extends Controller
             }
             if ($request->input('form_name') == 'login_form') {
                 // return "test";
-                $input = request()->all();
+                $input = $request->all();
                 $fieldType = 'username';
                 if (filter_var($input['username'], FILTER_VALIDATE_EMAIL)) {
                     $fieldType = 'email';
@@ -705,7 +710,7 @@ class InternalRequestsController extends Controller
                 return json_encode(false);
             }
             if ($request->input('form_name') == 'student_forget') {
-                $input = request()->all();
+                $input = $request->all();
                 // return json_encode($input);
                 $student = User::where('email', $input['forget_email'])->where('roles', 'student')->first();
                 if ($student) {
@@ -741,7 +746,7 @@ class InternalRequestsController extends Controller
                 return json_encode('error');
             }
             if ($request->input('form_name') == 'student_reset_form') {
-                $input = request()->all();
+                $input = $request->all();
                 // return json_encode($input);
 
                 $resetData = PasswordResetModel::find($input['reset_id']);
@@ -792,7 +797,7 @@ class InternalRequestsController extends Controller
 
             // only app functions
             if ($request->input('form_name') == 'verify_token') {
-                $input = request()->all();
+                $input = $request->all();
                 if (User::where(['username' => $input['username'], 'remember_token' => $input['token']])->first()) {
                     $this->returnResponse['success'] = true;
                 } else {
@@ -868,7 +873,8 @@ class InternalRequestsController extends Controller
                 return json_encode($this->returnResponse);
             }
             if ($request->input('form_name') == 'app_login') {
-                $input = request()->all();
+                $returnResponse = ['success' => false, 'message' => ''];
+                $input = $request->all();
                 $remember = true;
                 if (filter_var($input['username'], FILTER_VALIDATE_EMAIL)) {
                     $fieldType = 'email';
@@ -885,7 +891,7 @@ class InternalRequestsController extends Controller
                     } elseif ($thisUser['status'] == 'expired') {
                         $returnResponse['message'] = 'Your account is expired, please contact institute for your account activation.';
                     } elseif ($thisUser['status'] == 'active') {
-                        $data = request()->validate([
+                        $data = $request->validate([
                             $fieldType => 'required',
                             'password' => 'required',
                         ]);
@@ -1430,8 +1436,8 @@ class InternalRequestsController extends Controller
 
                     if ($userDb->save()) {
                         $userDetailsDb->user_id = $userDb->id;
-                        if ($file = request()->file('user_logo')) {
-                            $fullPath = $this->imageService->handleUpload(request()->file('user_logo'), 'student_uploads/'.$userDb->id, 400);
+                        if ($file = $request->file('user_logo')) {
+                            $fullPath = $this->imageService->handleUpload($request->file('user_logo'), 'student_uploads/'.$userDb->id, 400);
                             $userDetailsDb->photo_url = $fullPath;
                         }
                         $userDetailsDb->save();
