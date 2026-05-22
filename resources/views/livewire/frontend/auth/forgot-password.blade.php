@@ -22,7 +22,7 @@
         <div class="container">
 
             <div class="row align-items-center justify-content-between">
-                <div class="col-lg-4 col-md-6 col-sm-8 col-xs-12 login-form mx-auto">
+                <div class="col-lg-4 col-md-6 col-sm-8 col-xs-12 login-form mx-auto custom-shadow">
                     <form>
                         @csrf
                         <div class="form-group mb-3">

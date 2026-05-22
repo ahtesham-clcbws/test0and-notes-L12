@@ -26,7 +26,7 @@ class OptimizeExistingImages extends Command
      */
     protected $description = 'Optimizes existing images in storage and updates database records';
 
-    protected $imageService;
+    protected ImageService $imageService;
 
     /**
      * Create a new command instance.
@@ -41,10 +41,8 @@ class OptimizeExistingImages extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('Starting image optimization...');
 
@@ -65,7 +63,7 @@ class OptimizeExistingImages extends Command
         return 0;
     }
 
-    private function optimizeLandingPage()
+    private function optimizeLandingPage(): void
     {
         $this->info('Optimizing Landing Page Images...');
         $landingPages = DB::table('landing_page')->get();
@@ -116,7 +114,7 @@ class OptimizeExistingImages extends Command
         }
     }
 
-    private function optimizeStudyMaterials()
+    private function optimizeStudyMaterials(): void
     {
         $this->info('Optimizing Study Materials...');
         // Chunking to handle large datasets
@@ -136,7 +134,7 @@ class OptimizeExistingImages extends Command
         });
     }
 
-    private function optimizePackagePlans()
+    private function optimizePackagePlans(): void
     {
         $this->info('Optimizing Package Plans...');
         // Check column name - migration says 'package_image' isn't in create table, but PlanController usage suggests it exists or is added later.
@@ -161,7 +159,7 @@ class OptimizeExistingImages extends Command
         });
     }
 
-    private function optimizeUserDetails()
+    private function optimizeUserDetails(): void
     {
         $this->info('Optimizing User Details...');
         UserDetails::chunk(100, function ($users) {
@@ -178,7 +176,7 @@ class OptimizeExistingImages extends Command
         });
     }
 
-    private function shouldOptimize($filename)
+    private function shouldOptimize(string $filename): bool
     {
         if (empty($filename)) {
             return false;
@@ -188,7 +186,7 @@ class OptimizeExistingImages extends Command
         return strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'webp';
     }
 
-    private function processImage($relativePath, $maxWidth)
+    private function processImage(string $relativePath, int $maxWidth): ?string
     {
         try {
             // $relativePath is what's stored in DB.

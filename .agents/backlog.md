@@ -15,7 +15,11 @@
 - [x] Rename deprecated `.agent` folder to `.agents` folder in absolute compliance with workspace standards.
 
 ## Completed Tasks
+- [x] Fix Start Test flow on Package Details to route through the Instructions and Agreement page
+- [x] Fix Watch Video redirect to home issue by specifying 'external' attribute on Mary UI buttons linking to external URLs/files
+- [x] Replace basic local debugger with clcbws/laravel-agents-debug package from /mnt/BWS/public_projects/Local_Debug_Activity/ (V3.1.0)
 - [x] Role-Based Guest Routing Redirect Safeguards (V2.3.0)
+
 - [x] Guest Signup/Login/Forgot-Password Middleware Protection
 - [x] Student Profile Validation Exception Toasts Hook
 - [x] Premium Interactive OTP Verification UI for Student & Contributor Registration

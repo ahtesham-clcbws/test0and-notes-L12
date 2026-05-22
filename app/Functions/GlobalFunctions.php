@@ -57,20 +57,20 @@ function getAvailableStates()
 
     return State::whereIn('id', $stateIds)->get();
 }
-function getCitiesByState($stateid)
+function getCitiesByState(int|string $stateid): string
 {
     $cities = City::select('id', 'name')->where('state_id', $stateid)->get();
 
     return json_encode($cities);
 }
-function getAvailableCitiesByState($stateid)
+function getAvailableCitiesByState(int|string $stateid): string
 {
     $cityIds = FranchiseDetails::whereNull('deleted_at')->where('status', 'active')->where('state_id', $stateid)->distinct()->pluck('city_id');
     $cities = City::select('id', 'name')->whereIn('id', $cityIds)->get();
 
     return json_encode($cities);
 }
-function generateBranchCode($name)
+function generateBranchCode(string $name): string
 {
     $date = date('YmdHis', time());
     $time = substr($date, 6, 13);
@@ -95,11 +95,11 @@ function generateBranchCode($name)
 
     return $strName;
 }
-function getClassesByEducation($educationId)
+function getClassesByEducation(int|string $educationId): \Illuminate\Database\Eloquent\Collection
 {
     return ClassGoupExamModel::where('education_type_id', $educationId)->get();
 }
-function getBoardsbyClass($boards)
+function getBoardsbyClass(string $boards): array
 {
     $boards_agency_state = explode(',', $boards);
     $boardsArray = [];
@@ -110,15 +110,15 @@ function getBoardsbyClass($boards)
 
     return $boardsArray;
 }
-function getSubjectPartsBySubject($subjectId)
+function getSubjectPartsBySubject(int|string $subjectId)
 {
     return Subject::find($subjectId)->subject_parts();
 }
-function getSubjectPartLessonsBySubject($subjectId)
+function getSubjectPartLessonsBySubject(int|string $subjectId)
 {
     return Subject::find($subjectId)->subject_part_lessons();
 }
-function getSubjectPartLessonsBySubjectPart($subjectPartId)
+function getSubjectPartLessonsBySubjectPart(int|string $subjectPartId)
 {
     return SubjectPart::find($subjectPartId)->subject_part_lessons();
 }
@@ -127,16 +127,16 @@ function testOtherCategory()
     return OtherCategoryClass::get();
 }
 // //////////////////////
-function getSubjectPartsBySubject2($subjectId)
+function getSubjectPartsBySubject2(int|string $subjectId): \Illuminate\Database\Eloquent\Collection
 {
     return SubjectPart::where('subject_id', $subjectId)->get();
 }
-function getSubjectPartLessonsBySubjectPart2($subjectPartId)
+function getSubjectPartLessonsBySubjectPart2(int|string $subjectPartId): \Illuminate\Database\Eloquent\Collection
 {
     return SubjectPartLesson::where('subject_part_id', $subjectPartId)->get();
 }
 function sendEmail($emailto, $subject, $message) {}
-function defaultNumberCheck($mobile)
+function defaultNumberCheck(string $mobile): bool
 {
     $data = DefautlOtpNumber::where('mobile', $mobile)->first();
     if ($data) {
@@ -145,7 +145,7 @@ function defaultNumberCheck($mobile)
 
     return false;
 }
-function numberInUse($mobile)
+function numberInUse(string $mobile): bool
 {
     if (User::where('mobile', $mobile)->first()) {
         return true;
@@ -156,7 +156,7 @@ function numberInUse($mobile)
 
     return false;
 }
-function sendSMS($mobileNumber, $message)
+function sendSMS(string $mobileNumber, string $message): void
 {
     $message = rawurlencode($message);
     $apikey = urlencode('MzQ0YzZhMzU2ZTY2NjI0YjU4Mzc0NDMxNmU3MjYzNmM=');
@@ -172,7 +172,7 @@ function sendSMS($mobileNumber, $message)
     $response = json_decode($response);
 }
 
-function verifyOtp($otp, $credential = null)
+function verifyOtp(string|int $otp, ?string $credential = null): bool
 {
     // 1. Check Default OTP from DB
     $isDefault = \App\Models\DefaultOtp::where('otp', $otp)->where('is_active', 1)->exists();

@@ -40,6 +40,13 @@
 
         <link href="{{ asset('skillup/css/styles.min.css') }}" rel=" stylesheet">
 
+        <style>
+            .custom-shadow {
+                box-shadow:  0px 0px 33px 5px rgba(0, 0, 0, 0.1);
+                border-radius: 10px;
+            }
+        </style>
+
         @yield('css')
 
         @php

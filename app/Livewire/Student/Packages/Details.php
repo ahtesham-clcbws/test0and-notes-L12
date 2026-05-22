@@ -90,6 +90,20 @@ class Details extends Component
                 ->whereNull('test.deleted_at')
                 ->where('test.published', 1)
                 ->get();
+
+            // Load attempt status for the logged-in student
+            $attempts = \App\Models\TestAttempt::where('student_id', \Illuminate\Support\Facades\Auth::id())
+                ->whereIn('test_id', $test_ids)
+                ->get()
+                ->keyBy('test_id');
+
+            foreach ($this->test as $onetest) {
+                $attempt = $attempts->get($onetest->id);
+                if ($attempt && $attempt->status === 'running') {
+                    $attempt->checkAndHandleExpiry();
+                }
+                $onetest->attempt_status = $attempt ? $attempt->status : 'not_started';
+            }
         }
     }
 

@@ -73,16 +73,16 @@
                 </div>
             </div>
 
-            {{-- Box 4: Left Questions --}}
+            {{-- Box 4: Skip Questions --}}
             <div class="bg-[#f3f4f6] border border-[#d1d5db] p-5 rounded-2xl flex items-center gap-4 shadow-sm min-h-22.5">
                 <div class="w-10 h-10 rounded-full border border-[#9ca3af] bg-[#e5e7eb] shrink-0"></div>
                 <div class="flex-1 font-semibold text-xs text-[#374151] leading-normal">
                     <div class="flex justify-between items-center">
-                        <span>Left Questions</span>
+                        <span>Skip Questions</span>
                         <span class="text-xl font-black text-[#111827]">{{ $not_attempted }}</span>
                     </div>
                     <div class="flex justify-between items-center mt-1">
-                        <span>Left Marks</span>
+                        <span>Skip Marks</span>
                         <span class="text-xl font-black text-[#111827]">0</span>
                     </div>
                 </div>

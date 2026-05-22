@@ -1,5 +1,12 @@
 # Process Logs
 
+## Log 21 (2026-05-22): Laravel Agent-Debugger Package Replacement
+- **Major Shift (Package Transition):** Replaced the custom basic Zero-Touch Debug Activity Logger with the feature-rich `clcbws/laravel-agents-debug` package.
+- **Local Integration:** Added a local path repository configuration in `composer.json` and symlinked `/mnt/BWS/public_projects/Local_Debug_Activity` under `require-dev`.
+- **Cleanup:** Purged `app/Http/Middleware/DebugActivityLoggerMiddleware.php`, removed it from `bootstrap/app.php`, deleted the custom `debug_log` function from `app/Helper/GlobalHelper.php`, and deleted the `/debug-log` POST route block from `routes/web.php` to prevent namespace/route collisions.
+- **Configuration & Verification:** Added `AGENT_DEBUGGER_ENABLED=true` to `.env`, published config, enabled the suite with `php artisan agent:debug-on`, and verified status via `php artisan agent:debug-status`.
+- **Viewport Indicator Registration Fix:** Discovered that the standard Laravel 11/12 HTTP Kernel class does not define `appendMiddleware()`. Modified the local package code in `src/DebugActivityServiceProvider.php` to check for and use `pushMiddleware()` as a fallback, successfully registering the `ViewportBorderInjector` middleware.
+
 ## Log 4 (2026-04-14): Test Conduct Redesign & Security Hardening
 - **Major Shift (Timer Protocol):** Migrated from Livewire Polling to **Absolute Unix Timestamps**. Frontend now calculates remaining time against a fixed `end_time` in JS, eliminating flickering.
 - **Major Shift (Security Guards):** Successfully implemented server-side `selectQuestion` guards to prevent out-of-order navigation during tests.
@@ -97,5 +104,39 @@
 
 ## Log 15 (2026-05-19): Review Re-attempt Modal Button Placement & Close Flow Refinements
 - **Remove Redundant Cancel Button:** Removed the redundant "Cancel & Close" button from the re-attempt modal footer since the modal already supports modal backdrop clicks to close and has an "X" button in the header.
-- **Footer Button Alignment:** Aligned the "Save & Update Answer" button to the right side of the footer using `flex justify-end`.## Log 16 (2026-05-19): Backdrop Click Outside Dismissal for Re-attempt Modal
+- **Footer Button Alignment:** Aligned the "Save & Update Answer" button to the right side of the footer using `flex justify-end`.
+
+## Log 16 (2026-05-19): Backdrop Click Outside Dismissal for Re-attempt Modal
 - **Added Backdrop Click dismissal:** Added `wire:click.self="$set('showSolutionModal', false)"` on the backdrop outer container of the re-attempt modal to close it when the user clicks outside.
+
+## Log 17 (2026-05-21): Portable GD Extension Dynamic Loader
+- **Major Shift (Dynamic extension injection):** Resolved `gd` extension missing dependency using `PHP_INI_SCAN_DIR=:./.agents/php-config` to dynamically append local `gd.ini` loading `gd.so` without needing root/sudo access.
+- **Composer integration:** Pre-pended `PHP_INI_SCAN_DIR=:./.agents/php-config` to `composer dev` script in `composer.json` to seamlessly boot up Vite and Artisan server out-of-the-box.
+- **Style compliance:** Formatted and styled all modified files with `vendor/bin/pint --dirty`.
+
+## Log 18 (2026-05-21): Local Environment Server-Level Activity Logger
+- **Major Shift (Zero-Touch Logging):** Created a global request and database query interceptor `DebugActivityLoggerMiddleware` which logs full HTTP requests, Livewire method calls/updates, database queries with execution millisecond times/bindings, and all composed Blade views.
+- **Frontend Integration:** Automatically injected custom `window.debugLog(message, context)` global Javascript helper and frontend global JS exception catching right before `</body>` on all web HTML pages.
+- **Manual Triggers:** Added `debug_log($message, $context)` global PHP helper function to allow developers to trigger server logs manually from any code (views, plain controllers, or Livewire components).
+- **Environment Locks:** Fully locked all loggers and scripts under `config('app.env') === 'local'` and `env('DEBUG_LOGGING') === true` conditions to ensure complete environment safety.
+- **IDE static analysis hardening:** Fully type-hinted middleware properties (`array $queries`, `array $views`, `?float $startTime`) and replaced the `view()->composer(...)` helper call with the explicit `View` Facade (`View::composer('*', ...)`) to eliminate static analyzer warnings and errors.
+
+## Log 19 (2026-05-22): PHP 8.2 Strict Type Hardening Across Image Optimizer & Global Legacy Functions
+- **Command Typings (OptimizeExistingImages):** Declared typed properties (`ImageService $imageService`), parameters, and return types for methods (`shouldOptimize`, `processImage`, `handle`, and helper subroutines) to comply with high code quality guidelines.
+- **Procedural Typings (GlobalFunctions):** Hardened all 15 core procedural helper functions (`getCitiesByState`, `getAvailableCitiesByState`, `generateBranchCode`, `getClassesByEducation`, `getBoardsbyClass`, `defaultNumberCheck`, `numberInUse`, `sendSMS`, and `verifyOtp`) with explicit scalar, union (`int|string`), nullability (`?string`), array, and object type hints.
+- **Styling Alignment:** Standardized and verified all changes with `vendor/bin/pint --dirty`.
+
+## Log 20 (2026-05-22): Student Test Results and Review Mode Upgrades
+- **Terminology Shift:** Renamed "Left Questions" and "Left Marks" to "Skip Questions" and "Skip Marks" respectively inside `show-result.blade.php` statistics grid.
+- **Review Mode Re-attempt Upgrades:** Added standard `clearReviewAnswer()` method inside `TestReview` Livewire component class to set `$selectedAnswer` and db recorded selection to `null` to safely skip answered questions.
+- **UI Actions:** Integrated a premium styled "Clear Response & Skip" footer button in the re-attempt popup modal of `test-review.blade.php`.
+- **IDE Static Analysis Resolution:** Imported and utilized explicit `Illuminate\Support\Facades\Session` facade calls (`Session::flash(...)`) instead of loose global `session()` procedural helper calls, resolving the type analyzer's "Expected type 'object'. Found 'null'." error completely.
+
+## Log 21 (2026-05-22): Package Details Test Flow Recovery & External Link Interceptions Fixes
+- **Status-Aware Test Action Rendering:** Updated `Details.php` component to eager-evaluate each package test's status using `TestAttempt` model constraints. Modified the test action button inside `details.blade.php` to render status-aware actions:
+  - Bounces to `student.show-result` with encrypted parameters for `completed` test attempts.
+  - Links to `student.start-test` to direct resume for `running` test attempts.
+  - Routes to `student.test-name` to display instructions and the agreement screen for `not_started` attempts.
+- **SPA Link Interception Bypass:** Resolved video link, note download, and GK preview redirections to the home page by explicitly declaring the `external` attribute on Mary UI `<x-button>` tags, bypassing Livewire's client-side SPA route interceptor.
+- **Formattings:** Standardized codebase styling with `vendor/bin/pint --dirty`.
+

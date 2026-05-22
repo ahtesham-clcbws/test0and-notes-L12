@@ -224,7 +224,14 @@
                     </div>
                 </div>
 
-                <div class="p-6 bg-gray-50 flex justify-end items-center border-t border-gray-100">
+                <div class="p-6 bg-gray-50 flex justify-between items-center border-t border-gray-100">
+                    <button 
+                        wire:click="clearReviewAnswer"
+                        class="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-bold hover:bg-gray-200 transition-colors cursor-pointer flex items-center gap-2 border border-gray-200"
+                    >
+                        Clear Response & Skip
+                        <x-icon name="o-trash" class="w-5 h-5" />
+                    </button>
                     <button 
                         wire:click="saveReviewAnswer"
                         class="bg-[#16a34a] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#15803d] transition-colors cursor-pointer flex items-center gap-2"

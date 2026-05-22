@@ -6,6 +6,7 @@ use App\Models\TestAttempt;
 use App\Models\TestAttemptAnswer;
 use App\Models\TestModal;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -85,7 +86,35 @@ class TestReview extends Component
 
         $this->calculateCounts($attempt);
 
-        session()->flash('message', 'Answer updated successfully!');
+        Session::flash('message', 'Answer updated successfully!');
+        $this->showSolutionModal = false;
+    }
+
+    public function clearReviewAnswer(): void
+    {
+        $attempt = TestAttempt::find($this->attemptId);
+
+        if (! $attempt || $attempt->student_id !== Auth::id()) {
+            return;
+        }
+
+        $this->selectedAnswer = null;
+
+        TestAttemptAnswer::updateOrCreate(
+            [
+                'test_attempt_id' => $attempt->id,
+                'question_id' => $this->selectedQuestionId,
+            ],
+            [
+                'answer' => null,
+                'is_marked_for_review' => false,
+                'is_visited' => true,
+            ]
+        );
+
+        $this->calculateCounts($attempt);
+
+        Session::flash('message', 'Response cleared successfully!');
         $this->showSolutionModal = false;
     }
 

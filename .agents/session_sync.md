@@ -54,6 +54,48 @@
 
 # Session Sync - Momin Scholar Program
 
+## Session Handoff - 2026-05-22 (V3.1.0: Laravel Agent-Debugger Package Replacement)
+- **Objective:** Replace custom basic logger with the feature-rich `clcbws/laravel-agents-debug` package.
+- **Key Achievements:**
+  - **Local Composer Package Symlinking**: Added local path repository mapping `/mnt/BWS/public_projects/Local_Debug_Activity` and required `"clcbws/laravel-agents-debug": "*"` in `composer.json`. Successfully updated composer dependencies to symlink the package.
+  - **Removed Basic/Custom Logger Files**: Cleanly deleted the custom middleware `DebugActivityLoggerMiddleware.php`, removed its registration from `bootstrap/app.php`, deleted the POST `debug-log` route from `routes/web.php`, and removed the custom `debug_log` function from `app/Helper/GlobalHelper.php` to prevent conflicts.
+  - **Wired and Enabled the Package**: Appended `AGENT_DEBUGGER_ENABLED=true` to the `.env` configuration, published the package's configuration file, and activated it via `php artisan agent:debug-on`.
+  - **Viewport Indicator Registration Fix**: Resolved a bug where the package checked for `appendMiddleware()` which does not exist on the standard Laravel 11/12 HTTP Kernel class. Patched `DebugActivityServiceProvider.php` inside the local package codebase (`/mnt/BWS/public_projects/Local_Debug_Activity`) to gracefully fall back to the standard `pushMiddleware()` method, enabling successful injection of the glassmorphic status badge.
+  - **Verified Stable Status**: Executed `php artisan agent:debug-status` to verify that the debugging suite is active and running cleanly, followed by a successful Pint code formatting sweep.
+
+## Session Handoff - 2026-05-22 (V2.9.2: Student Test Results and Review Mode Upgrades)
+- **Objective:** Update terminology on results page and add response clearing/skipping features in review mode.
+- **Key Achievements:**
+  - **Terminology update**: Renamed "Left Questions" and "Left Marks" to "Skip Questions" and "Skip Marks" in `show-result.blade.php`.
+  - **Livewire response clearing**: Added standard `clearReviewAnswer()` method in the `TestReview.php` Livewire component class to set selections to `null` inside the database, recalculate completion statistics, and close the solution modal.
+  - **UI Integration**: Added a beautiful "Clear Response & Skip" button aligned to the left of the re-attempt modal footer in `test-review.blade.php`.
+  - **Static Analysis Fixes**: Replaced all procedural global `session()` helper actions with the static `Session` facade to eliminate IDE "Expected type 'object'. Found 'null'." warnings completely.
+
+## Session Handoff - 2026-05-22 (V2.9.1: Type Hardening & Static Analysis Resolutions)
+- **Objective:** Fix static analysis and IDE warnings across `GlobalFunctions.php` and `OptimizeExistingImages.php` to align with strict PHP 8.2 type declarations.
+- **Key Achievements:**
+  - **Console Command Type Hardening**: Fully type-hinted `OptimizeExistingImages` properties (`ImageService $imageService`), parameters, and return statements (`shouldOptimize(string $filename): bool`, `processImage(string $relativePath, int $maxWidth): ?string`, `handle(): int`, and `void` layout actions).
+  - **Global Procedural Functions Typing**: Applied explicit parameter type hinting and return types to all core procedural helper functions (`getCitiesByState`, `getAvailableCitiesByState`, `generateBranchCode`, `getClassesByEducation`, `getBoardsbyClass`, `defaultNumberCheck`, `numberInUse`, `sendSMS`, `verifyOtp`, and relation loaders) inside `GlobalFunctions.php`.
+  - **Formatting Consistency**: Standards-verified and formatted the changes using `vendor/bin/pint --dirty` with zero styling violations remaining.
+
+## Session Handoff - 2026-05-21 (V2.9.0: Local environment server-level activity logger)
+- **Objective:** Add an advanced, zero-touch activity logging system that automatically tracks all HTTP URLs visited, controllers, database queries with timings, composed Blade views, and provides manual/frontend logging controls, active ONLY in local environment when `DEBUG_LOGGING=true`.
+- **Key Achievements:**
+  - **Dynamic Global Middleware**: Designed and implemented `DebugActivityLoggerMiddleware` which logs client IP, duration in milliseconds, authenticated user info, controller routes, and inputs.
+  - **Livewire Interceptor**: Parsed Livewire request payload structures, logging components, updates, and method calls dynamically.
+  - **Server-Level Insights**: Captured all database queries with precise timings and bindings, along with all composed Blade views, to log them into `storage/logs/debug_activity.log`.
+  - **Dynamic JS Injection**: Embedded an automated frontend error handler and the `window.debugLog(message, context)` helper function right before `</body>` in HTML responses. This enables capturing all uncaught frontend Javascript crashes and button click events directly in the server log.
+  - **Manual PHP Helper**: Exposed `debug_log($message, $context)` to allow developers to trigger server-level logging from any Blade views, plain controllers, or Livewire components manually.
+  - **Environment-Locked Protection**: Secured all handlers strictly under the `config('app.env') === 'local'` and `env('DEBUG_LOGGING') === true` conditions to prevent performance degradation or leak risks in production.
+
+## Session Handoff - 2026-05-21 (V2.8.1: Portable GD Extension Dynamic Loader)
+- **Objective:** Resolve GD PHP extension dependency crash (`Intervention\Image\Exceptions\DriverException`) on systems where the extension library is installed but commented out/disabled in the system's `php.ini`.
+- **Key Achievements:**
+  - **Dynamic Extension Injection**: Established a highly portable, zero-overhead workspace solution using the standard `PHP_INI_SCAN_DIR` environment variable to append a local project directory (`.agents/php-config/`) where a `gd.ini` file enables the `gd` extension on-demand.
+  - **Relative Path Optimization**: Configured `PHP_INI_SCAN_DIR=:./.agents/php-config` so it resolves dynamically to the local project root, ensuring portability across multiple environments and developers without hardcoded absolute paths or side effects on unrelated projects.
+  - **Composer Dev Integration**: Patched the primary `composer dev` script in `composer.json` to automatically prefix execution with `PHP_INI_SCAN_DIR=:./.agents/php-config`, allowing both Vite and the Artisan serve processes to boot successfully out-of-the-box.
+  - **Verified Parity & Hot reloading**: Verified the server runs flawlessly without any `DriverException` crashes, allowing the system to boot up instantly.
+
 ## Session Handoff - 2026-05-19 (V2.2.1: Premium Interactive OTP Verification UI)
 - **Objective:** Fix button states, disable inputs correctly upon OTP transmission/verification, display contextual status messages below inputs, trigger error toasts, make success toasts fully green, ensure toasts close on click, and block registration bypasses.
 - **Key Achievements:**
@@ -286,8 +328,10 @@
   - **Formatting**: Verified clean styling using `vendor/bin/pint --dirty`.
 
 
-## Session Handoff - 2026-05-19 (V2.8.0: Modal Backdrop Dismissal Integration)
-- **Objective:** Allow dismissing the re-attempt modal by clicking outside.
+## Session Handoff - 2026-05-22 (V2.9.0: Test Flow Instruction Screen & External Link Interception Fixes)
+- **Objective:** Fix the Start Test flow on the Package Details page to show instructions/agreement screen, and prevent the "Watch Video" (and other media) links from redirecting to the homepage.
 - **Key Achievements:**
-  - **Backdrop Clicks**: Appended `wire:click.self` to the outer modal backdrop div to safely reset `showSolutionModal` to false.
-  - **Formatting**: Cleaned code files.
+  - **Start Test Flow Recovery:** Modified `Details.php` component to fetch the student's attempt status for each package test. Adjusted the package details Blade view to display the "View Results" button if completed, the "Resume" button if in progress, and the "Start Test" button pointing to the instructions/agreement screen (`student.test-name` route) if not started.
+  - **External Link Interception Fix:** Added the `external` attribute to all Mary UI `<x-button>` tags in `details.blade.php` that link to external resources (YouTube classes, PDF e-books/notes in storage, and GK downloads). This prevents Livewire's `wire:navigate` SPA router from intercepting clicks and redirecting students to the homepage.
+  - **Linter & Code Health:** Ran `vendor/bin/pint --dirty` successfully to enforce project style standards on the updated controller and view files.
+

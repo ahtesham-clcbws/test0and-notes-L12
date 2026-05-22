@@ -1,50 +1,37 @@
-# Implementation Plan - Strict 1:1 Student Dashboard Migration
+# Implementation Plan: Replace Custom Debugger with clcbws/laravel-agents-debug Package
 
-The objective is to achieve perfect functional parity between the old Controller-based dashboard and the new Livewire dashboard. We will replicate all data filters, navigation behaviors, and views as they existed, while only updating the aesthetic using MaryUI/Tailwind.
-
-## User Review Required
-
-> [!IMPORTANT]
-> -   **No Enhancements**: We will NOT add new mandatory checkboxes or global palettes to the main view if they were absent in the old version.
-> -   **Strict Data Filters**: We will replicate the exact filters for packages (e.g., excluding Free packages from "Purchased Packages" if that was the old behavior).
-> -   **Modal Reproduction**: The "Summary View" will be implemented as a Modal, matching the `loc-Modal` behavior from the legacy `start-test` page.
+This plan outlines the steps required to replace the existing custom Zero-Touch Debug Activity Logger with the newly provided local package `clcbws/laravel-agents-debug` from `/mnt/BWS/public_projects/Local_Debug_Activity/`.
 
 ## Proposed Changes
 
-### 1. Test Conduct (OnlineTestRunner) - Logical Clone
--   **Main View**:
-    -   Palette will show questions for the **active section only** (as per legacy behavior).
-    -   "Review & Submit" button will trigger a **Summary Modal**.
--   **Summary Modal**:
-    -   Show Time Left.
-    -   Show counts for Attempted, Not-Attempted, and Marked for Review.
-    -   Provide a global list of all questions (across all sections) purely for overview.
--   **Technical**: Refactor Timer to Alpine.js (`x-data`) for cleaner Livewire integration without changing its countdown behavior.
+### 1. Configure Local Composer Path Repository
+- Modify `composer.json` of the project to add the local repository of type `path` pointing to `/mnt/BWS/public_projects/Local_Debug_Activity`.
+- Add `"clcbws/laravel-agents-debug": "*"` (or `3.1.0`) under the `require-dev` section.
+- Run `composer update clcbws/laravel-agents-debug` to register and install the package with local symlinking.
 
-### 2. Package Management Migration
--   **[NEW] [PackageDetails.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Packages/Details.php)**: 
-    -   Clone the grouping logic from `ExamsController@package_manage` (Tests, Materials, Videos, GK).
-    -   Maintain the same data structure passed to the view.
--   **[MODIFY] [Purchased.php](file:///mnt/WebliesNew/test-and-notes-upgrading/app/Livewire/Student/Packages/Purchased.php)**: 
-    -   Ensure it **excludes** free packages (`final_fees == 0`) to match `StudentPlanController@myPlan`.
+### 2. Remove Custom/Basic Local Debugger Code
+- Delete the custom middleware file: `app/Http/Middleware/DebugActivityLoggerMiddleware.php`.
+- Remove registration of `DebugActivityLoggerMiddleware` from `bootstrap/app.php`.
+- Remove the POST `debug-log` route block from `routes/web.php`.
+- Delete the old helper function `debug_log` definition inside `app/Helper/GlobalHelper.php` (as the package provides its own version of `debug_log` in `src/Helpers/functions.php`).
 
-### 3. Remaining Page Migrations (1:1 Logic)
--   **Instructions View**: Create a Livewire component for the test overview screen, inheriting the same authorization checks from `ExamsController@getTest`.
--   **Feedback View**: Create a simple Livewire form for student reviews, replacing `ReviewController`.
-
-### 4. Routing & Baseline
--   **Baseline Commit**: `git commit -m "chore: strict 1:1 migration baseline for student dashboard"`
--   **Route Sync**: Point `student.package_manage` and `student.feedback` to the new Livewire components in `routes/student.php`.
-
-## Open Questions
--   None. We are proceeding with **Strict Parity**.
-
----
+### 3. Register and Enable the New Package
+- Configure the `.env` file to include `AGENT_DEBUGGER_ENABLED=true`.
+- Publish the package configuration using:
+  ```bash
+  php artisan vendor:publish --provider="LaravelAgentDebugger\DebugActivityServiceProvider"
+  ```
+- Run the package enablement command:
+  ```bash
+  php artisan agent:debug-on
+  ```
 
 ## Verification Plan
 
-### Manual Verification
-1.  Compare `/old/student/test/start-test/{id}` side-by-side with the new version.
-2.  Verify the "Summary Modal" content matches exactly (counts and question grid).
-3.  Verify "Purchased Packages" list shows identical items to the old dashboard.
-4.  Verify homepage "Start" buttons open the new Livewire Package view.
+### Command Line Verification
+1. Run `composer show clcbws/laravel-agents-debug` to ensure the package is registered from the correct path.
+2. Run `php artisan agent:debug-status` to verify that the agent-debugger is active.
+
+### Live/Manual Verification
+1. Visit the dashboard route at `/login` or any page, and verify the glassmorphic status badge appears in the bottom right corner showing the execution time and database queries count.
+2. Visit the debugger dashboard at `http://localhost:8000/_agent_debug/dashboard` (or mapped host URL) to confirm the full UI diagnostic dashboard is running.

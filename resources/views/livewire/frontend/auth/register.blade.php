@@ -22,7 +22,7 @@
         <div class="container">
 
             <div class="row align-items-center justify-content-between">
-                <div class="col-lg-6 col-md-8 col-sm-12 login-form mx-auto">
+                <div class="col-lg-6 col-md-8 col-sm-12 login-form mx-auto p-3 custom-shadow">
                     <form wire:submit.prevent="register">
 
                         <fieldset wire:target="register" wire:loading.attr="disabled">

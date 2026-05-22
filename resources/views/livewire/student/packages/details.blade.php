@@ -52,12 +52,28 @@
                             </div>
                             <div class="flex items-center justify-between pt-4 mt-auto border-t border-gray-50">
                                 <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">{{ date('d M Y', strtotime($onetest->created_at)) }}</span>
-                                <x-button 
-                                    label="Start Test" 
-                                    icon="o-play" 
-                                    link="{{ route('student.start-test', [$onetest->id]) }}" 
-                                    class="btn-primary btn-sm rounded-xl font-bold" 
-                                />
+                                @if($onetest->attempt_status === 'completed')
+                                    <x-button 
+                                        label="View Results" 
+                                        icon="o-chart-bar" 
+                                        link="{{ route('student.show-result', ['payload' => \Illuminate\Support\Facades\Crypt::encrypt(['student_id' => Auth::id(), 'test_id' => $onetest->id, 'mode' => 'result'])]) }}" 
+                                        class="btn-success btn-outline btn-sm rounded-xl font-bold" 
+                                    />
+                                @elseif($onetest->attempt_status === 'running')
+                                    <x-button 
+                                        label="Resume" 
+                                        icon="o-forward" 
+                                        link="{{ route('student.start-test', [$onetest->id]) }}" 
+                                        class="btn-warning btn-sm rounded-xl font-bold" 
+                                    />
+                                @else
+                                    <x-button 
+                                        label="Start Test" 
+                                        icon="o-play" 
+                                        link="{{ route('student.test-name', [$onetest->id]) }}" 
+                                        class="btn-primary btn-sm rounded-xl font-bold" 
+                                    />
+                                @endif
                             </div>
                         </div>
                     </x-card>
@@ -90,8 +106,8 @@
                             </div>
                             <div class="flex items-center justify-between pt-4 mt-auto border-t border-gray-50">
                                 <div class="flex gap-2">
-                                    <x-button icon="o-eye" link="{{ url('storage/' . $onematerial->file) }}" target="_blank" class="btn-ghost btn-sm btn-square rounded-lg" />
-                                    <x-button icon="o-cloud-arrow-down" link="{{ url('storage/' . $onematerial->file) }}" download class="btn-ghost btn-sm btn-square rounded-lg" />
+                                    <x-button icon="o-eye" link="{{ url('storage/' . $onematerial->file) }}" external class="btn-ghost btn-sm btn-square rounded-lg" />
+                                    <x-button icon="o-cloud-arrow-down" link="{{ url('storage/' . $onematerial->file) }}" external download class="btn-ghost btn-sm btn-square rounded-lg" />
                                 </div>
                                 <x-badge :value="$onematerial->publish_status" class="badge-success badge-sm font-bold opacity-80" />
                             </div>
@@ -126,11 +142,11 @@
                             </div>
                             <div class="pt-4 mt-auto border-t border-gray-50">
                                 @if($onevideo->file == 'NA')
-                                    <x-button label="Watch Video" icon="o-play-circle" link="{{ $onevideo->video_link }}" target="_blank" class="btn-primary btn-sm btn-block font-bold rounded-xl" />
+                                    <x-button label="Watch Video" icon="o-play-circle" link="{{ $onevideo->video_link }}" external class="btn-primary btn-sm btn-block font-bold rounded-xl" />
                                 @else
                                     <div class="flex gap-2">
-                                        <x-button label="View" icon="o-eye" link="{{ url('storage/' . $onevideo->file) }}" target="_blank" class="btn-outline btn-sm grow font-bold rounded-xl" />
-                                        <x-button icon="o-cloud-arrow-down" link="{{ url('storage/' . $onevideo->file) }}" download class="btn-outline btn-sm btn-square rounded-xl" />
+                                        <x-button label="View" icon="o-eye" link="{{ url('storage/' . $onevideo->file) }}" external class="btn-outline btn-sm grow font-bold rounded-xl" />
+                                        <x-button icon="o-cloud-arrow-down" link="{{ url('storage/' . $onevideo->file) }}" external download class="btn-outline btn-sm btn-square rounded-xl" />
                                     </div>
                                 @endif
                             </div>
@@ -168,8 +184,8 @@
                                     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest block text-center">Content not available</span>
                                 @else
                                     <div class="flex gap-2">
-                                        <x-button label="View Content" icon="o-eye" link="{{ url('storage/' . $one_gk->file) }}" target="_blank" class="btn-outline btn-sm grow font-bold rounded-xl" />
-                                        <x-button icon="o-cloud-arrow-down" link="{{ url('storage/' . $one_gk->file) }}" download class="btn-outline btn-sm btn-square rounded-xl" />
+                                        <x-button label="View Content" icon="o-eye" link="{{ url('storage/' . $one_gk->file) }}" external class="btn-outline btn-sm grow font-bold rounded-xl" />
+                                        <x-button icon="o-cloud-arrow-down" link="{{ url('storage/' . $one_gk->file) }}" external download class="btn-outline btn-sm btn-square rounded-xl" />
                                     </div>
                                 @endif
                             </div>

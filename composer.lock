@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1d1c1fb94e6e33f20d97ea0d97860616",
+    "content-hash": "9106e5e896c6649bb582d2c6dd19311d",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -7860,6 +7860,67 @@
                 }
             ],
             "time": "2025-12-03T14:52:46+00:00"
+        },
+        {
+            "name": "clcbws/laravel-agents-debug",
+            "version": "3.1.0",
+            "dist": {
+                "type": "path",
+                "url": "/mnt/BWS/public_projects/Local_Debug_Activity",
+                "reference": "5b9e5b2461a9c19d29e4d8be5f362aaa53570af3"
+            },
+            "require": {
+                "illuminate/console": "^12.0|^13.0",
+                "illuminate/database": "^12.0|^13.0",
+                "illuminate/http": "^12.0|^13.0",
+                "illuminate/log": "^12.0|^13.0",
+                "illuminate/session": "^12.0|^13.0",
+                "illuminate/support": "^12.0|^13.0",
+                "php": "^8.3|^8.4"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelAgentDebugger\\DebugActivityServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaravelAgentDebugger\\": "src/"
+                },
+                "files": [
+                    "src/Helpers/functions.php"
+                ]
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "LaravelAgentDebugger\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ahtesham",
+                    "email": "ahtesham2000@gmail.com"
+                }
+            ],
+            "description": "A Zero-JS, High-Fidelity Server-Side Diagnostics & Profiling Suite for Laravel 12/13.",
+            "homepage": "https://github.com/ahtesham-clcbws/laravel-agents-debug",
+            "support": {
+                "issues": "https://github.com/ahtesham-clcbws/laravel-agents-debug/issues",
+                "source": "https://github.com/ahtesham-clcbws/laravel-agents-debug"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": false
+            }
         },
         {
             "name": "fakerphp/faker",
