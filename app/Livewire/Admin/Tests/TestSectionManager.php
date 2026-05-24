@@ -42,7 +42,7 @@ class TestSectionManager extends Component
             ->get()
             ->pluck('subject');
 
-        $matchThis = ['in_franchise' => '0', 'isAdminAllowed' => '1'];
+        $matchThis = User::directContributorCriteria();
         $this->allCreators = User::where($matchThis)
             ->where(function ($q) {
                 $q->where('roles', 'like', '%"creator"%')

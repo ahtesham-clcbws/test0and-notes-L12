@@ -84,6 +84,70 @@ class User extends Authenticatable
         return $this->hasMany(RoleAssign::class, 'user_id', 'id');
     }
 
+    /**
+     * @return list<string>
+     */
+    public function roleNames(): array
+    {
+        return array_values(array_filter(array_map('trim', explode(',', (string) $this->roles))));
+    }
+
+    public function hasRoleName(string $name): bool
+    {
+        return in_array($name, $this->roleNames(), true);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return (int) $this->isAdminAllowed === 1
+            && $this->hasRoleName('superadmin')
+            && (int) $this->is_franchise === 0;
+    }
+
+    public function isContributorStaff(): bool
+    {
+        return (int) $this->is_staff === 1
+            && (int) $this->is_franchise === 0
+            && $this->status === 'active';
+    }
+
+    public function isDirectContributor(): bool
+    {
+        return $this->isContributorStaff() && (int) $this->in_franchise === 0;
+    }
+
+    public function isInstituteContributor(): bool
+    {
+        return $this->isContributorStaff() && (int) $this->in_franchise === 1;
+    }
+
+    /**
+     * @return list<int>
+     */
+    public function contributorRoleIds(): array
+    {
+        return $this->role->pluck('role_id')->map(fn ($id) => (int) $id)->values()->all();
+    }
+
+    public function canAccessContributorPanel(): bool
+    {
+        return $this->isContributorStaff() && ! $this->isSuperAdmin();
+    }
+
+    /**
+     * Query criteria for staff working directly for the platform (not an institute).
+     *
+     * @return array<string, int>
+     */
+    public static function directContributorCriteria(): array
+    {
+        return [
+            'in_franchise' => 0,
+            'is_franchise' => 0,
+            'is_staff' => 1,
+        ];
+    }
+
     public static function generateCounts()
     {
         $data = [

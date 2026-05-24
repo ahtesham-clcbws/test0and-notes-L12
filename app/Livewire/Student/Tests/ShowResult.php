@@ -165,7 +165,7 @@ class ShowResult extends Component
         $this->unattemptedCount = $this->total_question - $this->attemptedCount;
 
         $marksPerQ = $this->test->gn_marks_per_questions ?? 1;
-        $negMarksPerQ = $this->test->gn_negative_marks_per_questions ?? 0;
+        $negMarksPerQ = ($this->test->negative_marks ?? 0) * $marksPerQ;
 
         $this->total_marks = $this->correct_answer * $marksPerQ;
         $this->negative_marks = $this->incorrect_answer * $negMarksPerQ;

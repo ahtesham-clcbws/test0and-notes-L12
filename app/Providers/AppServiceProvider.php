@@ -43,56 +43,11 @@ class AppServiceProvider extends ServiceProvider
             return false;
         });
         // staffs only
-        Gate::define('creator', function (User $user) {
-            $roles = explode(',', $user->roles);
-            foreach ($roles as $role) {
-                if ($role == 'creator' && $user->isAdminAllowed && $user->is_staff && ! $user->is_franchise) {
-                    return true;
-                }
-            }
-
-            return false;
-        });
-        Gate::define('publisher', function (User $user) {
-            $roles = explode(',', $user->roles);
-            foreach ($roles as $role) {
-                if ($role == 'publisher' && $user->isAdminAllowed && $user->is_staff && ! $user->is_franchise) {
-                    return true;
-                }
-            }
-
-            return false;
-        });
-        Gate::define('manager', function (User $user) {
-            $roles = explode(',', $user->roles);
-            foreach ($roles as $role) {
-                if ($role == 'manager' && $user->isAdminAllowed && $user->is_staff && ! $user->is_franchise) {
-                    return true;
-                }
-            }
-
-            return false;
-        });
-        Gate::define('verifier', function (User $user) {
-            $roles = explode(',', $user->roles);
-            foreach ($roles as $role) {
-                if ($role == 'verifier' && $user->isAdminAllowed && $user->is_staff && ! $user->is_franchise) {
-                    return true;
-                }
-            }
-
-            return false;
-        });
-        Gate::define('reviewer', function (User $user) {
-            $roles = explode(',', $user->roles);
-            foreach ($roles as $role) {
-                if ($role == 'reviewer' && $user->isAdminAllowed && $user->is_staff && ! $user->is_franchise) {
-                    return true;
-                }
-            }
-
-            return false;
-        });
+        Gate::define('creator', fn (User $user) => $user->isDirectContributor() && $user->hasRoleName('creator'));
+        Gate::define('publisher', fn (User $user) => $user->isDirectContributor() && $user->hasRoleName('publisher'));
+        Gate::define('manager', fn (User $user) => $user->isDirectContributor() && $user->hasRoleName('manager'));
+        Gate::define('verifier', fn (User $user) => $user->isDirectContributor() && $user->hasRoleName('verifier'));
+        Gate::define('reviewer', fn (User $user) => $user->isDirectContributor() && $user->hasRoleName('reviewer'));
         // direct student
         Gate::define('student', function (User $user) {
             $roles = explode(',', $user->roles);
@@ -116,56 +71,11 @@ class AppServiceProvider extends ServiceProvider
             return false;
         });
         // franchise_staff only
-        Gate::define('franchise_creator', function (User $user) {
-            $roles = explode(',', $user->roles);
-            foreach ($roles as $role) {
-                if ($role == 'franchise_creator' && $user->is_staff && $user->is_franchise) {
-                    return true;
-                }
-            }
-
-            return false;
-        });
-        Gate::define('franchise_publisher', function (User $user) {
-            $roles = explode(',', $user->roles);
-            foreach ($roles as $role) {
-                if ($role == 'franchise_publisher' && $user->is_staff && $user->is_franchise) {
-                    return true;
-                }
-            }
-
-            return false;
-        });
-        Gate::define('franchise_manager', function (User $user) {
-            $roles = explode(',', $user->roles);
-            foreach ($roles as $role) {
-                if ($role == 'franchise_manager' && $user->is_staff && $user->is_franchise) {
-                    return true;
-                }
-            }
-
-            return false;
-        });
-        Gate::define('franchise_verifier', function (User $user) {
-            $roles = explode(',', $user->roles);
-            foreach ($roles as $role) {
-                if ($role == 'franchise_verifier' && $user->is_staff && $user->is_franchise) {
-                    return true;
-                }
-            }
-
-            return false;
-        });
-        Gate::define('franchise_reviewer', function (User $user) {
-            $roles = explode(',', $user->roles);
-            foreach ($roles as $role) {
-                if ($role == 'franchise_reviewer' && $user->is_staff && $user->is_franchise) {
-                    return true;
-                }
-            }
-
-            return false;
-        });
+        Gate::define('franchise_creator', fn (User $user) => $user->isInstituteContributor() && $user->hasRoleName('creator'));
+        Gate::define('franchise_publisher', fn (User $user) => $user->isInstituteContributor() && $user->hasRoleName('publisher'));
+        Gate::define('franchise_manager', fn (User $user) => $user->isInstituteContributor() && $user->hasRoleName('manager'));
+        Gate::define('franchise_verifier', fn (User $user) => $user->isInstituteContributor() && $user->hasRoleName('verifier'));
+        Gate::define('franchise_reviewer', fn (User $user) => $user->isInstituteContributor() && $user->hasRoleName('reviewer'));
         // franchise student
         Gate::define('franchise_student', function (User $user) {
             $roles = explode(',', $user->roles);

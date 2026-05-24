@@ -41,6 +41,11 @@ class TestSections extends Model
         return $this->belongsTo(TestModal::class, 'id', 'test_id');
     }
 
+    public function test()
+    {
+        return $this->belongsTo(TestModal::class, 'test_id', 'id');
+    }
+
     public function sectionSubject()
     {
         return $this->hasOne(Subject::class, 'id', 'subject');

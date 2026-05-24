@@ -306,7 +306,7 @@ class ExamsController extends Controller
                     $this->data['subjects'] = Subject::get();
                     $this->data['test'] = $test;
 
-                    $matchThis = ['in_franchise' => '0', 'isAdminAllowed' => '1'];
+                    $matchThis = User::directContributorCriteria();
                     $creators = User::where($matchThis)->where('roles', 'like', '%"creator"%')->orWhere('roles', 'like', '%"manager"%')->orWhere('roles', 'superadmin')->get();
 
                     foreach ($creators as $key => $creator) {
@@ -569,7 +569,7 @@ class ExamsController extends Controller
         $this->data['test'] = $test;
         $this->data['subjects'] = Subject::get();
 
-        $matchThis = ['in_franchise' => '0', 'isAdminAllowed' => '1'];
+        $matchThis = User::directContributorCriteria();
         $creators = User::where($matchThis)->where('roles', 'like', '%"creator"%')->orWhere('roles', 'like', '%"manager"%')->orWhere('roles', 'superadmin')->get();
 
         foreach ($creators as $key => $creator) {

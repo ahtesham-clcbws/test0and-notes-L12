@@ -1,5 +1,5 @@
 <div>
-    <x-header title="My Packages" subtitle="Your currently active and historical premium plans" separator progress-indicator>
+    <x-header title="My Packages" subtitle="Your enrolled premium and free packages" separator progress-indicator>
         <x-slot:actions>
             <x-input placeholder="Search package..." wire:model.live.debounce="search" icon="o-magnifying-glass" clearable />
         </x-slot:actions>
@@ -8,7 +8,12 @@
     <x-card shadow separator>
         <x-table :headers="$headers" :rows="$rows" :sort-by="$sortBy" with-pagination>
             @scope('cell_plan.package_type', $row)
-                <x-badge :value="$row->plan->package_type == 1 ? 'Institute' : 'Test and Notes'" class="badge-outline badge-primary" />
+                <div class="flex flex-col gap-1">
+                    <x-badge :value="$row->plan->package_type == 1 ? 'Institute' : 'Test and Notes'" class="badge-outline badge-primary" />
+                    @if($row->plan->final_fees == 0)
+                        <x-badge value="FREE" class="badge-success badge-outline" />
+                    @endif
+                </div>
             @endscope
 
             @scope('cell_plan_start_date', $row)
@@ -53,9 +58,12 @@
         @if($rows->isEmpty())
              <div class="py-20 text-center">
                 <x-icon name="o-shopping-bag" class="w-16 h-16 mx-auto mb-4 opacity-20" />
-                <h3 class="text-xl font-bold opacity-50">No purchased packages</h3>
-                <p class="mt-2 opacity-50">Explore our premium plans to unlock more content!</p>
-                <x-button label="View Premium Plans" link="{{ route('student.plan', ['type' => 'premium']) }}" class="mt-6 btn-primary" />
+                <h3 class="text-xl font-bold opacity-50">No enrolled packages</h3>
+                <p class="mt-2 opacity-50">Enroll in a free package or explore premium plans to get started.</p>
+                <div class="flex justify-center gap-3 mt-6">
+                    <x-button label="Free Packages" link="{{ route('student.plan', ['type' => 'free']) }}" class="btn-info" />
+                    <x-button label="Premium Packages" link="{{ route('student.plan', ['type' => 'premium']) }}" class="btn-primary" />
+                </div>
             </div>
         @endif
     </x-card>

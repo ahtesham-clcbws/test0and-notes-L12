@@ -8,6 +8,7 @@ use App\Models\OtpVerifications;
 use App\Models\PasswordResetModel;
 use App\Models\User;
 use App\Mail\AdminLoginOtp;
+use App\Support\AuthRedirect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -383,11 +384,19 @@ class AuthController extends Controller
                     'password' => $input['password'],
                 ];
 
-                if (Auth::attempt($data)) {
+                if (! Auth::attempt($data)) {
                     return back()->withErrors(['email' => 'Login failed, You are not authorized.']);
                 }
 
-                return back()->withErrors(['email' => 'Login failed, You are not authorized.']);
+                $user = Auth::user();
+
+                if (! $user->canAccessContributorPanel()) {
+                    Auth::logout();
+
+                    return back()->withErrors(['email' => 'Login failed, You are not authorized.']);
+                }
+
+                return AuthRedirect::homeFor($user);
             }
         }
 

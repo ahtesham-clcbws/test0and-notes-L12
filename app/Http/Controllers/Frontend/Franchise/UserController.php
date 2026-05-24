@@ -139,8 +139,8 @@ class UserController extends Controller
                         $userDb->is_staff = 1;
                         $userDb->franchise_roles = json_encode($request->input('role'));
                     } else {
-                        $userDb->isAdminAllowed = 1;
-                        $userDb->roles = json_encode($request->input('role'));
+                        $userDb->isAdminAllowed = 0;
+                        $userDb->roles = implode(',', $request->input('role'));
                         $userDb->franchise_roles = null;
                     }
                 }

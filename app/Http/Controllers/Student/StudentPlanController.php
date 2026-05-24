@@ -108,8 +108,6 @@ class StudentPlanController extends Controller
                 'gn__package_plans.duration', 'gn__package_plans.final_fees', 'gn__package_transactions.plan_status', 'gn__package_transactions.plan_id')
                 ->leftJoin('gn__package_plans', 'gn__package_transactions.plan_id', 'gn__package_plans.id')
                 ->where('gn__package_transactions.student_id', Auth::user()->id)
-
-                ->where('gn__package_plans.final_fees', '>', 0) // Exclude Free packages from My Plan lists
                 ->get()
                 ->sortBy(function ($item) {
                     // Sorting priority: Active (1) > Expired (2) > InQueue (0) > Inactive (3)

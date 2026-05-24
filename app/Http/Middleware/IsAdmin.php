@@ -8,14 +8,14 @@ use Illuminate\Support\Facades\Auth;
 class IsAdmin
 {
     /**
-     * Handle an incoming request.
-     *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::check() && Auth::user()['isAdminAllowed'] == 1 && Auth::user()->status == 'active') {
+        $user = Auth::user();
+
+        if ($user && $user->isSuperAdmin() && $user->status === 'active') {
             return $next($request);
         }
 

@@ -2,27 +2,34 @@
 
 namespace App\Http\Middleware\Management;
 
+use App\Http\Middleware\Concerns\ChecksContributorAccess;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class IsMulti
 {
+    use ChecksContributorAccess;
+
     /**
-     * Handle an incoming request.
-     *
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->isAdminAllowed == 0 && Auth::user()->is_franchise == 0 && Auth::user()->is_staff == 1 && Auth::user()->in_franchise == 1 && Auth::user()->status == 'active') {
-            if (count(Auth::user()->role->pluck('role_id')->toArray()) > 1 && (array_diff(Auth::user()->role->pluck('role_id')->toArray(), [6, 7, 8]) == 0)) {
-                return $next($request);
-            }
+        $user = Auth::user();
+
+        if (! $user || ! $user->canAccessContributorPanel()) {
             Auth::logout();
 
-            return redirect()->route('management_login')->with('error', "You don't have Admion access.");
+            return redirect()->route('management_login')
+                ->with('error', "You don't have contributor access.");
+        }
+
+        $roleIds = $user->contributorRoleIds();
+
+        if (count($roleIds) > 1 && empty(array_diff($roleIds, [6, 7, 8]))) {
+            return $next($request);
         }
 
         Auth::logout();

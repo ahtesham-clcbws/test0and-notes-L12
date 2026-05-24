@@ -76,7 +76,9 @@
 </style>
 <header class="navbar navbar-dark sticky-top bg-white flex-md-nowrap p-0 shadow cust-header">
     <div class="navbar-brand col-md-3 col-lg-2 m-0 p-2 bg-white text-center">
-        <img src="{{ asset('super/images/logo big size.png') }}" style="max-height: 50px; width: auto;">
+        <a href="{{ route('franchise.management.manager.dashboard') }}">
+            <img src="{{ asset('logos/logo-transparent.png') }}" alt="{{ config('app.name') }}" style="max-height: 40px; width: auto;">
+        </a>
     </div>
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
         data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">

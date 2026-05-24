@@ -22,9 +22,7 @@ class Purchased extends Component
         $query = \App\Models\Gn_PackageTransaction::query()
             ->with(['plan'])
             ->where('student_id', Auth::id())
-            ->whereHas('plan', function ($q) {
-                $q->where('final_fees', '>', 0);
-            })
+            ->whereHas('plan')
             ->when($this->search, function ($query) {
                 $query->where('plan_name', 'like', '%'.$this->search.'%');
             })
