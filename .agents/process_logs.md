@@ -140,3 +140,9 @@
 - **SPA Link Interception Bypass:** Resolved video link, note download, and GK preview redirections to the home page by explicitly declaring the `external` attribute on Mary UI `<x-button>` tags, bypassing Livewire's client-side SPA route interceptor.
 - **Formattings:** Standardized codebase styling with `vendor/bin/pint --dirty`.
 
+## Log 22 (2026-05-26): Fix Test Creator and Test Publisher Dropdown Matching Logic
+- **Major Shift (Dropdown Matching Fix):** Fixed the bug where the Test Creator and Test Publisher dropdowns in "Manage Test Sections" were empty.
+- **Query Resolution:** Removed the double quotes around role names (from `%"creator"%` to `%creator%`) in the query builder. The string in the database column is comma-separated text (e.g. `creator` or `manager,creator,publisher`) and does not contain serialized JSON quotes.
+- **Superadmin Inclusion:** Updated the query to explicitly include superadmin users (whose `is_staff` flag is `0` and therefore excluded by `User::directContributorCriteria()`) so they appear correctly in both dropdown lists alongside other active direct contributors.
+- **Code Health:** Formatted changes using `vendor/bin/pint --dirty` with no style violations remaining.
+

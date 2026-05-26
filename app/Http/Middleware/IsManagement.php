@@ -16,7 +16,7 @@ class IsManagement
     {
         $user = Auth::user();
 
-        if ($user && $user->isInstituteContributor()) {
+        if ($user && $user->canAccessContributorPanel()) {
             return $next($request);
         }
 

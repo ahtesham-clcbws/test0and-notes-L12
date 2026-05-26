@@ -433,19 +433,30 @@ class ExamsController extends Controller
         // $this->data['test']     = $test;
         // $this->data['subjects'] = Subject::get();
 
-        $matchThis = ['in_franchise' => '1'];
-        $user_franchise_code = Auth::user()->myInstitute->branch_code;
-        // dd($user_franchise_code);
-        // $creators = User::where($matchThis)->where('roles', 'like', '%"creator"%')->orWhere('roles', 'like', '%"manager"%')->get();
-        $creators = User::where($matchThis)->where('roles', 'like', '%creator%')->where('franchise_code', $user_franchise_code)->get();
-        // dd($creators);
+        if (Auth::user()->in_franchise != 1) {
+            $matchThis = User::directContributorCriteria();
+            $creators = User::where($matchThis)->where(function ($q) {
+                $q->where('roles', 'like', '%creator%')
+                    ->orWhere('roles', 'like', '%manager%')
+                    ->orWhere('roles', 'like', '%superadmin%');
+            })->orWhere('roles', 'like', '%superadmin%')->get();
+
+            $publishers = User::where($matchThis)->where(function ($q) {
+                $q->where('roles', 'like', '%publisher%')
+                    ->orWhere('roles', 'like', '%superadmin%');
+            })->orWhere('roles', 'like', '%superadmin%')->get();
+        } else {
+            $matchThis = ['in_franchise' => '1'];
+            $user_franchise_code = Auth::user()->myInstitute->branch_code ?? '';
+            $creators = User::where($matchThis)->where('roles', 'like', '%creator%')->where('franchise_code', $user_franchise_code)->get();
+            $publishers = User::where($matchThis)->where('roles', 'like', '%publisher%')->where('franchise_code', $user_franchise_code)->get();
+        }
+
         foreach ($creators as $key => $creator) {
             if ($creator['id'] == $this->data['auth_id']) {
                 $creators[$key]['name'] = 'My Self';
             }
         }
-
-        $publishers = User::where($matchThis)->where('roles', 'like', '%publisher%')->where('franchise_code', $user_franchise_code)->get();
 
         foreach ($publishers as $key => $publisher) {
             if ($publisher['id'] == $this->data['auth_id']) {

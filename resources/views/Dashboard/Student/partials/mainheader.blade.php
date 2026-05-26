@@ -102,8 +102,8 @@
     <ul class="nav w-100 nav-panel info-panel" style="background-color: #c4e9fa !important;">
         <li class="nav-item" style="margin: 0px 10px">
             <span class="required_text">
-                @if(auth()->user()->franchise_code)
-                    {{ auth()->user()->myInstitute->institute_name }} : {{ DB::table('cities')->select('name')->where('id',auth()->user()->myInstitute->city_id)->first()->name }}
+                @if(auth()->user()->franchise_code && auth()->user()->myInstitute)
+                    {{ auth()->user()->myInstitute->institute_name }} : {{ DB::table('cities')->select('name')->where('id',auth()->user()->myInstitute->city_id)->first()?->name ?? 'Unknown' }}
                 @else
                     <span class="required_num">21</span>
                 @endif

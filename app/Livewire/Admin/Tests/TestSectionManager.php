@@ -42,19 +42,22 @@ class TestSectionManager extends Component
             ->get()
             ->pluck('subject');
 
-        $matchThis = User::directContributorCriteria();
-        $this->allCreators = User::where($matchThis)
-            ->where(function ($q) {
-                $q->where('roles', 'like', '%"creator"%')
-                    ->orWhere('roles', 'like', '%"manager"%')
-                    ->orWhere('roles', 'superadmin');
-            })->get();
+        $this->allCreators = User::where(function ($q) {
+            $q->where(User::directContributorCriteria())
+                ->where(function ($sub) {
+                    $sub->where('roles', 'like', '%creator%')
+                        ->orWhere('roles', 'like', '%manager%')
+                        ->orWhere('roles', 'like', '%superadmin%');
+                });
+        })->orWhere('roles', 'like', '%superadmin%')->get();
 
-        $this->allPublishers = User::where($matchThis)
-            ->where(function ($q) {
-                $q->where('roles', 'like', '%"publisher"%')
-                    ->orWhere('roles', 'superadmin');
-            })->get();
+        $this->allPublishers = User::where(function ($q) {
+            $q->where(User::directContributorCriteria())
+                ->where(function ($sub) {
+                    $sub->where('roles', 'like', '%publisher%')
+                        ->orWhere('roles', 'like', '%superadmin%');
+                });
+        })->orWhere('roles', 'like', '%superadmin%')->get();
 
         $this->totalTestQuestions = $this->test->total_questions ?? 0;
         $this->calculateUsedQuestions();

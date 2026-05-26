@@ -58,7 +58,9 @@ class StudymaterialController extends Controller
                 $model = $model->where('franchise_details.id', Auth::user()->institute->id);
             }
             if ($is_staff == 1) {
-                $model = $model->where('franchise_details.id', Auth::user()->myInstitute->id);
+                if (Auth::user()->in_franchise == 1) {
+                    $model = $model->where('franchise_details.id', Auth::user()->myInstitute?->id);
+                }
                 $model = $model->where('users.id', Auth::user()->id);
             }
 
@@ -135,7 +137,7 @@ class StudymaterialController extends Controller
                         return $model['name'].' ('.Auth::user()->institute['institute_name'].')';
                     }
                     if ($is_staff == 1) {
-                        return $model['name'].' ('.Auth::user()->myInstitute->institute_name.')';
+                        return $model['name'].' ('.(Auth::user()->myInstitute?->institute_name ?? 'Test and Notes').')';
                     }
                 })
                 ->addColumn('category', '{{ $category }}')
@@ -352,7 +354,7 @@ class StudymaterialController extends Controller
             if (Auth::user()->roles == 'creator' || Auth::user()->roles == 'publisher') {
                 $is_staff = Auth::user()->is_staff;
                 if ($is_staff == 1) {
-                    $institute = Auth::user()->myInstitute->id;
+                    $institute = Auth::user()->myInstitute?->id ?? 0;
                     $UserDetails = UserDetails::get()->where('user_id', Auth::user()->id)->first();
                     if ($UserDetails->allowed_to_upload == 1) {
                         $publish_by = Auth::user()->id;
@@ -702,7 +704,7 @@ class StudymaterialController extends Controller
                     if ($model['institute_id'] == 0) {
                         return 'Test and Notes';
                     } else {
-                        return Auth::user()->myInstitute->institute_name;
+                        return Auth::user()->myInstitute?->institute_name ?? 'Test and Notes';
                     }
                 })
                 ->addColumn('view', function ($model) {
@@ -845,7 +847,7 @@ class StudymaterialController extends Controller
                     if ($model['institute_id'] == 0) {
                         return 'Test and Notes';
                     } else {
-                        return Auth::user()->myInstitute->institute_name;
+                        return Auth::user()->myInstitute?->institute_name ?? 'Test and Notes';
                     }
                 })
                 ->addColumn('view', function ($model) {
@@ -982,7 +984,7 @@ class StudymaterialController extends Controller
                     if ($model['institute_id'] == 0) {
                         return 'Test and Notes';
                     } else {
-                        return Auth::user()->myInstitute->institute_name;
+                        return Auth::user()->myInstitute?->institute_name ?? 'Test and Notes';
                     }
                 })
                 ->addColumn('view', function ($model) {
@@ -1114,7 +1116,7 @@ class StudymaterialController extends Controller
                     if ($model['institute_id'] == 0) {
                         return 'Test and Notes';
                     } else {
-                        return Auth::user()->myInstitute->institute_name;
+                        return Auth::user()->myInstitute?->institute_name ?? 'Test and Notes';
                     }
                 })
                 ->addColumn('view', function ($model) {
@@ -1246,7 +1248,7 @@ class StudymaterialController extends Controller
                     if ($model['institute_id'] == 0) {
                         return 'Test and Notes';
                     } else {
-                        return Auth::user()->myInstitute->institute_name;
+                        return Auth::user()->myInstitute?->institute_name ?? 'Test and Notes';
                     }
                 })
                 ->addColumn('view', function ($model) {

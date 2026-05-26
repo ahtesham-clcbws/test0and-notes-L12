@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\QuestionBankModel;
 use App\Models\TestAttempt;
 use App\Models\TestAttemptAnswer;
-use App\Models\QuestionBankModel;
 use App\Models\TestModal;
 use App\Models\User;
 use App\Models\UserDetails;
@@ -64,7 +64,7 @@ class TestController extends Controller
     {
         $test = TestModal::find($name);
         if (empty($test) || ! empty($test->institude)) {
-            if (Auth::user()->myInstitute->id == $test->institude->id) {
+            if (Auth::user()->myInstitute && Auth::user()->myInstitute->id == $test->institude->id) {
                 return redirect()->route('student.start-test', [$name]);
             }
 

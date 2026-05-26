@@ -54,6 +54,20 @@
 
 # Session Sync - Momin Scholar Program
 
+## Session Handoff - 2026-05-26 (V3.1.2: Project-Wide Null-Safety Hardening Audit)
+- **Objective:** Secure the entire portal from null pointer exceptions (`Attempt to read property "branch_code" on null`) when logged in as direct platform contributors or superadmins who do not belong to an institute (`in_franchise = 0`).
+- **Key Achievements:**
+  - **Hardened StudymaterialController**: Updated all references to `myInstitute` to be null-safe. Implemented conditional branching for staff based on `in_franchise == 1` so that direct creators and publishers are not filtered by a null institute relationship, allowing them to manage their own materials flawlessly.
+  - **Secured Student Views & Components**: Handled edge cases in `mainheader.blade.php` to prevent crashes when rendering institute branding for direct contributors or superadmins.
+  - **Clean Formatting**: Passed formatting checks cleanly using `vendor/bin/pint --dirty`.
+
+## Session Handoff - 2026-05-26 (V3.1.1: Fix Test Creator and Test Publisher Dropdowns Matching)
+- **Objective:** Fix the Test Creator and Test Publisher dropdown list matches in the Admin Panel's Manage Test Sections view to display the active superadmin and direct contributors.
+- **Key Achievements:**
+  - **Corrected Role String Queries**: Removed JSON double quotes from the database queries (from `%"creator"%` to `%creator%`) so they match the actual comma-separated string formatting inside the `roles` database column.
+  - **Included Superadmins**: Updated the Eloquent filters to explicitly pull users with the `superadmin` role, bypassing `directContributorCriteria()` restrictions that require `is_staff = 1` which is `0` for the platform's superadmin accounts.
+  - **Formatting Consistency**: Standardized the Livewire `TestSectionManager` changes using `vendor/bin/pint --dirty` with perfect style compliance.
+
 ## Session Handoff - 2026-05-22 (V3.1.0: Laravel Agent-Debugger Package Replacement)
 - **Objective:** Replace custom basic logger with the feature-rich `clcbws/laravel-agents-debug` package.
 - **Key Achievements:**
