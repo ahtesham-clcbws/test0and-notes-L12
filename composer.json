@@ -24,6 +24,7 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",
+        "clcbws/laravel-agents-debug": "dev-main",
         "fakerphp/faker": "^1.9.1",
         "laravel/boost": "^1.8",
         "laravel/pint": "^1.0",

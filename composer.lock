@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1f5890f37554f33342ee0230f7b1399f",
+    "content-hash": "d2c39704f9c429638727dc20b7f9872a",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -7794,6 +7794,67 @@
             "time": "2025-12-03T14:52:46+00:00"
         },
         {
+            "name": "clcbws/laravel-agents-debug",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ahtesham-clcbws/laravel-agents-debug.git",
+                "reference": "7e12e05d9fb6344672c50cb2770fc13be63615be"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ahtesham-clcbws/laravel-agents-debug/zipball/7e12e05d9fb6344672c50cb2770fc13be63615be",
+                "reference": "7e12e05d9fb6344672c50cb2770fc13be63615be",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "^12.0|^13.0",
+                "illuminate/database": "^12.0|^13.0",
+                "illuminate/http": "^12.0|^13.0",
+                "illuminate/log": "^12.0|^13.0",
+                "illuminate/session": "^12.0|^13.0",
+                "illuminate/support": "^12.0|^13.0",
+                "php": "^8.3|^8.4"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelAgentDebugger\\DebugActivityServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/Helpers/functions.php"
+                ],
+                "psr-4": {
+                    "LaravelAgentDebugger\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ahtesham",
+                    "email": "ahtesham2000@gmail.com"
+                }
+            ],
+            "description": "A Zero-JS, High-Fidelity Server-Side Diagnostics & Profiling Suite for Laravel 12/13.",
+            "homepage": "https://github.com/ahtesham-clcbws/laravel-agents-debug",
+            "support": {
+                "issues": "https://github.com/ahtesham-clcbws/laravel-agents-debug/issues",
+                "source": "https://github.com/ahtesham-clcbws/laravel-agents-debug"
+            },
+            "time": "2026-05-22T11:43:50+00:00"
+        },
+        {
             "name": "fakerphp/faker",
             "version": "v1.24.1",
             "source": {
@@ -10733,7 +10794,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": {
+        "clcbws/laravel-agents-debug": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
