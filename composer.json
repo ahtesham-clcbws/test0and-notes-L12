@@ -9,7 +9,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "clcbws/laravel-schema-sentinel": "dev-main",
         "intervention/image": "^3.11",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
@@ -25,7 +24,6 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",
-        "clcbws/laravel-agents-debug": "*",
         "fakerphp/faker": "^1.9.1",
         "laravel/boost": "^1.8",
         "laravel/pint": "^1.0",
@@ -35,15 +33,6 @@
         "phpunit/phpunit": "^11.0",
         "spatie/laravel-ignition": "^2.0"
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "/mnt/BWS/public_projects/Local_Debug_Activity",
-            "options": {
-                "symlink": true
-            }
-        }
-    ],
     "autoload": {
         "psr-4": {
             "App\\": "app/",

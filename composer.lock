@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9106e5e896c6649bb582d2c6dd19311d",
+    "content-hash": "1f5890f37554f33342ee0230f7b1399f",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -284,74 +284,6 @@
                 }
             ],
             "time": "2024-02-09T16:56:22+00:00"
-        },
-        {
-            "name": "clcbws/laravel-schema-sentinel",
-            "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ahtesham-clcbws/laravel-schema-sentinel.git",
-                "reference": "5f81cc64bb39a3a28a5e13fe5af4c3dfd6014da6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ahtesham-clcbws/laravel-schema-sentinel/zipball/5f81cc64bb39a3a28a5e13fe5af4c3dfd6014da6",
-                "reference": "5f81cc64bb39a3a28a5e13fe5af4c3dfd6014da6",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/console": "^13.0|^12.0|^11.0",
-                "illuminate/database": "^13.0|^12.0|^11.0",
-                "illuminate/support": "^13.0|^12.0|^11.0",
-                "php": "^8.2"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^9.0|^10.0",
-                "phpunit/phpunit": "^10.0|^11.0"
-            },
-            "default-branch": true,
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "Sentinel": "Sentinel\\SchemaSentinel\\Facades\\Sentinel"
-                    },
-                    "providers": [
-                        "Sentinel\\SchemaSentinel\\SentinelServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Sentinel\\SchemaSentinel\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ahtesham",
-                    "email": "ahtesham@clcbws.com",
-                    "homepage": "https://www.clcbws.com"
-                }
-            ],
-            "description": "Detect and fix database schema drift in Laravel by comparing migrations with the live database state.",
-            "keywords": [
-                "clcbws",
-                "database",
-                "drift",
-                "laravel",
-                "migration",
-                "schema",
-                "sentinel"
-            ],
-            "support": {
-                "issues": "https://github.com/ahtesham-clcbws/laravel-schema-sentinel/issues",
-                "source": "https://github.com/ahtesham-clcbws/laravel-schema-sentinel/tree/v1.1.9"
-            },
-            "time": "2026-04-28T11:30:23+00:00"
         },
         {
             "name": "composer/pcre",
@@ -7862,67 +7794,6 @@
             "time": "2025-12-03T14:52:46+00:00"
         },
         {
-            "name": "clcbws/laravel-agents-debug",
-            "version": "3.1.0",
-            "dist": {
-                "type": "path",
-                "url": "/mnt/BWS/public_projects/Local_Debug_Activity",
-                "reference": "5b9e5b2461a9c19d29e4d8be5f362aaa53570af3"
-            },
-            "require": {
-                "illuminate/console": "^12.0|^13.0",
-                "illuminate/database": "^12.0|^13.0",
-                "illuminate/http": "^12.0|^13.0",
-                "illuminate/log": "^12.0|^13.0",
-                "illuminate/session": "^12.0|^13.0",
-                "illuminate/support": "^12.0|^13.0",
-                "php": "^8.3|^8.4"
-            },
-            "require-dev": {
-                "orchestra/testbench": "^10.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "LaravelAgentDebugger\\DebugActivityServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "LaravelAgentDebugger\\": "src/"
-                },
-                "files": [
-                    "src/Helpers/functions.php"
-                ]
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "LaravelAgentDebugger\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ahtesham",
-                    "email": "ahtesham2000@gmail.com"
-                }
-            ],
-            "description": "A Zero-JS, High-Fidelity Server-Side Diagnostics & Profiling Suite for Laravel 12/13.",
-            "homepage": "https://github.com/ahtesham-clcbws/laravel-agents-debug",
-            "support": {
-                "issues": "https://github.com/ahtesham-clcbws/laravel-agents-debug/issues",
-                "source": "https://github.com/ahtesham-clcbws/laravel-agents-debug"
-            },
-            "transport-options": {
-                "symlink": true,
-                "relative": false
-            }
-        },
-        {
             "name": "fakerphp/faker",
             "version": "v1.24.1",
             "source": {
@@ -10862,9 +10733,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "clcbws/laravel-schema-sentinel": 20
-    },
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
