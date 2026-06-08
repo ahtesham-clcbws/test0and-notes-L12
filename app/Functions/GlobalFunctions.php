@@ -53,7 +53,9 @@ function getStates()
 }
 function getAvailableStates()
 {
-    $stateIds = FranchiseDetails::whereNull('deleted_at')->where('status', 'active')->distinct()->pluck('state_id');
+    $stateIds = FranchiseDetails::whereHas('user', function ($query) {
+        $query->where('status', 'active');
+    })->distinct()->pluck('state_id');
 
     return State::whereIn('id', $stateIds)->get();
 }
@@ -65,7 +67,9 @@ function getCitiesByState(int|string $stateid): string
 }
 function getAvailableCitiesByState(int|string $stateid): string
 {
-    $cityIds = FranchiseDetails::whereNull('deleted_at')->where('status', 'active')->where('state_id', $stateid)->distinct()->pluck('city_id');
+    $cityIds = FranchiseDetails::whereHas('user', function ($query) {
+        $query->where('status', 'active');
+    })->where('state_id', $stateid)->distinct()->pluck('city_id');
     $cities = City::select('id', 'name')->whereIn('id', $cityIds)->get();
 
     return json_encode($cities);

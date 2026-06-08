@@ -52,11 +52,20 @@ class APIController extends Controller
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        if (filter_var($data['mobile'], FILTER_VALIDATE_EMAIL)) {
+        $identifier = trim($data['mobile']);
 
-            $user = User::get()->where('email', $data['mobile'])->where('status', 'active')->where('roles', 'student')->first();
+        if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            $user = User::query()
+                ->where('email', $identifier)
+                ->where('status', 'active')
+                ->where('roles', 'student')
+                ->first();
         } else {
-            $user = User::get()->where('mobile', $data['mobile'])->where('status', 'active')->where('roles', 'student')->first();
+            $user = User::query()
+                ->where('mobile', $identifier)
+                ->where('status', 'active')
+                ->where('roles', 'student')
+                ->first();
         }
 
         if (! empty($user)) {
@@ -71,7 +80,7 @@ class APIController extends Controller
                 }
 
                 $success['token'] = $user->createToken('authToken')->plainTextToken;
-                $user['institute_name'] = $user->myInstitute['institute_name'];
+                $user['institute_name'] = $user->myInstitute?->institute_name;
                 $success['user_details'] = $user;
 
                 // return $this->BaseController->sendResponse($success);
