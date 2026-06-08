@@ -332,39 +332,44 @@ class APIController extends Controller
             return response()->json(['status' => 0, 'msg' => 'No test found']);
         }
 
-        // 1. Process any final answers sent in the request (if any)
+        // 1. Get the active attempt
+        $attempt = TestAttempt::where('student_id', Auth::id())
+            ->where('test_id', $request->test_id)
+            ->where('status', 'running')
+            ->latest()
+            ->first();
+
+        if (! $attempt) {
+            // Fallback for edge cases where attempt wasn't initialized
+            $attempt = TestAttempt::create([
+                'student_id' => Auth::id(),
+                'test_id' => $request->test_id,
+                'test_attempt' => 1,
+                'status' => 'running',
+            ]);
+        }
+
+        // 2. Process any final answers sent in the request (if any)
         if ($request->has('attemted_questions')) {
             foreach ($request->attemted_questions as $value) {
                 if ($value['answer'] == '') {
-                    TestAttemptAnswer::where('student_id', Auth::id())
-                        ->where('test_id', $request->test_id)
+                    TestAttemptAnswer::where('test_attempt_id', $attempt->id)
                         ->where('question_id', $value['question_id'])
                         ->delete();
                 } else {
                     TestAttemptAnswer::updateOrCreate(
-                        ['student_id' => Auth::id(), 'test_id' => $request->test_id, 'question_id' => $value['question_id']],
+                        ['test_attempt_id' => $attempt->id, 'question_id' => $value['question_id']],
                         ['answer' => $value['answer']]
                     );
                 }
             }
         }
 
-        // 2. Update status to completed
-        $attempt = TestAttempt::where('student_id', Auth::id())
-            ->where('test_id', $request->test_id)
-            ->first();
-
-        if ($attempt) {
-            $attempt->update(['status' => 'completed']);
-        } else {
-            // Fallback for edge cases where attempt wasn't initialized
-            $attempt = TestAttempt::create([
-                'student_id' => Auth::id(),
-                'test_id' => $request->test_id,
-                'test_attempt' => 1,
-                'status' => 'completed',
-            ]);
-        }
+        // 3. Update status to completed
+        $attempt->update([
+            'status' => 'completed',
+            'submitted_at' => now(),
+        ]);
 
         return response()->json([
             'status' => 1,
@@ -541,7 +546,7 @@ class APIController extends Controller
         }
 
         // Send SMS OTP via MSG91
-        if ($user->mobile) {
+        if ($user->mobile && config('app.live_mobile_otp')) {
             try {
                 app(Msg91Service::class)->sendSms($user->mobile, $otp);
             } catch (\Exception $e) {
@@ -646,7 +651,7 @@ class APIController extends Controller
             }
 
             // Send SMS OTP via MSG91
-            if ($mobileNumber) {
+            if ($mobileNumber && config('app.live_mobile_otp')) {
                 try {
                     app(Msg91Service::class)->sendSms($mobileNumber, $otp);
                 } catch (\Exception $e) {
@@ -882,12 +887,29 @@ class APIController extends Controller
                 unset($test->testSections); // Clean up response
             });
 
+            // 4. Slider Packages (is_mobile = 1, status = 1, matching student category/class)
+            $slider_packages = Gn_PackagePlan::where('status', 1)
+                ->where('is_mobile', 1)
+                ->where('class', $class)
+                ->latest()
+                ->get();
+
+            // 5. Banner Packages (is_mobile = 1, is_featured = 1, status = 1, matching student category/class)
+            $banner_packages = Gn_PackagePlan::where('status', 1)
+                ->where('is_mobile', 1)
+                ->where('is_featured', 1)
+                ->where('class', $class)
+                ->latest()
+                ->get();
+
             return response()->json([
                 'status' => 1,
                 'data' => [
                     'categories' => $categories,
                     'test_categories' => $test_categories,
                     'featured_tests' => $featured_tests,
+                    'slider_packages' => $slider_packages,
+                    'banner_packages' => $banner_packages,
                 ],
             ]);
         } catch (\Exception $e) {
@@ -908,11 +930,18 @@ class APIController extends Controller
             $institute_id = $user ? ($user->myInstitute?->id ?? 0) : 0;
             $institute_owner_id = $user ? ($user->myInstitute?->user_id ?? 0) : 0;
 
+            $active_plans = Gn_PackageTransaction::where('student_id', Auth::id())
+                ->where('plan_status', 1)
+                ->where('plan_end_date', '>=', time())
+                ->pluck('plan_id')
+                ->toArray();
+
             // 1. Premium Packages
             $packages = Gn_PackagePlan::where('status', 1)
-                ->where('final_fees', '>', 0)
+                ->where('final_fees', '>=', 0)
                 ->where('education_type', $education_type)
                 ->where('class', $class)
+                ->whereNotIn('id', $active_plans)
                 ->latest()
                 ->get();
 
@@ -977,7 +1006,38 @@ class APIController extends Controller
         $package_plan = Gn_PackagePlan::find($request->plan_id);
 
         if ($package_plan->final_fees <= 0) {
-            return response()->json(['status' => 0, 'message' => 'This is a free plan.']);
+            $already_active = Gn_PackageTransaction::where('student_id', Auth::id())
+                ->where('plan_id', $package_plan->id)
+                ->where('plan_status', 1)
+                ->exists();
+
+            if ($already_active) {
+                return response()->json([
+                    'status' => 1,
+                    'is_free' => true,
+                    'message' => 'Plan is already active.',
+                ]);
+            }
+
+            $transaction_id = 'gyn-free-'.uniqid();
+            $transaction = new Gn_PackageTransaction;
+            $transaction->student_id = Auth::id();
+            $transaction->plan_id = $package_plan->id;
+            $transaction->plan_amount = 0;
+            $transaction->plan_name = $package_plan->plan_name;
+            $transaction->plan_duration = $package_plan->duration;
+            $transaction->transaction_id = $transaction_id;
+            $transaction->transaction_date = time();
+            $transaction->plan_start_date = time();
+            $transaction->plan_end_date = strtotime('+'.$package_plan->duration.' days');
+            $transaction->plan_status = 1; // Active
+            $transaction->save();
+
+            return response()->json([
+                'status' => 1,
+                'is_free' => true,
+                'message' => 'Free plan activated successfully!',
+            ]);
         }
 
         try {
@@ -1071,30 +1131,49 @@ class APIController extends Controller
             $institute_owner_id = $user ? ($user->myInstitute?->user_id ?? 0) : 0;
 
             $query = TestModal::with('EducationClass')
-                ->where('published', 1)
-                ->where(function ($q) use ($institute_owner_id) {
-                    $q->whereIn('user_id', [$institute_owner_id, 1])
-                        ->orWhereNull('user_id');
+                ->where('published', 1);
+
+            if ($request->source === 'institute') {
+                $query->where('user_id', $institute_owner_id);
+            } else {
+                $query->where(function ($q) {
+                    $q->whereNull('user_id')
+                        ->orWhere('user_id', 1);
                 });
+            }
+
+            if ($request->has('test_type')) {
+                $query->where('test_type', $request->test_type);
+            }
 
             if ($request->category_id) {
                 $query->where('test_cat', $request->category_id);
             }
-            // if ($request->education_type_id) {
-            //     $query->where('education_type_id', $request->education_type_id);
-            // }
 
             $tests = $query->orderByRaw('CASE WHEN education_type_id = ? AND education_type_child_id = ? THEN 0 ELSE 1 END', [$education_type, $class])
                 ->latest()
                 ->paginate(20);
 
-            $tests->getCollection()->each(function ($test) use ($education_type, $class) {
+            $testIds = $tests->getCollection()->pluck('id')->toArray();
+            $attempts = TestAttempt::where('student_id', Auth::id())
+                ->whereIn('test_id', $testIds)
+                ->get()
+                ->keyBy('test_id');
+
+            $tests->getCollection()->each(function ($test) use ($education_type, $class, $attempts) {
                 $test->dynamic_duration = $test->testSections->sum(function ($section) {
                     return ($section->number_of_questions ?? 0) * ($section->duration ?: 1);
                 });
 
                 // Flag if this test matches student's class
                 $test->is_student_class = ($test->education_type_id == $education_type && $test->education_type_child_id == $class);
+
+                // Add attempt status
+                $attempt = $attempts->get($test->id);
+                if ($attempt && $attempt->status === 'running') {
+                    $attempt->checkAndHandleExpiry();
+                }
+                $test->attempt_status = $attempt ? $attempt->status : 'not_started';
 
                 unset($test->testSections); // Clean up response
             });
@@ -1131,11 +1210,11 @@ class APIController extends Controller
                     'section_id' => $q->pivot->section_id,
                     'question' => $q->question,
                     'options' => [
-                        $q->option_1,
-                        $q->option_2,
-                        $q->option_3,
-                        $q->option_4,
-                        $q->option_5,
+                        $q->ans_1,
+                        $q->ans_2,
+                        $q->ans_3,
+                        $q->ans_4,
+                        $q->ans_5,
                     ],
                     'has_solution' => ! empty($q->solution),
                     'question_type' => $q->question_type,
@@ -1171,6 +1250,47 @@ class APIController extends Controller
                 ]);
             }
 
+            // Load existing answers and states directly from DB tracking table
+            $answers = [];
+            $visited_questions = [];
+            $marked_questions = [];
+            $draft_state = [
+                'current_section' => 0,
+                'current_question' => 0,
+            ];
+
+            if ($attempt && $attempt->status === 'running') {
+                $existingResponses = TestAttemptAnswer::where('test_attempt_id', $attempt->id)->get();
+                foreach ($existingResponses as $response) {
+                    if ($response->answer !== null && $response->answer !== '') {
+                        $answers[$response->question_id] = (int) $response->answer;
+                    }
+                    if ($response->is_visited) {
+                        $visited_questions[] = $response->question_id;
+                    }
+                    if ($response->is_marked_for_review) {
+                        $marked_questions[] = $response->question_id;
+                    }
+                }
+                if ($attempt->draft_state && is_array($attempt->draft_state)) {
+                    $draft_state = $attempt->draft_state;
+                }
+            }
+
+            // Calculate precisely time left in seconds
+            $totalDuration = $test->time_to_complete;
+            if (! $totalDuration) {
+                $totalDuration = $test->testSections->sum(function ($section) {
+                    return ($section->number_of_questions ?? 0) * ($section->duration ?: 1);
+                });
+            }
+            if (! $totalDuration || $totalDuration <= 0) {
+                $totalDuration = 60; // 60 minutes default
+            }
+
+            $expiryTime = $attempt->created_at->timestamp + ($totalDuration * 60);
+            $timeLeftInSeconds = max(0, $expiryTime - now()->timestamp);
+
             return response()->json([
                 'status' => 1,
                 'data' => [
@@ -1179,6 +1299,11 @@ class APIController extends Controller
                     'questions' => $formatted_questions,
                     'test_attempt_id' => $attempt->id,
                     'status' => $attempt->status,
+                    'answers' => $answers,
+                    'visited_questions' => $visited_questions,
+                    'marked_questions' => $marked_questions,
+                    'draft_state' => $draft_state,
+                    'time_left' => $timeLeftInSeconds,
                 ],
             ]);
         } catch (\Exception $e) {
@@ -1192,6 +1317,10 @@ class APIController extends Controller
             'test_id' => 'required|exists:test,id',
             'question_id' => 'required|exists:question_bank,id',
             'answer' => 'nullable',
+            'current_section' => 'nullable|integer',
+            'current_question' => 'nullable|integer',
+            'is_visited' => 'nullable|integer',
+            'is_marked_for_review' => 'nullable|integer',
         ]);
 
         if ($validator->fails()) {
@@ -1199,16 +1328,46 @@ class APIController extends Controller
         }
 
         try {
+            $attempt = TestAttempt::where('student_id', Auth::id())
+                ->where('test_id', $request->test_id)
+                ->where('status', 'running')
+                ->latest()
+                ->first();
+
+            if (! $attempt) {
+                return response()->json(['status' => 0, 'message' => 'No active test attempt found.']);
+            }
+
+            // Sync answer selection and statuses
             if ($request->answer === null || $request->answer === '') {
-                TestAttemptAnswer::where('student_id', Auth::id())
-                    ->where('test_id', $request->test_id)
+                TestAttemptAnswer::where('test_attempt_id', $attempt->id)
                     ->where('question_id', $request->question_id)
                     ->delete();
             } else {
+                $updateData = ['answer' => $request->answer];
+                if ($request->has('is_visited')) {
+                    $updateData['is_visited'] = (int) $request->is_visited;
+                }
+                if ($request->has('is_marked_for_review')) {
+                    $updateData['is_marked_for_review'] = (int) $request->is_marked_for_review;
+                }
+
                 TestAttemptAnswer::updateOrCreate(
-                    ['student_id' => Auth::id(), 'test_id' => $request->test_id, 'question_id' => $request->question_id],
-                    ['answer' => $request->answer]
+                    ['test_attempt_id' => $attempt->id, 'question_id' => $request->question_id],
+                    $updateData
                 );
+            }
+
+            // Save active indices position tracking
+            $draft = $attempt->draft_state ?: [];
+            if ($request->has('current_section')) {
+                $draft['current_section'] = (int) $request->current_section;
+            }
+            if ($request->has('current_question')) {
+                $draft['current_question'] = (int) $request->current_question;
+            }
+            if (! empty($draft)) {
+                $attempt->update(['draft_state' => $draft]);
             }
 
             return response()->json(['status' => 1, 'message' => 'Answer saved successfully']);
@@ -1330,6 +1489,7 @@ class APIController extends Controller
         try {
             $packages = Gn_PackageTransaction::where('student_id', Auth::id())
                 ->where('plan_status', 1) // Active
+                ->where('plan_end_date', '>=', strtotime(date('Y-m-d'))) // Non-expired
                 ->latest()
                 ->get();
 
@@ -1359,6 +1519,66 @@ class APIController extends Controller
             return response()->json([
                 'status' => 1,
                 'data' => $attempts,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 0, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function getPackageDetails(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:gn__package_plans,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 0, 'message' => $validator->errors()->first()]);
+        }
+
+        try {
+            $plan = Gn_PackagePlan::with(['test' => function ($q) {
+                $q->where('published', 1);
+            }])->find($request->id);
+
+            // Fetch video materials
+            $video_ids = array_filter(array_map('intval', explode(',', $plan->video_id)));
+            $videos = ! empty($video_ids) ? Studymaterial::whereIn('id', $video_ids)->where('status', 1)->get() : [];
+
+            // Fetch study notes materials
+            $notes_ids = array_filter(array_map('intval', explode(',', $plan->study_material_id)));
+            $notes = ! empty($notes_ids) ? Studymaterial::whereIn('id', $notes_ids)->where('status', 1)->get() : [];
+
+            // Fetch static GK materials
+            $gk_ids = array_filter(array_map('intval', explode(',', $plan->static_gk_id)));
+            $gk = ! empty($gk_ids) ? Studymaterial::whereIn('id', $gk_ids)->where('status', 1)->get() : [];
+
+            // Load attempt status for the logged-in student (Matching Livewire packages/details.php)
+            $tests = $plan->test;
+            if ($tests && $tests->isNotEmpty()) {
+                $testIds = $tests->pluck('id')->toArray();
+                $attempts = TestAttempt::where('student_id', Auth::id())
+                    ->whereIn('test_id', $testIds)
+                    ->get()
+                    ->keyBy('test_id');
+
+                foreach ($tests as $onetest) {
+                    $attempt = $attempts->get($onetest->id);
+                    if ($attempt && $attempt->status === 'running') {
+                        $attempt->checkAndHandleExpiry();
+                    }
+                    $onetest->attempt_status = $attempt ? $attempt->status : 'not_started';
+                }
+            }
+
+            return response()->json([
+                'status' => 1,
+                'data' => [
+                    'plan' => $plan,
+                    'tests' => $tests,
+                    'videos' => $videos,
+                    'notes' => $notes,
+                    'gk' => $gk,
+                ],
             ]);
         } catch (\Exception $e) {
             return response()->json(['status' => 0, 'message' => $e->getMessage()]);

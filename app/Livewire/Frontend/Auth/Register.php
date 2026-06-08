@@ -82,22 +82,27 @@ class Register extends Component
                         'updated_at' => now(),
                     ]);
 
-                    // Send SMS OTP via MSG91
-                    try {
-                        $smsSent = app(\App\Services\Msg91Service::class)->sendSms($this->form->mobile_number, $otp);
-                        if ($smsSent) {
-                            $this->isOtpSend = true;
-                            $this->js('success("OTP sent successfully to your mobile number.")');
-                        } else {
+                    if (config('app.live_laravel_otp')) {
+                        // Send SMS OTP via MSG91
+                        try {
+                            $smsSent = app(\App\Services\Msg91Service::class)->sendSms($this->form->mobile_number, $otp);
+                            if ($smsSent) {
+                                $this->isOtpSend = true;
+                                $this->js('success("OTP sent successfully to your mobile number.")');
+                            } else {
+                                $this->isOtpSend = false;
+                                $this->addError('form.mobile_number', 'Failed to send OTP.');
+                                $this->js('error("Failed to send OTP. Please try again.")');
+                            }
+                        } catch (\Exception $e) {
+                            \Illuminate\Support\Facades\Log::error('Error sending signup OTP SMS: '.$e->getMessage());
                             $this->isOtpSend = false;
-                            $this->addError('form.mobile_number', 'Failed to send OTP.');
-                            $this->js('error("Failed to send OTP. Please try again.")');
+                            $this->addError('form.mobile_number', 'Error sending OTP.');
+                            $this->js('error("Error sending OTP. Please try again.")');
                         }
-                    } catch (\Exception $e) {
-                        \Illuminate\Support\Facades\Log::error('Error sending signup OTP SMS: '.$e->getMessage());
-                        $this->isOtpSend = false;
-                        $this->addError('form.mobile_number', 'Error sending OTP.');
-                        $this->js('error("Error sending OTP. Please try again.")');
+                    } else {
+                        $this->isOtpSend = true;
+                        $this->js('success("OTP sent successfully to your mobile number.")');
                     }
                 }
             } else {
@@ -136,15 +141,7 @@ class Register extends Component
     {
         try {
             if ($this->form->validateOnly('mobile_otp')) {
-                $time = date('Y-m-d H:i:s', strtotime('-10 minutes'));
-                $otpData = OtpVerifications::where([
-                    ['type', '=', 'mobile'],
-                    ['credential', '=', $this->form->mobile_number],
-                    ['otp', '=', $this->form->mobile_otp],
-                    ['created_at', '>', $time],
-                ])->first();
-
-                if ($otpData) {
+                if (verifyOtp($this->form->mobile_otp, $this->form->mobile_number)) {
                     $this->otpVerificationStatus = true;
                     $this->resetValidation('form.mobile_otp');
                     $this->resetValidation('form.mobile_number');

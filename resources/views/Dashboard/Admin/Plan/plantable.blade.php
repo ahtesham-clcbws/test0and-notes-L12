@@ -4,7 +4,7 @@
 <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
 @endsection
 @section('main')
-    <div class="container p-0">
+    <div class="p-0">
         <div class="dashboard-container mb-5">
             <div class="card">
                 <div class="" style="text-align: right;margin-top: 10px;margin-right: 28px;">
@@ -16,15 +16,16 @@
                         <thead>
                             <tr>
                                 <th scope="col">Sr. No</th>
-                                <th scope="col">Package Image</th>
-                                <th scope="col">Package Name & Class</th>
+                                <th scope="col">Image</th>
+                                <th scope="col">Name & Class</th>
                                  <th scope="col">Featured</th> 
                                 <th scope="col">Created For</th>
-                                <th scope="col">Package Detail</th>
+                                <th scope="col">Detail</th>
                                 <th scope="col">Duration</th>
-                                <th scope="col">Package Type & Fee</th>
+                                <th scope="col">Type & Fee</th>
                                 <th scope="col">Status</th>
-                                <th scope="col">Expire Status</th>
+                                <th scope="col">isMobile</th>
+                                <th scope="col">Expiry</th>
                                 <th class="text-end">Actions</th>
                             </tr>
                         </thead>
@@ -101,7 +102,7 @@
             // "lengthChange": true,
             bprocessing: true,
             serverSide: true,
-            ajax: '{!! route("administrator.plan") !!}',
+            ajax: '{!! route("administrator.old_plan") !!}',
             lengthMenu: [[10, 15, 30, 50],[10, 15, 30, 50]],
             responsive: {
                 details: true
@@ -123,6 +124,7 @@
                 {data: 'duration'},
                 {data: 'final_fees'},
                 {data: 'status'},
+                {data: 'is_mobile'},
                 {data: 'expire_status', orderable: true},
                 {data: 'edit',orderable: false},
             ],
@@ -169,15 +171,47 @@
                     success: function (data) {
                         if(data['status'] == 200){
                             alert(data['message']);
-                            location.href = '{!! route("administrator.plan") !!}';
+                            location.href = '{!! route("administrator.old_plan") !!}';
                         }else{
                             alert(data['message']);
-                            location.href = '{!! route("administrator.plan") !!}';
+                            location.href = '{!! route("administrator.old_plan") !!}';
                         }
                     }
                 });
             }
                 return false;
+            }
+        });
+
+        // Event to extend plan expiration date
+        $(document).on('click', '.extend-btn', function () {
+            var planId = $(this).attr('data-id');
+            var unit = $(this).attr('data-unit');
+            var amount = $('#select-' + planId).val();
+            
+            if (planId && unit && amount) {
+                $.ajax({
+                    type: "POST",
+                    url: '{!! route("administrator.plan_extend_expire_date") !!}',
+                    dataType: "JSON",
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        plan_id: planId,
+                        amount: amount,
+                        unit: unit
+                    },
+                    success: function (data) {
+                        if (data.status == 200) {
+                            alert(data.message);
+                            table.ajax.reload(null, false);
+                        } else {
+                            alert(data.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('Error: ' + xhr.responseText);
+                    }
+                });
             }
         });
 

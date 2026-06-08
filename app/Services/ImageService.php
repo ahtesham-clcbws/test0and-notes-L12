@@ -110,4 +110,49 @@ class ImageService
 
         return $newPath;
     }
+
+    /**
+     * Upload image, resize/crop to exact dimensions, and encode to WebP.
+     *
+     * @param  mixed  $file  Uploaded file instance
+     * @param  string  $path  Storage folder path
+     * @param  int  $width  Target width
+     * @param  int  $height  Target height
+     * @param  int  $quality  Encoding quality (default 80)
+     * @return string Stored file path
+     */
+    public function handleUploadCustom($file, $path, $width, $height, $quality = 80): string
+    {
+        $isImage = false;
+        if ($file instanceof \Illuminate\Http\UploadedFile) {
+            $mime = $file->getMimeType();
+            $isImage = str_starts_with($mime, 'image/');
+        } else {
+            $isImage = @is_array(getimagesize($file));
+        }
+
+        if (! $isImage) {
+            $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
+            $file->storeAs($path, $filename, 'public');
+
+            return $path.'/'.$filename;
+        }
+
+        $image = $this->manager->read($file);
+
+        // Crop/resize to fit the cover dimensions exactly
+        $image->cover($width, $height);
+
+        // Encode to WebP
+        $encoded = $image->toWebp($quality);
+
+        // Generate filename
+        $filename = Str::uuid().'.webp';
+        $fullPath = $path.'/'.$filename;
+
+        // Save
+        Storage::disk('public')->put($fullPath, (string) $encoded);
+
+        return $fullPath;
+    }
 }

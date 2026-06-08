@@ -14,3 +14,11 @@
 ## Architecture Guidelines
 - **Parent-Child Sync:** Use Livewire events or reactive properties to sync state between `TestSectionManager` and `TestSectionRow`.
 - **Automatic Sectioning:** `TestForm` is the source of truth for the `no_of_sections`. All CRUD operations for sections should be derived from this value.
+
+## Strict Development Rules (Mobile App Lock down)
+- **Bottom Tabs Lock**: The following mobile bottom tab files MUST NOT be modified or updated in any way unless explicitly requested by the user:
+  - `app/(tabs)/scholarship.tsx`
+  - `app/(tabs)/guidance.tsx`
+  - `app/(tabs)/premium.tsx`
+  - `app/(tabs)/selections.tsx`
+  These files are configured to display "Coming Soon" message boxes and must remain untouched.

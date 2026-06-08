@@ -94,6 +94,32 @@
                             </div>
                         </div>
                     @endif
+                    <div class="{{ isset($data['package'])  ? 'col-md-2 mt-3' : 'col-md-3 mt-3' }}">
+                        <div class="form-group">
+                            <label class="control-label" for="Package Banner">Package Banner (600x388)</label>
+                            <input class="form-control form-control-sm" id="banner" name="banner"
+                                type="file">
+                        </div>
+                    </div>
+                    @if (isset($data['package']))
+                        <div class="col-md-1 mt-3">
+                            <div class="form-group">
+                                <img id="banner_img"
+                                    src="{{ isset($data['package']) && $data['package'][0]['banner'] ? '/storage/' . $data['package'][0]['banner'] : asset('noimg.png') }}"
+                                    style="width:80px;height:80px;border:1px solid #c2c2c2;  ">
+                            </div>
+                        </div>
+                    @endif
+                    <div class="col-md-2 mt-3">
+                        <div class="form-group">
+                            <label class="control-label" for="is_mobile">Show in Mobile</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="is_mobile" name="is_mobile" value="1"
+                                    {{ isset($data['package']) && $data['package'][0]['is_mobile'] ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_mobile">Mobile Visibility</label>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-md-3 mt-3">
                         <div class="form-group">
                             <label class="control-label" for="Creation Date">Creation Date</label>

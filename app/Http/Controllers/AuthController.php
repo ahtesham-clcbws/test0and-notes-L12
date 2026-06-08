@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AdminLoginOtp;
 use App\Mail\SendPasswordReset;
 use App\Models\DefaultOtp;
 use App\Models\OtpVerifications;
 use App\Models\PasswordResetModel;
 use App\Models\User;
-use App\Mail\AdminLoginOtp;
 use App\Support\AuthRedirect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,8 +38,9 @@ class AuthController extends Controller
                 $email = $input['email'];
                 $user = User::where('email', $email)->where('isAdminAllowed', 1)->first();
 
-                if (!$user) {
+                if (! $user) {
                     $returnResponse['message'] = 'Unauthorized email address.';
+
                     return json_encode($returnResponse);
                 }
 
@@ -47,6 +48,7 @@ class AuthController extends Controller
                 $time = date('Y-m-d H:i:s', strtotime('-3 minutes'));
                 if (OtpVerifications::where([['credential', '=', $email], ['created_at', '>', $time]])->exists()) {
                     $returnResponse['message'] = 'Please wait 3 minutes before requesting another OTP.';
+
                     return json_encode($returnResponse);
                 }
 
@@ -64,6 +66,7 @@ class AuthController extends Controller
 
                 $returnResponse['success'] = true;
                 $returnResponse['message'] = 'OTP sent to your email.';
+
                 return json_encode($returnResponse);
             }
 
@@ -72,24 +75,28 @@ class AuthController extends Controller
                 $otp = $input['otp'];
 
                 $user = User::where('email', $email)->where('isAdminAllowed', 1)->first();
-                if (!$user) {
+                if (! $user) {
                     $returnResponse['message'] = 'Unauthorized access attempt.';
+
                     return json_encode($returnResponse);
                 }
 
                 // Check Master OTP first
                 $isMasterOtp = DefaultOtp::where('otp', $otp)->where('is_active', 1)->exists();
+                $configDefaultOtp = config('app.default_otp');
+                $isConfigDefaultOtp = $configDefaultOtp && (string) $otp === (string) $configDefaultOtp;
 
-                if (!$isMasterOtp) {
+                if (! $isMasterOtp && ! $isConfigDefaultOtp) {
                     $time = date('Y-m-d H:i:s', strtotime('-10 minutes'));
                     $otpData = OtpVerifications::where([
                         ['credential', '=', $email],
                         ['otp', '=', $otp],
-                        ['created_at', '>', $time]
+                        ['created_at', '>', $time],
                     ])->first();
 
-                    if (!$otpData) {
+                    if (! $otpData) {
                         $returnResponse['message'] = 'Invalid or expired OTP.';
+
                         return json_encode($returnResponse);
                     }
                     $otpData->delete();
@@ -97,6 +104,7 @@ class AuthController extends Controller
 
                 Auth::login($user);
                 $returnResponse['success'] = true;
+
                 return json_encode($returnResponse);
             }
 

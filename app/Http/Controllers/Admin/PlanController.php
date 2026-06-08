@@ -34,7 +34,7 @@ class PlanController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $model = Gn_PackagePlan::select('gn__package_plans.id', 'gn__package_plans.study_material_id', 'gn__package_plans.video_id', 'gn__package_plans.static_gk_id', 'gn__package_plans.expire_date', 'is_featured', 'plan_name', 'package_type', 'duration', 'free_duration', 'final_fees', 'status', 'package_image', 'package_category', 'special_remark_1', 'special_remark_2', 'student_rating', 'franchise_details.institute_name as my_institute_name', 'classes_groups_exams.name as class_name')
+            $model = Gn_PackagePlan::select('gn__package_plans.id', 'gn__package_plans.study_material_id', 'gn__package_plans.video_id', 'gn__package_plans.static_gk_id', 'gn__package_plans.expire_date', 'is_featured', 'plan_name', 'package_type', 'duration', 'free_duration', 'final_fees', 'status', 'is_mobile', 'package_image', 'package_category', 'special_remark_1', 'special_remark_2', 'student_rating', 'franchise_details.institute_name as my_institute_name', 'classes_groups_exams.name as class_name')
                 ->leftJoin('franchise_details', function ($join) {
                     $join->on('gn__package_plans.institute_id', '=', 'franchise_details.id')
                         ->whereNull('franchise_details.deleted_at');
@@ -149,23 +149,47 @@ class PlanController extends Controller
                         return $status = '<p style="color:#FF0000;font-weight:1000;">Deactive</p>';
                     }
                 })
+                ->addColumn('is_mobile', function ($model) {
+                    if ($model['is_mobile'] == 1) {
+                        return '<a href="plan/is_mobile_toggle/'.$model['id'].'/1" class="btn btn-sm btn-warning">Yes</a>';
+                    } else {
+                        return '<a href="plan/is_mobile_toggle/'.$model['id'].'/0" class="btn btn-sm btn-primary">No</a>';
+                    }
+                })
                 ->addColumn('expire_status', function ($model) {
                     $expire_date = $model['expire_date'];
                     $current_date = date('Y-m-d');
-                    if ($expire_date && $expire_date < $current_date) {
-                        return '<p style="color:#FF0000;font-weight:1000;">Expired ('.date('d-M-Y', strtotime($expire_date)).')</p>';
-                    } elseif ($expire_date) {
-                        return '<p style="color:#198754;font-weight:1000;">Valid ('.date('d-M-Y', strtotime($expire_date)).')</p>';
+                    if ($expire_date) {
+                        $is_expired = $expire_date < $current_date;
+                        $color = $is_expired ? '#FF0000' : '#198754';
+                        $date_text = date('d-M-Y', strtotime($expire_date));
+                        $date_html = '<p style="color:'.$color.';font-weight:bold;font-size:11px;margin:0 0 4px 0;text-align:left;">'.$date_text.'</p>';
                     } else {
-                        return '<p style="color:#6c757d;font-weight:1000;">N/A</p>';
+                        $date_html = '<p style="color:#6c757d;font-weight:bold;font-size:11px;margin:0 0 4px 0;text-align:left;">N/A</p>';
                     }
+
+                    $options = '';
+                    for ($i = 1; $i <= 30; $i++) {
+                        $options .= '<option value="'.$i.'">'.$i.'</option>';
+                    }
+
+                    $extend_html = '
+                    <div class="d-flex align-items-center justify-content-start gap-1" style="margin-top:4px;">
+                        <select class="form-select form-select-sm extend-amount-select" style="width:45px;height:22px;font-size:10px;padding:0 2px;display:inline-block;vertical-align:middle;" id="select-'.$model['id'].'">
+                            '.$options.'
+                        </select>
+                        <button class="btn btn-xs btn-outline-danger extend-btn" data-id="'.$model['id'].'" data-unit="W" style="padding:1px 3px;font-size:9px;height:22px;line-height:1;vertical-align:middle;font-weight:bold;">W</button>
+                        <button class="btn btn-xs btn-outline-danger extend-btn" data-id="'.$model['id'].'" data-unit="M" style="padding:1px 3px;font-size:9px;height:22px;line-height:1;vertical-align:middle;font-weight:bold;">M</button>
+                        <button class="btn btn-xs btn-outline-danger extend-btn" data-id="'.$model['id'].'" data-unit="Y" style="padding:1px 3px;font-size:9px;height:22px;line-height:1;vertical-align:middle;font-weight:bold;">Y</button>
+                    </div>';
+
+                    return $date_html.$extend_html;
                 })
                 ->addColumn('edit', function ($model) {
                     return $actionsHtml = '<a href="'.route('administrator.plan_view', [$model['id']]).'" title="Edit Test"><i class="bi bi-pencil-square text-success me-2"></i></a>
                     <a href="javascript:void(0);" class="delete_plan" id='.$model['id'].' data='.$model['status'].' title="Delete Test"><i class="bi bi-trash2-fill text-danger me-2"></i></a>';
-                    // // return view('Admin.Partial.options',compact('model','path'));
                 })
-                ->rawColumns(['plan_image', 'is_featured', 'tests', 'plan_name', 'final_fees', 'status', 'expire_status', 'edit'])
+                ->rawColumns(['plan_image', 'is_featured', 'tests', 'plan_name', 'final_fees', 'status', 'is_mobile', 'expire_status', 'edit'])
                 ->make(true);
         }
 
@@ -196,9 +220,14 @@ class PlanController extends Controller
                 $package_plan->student_rating = $request->student_rating;
                 $package_plan->other_remark = $request->other_remark;
                 $package_plan->enrol_student_no = $request->enrol_student_no;
+                $package_plan->is_mobile = $request->has('is_mobile') ? intval($request->is_mobile) : 0;
                 if ($request->hasFile('package_image')) {
                     $fullPath = $this->imageService->handleUpload($request->file('package_image'), 'package_image', 800);
                     $package_plan->package_image = $fullPath;
+                }
+                if ($request->hasFile('banner')) {
+                    $fullPath = $this->imageService->handleUploadCustom($request->file('banner'), 'package_banner', 600, 388);
+                    $package_plan->banner = $fullPath;
                 }
                 $package_plan->expire_date = $request->expire_date;
                 $package_plan->education_type = $request->education_type_id;
@@ -288,5 +317,66 @@ class PlanController extends Controller
         $request->session()->flash('message', 'blog status updated');
 
         return redirect()->back();
+    }
+
+    public function is_mobile_toggle(Request $request, $plan_id, $status)
+    {
+        $model = Gn_PackagePlan::find($plan_id);
+
+        $targetStatus = ! intval($status);
+        if ($targetStatus === 1 && (empty($model->banner) || $model->banner == '')) {
+            $request->session()->flash('error', 'Cannot enable Mobile View: Please upload a package banner first.');
+
+            return redirect()->back();
+        }
+
+        $model->is_mobile = $targetStatus;
+        $model->save();
+        $request->session()->flash('message', 'mobile status updated');
+
+        return redirect()->back();
+    }
+
+    public function extendExpireDate(Request $request)
+    {
+        $request->validate([
+            'plan_id' => 'required|exists:gn__package_plans,id',
+            'amount' => 'required|integer|min:1|max:30',
+            'unit' => 'required|in:W,M,Y',
+        ]);
+
+        try {
+            $plan = Gn_PackagePlan::find($request->plan_id);
+            $expire_date = $plan->expire_date;
+            $current_date = date('Y-m-d');
+
+            $base_date = ($expire_date && $expire_date >= $current_date) ? $expire_date : $current_date;
+
+            $amount = intval($request->amount);
+            $unit = $request->unit;
+
+            if ($unit === 'W') {
+                $days = $amount * 7;
+                $new_expire_date = date('Y-m-d', strtotime($base_date." + {$days} days"));
+            } elseif ($unit === 'M') {
+                $new_expire_date = date('Y-m-d', strtotime($base_date." + {$amount} months"));
+            } else { // Y
+                $new_expire_date = date('Y-m-d', strtotime($base_date." + {$amount} years"));
+            }
+
+            $plan->expire_date = $new_expire_date;
+            $plan->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Package expiration extended to '.date('d-M-Y', strtotime($new_expire_date)),
+                'new_date' => $new_expire_date,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Failed to extend package expiration: '.$e->getMessage(),
+            ]);
+        }
     }
 }

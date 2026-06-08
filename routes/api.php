@@ -29,12 +29,12 @@ Route::post('uniqueEmailCheck', [ApiController::class, 'uniqueEmailCheck']);
 Route::post('studentSignup', [ApiController::class, 'studentSignup']);
 Route::get('geteducationtype', [ApiController::class, 'geteducationtype']);
 Route::get('getclassbyeducation', [ApiController::class, 'getclassbyeducation']);
-Route::get('getPremiumData', [APIController::class, 'getPremiumData']);
-Route::any('/gethomepagedata', [APIController::class, 'getHomepageData']);
 Route::post('forgotPassword', [ApiController::class, 'forgotPassword']);
 Route::post('verifyOTP', [ApiController::class, 'verifyOTP']);
 Route::post('resetPassword', [ApiController::class, 'resetPassword']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('getPremiumData', [APIController::class, 'getPremiumData']);
+    Route::any('/gethomepagedata', [APIController::class, 'getHomepageData']);
     Route::get('getstudymaterial', [ApiController::class, 'studymaterial']);
     Route::get('userdetails', [ApiController::class, 'userDetails']);
     Route::post('updateProfile', [ApiController::class, 'updateProfile']);
@@ -53,6 +53,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('getTestDetails', [ApiController::class, 'getTestDetails']);
     Route::get('getStudyMaterialDetails', [ApiController::class, 'getStudyMaterialDetails']);
     Route::get('getMyPackages', [ApiController::class, 'getMyPackages']);
+    Route::get('getPackageDetails', [APIController::class, 'getPackageDetails']);
     Route::get('getAttemptedTests', [ApiController::class, 'getAttemptedTests']);
     Route::get('logout', [ApiController::class, 'logout']);
 });

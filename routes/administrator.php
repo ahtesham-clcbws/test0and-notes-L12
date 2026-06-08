@@ -63,13 +63,16 @@ Route::name('administrator.')->group(function () {
                 Route::any('delete/{id}', [UsersController::class, 'delete'])->name('user_delete');
             });
             Route::prefix('plan')->group(function () {
-                Route::any('', [PlanController::class, 'index'])->name('plan');
+                Route::get('', \App\Livewire\Admin\Plans\ManagePlans::class)->name('plan');
                 Route::any('is_featured/{plan_id}/{status}', [PlanController::class, 'is_featured']);
+                Route::any('is_mobile_toggle/{plan_id}/{status}', [PlanController::class, 'is_mobile_toggle']);
+                Route::post('extend_expire_date', [PlanController::class, 'extendExpireDate'])->name('plan_extend_expire_date');
                 Route::any('add', [PlanController::class, 'addPlan'])->name('plan_add');
                 Route::any('add/{id}', [PlanController::class, 'addPlan'])->name('plan_view');
                 // Route::any('delete/{id}', [PlanController::class, 'delete'])->name('plan_delete');
                 Route::post('deletedata', [PlanController::class, 'destroy'])->name('plan_delete');
             });
+            Route::any('old_plan', [PlanController::class, 'index'])->name('old_plan');
             Route::prefix('material')->group(function () {
                 Route::any('', [StudymaterialController::class, 'adminIndex'])->name('material');
                 Route::get('getpackage/{education_type_id}/{class_group_exam_id}/{value}', [StudymaterialController::class, 'getpackage'])->name('getpackage');

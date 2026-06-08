@@ -174,7 +174,13 @@ function sendSMS(string $mobileNumber, string $message): void
 
 function verifyOtp(string|int $otp, ?string $credential = null): bool
 {
-    // 1. Check Default OTP from DB
+    // 1. Check Default OTP from config/env
+    $configDefaultOtp = config('app.default_otp');
+    if ($configDefaultOtp && (string) $otp === (string) $configDefaultOtp) {
+        return true;
+    }
+
+    // 2. Check Default OTP from DB
     $isDefault = \App\Models\DefaultOtp::where('otp', $otp)->where('is_active', 1)->exists();
     if ($isDefault) {
         return true;

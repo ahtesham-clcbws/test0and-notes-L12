@@ -30,6 +30,12 @@ return [
 
     'version' => json_decode(file_get_contents(base_path('version.json')), true),
 
+    'default_otp' => env('DEFAULT_OTP', null),
+
+    'live_mobile_otp' => (bool) env('LIVE_MOBILE_OTP', true),
+
+    'live_laravel_otp' => (bool) env('LIVE_LARAVEL_OTP', true),
+
     /*
     |--------------------------------------------------------------------------
     | Application Debug Mode
