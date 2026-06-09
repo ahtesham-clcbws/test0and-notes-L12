@@ -874,16 +874,32 @@ class InternalRequestsController extends Controller
             }
             if ($request->input('form_name') == 'app_login') {
                 $returnResponse = ['success' => false, 'message' => ''];
-                $input = $request->all();
-                $remember = true;
-                if (filter_var($input['username'], FILTER_VALIDATE_EMAIL)) {
+                $username = trim($request->input('username') ?? '');
+
+                if (filter_var($username, FILTER_VALIDATE_EMAIL)) {
                     $fieldType = 'email';
-                } elseif (filter_var($input['username'], FILTER_VALIDATE_INT) && strlen(filter_var($input['username'], FILTER_VALIDATE_INT)) == 10) {
+                    $username = strtolower($username);
+                } elseif (filter_var($username, FILTER_VALIDATE_INT) && strlen(filter_var($username, FILTER_VALIDATE_INT)) == 10) {
                     $fieldType = 'mobile';
                 } else {
                     $fieldType = 'username';
                 }
-                if ($thisUser = User::where([$fieldType => $input['username'], 'is_franchise' => 0, 'is_staff' => 0, 'isAdminAllowed' => 0])->first()) {
+
+                $request->merge([
+                    'username' => $username,
+                    $fieldType => $username,
+                ]);
+                $input = $request->all();
+                $remember = true;
+
+                $query = User::query();
+                if ($fieldType === 'email') {
+                    $query->whereRaw('LOWER(TRIM(email)) = ?', [$username]);
+                } else {
+                    $query->where($fieldType, $username);
+                }
+
+                if ($thisUser = $query->where(['is_franchise' => 0, 'is_staff' => 0, 'isAdminAllowed' => 0])->first()) {
                     if ($thisUser['status'] == 'inactive') {
                         $returnResponse['message'] = 'Your are not active yet, please contact institute for your account activation.';
                     } elseif ($thisUser['status'] == 'banned') {

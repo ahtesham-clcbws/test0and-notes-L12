@@ -98,7 +98,7 @@ class ManagePlans extends Component
         $plan = Gn_PackagePlan::findOrFail($this->selectedPlanIdForBanner);
 
         $imageService = app(\App\Services\ImageService::class);
-        $fullPath = $imageService->handleUploadCustom($this->bannerFile, 'package_banner', 600, 388);
+        $fullPath = $imageService->handleUploadCustom($this->bannerFile, 'package_banner', 600, 300);
 
         $plan->banner = $fullPath;
         $plan->is_mobile = 1;

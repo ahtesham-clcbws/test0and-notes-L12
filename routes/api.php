@@ -38,6 +38,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('getstudymaterial', [ApiController::class, 'studymaterial']);
     Route::get('userdetails', [ApiController::class, 'userDetails']);
     Route::post('updateProfile', [ApiController::class, 'updateProfile']);
+    Route::post('profile/send-mobile-otp', [APIController::class, 'sendProfileMobileOtp']);
+    Route::post('profile/verify-mobile-otp', [APIController::class, 'verifyProfileMobileOtp']);
+    Route::post('profile/send-email-otp', [APIController::class, 'sendProfileEmailOtp']);
+    Route::post('profile/verify-email-otp', [APIController::class, 'verifyProfileEmailOtp']);
     Route::get('institutetest', [ApiController::class, 'instituteTest']);
     Route::get('testAndNotesTest', [ApiController::class, 'testAndNotesTest']);
     Route::post('startTestAndNotesTest', [ApiController::class, 'startTestAndNotesTest']);

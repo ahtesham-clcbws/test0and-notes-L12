@@ -52,11 +52,12 @@ class APIController extends Controller
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        $identifier = trim($data['mobile']);
+        $identifier = trim($data['mobile'] ?? '');
 
         if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+            $identifier = strtolower($identifier);
             $user = User::query()
-                ->where('email', $identifier)
+                ->whereRaw('LOWER(TRIM(email)) = ?', [$identifier])
                 ->where('status', 'active')
                 ->where('roles', 'student')
                 ->first();
@@ -366,9 +367,13 @@ class APIController extends Controller
                         ->where('question_id', $value['question_id'])
                         ->delete();
                 } else {
+                    $ans = $value['answer'];
+                    if (is_numeric($ans)) {
+                        $ans = 'ans_'.$ans;
+                    }
                     TestAttemptAnswer::updateOrCreate(
                         ['test_attempt_id' => $attempt->id, 'question_id' => $value['question_id']],
-                        ['answer' => $value['answer']]
+                        ['answer' => $ans]
                     );
                 }
             }
@@ -732,7 +737,7 @@ class APIController extends Controller
             return response()->json([
                 'status' => 1,
                 'message' => 'Profile updated successfully',
-                'user' => $user->load('userDetails'),
+                'user' => $user->load('user_details'),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -751,6 +756,182 @@ class APIController extends Controller
         }
 
         return response()->json(['status' => 0, 'message' => 'Invalid or expired OTP']);
+    }
+
+    public function sendProfileMobileOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'mobile' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 0, 'message' => $validator->errors()->first()]);
+        }
+
+        $mobileNumber = $request->input('mobile');
+        $userId = Auth::id();
+
+        if (! \App\Helpers\ProfileValidationHelper::isMobileUnique($mobileNumber, $userId)) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'Mobile number already used. Please try with another number.',
+            ]);
+        }
+
+        $time = date('Y-m-d H:i:s', strtotime('-10 minutes'));
+        $otpData = OtpVerifications::where([['type', '=', 'mobile'], ['credential', '=', $mobileNumber], ['created_at', '>', $time]])->first();
+
+        if ($otpData) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'You already requested an OTP in the last 10 minutes. Please wait.',
+            ]);
+        }
+
+        $otp = mt_rand(100000, 999999);
+        $otpVerifications = new OtpVerifications;
+        $otpVerifications->type = 'mobile';
+        $otpVerifications->credential = $mobileNumber;
+        $otpVerifications->otp = $otp;
+        $otpVerifications->status = 'pending';
+        $otpVerifications->save();
+
+        try {
+            app(\App\Services\Msg91Service::class)->sendSms($mobileNumber, $otp);
+        } catch (\Exception $e) {
+            Log::error('Error sending Profile Update mobile OTP SMS: '.$e->getMessage());
+        }
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'OTP sent successfully to '.$mobileNumber,
+            'otp' => $otp, // for dev/testing
+        ]);
+    }
+
+    public function verifyProfileMobileOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'mobile' => 'required|string',
+            'otp' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 0, 'message' => $validator->errors()->first()]);
+        }
+
+        $mobile = $request->input('mobile');
+        $otp = $request->input('otp');
+
+        if (verifyOtp($otp, $mobile)) {
+            $user = User::find(Auth::id());
+            $user->mobile = $mobile;
+            $user->save();
+
+            return response()->json([
+                'status' => 1,
+                'message' => 'Mobile number updated successfully',
+                'user' => $user->load('user_details'),
+            ]);
+        }
+
+        return response()->json([
+            'status' => 0,
+            'message' => 'Invalid or expired OTP',
+        ]);
+    }
+
+    public function sendProfileEmailOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 0, 'message' => $validator->errors()->first()]);
+        }
+
+        $email = $request->input('email');
+        $userId = Auth::id();
+
+        if (! \App\Helpers\ProfileValidationHelper::isEmailUnique($email, $userId)) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'Email address already used. Please try with another email.',
+            ]);
+        }
+
+        $time = date('Y-m-d H:i:s', strtotime('-10 minutes'));
+        $otpData = OtpVerifications::where([['type', '=', 'email'], ['credential', '=', $email], ['created_at', '>', $time]])->first();
+
+        if ($otpData) {
+            return response()->json([
+                'status' => 0,
+                'message' => 'You already requested an OTP in the last 10 minutes. Please wait.',
+            ]);
+        }
+
+        $otp = mt_rand(100000, 999999);
+        $otpVerifications = new OtpVerifications;
+        $otpVerifications->type = 'email';
+        $otpVerifications->credential = $email;
+        $otpVerifications->otp = $otp;
+        $otpVerifications->status = 'pending';
+        $otpVerifications->save();
+
+        try {
+            Mail::raw('Your OTP for updating email on Test and Notes is: '.$otp, function ($message) use ($email) {
+                $message->to($email)->subject('Email Verification OTP');
+            });
+        } catch (\Exception $e) {
+            Log::error('Error sending Profile Update email OTP: '.$e->getMessage());
+
+            return response()->json([
+                'status' => 0,
+                'message' => 'Failed to send OTP to email. Please try again.',
+            ]);
+        }
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'OTP sent successfully to '.$email,
+            'otp' => $otp, // for dev/testing
+        ]);
+    }
+
+    public function verifyProfileEmailOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'otp' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 0, 'message' => $validator->errors()->first()]);
+        }
+
+        $email = $request->input('email');
+        $otp = $request->input('otp');
+
+        $time = date('Y-m-d H:i:s', strtotime('-11 minutes'));
+        $otpData = OtpVerifications::where([['type', '=', 'email'], ['credential', '=', $email], ['otp', '=', $otp], ['created_at', '>', $time]])->first();
+
+        if ($otpData) {
+            $user = User::find(Auth::id());
+            $user->email = $email;
+            $user->save();
+
+            return response()->json([
+                'status' => 1,
+                'message' => 'Email updated successfully',
+                'user' => $user->load('user_details'),
+            ]);
+        }
+
+        return response()->json([
+            'status' => 0,
+            'message' => 'Invalid or expired OTP',
+        ]);
     }
 
     public function verifyBranchCode(Request $request)
@@ -1207,7 +1388,7 @@ class APIController extends Controller
         }
 
         try {
-            $test = TestModal::with(['testSections', 'EducationClass'])->find($request->test_id);
+            $test = TestModal::with(['testSections.sectionSubject', 'EducationClass'])->find($request->test_id);
 
             // Get questions grouped by section or just flat
             $questions = $test->getQuestions()->get();
@@ -1234,9 +1415,10 @@ class APIController extends Controller
                 return ($section->number_of_questions ?? 0) * ($section->duration ?: 1);
             });
 
-            // Ensure sections show duration
-            $test->testSections->transform(function ($section) {
+            // Ensure sections show duration and subject names
+            $sections = $test->testSections->map(function ($section) {
                 $section->duration = $section->duration ?: 1;
+                $section->name = $section->sectionSubject ? $section->sectionSubject->name : 'Section '.$section->section_index;
 
                 return $section;
             });
@@ -1250,7 +1432,7 @@ class APIController extends Controller
                 $attempt->checkAndHandleExpiry();
             }
 
-            if (! $attempt) {
+            if (! $attempt && $request->input('start') == 1) {
                 $attempt = TestAttempt::create([
                     'student_id' => Auth::id(),
                     'test_id' => $request->test_id,
@@ -1272,7 +1454,11 @@ class APIController extends Controller
                 $existingResponses = TestAttemptAnswer::where('test_attempt_id', $attempt->id)->get();
                 foreach ($existingResponses as $response) {
                     if ($response->answer !== null && $response->answer !== '') {
-                        $answers[$response->question_id] = (int) $response->answer;
+                        $ans = $response->answer;
+                        if (str_starts_with($ans, 'ans_')) {
+                            $ans = substr($ans, 4);
+                        }
+                        $answers[$response->question_id] = (int) $ans;
                     }
                     if ($response->is_visited) {
                         $visited_questions[] = $response->question_id;
@@ -1297,17 +1483,21 @@ class APIController extends Controller
                 $totalDuration = 60; // 60 minutes default
             }
 
-            $expiryTime = $attempt->created_at->timestamp + ($totalDuration * 60);
-            $timeLeftInSeconds = max(0, $expiryTime - now()->timestamp);
+            if ($attempt) {
+                $expiryTime = $attempt->created_at->timestamp + ($totalDuration * 60);
+                $timeLeftInSeconds = max(0, $expiryTime - now()->timestamp);
+            } else {
+                $timeLeftInSeconds = $totalDuration * 60;
+            }
 
             return response()->json([
                 'status' => 1,
                 'data' => [
                     'test' => $test,
-                    'sections' => $test->testSections,
+                    'sections' => $sections,
                     'questions' => $formatted_questions,
-                    'test_attempt_id' => $attempt->id,
-                    'status' => $attempt->status,
+                    'test_attempt_id' => $attempt ? $attempt->id : null,
+                    'status' => $attempt ? $attempt->status : 'not_started',
                     'answers' => $answers,
                     'visited_questions' => $visited_questions,
                     'marked_questions' => $marked_questions,
@@ -1353,7 +1543,11 @@ class APIController extends Controller
                     ->where('question_id', $request->question_id)
                     ->delete();
             } else {
-                $updateData = ['answer' => $request->answer];
+                $ans = $request->answer;
+                if (is_numeric($ans)) {
+                    $ans = 'ans_'.$ans;
+                }
+                $updateData = ['answer' => $ans];
                 if ($request->has('is_visited')) {
                     $updateData['is_visited'] = (int) $request->is_visited;
                 }
@@ -1399,13 +1593,29 @@ class APIController extends Controller
             $student_id = Auth::id();
             $test_id = $request->test_id;
 
-            $test = TestModal::with(['testSections'])->find($test_id);
+            $test = TestModal::with(['testSections.sectionSubject'])->find($test_id);
             if (! $test) {
                 return response()->json(['status' => 0, 'message' => 'Test not found']);
             }
 
-            $responses = TestAttemptAnswer::where('student_id', $student_id)
-                ->where('test_id', $test_id)
+            $attempt = null;
+            if ($request->has('test_attempt_id')) {
+                $attempt = TestAttempt::where('student_id', $student_id)
+                    ->where('id', $request->test_attempt_id)
+                    ->first();
+            }
+            if (! $attempt) {
+                $attempt = TestAttempt::where('student_id', $student_id)
+                    ->where('test_id', $test_id)
+                    ->orderBy('id', 'desc')
+                    ->first();
+            }
+
+            if (! $attempt) {
+                return response()->json(['status' => 0, 'message' => 'No test attempt found for this student']);
+            }
+
+            $responses = TestAttemptAnswer::where('test_attempt_id', $attempt->id)
                 ->get()
                 ->keyBy('question_id');
 
@@ -1420,7 +1630,7 @@ class APIController extends Controller
             foreach ($test->testSections as $section) {
                 $sections_stats[$section->id] = [
                     'id' => $section->id,
-                    'name' => $section->name,
+                    'name' => $section->sectionSubject ? $section->sectionSubject->name : 'Section '.$section->section_index,
                     'correct' => 0,
                     'incorrect' => 0,
                     'unattempted' => 0,
@@ -1455,11 +1665,11 @@ class APIController extends Controller
                     'id' => $q->id,
                     'question' => $q->question,
                     'options' => [
-                        $q->option_1,
-                        $q->option_2,
-                        $q->option_3,
-                        $q->option_4,
-                        $q->option_5,
+                        $q->ans_1,
+                        $q->ans_2,
+                        $q->ans_3,
+                        $q->ans_4,
+                        $q->ans_5,
                     ],
                     'correct_answer' => $q->mcq_answer,
                     'user_answer' => $user_answer,
@@ -1470,22 +1680,39 @@ class APIController extends Controller
 
             $marks_per_q = $test->gn_marks_per_questions ?? 1;
             $neg_rate = $test->negative_marks ?? 0;
+            $neg_marks_per_q = $neg_rate * $marks_per_q;
 
-            $total_score = ($correct * $marks_per_q) - ($incorrect * ($neg_rate * $marks_per_q));
-            $max_score = $allQuestions->count() * $marks_per_q;
+            $total_marks = $correct * $marks_per_q;
+            $negative_marks = $incorrect * $neg_marks_per_q;
+            $final_marks = $total_marks - $negative_marks;
+            $out_of_marks = $allQuestions->count() * $marks_per_q;
+
+            $attempted = $correct + $incorrect;
+            $accuracy = $attempted > 0 ? ($correct / $attempted) * 100 : 0;
 
             return response()->json([
                 'status' => 1,
                 'data' => [
                     'test_name' => $test->title,
-                    'total_score' => round($total_score, 2),
-                    'max_score' => $max_score,
-                    'accuracy' => $allQuestions->count() > 0 ? round(($correct / $allQuestions->count()) * 100, 2) : 0,
+                    'duration' => $test->time_to_complete,
+                    'completed_at' => $attempt->submitted_at ? $attempt->submitted_at->format('d M Y, h:i A') : ($attempt->updated_at ? $attempt->updated_at->format('d M Y, h:i A') : ''),
+                    'total_question' => $allQuestions->count(),
+                    'total_marks' => round($total_marks, 2),
+                    'correct_answer' => $correct,
+                    'incorrect_answer' => $incorrect,
+                    'not_attempted' => $unattempted,
+                    'negative_marks' => round($negative_marks, 2),
+                    'final_marks' => round($final_marks, 2),
+                    'out_of_marks' => $out_of_marks,
+                    'accuracy' => round($accuracy, 2),
+                    'sections' => array_values($sections_stats),
+                    'questions' => $formatted_questions,
+                    // Legacy support
+                    'total_score' => round($final_marks, 2),
+                    'max_score' => $out_of_marks,
                     'correct' => $correct,
                     'incorrect' => $incorrect,
                     'unattempted' => $unattempted,
-                    'sections' => array_values($sections_stats),
-                    'questions' => $formatted_questions,
                 ],
             ]);
         } catch (\Exception $e) {

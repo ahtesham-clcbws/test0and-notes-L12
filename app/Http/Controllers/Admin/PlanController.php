@@ -226,7 +226,7 @@ class PlanController extends Controller
                     $package_plan->package_image = $fullPath;
                 }
                 if ($request->hasFile('banner')) {
-                    $fullPath = $this->imageService->handleUploadCustom($request->file('banner'), 'package_banner', 600, 388);
+                    $fullPath = $this->imageService->handleUploadCustom($request->file('banner'), 'package_banner', 600, 300);
                     $package_plan->banner = $fullPath;
                 }
                 $package_plan->expire_date = $request->expire_date;

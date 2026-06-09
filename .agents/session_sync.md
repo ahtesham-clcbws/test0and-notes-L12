@@ -54,6 +54,83 @@
 
 # Session Sync - Momin Scholar Program
 
+## Session Handoff - 2026-06-09 (V3.2.7: Test Result Blank Screen & Key Alignment)
+- **Objective:** Fix the blank test result screen crash, align results keys with student web dashboard results, and resolve missing list badges.
+- **Key Achievements:**
+  - **SQL Query Column Crash Resolution:** Fixed a major backend crash in the `/getTestResult` endpoint where the controller tried to query non-existent fields (`student_id` and `test_id`) in `test_attempt_answers`. The code now correctly queries by `test_attempt_id` of the active/latest test attempt.
+  - **Aligned Response Keys & Calculations:** Updated `/getTestResult` JSON response to include all calculated keys matches from the web dashboard: `total_question`, `total_marks` (Obtained Marks), `correct_answer`, `incorrect_answer`, `not_attempted`, `negative_marks`, `final_marks` (Final Score), `out_of_marks` (Total Marks), and `accuracy`.
+  - **Mobile UI Stats Card Synchronization:** Refactored `test-result.tsx` to read the exact keys returned from the API, resolving hardcoded mock statistics and displaying the exact 1:1 dashboard results (with safe fallback hooks).
+  - **Package View Completed Status Badge:** Updated `package-view.tsx` to check for `attempt_status === 'completed'` in addition to `'submitted'` to ensure the "Result" badge displays instead of the "Start" badge for finished tests.
+  - **Result Page Layout Hardening:** Removed the congratulations banner card, removed the Section Analysis details card, and removed the "VIEW ALL SOLUTIONS" button.
+  - **Flat Details Header:** Added a flat, cardless header displaying the test name, completed timestamp, and total duration at the top of the result page.
+  - **Stats Cards Compaction:** Redesigned the 5 premium stats cards to place the metric titles on the left (wrapping naturally if screen space demands) and the values on the right horizontally. Reduced overall container padding (from `20` to `12` px), card internal padding (from `12` to `6` px), and vertical gaps to make the results layout extremely compact.
+  - **Rounded Squares & Compact Grid:** Modified the question grid bubbles to render as compact rounded squares (`borderRadius: 6`) scaled down (`30` x `30` pixels) with narrow gaps (`6` pixels) to easily fit 8 to 10 questions in a row, removing the white card background underneath the grid.
+  - **Answer Option Key Normalization:** Added dual-way format normalization in `APIController.php` `/saveanswer` and `/endtest` to transparently convert client indices (`"2"`) to database-compliant string keys (`"ans_2"`), and added normalized client-side checks with loose comparison operators (`==`) and verbose console matching trace logs to support both `"ans_X"` and raw numeric keys (matching all previous and new test attempts cleanly inside the solution modal).
+  - **Pruned Terminal Verbose Dumps:** Removed the verbose `JSON.stringify` logging of full API test details and results payloads from `test-result.tsx` and `test-instructions.tsx` to prevent terminal console pollution.
+  - **Syntax & Style Compliance:** Ran PHP syntax checker and formatted all changes via `vendor/bin/pint --dirty`.
+
+## Session Handoff - 2026-06-09 (V3.2.6: Non-Navigating Review Mark Toggle & Compact Grid layout)
+- **Objective:** Prevent "Mark for Review" from auto-advancing to the next question, make the question palette bubbles on the review screen more compact, add clear visual indicators for marked questions, and display section contexts.
+- **Key Achievements:**
+  - **Review Toggle Behavior:** Changed `handleMarkAndNext` to `handleToggleMarkForReview` inside `test-conduct.tsx`, removing the auto-navigation `handleNext()` call so the student stays on the active question.
+  - **Visual Marked Indicators:** Added a yellow `MARKED` flag next to the question number in the sticky subheader. Designed the "MARK FOR REVIEW" button to dynamically change its background to solid yellow (`#F1C40F`) and update its text to "MARKED FOR REVIEW" when active.
+  - **Section Subject Eager Loading:** Updated the `getTestDetails` API inside `APIController.php` to eager load the `sectionSubject` relationship and dynamically map the subject name to each section's `name` key, preventing fallback to the generic `"Section"` string.
+  - **Section Header Prefix & Title:** Replaced the generic `"Section"` header text with the actual active section name. If the test contains multiple sections, it automatically prepends the section number (e.g., `Section 1: Logic & Reasoning`).
+  - **Relative Question Counting:** Refactored the question counter in the subheader to display question numbers and total question counts relative to the active section (e.g., `Question 1 of 25` in that section, instead of `Question 1 of 100` globally).
+  - **Section Badging:** Added a dynamic, styled teal section-name badge directly above the question text within the question body ScrollView, making it clear which section is active (e.g. "LOGIC & REASONING").
+  - **Compact Review Layout:** Shrunk padding, margin, circle indicators, and button spacing on `test-review.tsx`. Shrunk question palette grid bubbles from 44px to 36px (12px text size) to maximize viewport efficiency.
+
+## Session Handoff - 2026-06-09 (V3.2.5: Logging Instrumentation in Mobile Test Module)
+- **Objective:** Enable granular interaction and state tracking within the mobile test module to isolate blank screen render issues.
+- **Key Achievements:**
+  - **Comprehensive Tracing Logs:** Added console logs to `test-instructions.tsx` and `test-conduct.tsx` tracing renders, API outputs, route redirects, checkbox toggles, and modal states.
+  - **Interaction Logs:** Instrumented user action callbacks (such as option selectors, response clearing, mark for review, navigations, and modal controls) to output state logs.
+
+## Session Handoff - 2026-06-09 (V3.2.4: Test Conduct Crash Hardening)
+- **Objective:** Eliminate potential render-phase crashes causing blank screens in the test conductor page.
+- **Key Achievements:**
+  - **Hardened Array Checks:** Replaced direct array operations with safe fallbacks (`details.questions || []`, `details.sections || []`, `options || []`) to avoid TypeError crashes in case of un-instantiated arrays.
+  - **Effect Mount Guarding:** Enforced check on `details.questions` inside `useEffect` hook to block execution before questions array is populated.
+  - **Draft State Robust Parsing:** Added string vs object checks when parsing `draft_state` JSON key from the backend to ensure parsing compatibility for legacy/string database entries.
+
+## Session Handoff - 2026-06-09 (V3.2.3: Secure Email/Mobile Change via OTP)
+- **Objective:** Replicate the secure email/mobile update flow from the Laravel student dashboard on mobile.
+- **Key Achievements:**
+  - **Verification API Endpoints:** Developed 4 backend API endpoints (`/profile/send-mobile-otp`, `/profile/verify-mobile-otp`, `/profile/send-email-otp`, `/profile/verify-email-otp`) in `APIController.php` mirroring the Livewire dashboard validations.
+  - **Inline Verify Buttons:** Implemented smart edit detection inside mobile `profile.tsx` that renders inline "Verify" buttons whenever the typed email or mobile differs from the authenticated user model.
+  - **Verification Modal:** Built a clean 6-digit OTP confirmation modal on the client that collects inputs, submits validation requests, updates the Zustand store upon success, and displays success/error alerts.
+
+## Session Handoff - 2026-06-09 (V3.2.2: Pull-To-Refresh Support)
+- **Objective:** Add pull-to-refresh capabilities to the Homepage and Profile screens.
+- **Key Achievements:**
+  - **Homepage Refresh:** Configured `RefreshControl` inside Homepage's `ScrollView` mapped to `fetchHomepageData()` to reload banner slides and active packages dynamically.
+  - **Profile Page Refresh:** Configured `RefreshControl` inside Profile's `ScrollView` to invoke `/userdetails` API, pulling fresh account details directly from the database and updates the Zustand auth store.
+
+## Session Handoff - 2026-06-09 (V3.2.1: Student Profile Update & Mobile Number Fix)
+- **Objective:** Fix profile update relation error and display the mobile number correctly on mobile.
+- **Key Achievements:**
+  - **Mobile Number Casting Fix:** Handled number-to-string cast inside mobile `profile.tsx` to ensure `TextInput` renders the numeric `mobile` value cleanly rather than displaying an empty placeholder.
+  - **Profile State Synchronization:** Appended `useEffect` state syncing to keep fields up to date and fed the fresh user payload directly from `/updateProfile` response into the client store.
+  - **Fixed Relationship Name:** Corrected undefined relationship loading error on `/updateProfile` API inside `APIController.php` (changed `userDetails` to `user_details`).
+
+## Session Handoff - 2026-06-09 (V3.2.0: Mobile Test Flow Parity Alignment)
+- **Objective:** Align the React Native mobile test flow 1:1 with the Laravel Livewire student panel.
+- **Key Achievements:**
+  - **Instructions Redirection & Resume Action:** Fixed startButton disabled check in `test-instructions.tsx` to ensure instant activation for resume and review results flows.
+  - **Enforcing Locks & Skip Flow:** Added visitedQuestions state, unvisited question locking, Skip & Next warning confirmation, and redirected test finalization to the intermediate review screen.
+  - **Dedicated Test Review Screen:** Created `test-review.tsx` featuring completion circular progress, 4 stats cards, color-coded grid dots, atomic `/saveanswer` re-attempt edits, and finalized `/endtest` submission.
+  - **Premium Results Scorecard:** Refactored scorecard screen with 5 stats cards, correctness-colored scorecard bubbles, proper answer matching/highlighting, and HTML-stripped explanation displays.
+  - **Option Letters & API bug fix:** Prepended option indicators (A, B, C, D) to option texts dynamically in `test-conduct`, `test-review`, and `test-result`. Corrected a key bug in backend `getTestResult` endpoint where it queried non-existent `option_1` instead of `ans_1` columns.
+  - **Safe Area Navigation Guard:** Integrated layout safety guards utilizing `Math.max(insets.bottom, 16)` fallback values across all test screens (`test-instructions`, `test-conduct`, `test-review`, `test-result`) to guarantee that bottom buttons and scroll contents never overlap with system navigation bars or home indicators on translucent Android/iOS screens.
+
+## Session Handoff - 2026-06-09 (V3.1.3: Case-Insensitive Email Login Matching & Trimming)
+- **Objective:** Support case-insensitive and trimmed email comparison for mobile email logins.
+- **Key Achievements:**
+  - **Case-Insensitive Normalization:** Trimmed and lowercased input email values in both `studentLogin` (`APIController`) and `app_login` (`InternalRequestsController`).
+  - **Database Query Alignment:** Implemented robust database matching utilizing `LOWER(TRIM(email)) = ?` for case-insensitivity.
+  - **Pint Formatting:** Ran Pint on the updated controllers to ensure perfect code formatting.
+  - **Successful Verification:** Ran tests against a local server instance checking exact email, case-insensitive email, and mobile logins with a 100% success rate.
+
 ## Session Handoff - 2026-05-26 (V3.1.2: Project-Wide Null-Safety Hardening Audit)
 - **Objective:** Secure the entire portal from null pointer exceptions (`Attempt to read property "branch_code" on null`) when logged in as direct platform contributors or superadmins who do not belong to an institute (`in_franchise = 0`).
 - **Key Achievements:**
