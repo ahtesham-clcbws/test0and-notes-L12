@@ -1,16 +1,8 @@
-- [x] Phase 1: Baseline Commit
-- [/] Phase 2: Package Migration (1:1 Logic)
-    - [ ] Update `Purchased.php` to strictly match `StudentPlanController@myPlan` filters.
-    - [ ] Update `Index.php` to hide active packages from discovery.
-    - [ ] Create `App\Livewire\Student\Packages\Details` (clone of `ExamsController@package_manage`).
-    - [ ] Update `student.php` routes for `package_manage`.
-- [ ] Phase 3: Remaining Page Migrations
-    - [ ] Create `App\Livewire\Student\Exams\Instructions` (clone of `ExamsController@getTest`).
-    - [ ] Create `App\Livewire\Student\Feedback\Index` (clone of `ReviewController`).
-    - [ ] Update `student.php` routes for `test-name` and `feedback`.
-- [ ] Phase 4: Test Conduct 1:1 Refinement
-    - [ ] Refactor `OnlineTestRunner` timer to Alpine.js.
-    - [ ] Implement Summary Modal in `OnlineTestRunner`.
-    - [ ] Ensure Palette is section-specific.
-    - [ ] Verify 1:1 parity with `start-test.blade.php`.
-- [ ] Phase 5: Final Verification & Session Sync
+# Task List: Free Package View & Enrollment
+
+- `[x]` Update backend `getPackageDetails` API to return `is_enrolled` status
+- `[x]` Modify mobile `packages.tsx` to route premium/un-enrolled packages to `package-view.tsx`
+- `[x]` Build details header and admin-selected counts display in `package-view.tsx`
+- `[x]` Implement free package enrollment button and handler in `package-view.tsx`
+- `[x]` Integrate `is_enrolled` check to toggle between info view and actual content lists
+- `[x]` Verify implementation works for free packages

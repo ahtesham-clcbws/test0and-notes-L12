@@ -314,7 +314,7 @@ class APIController extends Controller
     public function getStudyMaterialDetails(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'id' => 'required|exists:studymaterial,id',
+            'id' => 'required|exists:study_material,id',
         ]);
 
         if ($validator->fails()) {
@@ -322,7 +322,7 @@ class APIController extends Controller
         }
 
         try {
-            $material = DB::table('studymaterial')
+            $material = Studymaterial::query()
                 ->where('id', $request->id)
                 ->first();
 
@@ -1806,10 +1806,20 @@ class APIController extends Controller
                 }
             }
 
+            $is_enrolled = false;
+            if (Auth::check()) {
+                $is_enrolled = Gn_PackageTransaction::where('student_id', Auth::id())
+                    ->where('plan_id', $plan->id)
+                    ->where('plan_status', 1)
+                    ->where('plan_end_date', '>=', strtotime(date('Y-m-d')))
+                    ->exists();
+            }
+
             return response()->json([
                 'status' => 1,
                 'data' => [
                     'plan' => $plan,
+                    'is_enrolled' => $is_enrolled,
                     'tests' => $tests,
                     'videos' => $videos,
                     'notes' => $notes,

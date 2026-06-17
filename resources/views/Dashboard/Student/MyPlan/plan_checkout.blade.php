@@ -1,4 +1,4 @@
-@extends('Layouts.student')
+@extends(session('from_mobile') ? 'Layouts.mobile_payment' : 'Layouts.student')
 
 @section('css')
 @endsection
@@ -144,21 +144,37 @@
                         razorpay_order_id: response.razorpay_order_id,
                         razorpay_signature: response.razorpay_signature,
                     },
-                    success: function(response) {
+                     success: function(response) {
                         if (response.data == 'false') {
-                            var data_false = "/student/plan";
-                            window.location.replace(data_false);
+                            @if(session('from_mobile'))
+                                window.location.replace("testandnotesmobileapp://payment-failed");
+                            @else
+                                var data_false = "/student/plan";
+                                window.location.replace(data_false);
+                            @endif
                         } else if (response.data == 'success') {
-                            var plan_id = response.plan_id;
-                            var success = "{{ route('student.package_manage', ['id' => ':id']) }}";
-                            success = success.replace(':id', plan_id);
-                            window.location.replace(success);
+                            @if(session('from_mobile'))
+                                window.location.replace("testandnotesmobileapp://payment-success");
+                            @else
+                                var plan_id = response.plan_id;
+                                var success = "{{ route('student.package_manage', ['id' => ':id']) }}";
+                                success = success.replace(':id', plan_id);
+                                window.location.replace(success);
+                            @endif
                         } else if (response.data == 'failed') {
-                            var failed = "{{ route('student.payment-failed')}}";
-                            window.location.replace(failed);
+                            @if(session('from_mobile'))
+                                window.location.replace("testandnotesmobileapp://payment-failed");
+                            @else
+                                var failed = "{{ route('student.payment-failed')}}";
+                                window.location.replace(failed);
+                            @endif
                         } else {
-                            var data_false = "/student/plan";
-                            window.location.replace(data_false);
+                            @if(session('from_mobile'))
+                                window.location.replace("testandnotesmobileapp://payment-failed");
+                            @else
+                                var data_false = "/student/plan";
+                                window.location.replace(data_false);
+                            @endif
                         }
                     }
                 });

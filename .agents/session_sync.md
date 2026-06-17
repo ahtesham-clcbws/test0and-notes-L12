@@ -54,6 +54,18 @@
 
 # Session Sync - Momin Scholar Program
 
+## Session Handoff - 2026-06-10 (V3.2.8: Free Package View & Enrollment)
+- **Objective:** Enable a detailed package information page with admin-selected counts for non-enrolled packages, and support instant enrollment for free packages in the mobile app.
+- **Key Achievements:**
+  - **Backend API Enhancement:** Added `is_enrolled` boolean status directly to the `getPackageDetails` API response by querying transaction history of the authenticated user.
+  - **Premium UI Information Banner:** Designed a gorgeous solid indigo package banner with white badge pills showing the selected counts of Tests, Videos, Notes, and GK.
+  - **Dynamic Info View & Conditional Tabs:** Non-enrolled students are shown validity, description, and an active "ENROLL FOR FREE" button instead of the content list. Enrolled students are shown the full interactive tab bar and resource lists.
+  - **Instant Free Enrollment Handler:** Integrated the `/createRazorpayOrder` API trigger inside the mobile package details screen, enabling students to instantly enroll in free packages and immediately unlock content dynamically.
+  - **Homepage Package Direct Routing:** Updated `handlePackagePress` on the mobile homepage (`index.tsx`) so that clicking any slider package category or banner redirects the student directly to the package information details page (`package-view.tsx`) with its ID, rather than the general packages listing screen.
+  - **Redirection-Based Web Checkout (No Dev Build Needed):** Created `/student/payment-autologin` route in the Laravel backend to securely validate the mobile app's authentication token and redirect the student to the web checkout view. Integrated `expo-web-browser` on the mobile app to load this URL when purchasing paid packages, removing native `react-native-razorpay` and `expo-dev-client` dependencies entirely to run on standard Expo Go.
+  - **Isolated Mobile Payment Layout:** Designed a dedicated `mobile_payment.blade.php` layout stripped of headers, sidebars, and dashboard items. Updated the checkout template to extend this layout conditionally when accessed via mobile, showing only the transaction details and payment triggers.
+  - **Automatic Browser Dismissal (Deep Link Redirects):** Modified the web payment callbacks to redirect to `testandnotesmobileapp://payment-success` or `testandnotesmobileapp://payment-failed` custom schemes. Integrated `WebBrowser.openAuthSessionAsync` on mobile, which automatically intercepts the custom scheme redirects, closes the web browser popup overlay, and refreshes the package details to unlock content.
+
 ## Session Handoff - 2026-06-09 (V3.2.7: Test Result Blank Screen & Key Alignment)
 - **Objective:** Fix the blank test result screen crash, align results keys with student web dashboard results, and resolve missing list badges.
 - **Key Achievements:**

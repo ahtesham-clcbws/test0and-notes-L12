@@ -1470,15 +1470,35 @@ class StudymaterialController extends Controller
 
     public function download($file)
     {
-        $path = storage_path('app/study_material/'.$file);
+        $cleanFile = ltrim($file, '/');
+        if (str_starts_with($cleanFile, 'study_material/')) {
+            $cleanFile = substr($cleanFile, strlen('study_material/'));
+        }
 
-        // dd($path);
-        return response()->download($path);
+        $paths = [
+            storage_path('app/public/study_material/'.$cleanFile),
+            storage_path('app/study_material/'.$cleanFile),
+            storage_path('app/public/'.$file),
+            storage_path('app/'.$file),
+        ];
+
+        foreach ($paths as $path) {
+            if (file_exists($path) && is_file($path)) {
+                return response()->download($path);
+            }
+        }
+
+        return response()->download(storage_path('app/study_material/'.$file));
     }
 
     public function viewMaterial($file)
     {
-        $filename = url('/storage/study_material/'.$file);
+        $cleanFile = ltrim($file, '/');
+        if (str_starts_with($cleanFile, 'study_material/')) {
+            $cleanFile = substr($cleanFile, strlen('study_material/'));
+        }
+
+        $filename = url('/storage/study_material/'.$cleanFile);
         $title = '<i class="bi bi-file-pdf text-danger"></i>&nbsp;<i class="bi bi-file-word text-info"></i>&nbsp;<i class="bi bi-file-excel text-success"></i>&nbsp; <b class="text-primary">View Study Material</b>';
 
         return view('Dashboard/Student/Material/viewmaterial', compact('filename', 'title'));

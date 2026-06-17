@@ -90,6 +90,27 @@ Route::view('resetpassword_publisher', 'Dashboard/Franchise/Management/Publisher
 
 Route::post('resetpassword', [AuthController::class, 'resetPwd']);
 
+Route::get('student/payment-autologin', function (\Illuminate\Http\Request $request) {
+    $plainTextToken = $request->query('token');
+    $planId = $request->query('plan_id');
+
+    if (! $plainTextToken || ! $planId) {
+        return redirect()->route('login')->with('error', 'Invalid parameters');
+    }
+
+    $token = \Laravel\Sanctum\PersonalAccessToken::findToken($plainTextToken);
+    if (! $token) {
+        return redirect()->route('login')->with('error', 'Session expired');
+    }
+
+    $user = $token->tokenable;
+    \Illuminate\Support\Facades\Auth::login($user);
+
+    $request->session()->put('from_mobile', true);
+
+    return redirect()->route('student.plan-checkout', [$planId]);
+})->name('student.payment-autologin');
+
 Route::any('{slug}', Pages::class)->name('policy-page');
 // Route::any('privacy-policy', Pages::class);
 // Route::any('terms-and-conditions', Pages::class);

@@ -75,8 +75,8 @@ Route::name('student.')->group(function () {
                 Route::get('short-notes', \App\Livewire\Student\Material\Index::class)->name('showShortNotes');
                 Route::get('premium-notes', \App\Livewire\Student\Material\Index::class)->name('showPremium');
 
-                Route::any('download/{file}', [StudymaterialController::class, 'download'])->name('download');
-                Route::any('viewmaterial/{file}', [StudymaterialController::class, 'viewMaterial'])->name('viewmaterial');
+                Route::any('download/{file}', [StudymaterialController::class, 'download'])->name('download')->where('file', '.*');
+                Route::any('viewmaterial/{file}', [StudymaterialController::class, 'viewMaterial'])->name('viewmaterial')->where('file', '.*');
             });
 
             Route::prefix('feedback')->group(function () {
