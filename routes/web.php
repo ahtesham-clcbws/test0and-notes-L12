@@ -130,9 +130,39 @@ Route::get('student/material-autologin', function (\Illuminate\Http\Request $req
 
     $request->session()->put('from_mobile', true);
 
-    $routePath = $type === 'download' ? 'download' : 'viewmaterial';
+    $cleanFile = ltrim($file, '/');
+    if (str_starts_with($cleanFile, 'study_material/')) {
+        $cleanFile = substr($cleanFile, strlen('study_material/'));
+    }
 
-    return redirect()->to(url("/student/material/{$routePath}/{$file}"));
+    $paths = [
+        storage_path('app/public/study_material/'.$cleanFile),
+        storage_path('app/study_material/'.$cleanFile),
+        storage_path('app/public/'.$file),
+        storage_path('app/'.$file),
+    ];
+
+    $foundPath = null;
+    foreach ($paths as $path) {
+        if (file_exists($path) && is_file($path)) {
+            $foundPath = $path;
+            break;
+        }
+    }
+
+    if (! $foundPath) {
+        $foundPath = storage_path('app/study_material/'.$file);
+    }
+
+    if (file_exists($foundPath) && is_file($foundPath)) {
+        if ($type === 'download') {
+            return response()->download($foundPath);
+        } else {
+            return response()->file($foundPath);
+        }
+    }
+
+    return redirect()->route('login')->with('error', 'File not found');
 })->name('student.material-autologin');
 
 Route::any('{slug}', Pages::class)->name('policy-page');
