@@ -110,6 +110,9 @@ class APIController extends Controller
     public function userDetails(Request $request)
     {
         $user = Auth::user();
+        if ($user) {
+            $user['institute_name'] = $user->myInstitute?->institute_name;
+        }
 
         return response()->json(['status' => 1, 'user_details' => $user]);
     }
@@ -407,9 +410,8 @@ class APIController extends Controller
         $userDb->name = htmlspecialchars($request->input('full_name'));
         $userDb->username = htmlspecialchars($request->input('my_username'));
         $userDb->roles = 'student';
-        if ($request->input('institute_code') == '') {
-            $userDb->status = 'active';
-        } else {
+        $userDb->status = 'active';
+        if ($request->input('institute_code') != '') {
             $userDb->in_franchise = '1';
             $userDb->franchise_code = filter_var($request->input('institute_code'));
         }
@@ -734,6 +736,8 @@ class APIController extends Controller
 
             DB::commit();
 
+            $user['institute_name'] = $user->myInstitute?->institute_name;
+
             return response()->json([
                 'status' => 1,
                 'message' => 'Profile updated successfully',
@@ -937,11 +941,11 @@ class APIController extends Controller
     public function verifyBranchCode(Request $request)
     {
         $branch_code = $request->input('branch_code');
-        $time = date('Y-m-d');
-        $time .= ' 00:00:00';
-        $query = FranchiseDetails::where([['branch_code', '=', $branch_code], ['inactive_at', '>', $time]])->first();
+        $query = \App\Models\CorporateEnquiry::where('branch_code', $branch_code)
+            ->where('status', 'activated')
+            ->first();
         if ($query) {
-            return json_encode(['status' => 1, 'msg' => $query['institute_name']]);
+            return json_encode(['status' => 1, 'msg' => $query->institute_name]);
         }
 
         return json_encode(['status' => 0, 'msg' => 'Institute not found']);

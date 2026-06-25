@@ -197,7 +197,7 @@ function verifyOtp(string|int $otp, ?string $credential = null): bool
         $otpVerification = \App\Models\OtpVerifications::where('credential', $credential)
             ->where('otp', $otp)
             ->where('created_at', '>=', $timeLimit)
-            ->whereIn('status', ['pending', 'verified']) // Allow verified if recently checked (anti-double-tap)
+            ->whereIn('status', [0, 1]) // Allow verified if recently checked (anti-double-tap)
             ->orderBy('created_at', 'desc')
             ->first();
 

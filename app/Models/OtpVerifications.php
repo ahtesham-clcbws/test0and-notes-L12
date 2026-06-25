@@ -29,4 +29,15 @@ class OtpVerifications extends Model
     const UPDATED_AT = 'updated_at';
 
     const DELETED_AT = 'deleted_at';
+
+    /**
+     * Get or set the status attribute.
+     */
+    protected function status(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn (mixed $value) => $value == 1 ? 'verified' : 'pending',
+            set: fn (mixed $value) => $value === 'verified' || $value === 1 ? 1 : 0,
+        );
+    }
 }

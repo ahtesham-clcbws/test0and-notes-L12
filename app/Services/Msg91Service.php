@@ -24,7 +24,7 @@ class Msg91Service
         $this->authKey = $authKey ?: config('services.msg91.auth_key');
         $this->senderId = $senderId ?: config('services.msg91.sender_id', 'TSTNTS');
         $this->templateId = $templateId ?: config('services.msg91.template_id');
-        $this->dltTemplateId = $dltTemplateId ?: config('services.msg91.dlt_template_id', '1707177540051977802');
+        $this->dltTemplateId = $dltTemplateId ?: config('services.msg91.dlt_template_id', '1707177955748929083');
     }
 
     /**
