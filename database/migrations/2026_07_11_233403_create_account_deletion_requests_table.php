@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('account_deletion_requests', function (Blueprint $table) {
+            $table->id();
+            $table->string('email')->nullable();
+            $table->string('mobile')->nullable();
+            $table->boolean('delete_all_data')->default(false);
+            $table->boolean('backup_data')->default(false);
+            $table->string('status')->default('pending');
+            $table->timestamp('completed_at')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('account_deletion_requests');
+    }
+};

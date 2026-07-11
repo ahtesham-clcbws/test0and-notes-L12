@@ -165,6 +165,8 @@ Route::get('student/material-autologin', function (\Illuminate\Http\Request $req
     return redirect()->route('login')->with('error', 'File not found');
 })->name('student.material-autologin');
 
+Route::get('account-delete', \App\Livewire\Frontend\AccountDeletePage::class)->name('account.delete');
+
 Route::any('{slug}', Pages::class)->name('policy-page');
 // Route::any('privacy-policy', Pages::class);
 // Route::any('terms-and-conditions', Pages::class);

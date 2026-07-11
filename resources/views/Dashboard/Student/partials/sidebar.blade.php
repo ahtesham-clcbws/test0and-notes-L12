@@ -190,6 +190,18 @@
                     </div>
                 </a>
             </li>
+            <li class="nav-item" style="border: 1px solid black;border-top: 0;">
+                <a class="nav-link btn-toggle collapsed rounded" href="{{ route('account.delete') }}" aria-current="page">
+                    <div class="row text-danger">
+                        <div class="col-4 text-center" style="font-size: 1.5rem;">
+                            <i class="bi bi-trash"></i>
+                        </div>
+                        <div class="col-8" style="margin:auto; font-size: 0.85rem; font-weight: bold;">
+                            Delete Account
+                        </div>
+                    </div>
+                </a>
+            </li>
         </ul>
     </div>
 </nav>

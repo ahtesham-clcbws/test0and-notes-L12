@@ -27,6 +27,8 @@
 
 <body>
 
+    <livewire:student.components.deletion-alert-topbar />
+
     @include('Dashboard.Student.partials.mainheader')
 
     <div class="container-fluid">
