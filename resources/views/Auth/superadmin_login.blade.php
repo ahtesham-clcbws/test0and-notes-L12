@@ -2,9 +2,8 @@
 
 @section('form')
     <style>
-        #otpForm,
-        #forgetForm,
-        #loginStep2 {
+        #loginStep2,
+        #forgetForm {
             display: none;
         }
 
@@ -42,26 +41,56 @@
             background: #0b5ed7;
             transform: translateY(-1px);
         }
+
+        .auth-link {
+            font-size: 13px;
+            color: #0d6efd;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .auth-link:hover {
+            text-decoration: underline;
+        }
     </style>
 
     <div class="Login Box">
         <div class="Box__Header panel_logo"></div>
 
-        {{-- Step 1: Email --}}
+        @if (session('loginSuccess'))
+            <div class="alert alert-success text-center mb-3 p-2" style="background:#d1e7dd;color:#0f5132;border-radius:6px;font-size:14px;">
+                {{ session('loginSuccess') }}
+            </div>
+        @endif
+
+        {{-- Step 1: Email & Password --}}
         <form method="POST" action="" id="loginStep1" class="Box__Form">
             @csrf
             <h4 class="form-title">Admin Access</h4>
-            <div id="step1Error" class="text-danger mb-3" style="display:none;"></div>
+            <div id="step1Error" class="text-danger mb-3" style="display:none;font-size:13px;text-align:center;"></div>
 
             <input hidden style="display: none;" name="form_name" value="get_otp">
+            
             <label for="admin_email" class="InputLabel">Email Address</label>
-            <div class="Input mb-4">
+            <div class="Input mb-3">
                 <input type="email" id="admin_email" name="email" class="Input__Text" value="{{ old('email') }}"
-                    placeholder="Enter your administrative email" required>
+                    placeholder="Enter administrative email" required autocomplete="username">
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="admin_password" class="InputLabel">Password</label>
+            </div>
+            <div class="Input mb-3">
+                <input type="password" id="admin_password" name="password" class="Input__Text"
+                    placeholder="Enter password" required autocomplete="current-password">
+            </div>
+
+            <div class="text-end mb-3">
+                <a href="javascript:void(0)" onclick="showForgotForm()" class="auth-link">Forgot password?</a>
             </div>
 
             <button type="submit" id="btnGetOtp" class="btn-get-otp mb-3">
-                <span>Get Login OTP</span>
+                <span>Continue to OTP Verification</span>
             </button>
         </form>
 
@@ -69,7 +98,7 @@
         <form method="POST" action="" id="loginStep2" class="Box__Form">
             @csrf
             <h4 class="form-title">Verify Your Identity</h4>
-            <div id="step2Error" class="text-danger mb-3" style="display:none;"></div>
+            <div id="step2Error" class="text-danger mb-3" style="display:none;font-size:13px;text-align:center;"></div>
             <p class="text-muted small mb-4 text-center">We've sent a 6-digit verification code to <b id="displayEmail"></b></p>
 
             <input hidden style="display: none;" name="form_name" value="login_otp">
@@ -85,22 +114,65 @@
             </button>
 
             <div class="text-center">
-                <a href="javascript:void(0)" onclick="backToStep1()" class="small text-decoration-none">Back to start</a>
+                <a href="javascript:void(0)" onclick="backToStep1()" class="auth-link">Back to credentials</a>
             </div>
         </form>
 
-        {{-- Legacy Forms Hidden --}}
-        <form id="forgetForm" style="display:none;"></form>
-        <form id="otpForm" style="display:none;"></form>
+        {{-- Forgot Password Form --}}
+        <form method="POST" action="" id="forgetForm" class="Box__Form">
+            @csrf
+            <h4 class="form-title">Reset Admin Password</h4>
+            <div id="forgetStatus" class="mb-3" style="display:none;font-size:13px;text-align:center;"></div>
+
+            <input hidden style="display: none;" name="form_name" value="forget_password">
+            
+            <label for="forget_email" class="InputLabel">Email Address</label>
+            <div class="Input mb-4">
+                <input type="email" id="forget_email" name="email" class="Input__Text"
+                    placeholder="Enter registered email" required>
+            </div>
+
+            <button type="submit" id="btnForgetPassword" class="btn-get-otp mb-3">
+                <span>Send Password Reset Link</span>
+            </button>
+
+            <div class="text-center">
+                <a href="javascript:void(0)" onclick="backToStep1()" class="auth-link">Back to Login</a>
+            </div>
+        </form>
     </div>
 @endsection
 
 @section('javascript')
     <script>
+        function parseResponse(data, xhr) {
+            if (data && typeof data === 'object') return data;
+            if (xhr && xhr.responseJSON) return xhr.responseJSON;
+            if (typeof data === 'string') {
+                try { return JSON.parse(data); } catch(e) {}
+            }
+            if (xhr && xhr.responseText) {
+                try { return JSON.parse(xhr.responseText); } catch(e) {}
+            }
+            return null;
+        }
+
         function backToStep1() {
             $('#loginStep2').hide();
+            $('#forgetForm').hide();
             $('#loginStep1').fadeIn();
             $('#step1Error').hide();
+        }
+
+        function showForgotForm() {
+            $('#loginStep1').hide();
+            $('#loginStep2').hide();
+            $('#forgetForm').fadeIn();
+            $('#forgetStatus').hide();
+            const currentEmail = $('#admin_email').val();
+            if (currentEmail) {
+                $('#forget_email').val(currentEmail);
+            }
         }
 
         $('#loginStep1').submit(function(e) {
@@ -109,27 +181,28 @@
             const errorDiv = $('#step1Error');
             const email = $('#admin_email').val();
 
-            btn.prop('disabled', true).html('<span>Sending...</span>');
+            btn.prop('disabled', true).html('<span>Authenticating...</span>');
             errorDiv.hide();
 
             $.ajax({
                 url: '{{ route('administrator.login') }}',
                 type: 'POST',
                 data: $(this).serialize()
-            }).done(function(data) {
-                const res = JSON.parse(data);
-                if (res.success) {
+            }).done(function(data, textStatus, xhr) {
+                const res = parseResponse(data, xhr);
+                if (res && res.success) {
                     $('#verify_email').val(email);
                     $('#displayEmail').text(email);
                     $('#loginStep1').hide();
                     $('#loginStep2').fadeIn();
                 } else {
-                    errorDiv.text(res.message).fadeIn();
+                    errorDiv.text(res && res.message ? res.message : 'Authentication failed.').fadeIn();
                 }
-            }).fail(function() {
-                errorDiv.text('Request failed. Please try again.').fadeIn();
+            }).fail(function(xhr) {
+                const res = parseResponse(null, xhr);
+                errorDiv.text(res && res.message ? res.message : 'Request failed. Please try again.').fadeIn();
             }).always(function() {
-                btn.prop('disabled', false).html('<span>Get Login OTP</span>');
+                btn.prop('disabled', false).html('<span>Continue to OTP Verification</span>');
             });
         });
 
@@ -145,17 +218,45 @@
                 url: '{{ route('administrator.login') }}',
                 type: 'POST',
                 data: $(this).serialize()
-            }).done(function(data) {
-                const res = JSON.parse(data);
-                if (res.success) {
+            }).done(function(data, textStatus, xhr) {
+                const res = parseResponse(data, xhr);
+                if (res && res.success) {
                     window.location.href = '{{ route('administrator.dashboard') }}';
                 } else {
-                    errorDiv.text(res.message).fadeIn();
+                    errorDiv.text(res && res.message ? res.message : 'Verification failed.').fadeIn();
                 }
-            }).fail(function() {
-                errorDiv.text('Verification failed. Please try again.').fadeIn();
+            }).fail(function(xhr) {
+                const res = parseResponse(null, xhr);
+                errorDiv.text(res && res.message ? res.message : 'Verification failed. Please try again.').fadeIn();
             }).always(function() {
                 btn.prop('disabled', false).html('<span>Verify & Login</span>');
+            });
+        });
+
+        $('#forgetForm').submit(function(e) {
+            e.preventDefault();
+            const btn = $('#btnForgetPassword');
+            const statusDiv = $('#forgetStatus');
+
+            btn.prop('disabled', true).html('<span>Sending Link...</span>');
+            statusDiv.hide();
+
+            $.ajax({
+                url: '{{ route('administrator.login') }}',
+                type: 'POST',
+                data: $(this).serialize()
+            }).done(function(data, textStatus, xhr) {
+                const res = parseResponse(data, xhr);
+                if (res && res.success) {
+                    statusDiv.attr('class', 'alert alert-info text-success').text(res.message).fadeIn();
+                } else {
+                    statusDiv.attr('class', 'alert alert-danger text-danger').text(res && res.message ? res.message : 'Failed to send link.').fadeIn();
+                }
+            }).fail(function(xhr) {
+                const res = parseResponse(null, xhr);
+                statusDiv.attr('class', 'alert alert-danger text-danger').text(res && res.message ? res.message : 'Unable to process request. Please try again.').fadeIn();
+            }).always(function() {
+                btn.prop('disabled', false).html('<span>Send Password Reset Link</span>');
             });
         });
     </script>

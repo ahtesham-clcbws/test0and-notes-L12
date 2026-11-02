@@ -19,13 +19,13 @@ use App\Models\Gn_DisplaySubjectPartChapter;
 use App\Models\Gn_EducationClassExamAgencyBoardUniversity;
 use App\Models\Gn_OtherExamClassDetailModel;
 use App\Models\Gn_PackagePlanTest;
-use App\Models\TestAttempt;
 use App\Models\Gn_SubjectPartLessionNew;
 use App\Models\OtherCategoryClass;
 use App\Models\QuestionBankModel;
 use App\Models\Subject;
 use App\Models\SubjectPart;
 use App\Models\SubjectPartLesson;
+use App\Models\TestAttempt;
 use App\Models\TestModal;
 use App\Models\TestQuestions;
 use App\Models\TestSections;
@@ -54,7 +54,11 @@ class ExamsController extends Controller
         $this->imageService = $imageService;
         $this->data = [];
 
-        $this->data['educations'] = Educationtype::get();
+        try {
+            $this->data['educations'] = Educationtype::get();
+        } catch (\Throwable $e) {
+            $this->data['educations'] = collect();
+        }
 
         // $this->data['others'] = OtherCategoryClass::get();
         $this->data['pagename'] = 'Add Questions';
@@ -1809,7 +1813,7 @@ class ExamsController extends Controller
                 $studentListData[$key]['title'] = $testData->title;
                 $studentListData[$key]['test_attempt_date'] = date('d-m-Y', strtotime($testData->test_attempt));
                 $studentListData[$key]['class_name'] = date('d-m-Y', strtotime($testData->test_create));
-                
+
                 // Add status for admin visibility
                 $status = $testData->status === 'completed' ? 'Completed' : 'Running';
                 if ($testData->is_in_review) {

@@ -438,3 +438,13 @@
   - **External Link Interception Fix:** Added the `external` attribute to all Mary UI `<x-button>` tags in `details.blade.php` that link to external resources (YouTube classes, PDF e-books/notes in storage, and GK downloads). This prevents Livewire's `wire:navigate` SPA router from intercepting clicks and redirecting students to the homepage.
   - **Linter & Code Health:** Ran `vendor/bin/pint --dirty` successfully to enforce project style standards on the updated controller and view files.
 
+
+## Session Handoff - 2026-11-02 (V3.0.0: Admin 2FA Credentials First, Password Reset & Production Hardening)
+- **Objective:** Upgrade Admin Login to 2FA requiring password prior to OTP, implement forgotten/reset password feature, and harden authentication subsystem for production resilience.
+- **Key Achievements:**
+  - **Credentials First, Then OTP (2FA):** Updated `AuthController::adminlogin` Step 1 to validate email and password using `Hash::check()` on active superadmins, establishing a 10-minute pre-auth session before triggering OTP.
+  - **Forgot & Reset Password Feature:** Wired `administrator.forget_password` and completed `AuthController::adminPasswordReset()` and `adminForgetPassword()` using `PasswordResetModel` with one-time tokens and remember token revocation (`Str::random(60)`).
+  - **Security & Throttling:** Added route rate-limiting (`throttle:20,1` on login, `throttle:5,1` on forgot password), 5-failed-attempts OTP lockout, and session regeneration to shield against session fixation.
+  - **Protocol Standardization:** Replaced raw `json_encode` with typed `response()->json($data, $statusCode)` and upgraded `superadmin_login.blade.php` to handle HTTP statuses gracefully.
+  - **Production Safety:** Aligned Auth gate with `IsAdmin` middleware (`isSuperAdmin()` and `status === 'active'`) and wrapped synchronous SMTP mailers in exception blocks. Protected `ExamsController` and `PlanController` constructors against offline database failures.
+  - **Build & Formatter:** Ran `npm run build` and formatted codebase with `vendor/bin/pint`.

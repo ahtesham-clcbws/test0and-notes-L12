@@ -15,6 +15,7 @@
 - [x] Rename deprecated `.agent` folder to `.agents` folder in absolute compliance with workspace standards.
 
 ## Completed Tasks
+- [x] Implement Admin 2FA (Password + OTP) and Forgot/Reset Password flow
 - [x] Align React Native mobile test flow 1:1 with Laravel Livewire student panel (Instructions, Palette Locking, Skip Modal, Review & Re-attempt popup, results scorecard layout) (V3.2.0)
 - [x] Case-insensitive and trimmed email matching for mobile studentLogin and app_login endpoints (V3.1.3)
 - [x] Null-Safety Project-Wide Audit: Resolved `Attempt to read property "branch_code" on null` and similar null-pointer/institute relationship crashes across Creater, Publisher, Manager ExamsControllers, StudymaterialController, TestController, and mainheader view to prevent crashes for direct platform contributors/superadmins.

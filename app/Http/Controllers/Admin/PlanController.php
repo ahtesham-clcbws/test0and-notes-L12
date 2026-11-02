@@ -27,7 +27,11 @@ class PlanController extends Controller
     {
         $this->imageService = $imageService;
         $this->data = [];
-        $this->data['educations'] = Educationtype::get();
+        try {
+            $this->data['educations'] = Educationtype::get();
+        } catch (\Throwable $e) {
+            $this->data['educations'] = collect();
+        }
         $this->data['pagename'] = 'Add Package';
     }
 

@@ -146,3 +146,28 @@
 - **Superadmin Inclusion:** Updated the query to explicitly include superadmin users (whose `is_staff` flag is `0` and therefore excluded by `User::directContributorCriteria()`) so they appear correctly in both dropdown lists alongside other active direct contributors.
 - **Code Health:** Formatted changes using `vendor/bin/pint --dirty` with no style violations remaining.
 
+
+## Log 23 (2026-11-02): Implement Admin 2FA (Password + OTP) and Forgot/Reset Password
+- **2FA Flow (Credentials First, Then OTP):** Updated `AuthController::adminlogin` so Step 1 (`get_otp`) validates `email` and `password` with `Hash::check($password, $user->password)` against `User` records with `isAdminAllowed = 1`. Sets a 10-minute pre-auth session token before dispatching OTP to prevent OTP abuse/enumeration.
+- **Step 2 Verification:** Verified pre-auth session token in `login_otp` before validating dynamic OTP, master OTP (`DefaultOtp`), or config default OTP (`config('app.default_otp')`).
+- **Forgot & Reset Password Support:** Enabled forgotten password retrieval and reset:
+  - Added `forget_password` handler in `adminlogin` (AJAX) and direct route `administrator.forget_password` in `routes/administrator.php`.
+  - Completed `AuthController::adminPasswordReset` and `adminForgetPassword` with `PasswordResetModel` (status tracking and one-time use token).
+  - Enhanced `resources/views/Auth/superadmin_login.blade.php` with password input, "Forgot password?" toggle, and reset request handling.
+  - Linked `resources/views/Dashboard/Admin/Auth/reset_form.blade.php` to administrative auth flow.
+- **Code Health:** Verified with `vendor/bin/pint` and syntax checked.
+
+## Log 24 (2026-11-02): Harden Admin 2FA Against Fixation, Throttling & Zombie Sessions
+- **Session Fixation Shield:** Added `$request->session()->regenerate()` immediately upon primary credential validation and upon OTP completion.
+- **Brute-Force & Route Throttling:**
+  - Added `throttle:20,1` to `administrator.login` and `throttle:5,1` to `administrator.forget_password`.
+  - Added in-session OTP retry tracking: limits failed OTP attempts to 5 per session, invalidating the OTP upon breach (`HTTP 429`).
+- **Response Contract Standard:** Switched from raw `json_encode()` to typed `response()->json($returnResponse, $statusCode)` with proper HTTP status codes (`200`, `401`, `419`, `422`, `429`).
+- **Zombie Session Purge:** Invalidate `remember_token` via `Str::random(60)` upon password reset in `AuthController::adminPasswordReset`.
+- **Master OTP Preserved:** Kept master OTP / `DEFAULT_OTP` active as explicitly instructed.
+- **Pint & Syntax:** Formatted and syntax verified.
+
+## Log 25 (2026-11-02): Production Gate Alignment & Exception Safety
+- **Auth Gate Synchronization:** Aligned `AuthController::adminlogin`, `adminPasswordReset`, and `adminForgetPassword` with `IsAdmin` middleware contract (`isSuperAdmin()` and `status === 'active'`). Prevents unauthorized or non-superadmin users from executing 2FA only to be bounced by the middleware.
+- **Mail Transport Exception Safety:** Wrapped synchronous `Mail::to()->send()` operations in try-catch with error reporting to eliminate uncaught `500` server errors caused by external SMTP latency/failures.
+- **Pint & Syntax:** Formatted with `vendor/bin/pint` and verified with `php -l`.

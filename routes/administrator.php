@@ -26,9 +26,9 @@ Route::post('gettestpackage', [ExamsController::class, 'gettestpackage'])->name(
 
 Route::name('administrator.')->group(function () {
     Route::prefix('administrator')->group(function () {
-        Route::any('/login', [AuthController::class, 'adminlogin'])->middleware(['adminguest'])->name('login');
+        Route::any('/login', [AuthController::class, 'adminlogin'])->middleware(['adminguest', 'throttle:20,1'])->name('login');
         Route::any('/password-reset/{email}/{code}', [AuthController::class, 'adminPasswordReset'])->middleware(['adminguest'])->name('password_reset');
-        // Route::any('/forget-password', [AuthController::class, 'forgetPassword'])->middleware(['adminguest'])->name('forget_password');
+        Route::any('/forget-password', [AuthController::class, 'adminForgetPassword'])->middleware(['adminguest', 'throttle:5,1'])->name('forget_password');
         Route::middleware(['is_admin'])->group(function () {
             Route::any('/', [DashboardController::class, 'index'])->name('dashboard');
             Route::prefix('corporate-enquiry')->group(function () {

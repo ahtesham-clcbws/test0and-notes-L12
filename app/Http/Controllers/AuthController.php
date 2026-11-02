@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -35,13 +36,21 @@ class AuthController extends Controller
             $formName = $input['form_name'] ?? '';
 
             if ($formName === 'get_otp') {
-                $email = $input['email'];
-                $user = User::where('email', $email)->where('isAdminAllowed', 1)->first();
+                $email = trim($input['email'] ?? '');
+                $password = $input['password'] ?? '';
 
-                if (! $user) {
-                    $returnResponse['message'] = 'Unauthorized email address.';
+                if (empty($email) || empty($password)) {
+                    $returnResponse['message'] = 'Email and password are required.';
 
-                    return json_encode($returnResponse);
+                    return response()->json($returnResponse, 422);
+                }
+
+                $user = User::where('email', $email)->first();
+
+                if (! $user || ! $user->isSuperAdmin() || $user->status !== 'active' || ! Hash::check($password, $user->password)) {
+                    $returnResponse['message'] = 'Invalid administrative credentials.';
+
+                    return response()->json($returnResponse, 401);
                 }
 
                 // Check for cooldown
@@ -49,7 +58,7 @@ class AuthController extends Controller
                 if (OtpVerifications::where([['credential', '=', $email], ['created_at', '>', $time]])->exists()) {
                     $returnResponse['message'] = 'Please wait 3 minutes before requesting another OTP.';
 
-                    return json_encode($returnResponse);
+                    return response()->json($returnResponse, 429);
                 }
 
                 $otp = mt_rand(100000, 999999);
@@ -61,24 +70,50 @@ class AuthController extends Controller
                 $otpEntry->otp = $otp;
                 $otpEntry->save();
 
-                // Send Mail
-                Mail::to($email)->send(new AdminLoginOtp($otp));
+                // Prevent session fixation by regenerating session ID before storing pre-auth credentials
+                $request->session()->regenerate();
+                session()->put('admin_pre_auth_email', $email);
+                session()->put('admin_pre_auth_time', now()->timestamp);
+                session()->forget('admin_otp_failed_attempts');
+
+                // Send Mail with exception safety
+                try {
+                    Mail::to($email)->send(new AdminLoginOtp($otp));
+                } catch (\Throwable $e) {
+                    report($e);
+
+                    return response()->json([
+                        'success' => false,
+                        'type' => 'failed',
+                        'message' => 'Unable to dispatch OTP email. Please verify mail configuration.',
+                    ], 500);
+                }
 
                 $returnResponse['success'] = true;
-                $returnResponse['message'] = 'OTP sent to your email.';
+                $returnResponse['message'] = 'Credentials verified. OTP sent to your email.';
 
-                return json_encode($returnResponse);
+                return response()->json($returnResponse, 200);
             }
 
             if ($formName === 'login_otp') {
-                $email = $input['email'];
-                $otp = $input['otp'];
+                $email = trim($input['email'] ?? '');
+                $otp = trim($input['otp'] ?? '');
 
-                $user = User::where('email', $email)->where('isAdminAllowed', 1)->first();
-                if (! $user) {
+                // Verify pre-auth session
+                $preAuthEmail = session()->get('admin_pre_auth_email');
+                $preAuthTime = session()->get('admin_pre_auth_time');
+
+                if (! $preAuthEmail || $preAuthEmail !== $email || ! $preAuthTime || (now()->timestamp - $preAuthTime) > 600) {
+                    $returnResponse['message'] = 'Session expired. Please enter your credentials again.';
+
+                    return response()->json($returnResponse, 419);
+                }
+
+                $user = User::where('email', $email)->first();
+                if (! $user || ! $user->isSuperAdmin() || $user->status !== 'active') {
                     $returnResponse['message'] = 'Unauthorized access attempt.';
 
-                    return json_encode($returnResponse);
+                    return response()->json($returnResponse, 403);
                 }
 
                 // Check Master OTP first
@@ -95,20 +130,80 @@ class AuthController extends Controller
                     ])->first();
 
                     if (! $otpData) {
-                        $returnResponse['message'] = 'Invalid or expired OTP.';
+                        $failedAttempts = (int) session()->get('admin_otp_failed_attempts', 0) + 1;
+                        session()->put('admin_otp_failed_attempts', $failedAttempts);
 
-                        return json_encode($returnResponse);
+                        if ($failedAttempts >= 5) {
+                            session()->forget(['admin_pre_auth_email', 'admin_pre_auth_time', 'admin_otp_failed_attempts']);
+                            OtpVerifications::where('credential', $email)->delete();
+
+                            return response()->json([
+                                'success' => false,
+                                'type' => 'failed',
+                                'message' => 'Too many invalid OTP attempts. Please verify credentials again.',
+                            ], 429);
+                        }
+
+                        $returnResponse['message'] = 'Invalid or expired OTP. (Attempt '.$failedAttempts.' of 5)';
+
+                        return response()->json($returnResponse, 422);
                     }
                     $otpData->delete();
                 }
 
+                session()->forget(['admin_pre_auth_email', 'admin_pre_auth_time', 'admin_otp_failed_attempts']);
+                $request->session()->regenerate();
                 Auth::login($user);
                 $returnResponse['success'] = true;
 
-                return json_encode($returnResponse);
+                return response()->json($returnResponse, 200);
             }
 
-            return json_encode($returnResponse);
+            if ($formName === 'forget_password') {
+                $email = trim($input['email'] ?? '');
+                if (empty($email)) {
+                    $returnResponse['message'] = 'Email address is required.';
+
+                    return response()->json($returnResponse, 422);
+                }
+
+                $userData = User::where('email', $email)->first();
+                if ($userData && $userData->isSuperAdmin() && $userData->status === 'active') {
+                    $code = mt_rand(100000, 999999);
+
+                    PasswordResetModel::where('user_id', $userData->id)
+                        ->where('user_type', 'admin')
+                        ->update(['status' => 1]);
+
+                    $resetDb = new PasswordResetModel;
+                    $resetDb->user_id = $userData->id;
+                    $resetDb->user_type = 'admin';
+                    $resetDb->verify_type = 'email';
+                    $resetDb->code = $code;
+                    $resetDb->status = 0;
+                    $resetDb->save();
+
+                    $verifyLink = route('administrator.password_reset', [$userData->email, $code]);
+                    $details = [
+                        'name' => $userData->name ?? 'Administrator',
+                        'verifyLink' => $verifyLink,
+                        'resetCode' => $code,
+                    ];
+
+                    try {
+                        Mail::to($userData->email)->send(new SendPasswordReset($details));
+                    } catch (\Throwable $e) {
+                        report($e);
+                    }
+                }
+
+                $returnResponse['success'] = true;
+                $returnResponse['message'] = 'If an administrative account exists for this email, a password reset link has been dispatched.';
+
+                return response()->json($returnResponse, 200);
+            }
+
+            return response()->json($returnResponse, 400);
         }
 
         return view('Auth/superadmin_login');
@@ -187,13 +282,92 @@ class AuthController extends Controller
 
     public function adminPasswordReset($email, $code)
     {
-        $data = [];
+        $resetData = PasswordResetModel::where('code', $code)
+            ->where('user_type', 'admin')
+            ->where('status', 0)
+            ->first();
+
+        if (request()->isMethod('post')) {
+            $input = request()->all();
+            $password = $input['password'] ?? '';
+            $confirmPassword = $input['confirm_password'] ?? '';
+
+            if (empty($password) || strlen($password) < 6) {
+                return back()->withErrors(['error' => 'Password must be at least 6 characters.']);
+            }
+
+            if ($password !== $confirmPassword) {
+                return back()->withErrors(['error' => 'Passwords do not match.']);
+            }
+
+            if (! $resetData) {
+                return back()->withErrors(['error' => 'Invalid or expired password reset link.']);
+            }
+
+            $user = User::where('id', $resetData->user_id)
+                ->where('email', $email)
+                ->first();
+
+            if (! $user || ! $user->isSuperAdmin() || $user->status !== 'active') {
+                return back()->withErrors(['error' => 'Administrator account not authorized or inactive.']);
+            }
+
+            $resetData->status = 1;
+            $resetData->save();
+
+            $user->password = Hash::make($password);
+            $user->setRememberToken(Str::random(60));
+            $user->save();
+
+            return redirect()->route('administrator.login')->with('loginSuccess', 'Password reset successfully. Please login with your new password.');
+        }
+
         $data = [
+            'success' => (bool) $resetData,
             'email' => $email,
             'code' => $code,
         ];
 
         return view('Dashboard/Admin/Auth/reset_form')->with('data', $data);
+    }
+
+    public function adminForgetPassword(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            $email = trim($request->input('email', ''));
+            $userData = User::where('email', $email)->first();
+            if ($userData && $userData->isSuperAdmin() && $userData->status === 'active') {
+                $code = mt_rand(100000, 999999);
+                PasswordResetModel::where('user_id', $userData->id)
+                    ->where('user_type', 'admin')
+                    ->update(['status' => 1]);
+
+                $resetDb = new PasswordResetModel;
+                $resetDb->user_id = $userData->id;
+                $resetDb->user_type = 'admin';
+                $resetDb->verify_type = 'email';
+                $resetDb->code = $code;
+                $resetDb->status = 0;
+                $resetDb->save();
+
+                $verifyLink = route('administrator.password_reset', [$userData->email, $code]);
+                $details = [
+                    'name' => $userData->name ?? 'Administrator',
+                    'verifyLink' => $verifyLink,
+                    'resetCode' => $code,
+                ];
+
+                try {
+                    Mail::to($userData->email)->send(new SendPasswordReset($details));
+                } catch (\Throwable $e) {
+                    report($e);
+                }
+            }
+
+            return redirect()->route('administrator.login')->with('loginSuccess', 'If an administrator account exists for this email, a reset link was sent.');
+        }
+
+        return redirect()->route('administrator.login');
     }
 
     public function franchisePasswordReset($email, $code)

@@ -25,7 +25,7 @@
 
             @if (Request::segment(1) == 'administrator')
                 <div class="checkbox text-end">
-                    <a href="#">Click to get reset code again.</a>
+                    <a href="{{ route('administrator.login') }}">Return to admin login</a>
                 </div>
             @endif
             @if (Request::segment(1) == 'franchise')
