@@ -70,8 +70,7 @@ class AuthController extends Controller
                 $otpEntry->otp = $otp;
                 $otpEntry->save();
 
-                // Prevent session fixation by regenerating session ID before storing pre-auth credentials
-                $request->session()->regenerate();
+                // Store pre-auth state in session
                 session()->put('admin_pre_auth_email', $email);
                 session()->put('admin_pre_auth_time', now()->timestamp);
                 session()->forget('admin_otp_failed_attempts');
@@ -86,11 +85,13 @@ class AuthController extends Controller
                         'success' => false,
                         'type' => 'failed',
                         'message' => 'Unable to dispatch OTP email. Please verify mail configuration.',
+                        'csrf_token' => csrf_token(),
                     ], 500);
                 }
 
                 $returnResponse['success'] = true;
                 $returnResponse['message'] = 'Credentials verified. OTP sent to your email.';
+                $returnResponse['csrf_token'] = csrf_token();
 
                 return response()->json($returnResponse, 200);
             }
@@ -155,6 +156,7 @@ class AuthController extends Controller
                 $request->session()->regenerate();
                 Auth::login($user);
                 $returnResponse['success'] = true;
+                $returnResponse['csrf_token'] = csrf_token();
 
                 return response()->json($returnResponse, 200);
             }
@@ -199,6 +201,7 @@ class AuthController extends Controller
 
                 $returnResponse['success'] = true;
                 $returnResponse['message'] = 'If an administrative account exists for this email, a password reset link has been dispatched.';
+                $returnResponse['csrf_token'] = csrf_token();
 
                 return response()->json($returnResponse, 200);
             }

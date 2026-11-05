@@ -15,6 +15,13 @@ class IsAdminGuest
     public function handle($request, Closure $next)
     {
         if (Auth::check()) {
+            if ($request->ajax() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'redirect' => route('administrator.dashboard'),
+                ]);
+            }
+
             return AuthRedirect::homeFor(Auth::user());
         }
 

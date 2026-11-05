@@ -9,6 +9,7 @@
     <link rel="shortcut-icon" href="{{ asset('logos/logo-white-square.png') }}" type="image/x-icon">
     <link rel="apple-touch-icon" href="{{ asset('logos/logo-white-square.png') }}">
     <link rel="stylesheet" href="{{ URL::asset('frontend/sweetalert2/sweetalert2.min.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -912,6 +913,14 @@
         function showForget() {
             $('#forgetForm').toggle();
             $('#loginForm').toggle();
+        }
+
+        if (window.jQuery) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
         }
     </script>
 
