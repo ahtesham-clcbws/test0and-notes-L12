@@ -1,3 +1,16 @@
+# Session Sync & Handoff Summary
+
+## Latest Session Status (2026-11-09)
+- **Target:** Corporate Enquiry Form (`https://testandnotes.com/corporate-enquiry`)
+- **Diagnosis:** Form submission failure, GET fallback URL dump, city dropdown disappearing, OTP script exception, and silent 422 errors.
+- **Root Cause & Fixes:**
+  - `InternalRequestsController`: Switched `get_cities` from `getAvailableCitiesByState` (which only returned cities with active franchises, returning `[]` for almost all states and causing the city dropdown to vanish) to `getCitiesByState`.
+  - `FormsController` & `InternalRequestsController`: Updated validation rules for `corporate_logo` and `institute_images_pdf` to `nullable|file` to prevent empty file submissions from failing.
+  - `public/skillup/js/custom.js`: Fixed `mobile_input` variable name crash in `verifyOtp`, handled pre-parsed JSON response objects safely, and added boolean check for OTP verification.
+  - `bussiness-enquiry.blade.php`: Added `method="POST" action="{{ route('bussines_enquiry') }}" onsubmit="return false;"` to eliminate GET parameter dumps in the URL. Replaced legacy `swal()` calls with `showAlert()`, initialized select2 on document ready, and surfaced specific 422 validation errors to user.
+- **Verification:** Ran end-to-end headless Firefox test via Geckodriver: State selection dynamically loaded 625 cities, OTP verified, form submitted cleanly, 200 OK returned with success modal, and record persisted in `corporate_enquiries`.
+- **Multi-Select Upgrade:** Converted "Type of Institution" and "Interested For" from multi-line `<select multiple>` into a modern multi-select checkbox dropdown with badge truncation (`First Option +1`, `+2`), auto-close prevention on row toggle, and max-3 selection caps.
+
 # Laravel Backlog
 
 ## Pending Tasks
@@ -448,3 +461,12 @@
   - **Protocol Standardization:** Replaced raw `json_encode` with typed `response()->json($data, $statusCode)` and upgraded `superadmin_login.blade.php` to handle HTTP statuses gracefully.
   - **Production Safety:** Aligned Auth gate with `IsAdmin` middleware (`isSuperAdmin()` and `status === 'active'`) and wrapped synchronous SMTP mailers in exception blocks. Protected `ExamsController` and `PlanController` constructors against offline database failures.
   - **Build & Formatter:** Ran `npm run build` and formatted codebase with `vendor/bin/pint`.
+
+## Session Handoff - 2026-11-05 (V3.1.0: Fix CSRF Token Mismatch & Universal Password Eye Icon)
+- **Objective:** Fix admin login HTTP 419 CSRF token mismatch error and implement eye icon password visibility toggle on all password inputs.
+- **Key Achievements:**
+  - **CSRF Mismatch Resolution:** Identified premature `session()->regenerate()` in `AuthController::adminlogin()` during `get_otp` which invalidated the client's CSRF token before Step 2 OTP verification. Removed premature regeneration, preserving token stability until `Auth::login()`.
+  - **Dynamic Token Sync & Expiration Shield:** Embedded fresh CSRF tokens into all controller responses (`csrf_token => csrf_token()`), wired `<meta name="csrf-token">` with automatic `$.ajaxSetup` in `superadminauth.blade.php`, and added auto-reload on 419 session expiration.
+  - **AJAX Redirect Contract:** Updated `IsAdminGuest` middleware to return JSON redirect response on AJAX rather than HTTP 302 redirects.
+  - **Universal Password Reveal:** Integrated SVG eye / eye-slash toggles with persistent styling on `#admin_password` (admin login) and `#password` + `#confirm_password` (password reset).
+  - **Build & Quality:** Compiled production assets with `npm run build` and verified formatting with `vendor/bin/pint`.

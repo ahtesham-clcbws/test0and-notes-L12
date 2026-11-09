@@ -29,8 +29,8 @@ class FormsController extends Controller
                 'state_id' => 'required|integer',
                 'city_id' => 'required|integer',
                 'pincode' => 'required|integer',
-                'corporate_logo' => 'sometimes|file|mimes:jpg,jpeg,png|max:2048',
-                'institute_images_pdf' => 'sometimes|file|mimes:pdf|max:5120',
+                'corporate_logo' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+                'institute_images_pdf' => 'nullable|file|mimes:pdf|max:5120',
             ]);
 
             $corporateDb = new CorporateEnquiry;

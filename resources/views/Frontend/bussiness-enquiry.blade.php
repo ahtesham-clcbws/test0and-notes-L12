@@ -5,6 +5,38 @@
     #corporate .input-group .btn {
         min-width: 85px;
     }
+    .custom-multi-select .multi-select-btn {
+        background-color: #fff;
+        min-height: 48px;
+        border: 1px solid #e0e6ed;
+        border-radius: 4px;
+        padding: 10px 14px;
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
+    }
+    .custom-multi-select .multi-select-btn:after {
+        display: none;
+    }
+    .custom-multi-select .dropdown-menu {
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    .custom-multi-select .multi-select-option {
+        transition: background-color 0.15s ease-in-out;
+        white-space: normal;
+        user-select: none;
+        cursor: pointer;
+    }
+    .custom-multi-select .multi-select-option:hover {
+        background-color: #f1f5f9;
+    }
+    .custom-multi-select .multi-select-option input[type="checkbox"] {
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+    }
 </style>
 @endsection
 @section('main')
@@ -15,7 +47,7 @@
 
             <div class="col-xl-7 col-lg-8 col-md-12 col-sm-12">
                 <div class="crs_log_wrap">
-                    <form class="crs_log__caption" id="corporate" enctype="multipart/form-data" style="z-index: 1;">
+                    <form class="crs_log__caption" id="corporate" method="POST" action="{{ route('bussines_enquiry') }}" onsubmit="return false;" enctype="multipart/form-data" style="z-index: 1;">
                         <div class="rcs_log_124">
                             <div class="row py-3">
                                 <div class="col">
@@ -66,31 +98,55 @@
                                 </div>
                                 <div class="col-md-6 col-12 mt-2">
                                     <div class="form-group smalls">
-                                        <label>Type if Institution *</label>
-                                        <div class="input-group">
-                                            <select name="institute_type[]" id="institute_type" class="form-control"
-                                                multiple required>
+                                        <label>Type of Institution *</label>
+                                        <div class="dropdown custom-multi-select" id="multi_select_institute_type" data-max="3" data-placeholder="Select Type of Institution">
+                                            <button class="form-control text-start d-flex justify-content-between align-items-center dropdown-toggle multi-select-btn"
+                                                    type="button"
+                                                    data-bs-toggle="dropdown"
+                                                    data-bs-auto-close="outside"
+                                                    aria-expanded="false">
+                                                <span class="multi-select-label text-truncate text-muted">Select Type of Institution</span>
+                                                <i class="ti-angle-down ms-2 small"></i>
+                                            </button>
+                                            <div class="dropdown-menu p-2 w-100" style="max-height: 260px; overflow-y: auto;">
+                                                <div class="d-flex justify-content-between align-items-center mb-1 pb-1 border-bottom px-1">
+                                                    <small class="text-muted count-indicator">Select up to 3</small>
+                                                    <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 clear-btn text-danger small">Clear</button>
+                                                </div>
                                                 @foreach (franchiseTypes() as $institute)
-                                                <option value="{{ $institute['name'] }}">
-                                                    {{ $institute['name'] }}
-                                                </option>
+                                                <label class="dropdown-item d-flex align-items-center py-2 px-2 rounded multi-select-option">
+                                                    <input type="checkbox" name="institute_type[]" value="{{ $institute['name'] }}" class="form-check-input me-2 mt-0">
+                                                    <span class="small">{{ $institute['name'] }}</span>
+                                                </label>
                                                 @endforeach
-                                            </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-12 mt-2">
                                     <div class="form-group smalls">
                                         <label>Interested For *</label>
-                                        <div class="input-group">
-                                            <select name="interested_for[]" id="interested_for" class="form-control"
-                                                multiple required>
+                                        <div class="dropdown custom-multi-select" id="multi_select_interested_for" data-max="3" data-placeholder="Select Interested For">
+                                            <button class="form-control text-start d-flex justify-content-between align-items-center dropdown-toggle multi-select-btn"
+                                                    type="button"
+                                                    data-bs-toggle="dropdown"
+                                                    data-bs-auto-close="outside"
+                                                    aria-expanded="false">
+                                                <span class="multi-select-label text-truncate text-muted">Select Interested For</span>
+                                                <i class="ti-angle-down ms-2 small"></i>
+                                            </button>
+                                            <div class="dropdown-menu p-2 w-100" style="max-height: 260px; overflow-y: auto;">
+                                                <div class="d-flex justify-content-between align-items-center mb-1 pb-1 border-bottom px-1">
+                                                    <small class="text-muted count-indicator">Select up to 3</small>
+                                                    <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 clear-btn text-danger small">Clear</button>
+                                                </div>
                                                 @foreach (corporateInterests() as $corporate)
-                                                <option value="{{ $corporate['name'] }}">
-                                                    {{ $corporate['name'] }}
-                                                </option>
+                                                <label class="dropdown-item d-flex align-items-center py-2 px-2 rounded multi-select-option">
+                                                    <input type="checkbox" name="interested_for[]" value="{{ $corporate['name'] }}" class="form-check-input me-2 mt-0">
+                                                    <span class="small">{{ $corporate['name'] }}</span>
+                                                </label>
                                                 @endforeach
-                                            </select>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -200,82 +256,113 @@
 
 @section('js')
 <script>
-    $("#corporate_logo").change(function() {
+    function initCustomMultiSelect(selector) {
+        var $el = $(selector);
+        var placeholder = $el.data('placeholder') || 'Select options';
+        var max = parseInt($el.data('max')) || 3;
+        var $label = $el.find('.multi-select-label');
+        var $indicator = $el.find('.count-indicator');
+        var $checkboxes = $el.find('input[type="checkbox"]');
+        var $clearBtn = $el.find('.clear-btn');
 
-        var photo = $("#corporate_logo").val();
-        var ext = $("#corporate_logo").val().split('.').pop().toLowerCase();
-        if ($.inArray(ext, ['jpg', 'jpeg', 'JPG', 'JPEG', 'PNG', 'png']) == -1) {
-            swal({
-                title: "Oh!Snap",
-                text: "Only Accept JPEG/JPG/PNG Files ",
-                icon: "error",
-                button: "close!",
-            });
-            $("#corporate_logo").val("");
-            $("#corporate_logo").focus();
+        function syncUI() {
+            var $checked = $checkboxes.filter(':checked');
+            var count = $checked.length;
 
-        } else {
-            var file, img, height, width;
-            var a = (this.files[0].size);
-            if ((file = this.files[0])) {
-                img = new Image();
-                img.onload = function() {
-                    alert("width : " + this.width + " and height : " + this.height);
-                    width = this.width;
-                    height = this.height;
-                    console.log(height);
-                    console.log(width);
-
-                };
-            }
-            if (parseInt(width) > 1000 || parseInt(height) > 1000) {
-
-                swal({
-                    title: "Oh!Snap",
-                    text: "Image Width & Height Must be 1000px X 1000px",
-                    icon: "error",
-                    button: "close!",
-                });
-                $("#corporate_logo").val('');
-                $('#corporate_logo').closest('div').find('.custom-file-label').html('Choose File')
-                // $("#corporate_logo").focus();
-
+            if (count === 0) {
+                $label.text(placeholder).addClass('text-muted').removeClass('text-dark fw-medium');
+                $indicator.text('Select up to ' + max);
             } else {
-
-                if ((Math.round(a) / 1024) > 200) {
-
-                    swal({
-                        title: "Oh!Snap",
-                        text: "Image Size Must be under 200 KB",
-                        icon: "error",
-                        button: "close!",
-                    });
-                    $("#corporate_logo").val('');
-                    $('#corporate_logo').closest('div').find('.custom-file-label').html('Choose File')
-                    // $("#corporate_logo").focus();
-
+                var firstText = $checked.first().next('span').text().trim();
+                if (count === 1) {
+                    $label.html('<span class="text-truncate">' + firstText + '</span>')
+                          .removeClass('text-muted').addClass('text-dark fw-medium');
                 } else {
-
-                    //readURL(this);
-
+                    var extra = count - 1;
+                    $label.html('<span class="text-truncate">' + firstText + '</span> <span class="badge bg-secondary ms-1">+' + extra + '</span>')
+                          .removeClass('text-muted').addClass('text-dark fw-medium');
                 }
+                $indicator.text(count + ' of ' + max + ' selected');
+            }
+
+            if (count >= max) {
+                $checkboxes.not(':checked').prop('disabled', true).closest('.multi-select-option').addClass('text-muted opacity-50');
+            } else {
+                $checkboxes.prop('disabled', false).closest('.multi-select-option').removeClass('text-muted opacity-50');
             }
         }
-    });
-    var corporateEmailValid = false;
-    var corporateMobileValid = false;
-    $('#institute_type').select2({
-        maximumSelectionLength: 3
-    });
-    $('#interested_for').select2({
-        maximumSelectionLength: 3
+
+        $checkboxes.on('change', function() {
+            syncUI();
+        });
+
+        $clearBtn.on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $checkboxes.prop('checked', false);
+            syncUI();
+        });
+
+        syncUI();
+    }
+
+    $(document).ready(function() {
+        initCustomMultiSelect('#multi_select_institute_type');
+        initCustomMultiSelect('#multi_select_interested_for');
     });
 
+    $("#corporate_logo").change(function() {
+        var fileInput = this;
+        if (!fileInput.files || !fileInput.files[0]) {
+            return;
+        }
+        var file = fileInput.files[0];
+        var ext = file.name.split('.').pop().toLowerCase();
+        if ($.inArray(ext, ['jpg', 'jpeg', 'png']) == -1) {
+            showAlert("Only JPG, JPEG, and PNG files are allowed.", "Invalid File", "error");
+            $(fileInput).val("");
+            $(fileInput).closest('.custom-file').find('.custom-file-label').html('Choose File');
+            return;
+        }
+
+        if (file.size > 200 * 1024) {
+            showAlert("Image size must be under 200 KB.", "File Too Large", "error");
+            $(fileInput).val("");
+            $(fileInput).closest('.custom-file').find('.custom-file-label').html('Choose File');
+            return;
+        }
+
+        $(fileInput).closest('.custom-file').find('.custom-file-label').html(file.name);
+    });
+
+    $("#institute_images_pdf").change(function() {
+        var fileInput = this;
+        if (!fileInput.files || !fileInput.files[0]) {
+            return;
+        }
+        var file = fileInput.files[0];
+        var ext = file.name.split('.').pop().toLowerCase();
+        if (ext !== 'pdf') {
+            showAlert("Only PDF files are allowed.", "Invalid File", "error");
+            $(fileInput).val("");
+            $(fileInput).closest('.custom-file').find('.custom-file-label').html('Choose File');
+            return;
+        }
+        $(fileInput).closest('.custom-file').find('.custom-file-label').html(file.name);
+    });
+
+    var corporateEmailValid = false;
+    var corporateMobileValid = false;
+
     function franchiseStateSelected(event) {
-        console.log(event.value);
+        var stateId = $(event).val();
+        if (!stateId) {
+            $('#city_id_franchise').html('<option value="">Select City</option>');
+            return;
+        }
         var formData = new FormData();
         formData.append('form_name', 'get_cities');
-        formData.append('state_id', event.value);
+        formData.append('state_id', stateId);
         $.ajax({
             url: '/',
             data: formData,
@@ -283,20 +370,19 @@
             processData: false,
             contentType: false
         }).done(function(data) {
-            console.log(data);
-            // return;
-            if (data != 'false') {
-                // var options = '<option value="">Cities</option>';
-                var options = '<option selected value=""></option>';
-                var cities = JSON.parse(data);
-                if (cities.length) {
-                    $(cities).each(function(index, city) {
+            if (data && data != 'false') {
+                var options = '<option value="">Select City</option>';
+                var cities = (typeof data === 'string') ? JSON.parse(data) : data;
+                if (cities && cities.length) {
+                    $.each(cities, function(index, city) {
                         options += '<option value="' + city.id + '">' + city.name + '</option>';
                     });
                     $('#city_id_franchise').html(options);
                     $('#city_id_franchise').attr('required', 'required');
                     $('#citiesDiv').show();
-                    initSelect2();
+                    if (typeof initSelect2 === 'function') {
+                        initSelect2();
+                    }
                 } else {
                     $('#citiesDiv').hide();
                     $('#city_id_franchise').html('');
@@ -307,45 +393,65 @@
                 $('#city_id_franchise').html('');
                 $('#city_id_franchise').removeAttr('required');
             }
-        }).fail(function(data) {
-            $('#citiesDiv').hide();
-            $('#city_id_franchise').html('');
-            $('#city_id_franchise').removeAttr('required');
-            console.log(data);
+        }).fail(function(xhr) {
+            console.error('Failed to load cities:', xhr);
         });
     }
-    $('#corporate').submit(function(event) {
+
+    $('#corporate').on('submit', function(event) {
         event.preventDefault();
-        $('#corporate_submit_button').html('Submitting...');
-        var formData = new FormData($(this)[0]);
-        console.log(Array.from(formData));
-        formData.append('form_name', 'corporate_form');
-        if ($('#verifystatus_corporate').val() == 1) {
-            $.ajax({
-                // url: '/',
-                data: formData,
-                processData: false,
-                type: 'post',
-                contentType: false
-            }).done(function(data) {
-                console.log(data);
-                if (data == true) {
-                    showAlert("Thank you, we will reach back to you within 72 hours.").then(() => {
-                        // $("#corporateModal").modal('hide');
-                        window.location.href = "{{ route('home_page') }}";
-                    });
-                } else {
-                    showAlert('Server issue, please try again later.', 'Error', 'error');
-                }
-            }).fail(function(data) {
-                $('#corporate_submit_button').html('Submit');
-                showAlert('Server Error, please try again later.', 'Error', 'error');
-                console.log(data)
-            })
-        } else {
-            $('#corporate_submit_button').html('Submit');
-            showAlert('Verify your number first before continue.', 'Error', 'warning');
+
+        if ($('#verifystatus_corporate').val() != 1) {
+            showAlert('Please verify your mobile number with OTP before continuing.', 'Verification Required', 'warning');
+            return false;
         }
+
+        if ($('#multi_select_institute_type input[type="checkbox"]:checked').length === 0) {
+            showAlert('Please select at least one Type of Institution.', 'Required Field', 'warning');
+            return false;
+        }
+
+        if ($('#multi_select_interested_for input[type="checkbox"]:checked').length === 0) {
+            showAlert('Please select at least one option you are Interested For.', 'Required Field', 'warning');
+            return false;
+        }
+
+        var submitBtn = $('#corporate_submit_button');
+        submitBtn.prop('disabled', true).html('Submitting...');
+        var formEl = this;
+        var formData = new FormData(formEl);
+        formData.append('form_name', 'corporate_form');
+
+        $.ajax({
+            url: "{{ route('bussines_enquiry') }}",
+            data: formData,
+            processData: false,
+            type: 'POST',
+            contentType: false
+        }).done(function(data) {
+            console.log('Submission response:', data);
+            if (data == true || (data && data.success)) {
+                showAlert("Thank you! We will reach back to you within 72 hours.", "Success", "success").then(() => {
+                    window.location.href = "{{ route('home_page') }}";
+                });
+            } else {
+                submitBtn.prop('disabled', false).html('Submit');
+                showAlert('Server issue, please try again later.', 'Error', 'error');
+            }
+        }).fail(function(xhr) {
+            submitBtn.prop('disabled', false).html('Submit');
+            var errorMsg = 'An error occurred. Please check the form and try again.';
+            if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                var firstKey = Object.keys(xhr.responseJSON.errors)[0];
+                errorMsg = xhr.responseJSON.errors[firstKey][0];
+            } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMsg = xhr.responseJSON.message;
+            }
+            showAlert(errorMsg, 'Validation Error', 'error');
+            console.error('Submission error:', xhr);
+        });
+
+        return false;
     });
 </script>
 @endsection

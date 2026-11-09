@@ -1,5 +1,54 @@
 # Process Logs
 
+## Log 25 (2026-11-09): Multi-Select Checkbox Dropdown Conversion
+- **UI/UX Enhancement:** Replaced the legacy raw `<select multiple>` controls for "Type of Institution" and "Interested For" in `bussiness-enquiry.blade.php` with a modern Bootstrap 5 checkbox dropdown component (`.custom-multi-select`).
+- **Interaction Model:**
+  - Standard click opens a dropdown menu (`data-bs-auto-close="outside"`) without requiring users to hold `Ctrl` or `Cmd`.
+  - When 0 selected: Shows placeholder ("Select Type of Institution" / "Select Interested For").
+  - When 1 selected: Displays the full option name (e.g., `Kids School (PG - 5th)`).
+  - When 2+ selected: Displays first selected option + badge indicator (e.g., `Kids School (PG - 5th) +1`, `+2`).
+  - Cap enforced: Enforces maximum 3 selections by disabling unchecked items and updating the indicator counter. Includes a one-click "Clear" button.
+- **Verification:**
+  - Automated browser test verified dynamic label updates on toggle, max-3 disable constraint, and payload serialization.
+  - Successfully submitted and saved to `corporate_enquiries` (Record ID: 23) with correct JSON encoded array columns.
+
+
+## Log 24 (2026-11-09): Corporate Enquiry Flow Audit & End-to-End Browser Resolution
+- **Root Cause Analysis (`/corporate-enquiry`):**
+  1. **City Dropdown Disappearance:** `InternalRequestsController:get_cities` erroneously called `getAvailableCitiesByState($stateId)` which only returned cities with an existing active franchise. For almost all states, this returned `[]`, triggering JS to hide `#citiesDiv`. The form was then submitted with empty `city_id`, triggering backend 422 `The city id field is required.`
+  2. **GET Form Submission:** `<form id="corporate">` lacked `method="POST"`, `action`, and `onsubmit="return false;"`. Any Enter press or detached handler triggered a native browser GET dump into the address bar.
+  3. **Silent 422 Failures:** `.fail()` showed generic `'Server Error, please try again later.'` without surfacing validation errors (`xhr.responseJSON.errors`).
+  4. **OTP Script Bugs:** `mobile_input` vs `mobileInput` variable mismatch in `custom.js` caused `ReferenceError` on verify. Also, `JSON.parse(data)` on pre-parsed JSON objects threw `SyntaxError`.
+  5. **Logo Upload Script Errors:** Called legacy `swal()` which threw `ReferenceError` and had an unescaped `alert(...)` debugging statement.
+  6. **Unique Mobile Check Contamination:** `unique_mobile_check` checked `User::where('mobile', $mobile)` for corporate enquiries, preventing legitimate users or existing students from enquiring about a franchise.
+- **Remediation Implemented:**
+  - `InternalRequestsController.php`: Updated `get_cities` to call `getCitiesByState($stateId)`. Adjusted `unique_mobile_check` for `type === 'corporate'` to only block if an active franchise user already exists.
+  - `FormsController.php` & `InternalRequestsController.php`: Set `corporate_logo` and `institute_images_pdf` validation rules to `nullable|file` instead of `sometimes|file`.
+  - `public/skillup/js/custom.js`: Fixed `mobileInput` naming, relaxed JSON parsing, and checked boolean/string equality for OTP responses.
+  - `bussiness-enquiry.blade.php`: Added `method="POST" action="{{ route('bussines_enquiry') }}" onsubmit="return false;"`. Replaced legacy `swal()` with `showAlert()`, bound select2 on `$(document).ready`, and surfaced 422 validation errors to user.
+- **Verification:**
+  - Automated headless Firefox browser test via Geckodriver: Selected Uttar Pradesh (state 4022) -> verified 625 cities populated dynamically -> selected city -> verified OTP -> submitted form -> received 200 OK + "Thank you! We will reach back to you within 72 hours." popup.
+  - Database record ID 22 successfully persisted in `corporate_enquiries`.
+
+
+## Log 23 (2026-11-09): Form GET Submission Mechanism & Livewire DOM Disconnect
+- **Mechanism of GET Submission Identified:**
+  1. Livewire sends AJAX POST to `/livewire/update`.
+  2. If the backend throws a 500 error (e.g., missing `$user->username`, missing `user_details.country`, or null pointer `$inst->user_id`), Livewire 3 enters a detached/error state.
+  3. Subsequent clicks or Enter keypresses bypass Livewire's crashed JavaScript event listeners.
+  4. The browser falls back to native HTML form submission. Because `<form>` omits `method="POST"`, the browser natively converts the submission into a GET request, appending all form inputs to the URL.
+- **Client Script Crash Vector:** In non-Livewire forms (`bussiness-enquiry.blade.php`), deferred `select2.min.js` causes synchronous inline scripts to fail with `TypeError: $(...).select2 is not a function`, preventing the `submit(preventDefault)` handler from attaching at all.
+
+- **Form Submission Failure Root Cause:**
+  - `<form>` tags in both `register.blade.php` and `bussiness-enquiry.blade.php` omitted `method="POST"`.
+  - In `bussiness-enquiry.blade.php`, `select2.min.js` loaded via `<script defer>`, while the inline script executed synchronously during HTML parsing. Calling `$('#institute_type').select2()` threw an uncaught `TypeError`, killing script execution before the `$('#corporate').submit(...)` handler was bound.
+  - In `register.blade.php`, any uncaught JavaScript error or Enter keypress without `method="POST"` causes browser native fallback to standard HTML GET submission with query parameters.
+- **Production Schema & Field Reconciliation:**
+  - Active institutes exist in `franchise_details` (14 records), NOT `corporate_enquiries` (0 records).
+  - Missing `$user->username` (maps to `email`) and `$userDetailsDb->country` (default `101`).
+
+
+
 ## Log 21 (2026-05-22): Laravel Agent-Debugger Package Replacement
 - **Major Shift (Package Transition):** Replaced the custom basic Zero-Touch Debug Activity Logger with the feature-rich `clcbws/laravel-agents-debug` package.
 - **Local Integration:** Added a local path repository configuration in `composer.json` and symlinked `/mnt/BWS/public_projects/Local_Debug_Activity` under `require-dev`.
@@ -171,3 +220,24 @@
 - **Auth Gate Synchronization:** Aligned `AuthController::adminlogin`, `adminPasswordReset`, and `adminForgetPassword` with `IsAdmin` middleware contract (`isSuperAdmin()` and `status === 'active'`). Prevents unauthorized or non-superadmin users from executing 2FA only to be bounced by the middleware.
 - **Mail Transport Exception Safety:** Wrapped synchronous `Mail::to()->send()` operations in try-catch with error reporting to eliminate uncaught `500` server errors caused by external SMTP latency/failures.
 - **Pint & Syntax:** Formatted with `vendor/bin/pint` and verified with `php -l`.
+
+## Log 26 (2026-11-05): Resolve CSRF Token Mismatch & Implement Password Visibility Toggle
+- **Root-Cause Analysis of CSRF Mismatch:**
+  - `session()->regenerate()` was being prematurely invoked in `AuthController::adminlogin()` during Step 1 (`get_otp`). In Laravel, regenerating the session automatically rolls the CSRF token (`_token`), causing Step 2 (`loginStep2`) to submit the initial page's stale token, which triggered HTTP 419 CSRF Token Mismatch.
+  - Removed premature session regeneration from Step 1, preserving session ID until authentication completes at Step 2 (`Auth::login`).
+  - Added `'csrf_token' => csrf_token()` to all JSON responses to ensure seamless dynamic token synchronization.
+  - Added `<meta name="csrf-token">` and global `$.ajaxSetup` with `X-CSRF-TOKEN` to `Layouts/superadminauth.blade.php`.
+  - Added automatic 419 session expiration handling with graceful reload in `superadmin_login.blade.php`.
+  - Fixed `IsAdminGuest` middleware returning redirect on AJAX requests; now returns JSON redirect contract.
+- **Universal Password Reveal:**
+  - Added toggleable SVG eye/eye-slash icons to `#admin_password` in `resources/views/Auth/superadmin_login.blade.php`.
+  - Added toggleable SVG eye/eye-slash icons to `#password` and `#confirm_password` in `resources/views/Dashboard/Admin/Auth/reset_form.blade.php`.
+- **Code Health:** Verified with `vendor/bin/pint`, `php -l`, and Vite `npm run build`.
+
+## Log 27 (2026-11-05): Production Deployment via SSH
+- **Remote Host:** `u829699752@82.25.120.120:65002` (`domains/testandnotes.com/public_html`).
+- **Deployment Operations:**
+  - `git pull`: Updated code to commit `eff0f252`.
+  - `/opt/alt/php84/usr/bin/php artisan migrate --force`: Database migrations up-to-date.
+  - `/opt/alt/php84/usr/bin/php artisan optimize:clear && optimize`: Cleared and rebuilt events, routes, and compiled views.
+  - Verification: Confirmed HTTP 200 on `https://testandnotes.com/administrator/login` with active `<meta name="csrf-token">` and password eye reveal icons.

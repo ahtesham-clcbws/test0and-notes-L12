@@ -86,7 +86,7 @@ class InternalRequestsController extends Controller
             if ($request->input('form_name') == 'get_cities') {
                 $stateId = $request->input('state_id');
 
-                return getAvailableCitiesByState($stateId);
+                return getCitiesByState($stateId);
             }
             // code to get study material for package
             if ($request->input('form_name') == 'get_study_material') {
@@ -304,21 +304,23 @@ class InternalRequestsController extends Controller
             if ($request->input('form_name') == 'unique_mobile_check') {
                 $mobile = $request->input('mobile');
                 $type = $request->input('type');
-                $query2 = false;
+
+                if ($type === 'corporate') {
+                    $query = FranchiseDetails::whereHas('user', function ($q) use ($mobile) {
+                        $q->where('mobile', $mobile);
+                    })->first();
+                    if ($query) {
+                        return json_encode(true);
+                    }
+
+                    return json_encode(false);
+                }
+
                 $query = User::where('mobile', $mobile)->first();
-                // if ($type == 'corporate') {
-                $query2 = CorporateEnquiry::where('mobile', $mobile)->first();
-                // }
-                if ($query || $query2) {
+                if ($query) {
                     return json_encode(true);
                 }
 
-                // if ($type == 'corporate') {
-                //     $query = CorporateEnquiry::where('mobile', $mobile)->first();
-                //     if ($query) {
-                //         return json_encode(true);
-                //     }
-                // }
                 return json_encode(false);
             }
             if ($request->input('form_name') == 'corporate_form') {
@@ -334,8 +336,8 @@ class InternalRequestsController extends Controller
                     'state_id' => 'required|integer',
                     'city_id' => 'required|integer',
                     'pincode' => 'required|integer',
-                    'corporate_logo' => 'sometimes|file|mimes:jpg,jpeg,png|max:2048',
-                    'institute_images_pdf' => 'sometimes|file|mimes:pdf|max:5120',
+                    'corporate_logo' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+                    'institute_images_pdf' => 'nullable|file|mimes:pdf|max:5120',
                 ]);
 
                 $corporateDb = new CorporateEnquiry;

@@ -625,7 +625,7 @@ function sendOtp(type) {
 			console.log(data);
 			// return;
 			if (data) {
-				var response = JSON.parse(data);
+				var response = (typeof data === 'string') ? JSON.parse(data) : data;
 				// alert('Success');
 				var lastFour = mobileStr.substr(mobileStr.length - 4);
 				var message = "An OTP has been sent to your mobile number +91XXXXXX" + lastFour + " and OTP is valid for 10 minutes"
@@ -676,19 +676,21 @@ function verifyOtp(type) {
 
 	verifystatus.val(0);
 	console.log(mobileNumber);
-	if (!mobileNumber || mobileStr.length > 10 || mobileStr.length < 10) {
+	if (!mobileNumber || mobileStr.length !== 10) {
 		showAlert('10 digit mobile no is required for verify the OTP', 'Error', 'warning');
-		mobile_input.css('border-color', 'crimson');
+		mobileInput.css('border-color', 'crimson');
+		return;
 	}
-	if (!mobileOtp || mobileOtp.length > 10 || mobileOtp.length < 10) {
+	var otpStr = mobileOtpInput.val() ? mobileOtpInput.val().trim() : '';
+	if (!otpStr || otpStr.length !== 6) {
 		showAlert('6 digit OTP is required', 'Error', 'warning');
-		mobile_input.css('border-color', 'crimson');
+		mobileOtpInput.css('border-color', 'crimson');
 		return;
 	}
 	var formData = new FormData();
 	formData.append('form_name', 'verify_otp');
 	formData.append('mobile', mobileNumber);
-	formData.append('otp', mobileOtp);
+	formData.append('otp', otpStr);
 	formData.append('type', 'mobile');
 	$.ajax({
 		url: '/',
@@ -699,7 +701,7 @@ function verifyOtp(type) {
 	}).done(function (data) {
 		console.log(data);
 		// return;
-		if (data == 'true') {
+		if (data == 'true' || data === true) {
 			showAlert('OTP verified.');
 			if (type == 'corporate') {
 				$('#button-mobile-otp-verify').html('Verified');
