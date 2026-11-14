@@ -257,7 +257,14 @@
   - Added toggleable SVG eye/eye-slash icons to `#password` and `#confirm_password` in `resources/views/Dashboard/Admin/Auth/reset_form.blade.php`.
 - **Code Health:** Verified with `vendor/bin/pint`, `php -l`, and Vite `npm run build`.
 
-## Log 27 (2026-11-05): Production Deployment via SSH
+## Log 28 (2026-11-14): Production Deployment via SSH (Mobile API Parity)
+- **Remote Host:** `u829699752@82.25.120.120:65002` (`domains/testandnotes.com/public_html`).
+- **Deployment Operations:**
+  - `git pull`: Fast-forwarded to commit `d6145f1d`.
+  - `/opt/alt/php84/usr/bin/php artisan migrate --force`: Database verified up to date.
+  - `/opt/alt/php84/usr/bin/php artisan optimize:clear && optimize`: Re-cached config, events, routes, and views.
+  - Verification: Confirmed live `200 OK` on `https://testandnotes.com/api/states` (returning Indian states) and `https://testandnotes.com/api/cities?state_id=4008` (returning Maharashtra cities).
+
 - **Remote Host:** `u829699752@82.25.120.120:65002` (`domains/testandnotes.com/public_html`).
 - **Deployment Operations:**
   - `git pull`: Updated code to commit `eff0f252`.
