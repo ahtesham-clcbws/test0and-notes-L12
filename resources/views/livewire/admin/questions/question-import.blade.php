@@ -115,8 +115,22 @@
             </div>
 
             <hr class="border-secondary my-3 border-opacity-25">
-            <h6 class="fw-bold text-secondary mb-2">2. Upload File</h6>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold text-secondary mb-0">2. Choose Input Method</h6>
+                <div class="btn-group btn-group-sm shadow-sm" role="group">
+                    <button type="button" class="btn {{ $importMode === 'file' ? 'btn-primary text-white fw-bold' : 'btn-outline-primary' }}"
+                        wire:click="$set('importMode', 'file')">
+                        <i class="bi bi-file-earmark-spreadsheet me-1"></i> Upload Spreadsheet
+                    </button>
+                    <button type="button" class="btn {{ $importMode === 'paste' ? 'btn-primary text-white fw-bold' : 'btn-outline-primary' }}"
+                        wire:click="$set('importMode', 'paste')">
+                        <i class="bi bi-clipboard-data me-1"></i> Paste Formatted Text
+                    </button>
+                </div>
+            </div>
 
+            @if($importMode === 'file')
+            <!-- File Upload Zone -->
             <div class="upload-zone rounded-4 bg-light border-2 border-dashed p-4 text-center transition-all"
                 :class="isDragging ? 'border-primary bg-primary bg-opacity-10 scale-102 shadow-glow' : 'border-muted opacity-80'"
                 @dragover.prevent="isDragging = true" @dragleave.prevent="isDragging = false"
@@ -179,6 +193,51 @@
                     <i class="bi bi-download me-2"></i>Download Reference Schema Blueprint
                 </a>
             </div>
+
+            @else
+            <!-- Paste Formatted Text Zone -->
+            <div class="bg-light rounded-4 border p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small">
+                        <i class="bi bi-info-circle me-1"></i>Format: Numbered question, A-D options, and <code>Correct Answer: (A)</code>
+                    </span>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-2" wire:click="insertSampleFormat">
+                            <i class="bi bi-magic me-1"></i>Insert Sample Format
+                        </button>
+                        @if($pastedText)
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-2" wire:click="$set('pastedText', '')">
+                            <i class="bi bi-trash me-1"></i>Clear
+                        </button>
+                        @endif
+                    </div>
+                </div>
+
+                <textarea class="form-control font-monospace border-2 bg-white" rows="12"
+                    placeholder="Paste formatted questions here, e.g.:&#10;1. What is the capital of France?&#10;A) London&#10;B) Berlin&#10;C) Paris&#10;D) Madrid&#10;Correct Answer: (C)&#10;Explanation: Paris is the capital of France.&#10;&#10;2. What is the powerhouse of the cell?&#10;A) Nucleus&#10;B) Ribosome&#10;C) Mitochondria&#10;D) Endoplasmic Reticulum&#10;Answer: C"
+                    wire:model="pastedText"></textarea>
+
+                @error('pastedText')
+                    <div class="text-danger small mt-2">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="d-flex mt-4 gap-3 justify-content-center">
+                <button class="btn btn-primary btn-lg rounded-3 fw-bold hover-glow py-3 shadow-lg transition-all"
+                    wire:click="parsePastedText" @disabled(!trim($pastedText) || $isImporting)>
+                    <span wire:loading.remove wire:target="parsePastedText">
+                        <i class="bi bi-cpu me-2"></i>Parse & Preview Questions
+                    </span>
+                    <span wire:loading wire:target="parsePastedText">
+                        <span class="spinner-border spinner-border-sm me-2"></span>Parsing Text Stream...
+                    </span>
+                </button>
+                <a class="btn btn-light text-muted fw-semi-bold border-0 py-2"
+                    href="{{ route('administrator.dashboard_question_list') }}">
+                    Abort Mission
+                </a>
+            </div>
+            @endif
 
             @else
             <!-- Preview Table -->

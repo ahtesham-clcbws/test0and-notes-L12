@@ -1,5 +1,28 @@
 # Process Logs
 
+## Log 26 (2026-11-09): Question Bank Import - Sample Spreadsheet Fix & Formatted Text Parser
+- **Context:** User identified two defects at `/administrator/questions-bank/import` (`App\Livewire\Admin\Questions\QuestionImport`):
+  1. `public/samples/question_import_sample.xlsx` had an alignment error where the demo subjective question in row 2 had its active status displaced to column 13 (`""`) with an invalid status string `"active"`.
+  2. Need for a formatted text / paste MCQ importer (identical to the assessment quiz import workflow in `SchoolManagementSystem`), parsing text directly into structured records for preview and batch save.
+- **Remediation Implemented:**
+  - **Sample Excel Spreadsheet Alignment:**
+    - Re-generated `public/samples/question_import_sample.xlsx` using PhpSpreadsheet.
+    - Standardized exactly 12 columns (`question`, `solution`, `explanation`, `question_type`, `mcq_options`, `ans_1`..`ans_5`, `mcq_answer`, `status`).
+    - Fixed row 2 so status is located in column index 11 (`status`) with valid enum value `'approved'`.
+  - **Formatted Text MCQ Parser:**
+    - Updated `QuestionImport.php`: Added `$importMode` (`'file'` vs `'paste'`) and `$pastedText`.
+    - Added `insertSampleFormat()` prefilling 3 structured questions with options, answers, and explanations.
+    - Implemented `parseFormattedMcqText(string $pastedData): array` supporting patterns: numbered questions (`1. `, `1) `, `Q1. `), option letters (`(A)`, `A) `, `A. `), answer keys (`Ans: B`, `Answer: (C)`, `Correct Answer: A`), and optional explanations (`Explanation: ...`, `Solution: ...`).
+    - Fixed database persistence in `saveAll()`: Coerced empty string values `""` on nullable foreign keys (`board_agency_state_id`, `subject_part`, `subject_lesson_chapter`) to `null` to eliminate MySQL 1366 errors.
+  - **Livewire UI:**
+    - Updated `question-import.blade.php` with pill tabs switching between "Upload Spreadsheet" and "Paste Formatted Text".
+    - Added text area with "Insert Sample Format" and "Clear" helper actions.
+    - Integrated with existing editable preview table and `saveAll()` persistence flow.
+- **Verification:**
+  - Tested parsing via Tinker: Sample text parsed accurately into 3 MCQs with mapped answer keys (`ans_3`, `ans_3`, `ans_2`).
+  - Tested batch insertion: Successfully saved records into `question_bank` with valid enum values.
+  - Formatted codebase using `vendor/bin/pint --dirty`.
+
 ## Log 25 (2026-11-09): Multi-Select Checkbox Dropdown Conversion
 - **UI/UX Enhancement:** Replaced the legacy raw `<select multiple>` controls for "Type of Institution" and "Interested For" in `bussiness-enquiry.blade.php` with a modern Bootstrap 5 checkbox dropdown component (`.custom-multi-select`).
 - **Interaction Model:**

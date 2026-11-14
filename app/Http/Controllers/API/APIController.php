@@ -24,7 +24,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
@@ -80,6 +79,7 @@ class APIController extends Controller
                     $user->save();
                 }
 
+                $user->tokens()->where('name', 'authToken')->delete();
                 $success['token'] = $user->createToken('authToken')->plainTextToken;
                 $user['institute_name'] = $user->myInstitute?->institute_name;
                 $success['user_details'] = $user;
@@ -397,32 +397,76 @@ class APIController extends Controller
 
     public function studentSignup(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'full_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'mobile_number' => 'required|digits:10|unique:users,mobile',
+            'password' => 'required|min:6',
+            'state_id' => 'required',
+            'city_id' => 'required',
+            'education_type_id' => 'required',
+            'class_group_exam_id' => 'required',
+        ], [
+            'email.unique' => 'The email address is already registered. Please log in or use a different email.',
+            'mobile_number.unique' => 'The mobile number is already registered. Please log in or use a different number.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 0,
+                'message' => $validator->errors()->first(),
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
         // Verify OTP if provided
-        if ($request->has('otp')) {
+        if ($request->filled('otp')) {
             if (! verifyOtp($request->otp, $request->input('mobile_number'))) {
-                return response()->json(['status' => 0, 'message' => 'Invalid or expired OTP']);
+                return response()->json(['status' => 0, 'message' => 'Invalid or expired OTP'], 422);
             }
         }
 
-        // return json_encode($request->all());
-        $userDb = new User;
+        // Verify institute code if provided to prevent boundary contamination
+        $instituteCode = $request->input('institute_code');
+        $validFranchise = null;
+        if ($request->filled('institute_code')) {
+            $validFranchise = \App\Models\CorporateEnquiry::where('branch_code', $instituteCode)
+                ->where('status', 'activated')
+                ->first();
 
-        $userDb->name = htmlspecialchars($request->input('full_name'));
-        $userDb->username = htmlspecialchars($request->input('my_username'));
-        $userDb->roles = 'student';
-        $userDb->status = 'active';
-        if ($request->input('institute_code') != '') {
-            $userDb->in_franchise = '1';
-            $userDb->franchise_code = filter_var($request->input('institute_code'));
+            if (! $validFranchise) {
+                $validFranchise = FranchiseDetails::where('branch_code', $instituteCode)->first();
+            }
+
+            if (! $validFranchise) {
+                return response()->json([
+                    'status' => 0,
+                    'message' => 'The provided Institute Code is invalid or not active.',
+                ], 422);
+            }
         }
-        $userDb->email = filter_var($request->input('email'), FILTER_VALIDATE_EMAIL) ? $request->input('email') : null;
-        // $userDb->mobile =  filter_var($request->input('mobile_number'), FILTER_SANITIZE_NUMBER_INT);
-        $userDb->mobile = $request->input('mobile_number');
-        $userDb->password = Hash::make($request->input('password'));
-        $mail_flag = 0;
-        // return json_encode($userDb);
-        // $query = $userDb->save();
-        if ($userDb->save()) {
+
+        try {
+            DB::beginTransaction();
+
+            $userDb = new User;
+            $userDb->name = htmlspecialchars($request->input('full_name'));
+            $userDb->username = htmlspecialchars($request->input('my_username', $request->input('email')));
+            $userDb->roles = 'student';
+            $userDb->status = 'active';
+            if ($validFranchise) {
+                $userDb->in_franchise = '1';
+                $userDb->franchise_code = $instituteCode;
+            }
+            $userDb->email = $request->input('email');
+            $userDb->mobile = $request->input('mobile_number');
+            $userDb->password = Hash::make($request->input('password'));
+
+            if (! $userDb->save()) {
+                DB::rollBack();
+
+                return response()->json(['status' => 0, 'message' => 'Registration failed while creating user record.'], 500);
+            }
 
             // Create UserDetails
             $userDetailsDb = new UserDetails;
@@ -431,11 +475,11 @@ class APIController extends Controller
             if ($request->hasfile('photo_url')) {
                 $file = $request->file('photo_url');
                 $name = $file->hashName();
-                $image_name = $request->file('photo_url')->storeAs('student_uploads/'.$userDb->id, $name, 'public');
+                $request->file('photo_url')->storeAs('student_uploads/'.$userDb->id, $name, 'public');
                 $userDetailsDb->photo_url = $name;
             }
 
-            if ($request->input('institute_code')) {
+            if ($request->filled('institute_code')) {
                 $userDetailsDb->institute_code = filter_var($request->input('institute_code'));
             }
 
@@ -448,6 +492,8 @@ class APIController extends Controller
 
             $userDetailsDb->save();
 
+            DB::commit();
+
             if ($request->input('email')) {
                 $details = [
                     'fullname' => $request->input('full_name'),
@@ -456,54 +502,47 @@ class APIController extends Controller
                 ];
 
                 try {
-                    if ($request->input('institute_code') != '') {
-                        $inst = FranchiseDetails::where('branch_code', $request->input('institute_code'))->get()->first();
-                        $inst_email = User::where('id', $inst->id)->get(['email'])->first();
-                        $inst_details = [
-                            'inst_name' => $inst->institute_name,
-                            'email_id' => $request->input('email'),
-                            'institute_code' => $request->input('institute_code'),
-                            'fullname' => $request->input('full_name'),
-                        ];
-                        $instMailToSend = new NotifyAdminStudentSignup($inst_details);
-                        $sendMail = Mail::to($inst_email->email)->send($instMailToSend);
-                        Log::build([
-                            'driver' => 'single',
-                            'path' => storage_path('logs/custom.log'),
-                        ])->info('Institute email to '.$inst_email->email.' for student '.$request->input('email'));
+                    if ($request->filled('institute_code')) {
+                        $inst = FranchiseDetails::where('branch_code', $request->input('institute_code'))->first();
+                        if ($inst) {
+                            $inst_user = User::where('id', $inst->user_id ?? $inst->id)->first(['email']);
+                            if ($inst_user && $inst_user->email) {
+                                $inst_details = [
+                                    'inst_name' => $inst->institute_name,
+                                    'email_id' => $request->input('email'),
+                                    'institute_code' => $request->input('institute_code'),
+                                    'fullname' => $request->input('full_name'),
+                                ];
+                                $instMailToSend = new NotifyAdminStudentSignup($inst_details);
+                                Mail::to($inst_user->email)->send($instMailToSend);
+                            }
+                        }
                     }
 
-                    $admin_datails = [
+                    $admin_details = [
                         'fullname' => $request->input('full_name'),
                         'email_id' => $request->input('email'),
                         'institute_code' => $request->input('institute_code'),
                     ];
 
-                    $super_admins = User::where('roles', 'superadmin')->where('status', 'active')->where('deleted_at', null)->get(['email'])->toArray();
-                    $emails = [];
-                    foreach ($super_admins as $super_admin) {
-                        array_push($emails, $super_admin['email']);
+                    $super_admins = User::where('roles', 'superadmin')->where('status', 'active')->whereNull('deleted_at')->pluck('email')->filter()->toArray();
+                    if (! empty($super_admins)) {
+                        $superAdminMailToSend = new NotifyAdminStudentSignup($admin_details);
+                        Mail::to($super_admins)->send($superAdminMailToSend);
                     }
-                    $superAdminMailToSend = new NotifyAdminStudentSignup($admin_datails);
-                    $sendAdminMail = Mail::to($emails)->send($superAdminMailToSend);
-                    Log::build([
-                        'driver' => 'single',
-                        'path' => storage_path('logs/custom.log'),
-                    ])->info(json_encode($emails));
 
                     $mailToSend = new sendFranchiseEmail($details);
-                    $sendMail = Mail::to($request->input('email'))->send($mailToSend);
+                    Mail::to($request->input('email'))->send($mailToSend);
                 } catch (\Throwable $th) {
-                    $mail_flag = 1;
+                    Log::error('Registration email sending error: '.$th->getMessage());
                 }
             }
 
             // generate counts
             User::generateCounts();
-            // generate counts
-            User::generateCounts();
 
             // Auto-login after signup for mobile
+            $userDb->tokens()->delete();
             $token = $userDb->createToken('authToken')->plainTextToken;
             $userDb['institute_name'] = $userDb->myInstitute ? $userDb->myInstitute->institute_name : null;
 
@@ -512,12 +551,14 @@ class APIController extends Controller
                 'message' => 'Registration successful',
                 'data' => [
                     'token' => $token,
-                    'user_details' => $userDb,
+                    'user_details' => $userDb->load('user_details'),
                 ],
             ]);
-        }
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-        return response()->json(['status' => 0, 'message' => 'Registration failed']);
+            return response()->json(['status' => 0, 'message' => 'Registration error: '.$e->getMessage()], 500);
+        }
     }
 
     public function forgotPassword(Request $request)
@@ -588,7 +629,7 @@ class APIController extends Controller
             return response()->json(['status' => 0, 'message' => $validator->errors()->first()]);
         }
 
-        $user = User::where('mobile', $request->mobile)->first();
+        $user = User::where('mobile', $request->mobile)->orWhere('email', $request->mobile)->first();
         if (! $user) {
             return response()->json(['status' => 0, 'message' => 'User not found']);
         }
@@ -597,7 +638,7 @@ class APIController extends Controller
         $user->save();
 
         // Clear OTP
-        DB::table('otp_verifications')->where('mobile', $request->mobile)->delete();
+        DB::table('otp_verifications')->where('credential', $request->mobile)->delete();
 
         return response()->json(['status' => 1, 'message' => 'Password reset successful']);
     }
@@ -630,20 +671,20 @@ class APIController extends Controller
         $query2 = CorporateEnquiry::where('mobile', $mobileNumber)->first();
         if ($query || $query2) {
             $returnResponse['success'] = false;
-            $returnResponse['message'] = 'Mobile number already used. Please try with other number';
+            $returnResponse['message'] = 'Mobile number already used. Please try with another number.';
 
-            return json_encode($returnResponse);
+            return response()->json($returnResponse);
         }
         // check for already sent or not
-        $time = date('Y-m-d H:i:s', strtotime('-10 minutes'));
+        $time = date('Y-m-d H:i:s', strtotime('-1 minute'));
         $otpData = OtpVerifications::where([['type', '=', 'mobile'], ['credential', '=', $mobileNumber], ['created_at', '>', $time]])->first();
 
-        // send once in only 10 minutes
+        // send once in 1 minute
         if ($otpData) {
             $returnResponse['success'] = false;
-            $returnResponse['message'] = 'You already request an OTP in last 10 minutes. please wait for another attempt.';
+            $returnResponse['message'] = 'You already requested an OTP recently. Please wait a minute before requesting another.';
 
-            return json_encode($returnResponse);
+            return response()->json($returnResponse);
         }
 
         $otp = mt_rand(100000, 999999);
@@ -679,7 +720,7 @@ class APIController extends Controller
             $returnResponse['otp'] = $otp; // Added for development/testing as requested in other methods
         }
 
-        return json_encode($returnResponse);
+        return response()->json($returnResponse);
         // }
     }
 
@@ -945,10 +986,10 @@ class APIController extends Controller
             ->where('status', 'activated')
             ->first();
         if ($query) {
-            return json_encode(['status' => 1, 'msg' => $query->institute_name]);
+            return response()->json(['status' => 1, 'msg' => $query->institute_name]);
         }
 
-        return json_encode(['status' => 0, 'msg' => 'Institute not found']);
+        return response()->json(['status' => 0, 'msg' => 'Institute not found']);
     }
 
     public function uniqueEmailCheck(Request $request)

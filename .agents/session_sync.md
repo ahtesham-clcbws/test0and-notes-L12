@@ -1,6 +1,17 @@
 # Session Sync & Handoff Summary
 
 ## Latest Session Status (2026-11-09)
+- **Target:** Admin Question Bank Import (`/administrator/questions-bank/import`) & Sample File (`public/samples/question_import_sample.xlsx`).
+- **Diagnosis & Fixes:**
+  1. **Sample Excel Alignment:** Fixed `public/samples/question_import_sample.xlsx` where row 2 had its active status value shifted into an empty 13th column. Rebuilt sheet to exactly 12 columns with valid enum status `'approved'` (matching `question_bank.status` ENUM).
+  2. **Formatted Text / Paste MCQ Import:** Added dual-tab import mechanism (`Upload Spreadsheet` vs `Paste Formatted Text`) modeled after `SchoolManagementSystem` quiz parser:
+     - Regex parsing handles `1.`, `1)`, `Q1.`, options `(A)`, `A)`, `Ans: B`, and `Solution: / Explanation:`.
+     - Added "Insert Sample Format" and "Clear" helpers.
+     - Livewire preview table allows inline inspection and edits prior to database commit.
+     - Coerced empty string values for nullable foreign keys (`board_agency_state_id`, `subject_part`, `subject_lesson_chapter`) to `null` to eliminate MySQL strict mode 1366 errors.
+- **Verification:** Unit and tinker tests confirmed 100% parse accuracy for sample MCQs and successful persistence into `question_bank`. Code formatted with Laravel Pint.
+
+## Previous Sessions Summary (2026-11-09)
 - **Target:** Corporate Enquiry Form (`https://testandnotes.com/corporate-enquiry`)
 - **Diagnosis:** Form submission failure, GET fallback URL dump, city dropdown disappearing, OTP script exception, and silent 422 errors.
 - **Root Cause & Fixes:**

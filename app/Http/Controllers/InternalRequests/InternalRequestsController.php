@@ -1471,7 +1471,9 @@ class InternalRequestsController extends Controller
 
     public function getStates()
     {
-        return json_encode(getAvailableStates());
+        $states = \App\Models\State::where('country_id', 101)->select('id', 'name')->get();
+
+        return response()->json($states);
     }
 
     public function getCities(Request $request)
@@ -1481,7 +1483,9 @@ class InternalRequestsController extends Controller
             return response()->json(['success' => false, 'message' => 'State ID is required']);
         }
 
-        return getAvailableCitiesByState($stateId);
+        $cities = \App\Models\City::where('state_id', $stateId)->select('id', 'name')->get();
+
+        return response()->json($cities);
     }
 
     public function demoemail(Request $request)

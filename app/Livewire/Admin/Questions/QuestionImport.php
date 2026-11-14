@@ -5,7 +5,6 @@ namespace App\Livewire\Admin\Questions;
 use App\Imports\QuestionBankImport;
 use App\Models\QuestionBankModel;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -47,6 +46,10 @@ class QuestionImport extends Component
     public $lessons = [];
 
     public $file;
+
+    public $importMode = 'file'; // 'file' or 'paste'
+
+    public $pastedText = '';
 
     public $isImporting = false;
 
@@ -95,6 +98,117 @@ class QuestionImport extends Component
         $this->reset(['lesson_id']);
     }
 
+    public function insertSampleFormat(): void
+    {
+        $this->pastedText = "1. What is the capital of France?\nA) London\nB) Berlin\nC) Paris\nD) Madrid\nCorrect Answer: (C)\nExplanation: Paris has been the capital since 508 AD.\n\n2. What is the powerhouse of the cell?\nA) Nucleus\nB) Ribosome\nC) Mitochondria\nD) Endoplasmic Reticulum\nAnswer: C\n\n3. Which planet is known as the Red Planet?\nA) Earth\nB) Mars\nC) Jupiter\nD) Saturn\nAns: B";
+    }
+
+    public function parsePastedText(): void
+    {
+        $this->validate([
+            'education_type_id' => 'required',
+            'class_id' => 'required',
+            'subject_id' => 'required',
+            'question_type' => 'required',
+            'pastedText' => 'required|string|min:10',
+        ], [
+            'education_type_id.required' => 'Please select an Education Type.',
+            'class_id.required' => 'Please select a Class / Group.',
+            'subject_id.required' => 'Please select a Subject.',
+            'pastedText.required' => 'Please paste formatted MCQ text.',
+            'pastedText.min' => 'Pasted text is too short to contain valid questions.',
+        ]);
+
+        $this->isImporting = true;
+
+        try {
+            $parsed = $this->parseFormattedMcqText($this->pastedText);
+
+            if (empty($parsed)) {
+                $this->dispatch('notify', ['type' => 'error', 'message' => 'No valid questions could be extracted. Please check the format.']);
+
+                return;
+            }
+
+            $this->previewData = $parsed;
+            $this->showPreview = true;
+
+            $this->dispatch('notify', ['type' => 'success', 'message' => count($parsed).' questions parsed successfully. Please review below.']);
+        } catch (\Exception $e) {
+            $this->dispatch('notify', ['type' => 'error', 'message' => 'Parsing error: '.$e->getMessage()]);
+        } finally {
+            $this->isImporting = false;
+        }
+    }
+
+    public function parseFormattedMcqText(string $pastedData): array
+    {
+        $pastedData = html_entity_decode($pastedData, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $questions = [];
+        $current = [];
+        $answers = [];
+        $lines = preg_split('/\r?\n+/', trim($pastedData));
+
+        $finalize = function (&$cur, &$ans, &$qList) {
+            if (! empty($cur['question'])) {
+                $cur['ans_1'] = $ans[0] ?? null;
+                $cur['ans_2'] = $ans[1] ?? null;
+                $cur['ans_3'] = $ans[2] ?? null;
+                $cur['ans_4'] = $ans[3] ?? null;
+                $cur['ans_5'] = $ans[4] ?? null;
+                $cur['mcq_options'] = count($ans) > 4 ? 5 : 4;
+                if (empty($cur['mcq_answer'])) {
+                    $cur['mcq_answer'] = 'ans_1';
+                }
+                $qList[] = $cur;
+            }
+        };
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+
+            if (preg_match('/^(?:Q(?:uestion)?\.?\s*)?\d+[\.\)]\s*(.+)/i', $line, $matches)) {
+                $finalize($current, $answers, $questions);
+                $current = [
+                    'question' => trim($matches[1]),
+                    'solution' => null,
+                    'explanation' => null,
+                    'question_type' => (int) $this->question_type,
+                    'status' => 'approved',
+                ];
+                $answers = [];
+            } elseif (preg_match('/^(?:\(?([A-Ea-e])\)|([A-Ea-e])[\.\)])\s*(.+)/', $line, $matches)) {
+                $letter = strtoupper(! empty($matches[1]) ? $matches[1] : $matches[2]);
+                $optText = trim($matches[3]);
+                $idx = ord($letter) - ord('A');
+                $answers[$idx] = $optText;
+            } elseif (preg_match('/^(?:Correct\s+)?Ans(?:wer)?\s*[:\-]?\s*\(?([A-Ea-e]|ans_[1-5])\)?/i', $line, $matches)) {
+                $val = $matches[1];
+                if (str_starts_with(strtolower($val), 'ans_')) {
+                    $current['mcq_answer'] = strtolower($val);
+                } else {
+                    $idx = ord(strtoupper($val)) - ord('A') + 1;
+                    $current['mcq_answer'] = 'ans_'.$idx;
+                }
+            } elseif (preg_match('/^(?:Explanation|Solution|Exp)\s*[:\-]\s*(.+)/i', $line, $matches)) {
+                $current['explanation'] = trim($matches[1]);
+                $current['solution'] = trim($matches[1]);
+            } elseif (isset($current['question']) && empty($answers)) {
+                $current['question'] .= "\n".$line;
+            } elseif (! empty($current['explanation'])) {
+                $current['explanation'] .= "\n".$line;
+                $current['solution'] .= "\n".$line;
+            }
+        }
+
+        $finalize($current, $answers, $questions);
+
+        return $questions;
+    }
+
     public function import()
     {
         $this->validate([
@@ -139,13 +253,13 @@ class QuestionImport extends Component
         try {
             foreach ($this->previewData as $data) {
                 // Ensure categorization and status are correctly set
-                $data['education_type_id'] = $this->education_type_id;
-                $data['class_group_exam_id'] = $this->class_id;
-                $data['board_agency_state_id'] = $this->board_id;
-                $data['subject'] = $this->subject_id;
-                $data['subject_part'] = $this->part_id;
-                $data['subject_lesson_chapter'] = $this->lesson_id ?: $this->chapter_id;
-                $data['status'] = 'approved'; 
+                $data['education_type_id'] = $this->education_type_id ?: null;
+                $data['class_group_exam_id'] = $this->class_id ?: null;
+                $data['board_agency_state_id'] = $this->board_id ?: null;
+                $data['subject'] = $this->subject_id ?: null;
+                $data['subject_part'] = $this->part_id ?: null;
+                $data['subject_lesson_chapter'] = $this->lesson_id ?: ($this->chapter_id ?: null);
+                $data['status'] = 'approved';
                 $data['creator_id'] = Auth::id();
 
                 QuestionBankModel::create($data);

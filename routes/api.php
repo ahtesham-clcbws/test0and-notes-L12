@@ -30,7 +30,6 @@ Route::post('studentSignup', [ApiController::class, 'studentSignup']);
 Route::get('geteducationtype', [ApiController::class, 'geteducationtype']);
 Route::get('getclassbyeducation', [ApiController::class, 'getclassbyeducation']);
 Route::post('forgotPassword', [ApiController::class, 'forgotPassword']);
-Route::post('verifyOTP', [ApiController::class, 'verifyOTP']);
 Route::post('resetPassword', [ApiController::class, 'resetPassword']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('getPremiumData', [APIController::class, 'getPremiumData']);
