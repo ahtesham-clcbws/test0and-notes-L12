@@ -15,6 +15,7 @@
 - [x] Rename deprecated `.agent` folder to `.agents` folder in absolute compliance with workspace standards.
 
 ## Completed Tasks
+- [x] Guest Portal Mobile Responsiveness Audit & Resolution: Fixed navigation drawer left-clipping, prevented horizontal viewport overflow/strip, standardized 44px touch targets, adjusted multi-column inputs to full-width stacking (`col-md-6/4 col-12`) on `/registration` and `/corporate-enquiry`, and adapted authentication cards for small mobile viewports.
 - [x] Implement Admin 2FA (Password + OTP) and Forgot/Reset Password flow
 - [x] Align React Native mobile test flow 1:1 with Laravel Livewire student panel (Instructions, Palette Locking, Skip Modal, Review & Re-attempt popup, results scorecard layout) (V3.2.0)
 - [x] Case-insensitive and trimmed email matching for mobile studentLogin and app_login endpoints (V3.1.3)

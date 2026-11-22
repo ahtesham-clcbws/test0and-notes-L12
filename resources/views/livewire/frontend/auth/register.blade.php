@@ -175,7 +175,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-6">
+                                <div class="col-md-6 col-12">
                                     <div class="form-group mb-3">
                                         <div class="input-group">
                                             <span class="input-group-text">
@@ -194,7 +194,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-6">
+                                <div class="col-md-6 col-12">
                                     <div class="form-group mb-3">
                                         <div class="input-group">
                                             <span class="input-group-text">
@@ -214,7 +214,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-6">
+                                <div class="col-md-6 col-12">
                                     <div class="form-group mb-3">
                                         <div class="input-group">
                                             <span class="input-group-text">
@@ -233,7 +233,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-6">
+                                <div class="col-md-6 col-12">
                                     <div class="form-group mb-3">
                                         <div class="input-group">
                                             <span class="input-group-text">

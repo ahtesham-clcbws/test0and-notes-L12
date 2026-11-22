@@ -174,7 +174,7 @@
                                 </div>
                                 <div class="col-12 mt-2">
                                     <div class="row">
-                                        <div class="col">
+                                        <div class="col-md-4 col-12">
                                             <div class="form-group smalls">
                                                 <label>Select State *</label>
                                                 <div class="input-group">
@@ -190,7 +190,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col" id="citiesDiv">
+                                        <div class="col-md-4 col-12" id="citiesDiv">
                                             <div class="form-group smalls">
                                                 <label>Select City *</label>
                                                 <div class="input-group">
@@ -200,7 +200,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col">
+                                        <div class="col-md-4 col-12">
                                             <div class="form-group smalls">
                                                 <label>Pincode *</label>
                                                 <div class="input-group">

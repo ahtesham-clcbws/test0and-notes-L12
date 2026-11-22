@@ -47,6 +47,28 @@
             background-color: rgba(0, 0, 0, 0.5) !important;
         }
 
+        @media (max-width: 576px) {
+            .card {
+                width: 92vw !important;
+                max-width: 380px !important;
+                height: auto !important;
+                min-height: auto !important;
+                margin: 25px auto !important;
+            }
+            .login_btn {
+                width: 100% !important;
+                margin-top: 10px !important;
+                height: 44px !important;
+                float: none !important;
+            }
+            .remember {
+                margin-bottom: 12px !important;
+            }
+            .form-control {
+                height: 44px !important;
+            }
+        }
+
         .card-header h3 {
             color: white;
             font-size: 20px;

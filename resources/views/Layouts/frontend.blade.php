@@ -45,6 +45,74 @@
                 box-shadow:  0px 0px 33px 5px rgba(0, 0, 0, 0.1);
                 border-radius: 10px;
             }
+
+            /* ==============================================================
+               MOBILE RESPONSIVENESS FIXES
+               ============================================================== */
+            @media (max-width: 991px) {
+                /* Fix Hamburger Navigation Drawer Left-Clipping and Animation */
+                .navigation-portrait .nav-menus-wrapper {
+                    width: 300px !important;
+                    max-width: 85vw !important;
+                    left: -320px !important;
+                    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                }
+                .navigation-portrait .nav-menus-wrapper.nav-menus-wrapper-open,
+                .nav-menus-wrapper.nav-menus-wrapper-open {
+                    left: 0 !important;
+                    transform: translateX(0) !important;
+                }
+                .navigation-portrait .nav-menu > li > a {
+                    padding: 13px 18px !important;
+                    font-size: 15px !important;
+                }
+                .navigation-portrait .nav-menus-wrapper-close-button {
+                    font-size: 22px !important;
+                    margin: 12px 14px !important;
+                    line-height: 1 !important;
+                }
+            }
+
+            @media (max-width: 768px) {
+                /* Prevent horizontal spill and eliminate artificial scrollbar artifact on touch screens */
+                html, body, #main-wrapper {
+                    overflow-x: hidden !important;
+                    max-width: 100vw !important;
+                }
+                *::-webkit-scrollbar {
+                    width: 0px !important;
+                    height: 0px !important;
+                    display: none !important;
+                }
+
+                /* Mobile Touch Targets & Form Control Standards */
+                .form-control, .input-group-text, .form-select, select.form-control {
+                    min-height: 44px !important;
+                    font-size: 16px !important;
+                }
+                .input-group > .btn,
+                .input-group > .btn.togglePassword {
+                    min-height: 44px !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                }
+                .login-form .btn-theme,
+                .login-form button[type="submit"] {
+                    min-height: 44px !important;
+                    font-size: 16px !important;
+                    width: 100% !important;
+                }
+
+                /* Back-to-top button safe touch boundary */
+                #back2Top {
+                    width: 36px !important;
+                    line-height: 36px !important;
+                    right: 12px !important;
+                    bottom: 16px !important;
+                    font-size: 13px !important;
+                }
+            }
         </style>
 
         @yield('css')

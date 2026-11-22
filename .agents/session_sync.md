@@ -481,3 +481,11 @@
   - **AJAX Redirect Contract:** Updated `IsAdminGuest` middleware to return JSON redirect response on AJAX rather than HTTP 302 redirects.
   - **Universal Password Reveal:** Integrated SVG eye / eye-slash toggles with persistent styling on `#admin_password` (admin login) and `#password` + `#confirm_password` (password reset).
   - **Build & Quality:** Compiled production assets with `npm run build` and verified formatting with `vendor/bin/pint`.
+
+
+## [2026-11-22] Mobile Responsiveness Polish & Verification
+- **Drawer Left Clipping:** Fixed `.navigation-portrait .nav-menus-wrapper` offset and transition speed (`0.3s`, `left: 0 !important`).
+- **Green Strip & Horizontal Spill:** Resolved with `overflow-x: hidden !important` and disabled desktop webkit scrollbars on mobile.
+- **Form Truncations:** Updated `register.blade.php` and `bussiness-enquiry.blade.php` multi-column inputs to `col-md-6/4 col-12`.
+- **Auth Cards:** Added 576px responsive bounds (`width: 92vw`, full-width submit button) in `blackauth.blade.php`.
+- **Status:** All mobile viewports (375x844) verified with clean screenshots.
